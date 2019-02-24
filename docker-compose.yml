@@ -1,9 +1,9 @@
 version: "3.7"
 
 services:
-  graphql-gateway.resource-controller:
+  graphql-gateway.schema-registry:
     build:
-      context: ./resource-controller
+      context: ./schema-registry
       args:
         target: PRODUCTION
     healthcheck:

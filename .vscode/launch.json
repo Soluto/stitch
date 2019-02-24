@@ -4,11 +4,11 @@
     {
       "type": "node",
       "request": "attach",
-      "name": "resource-controller",
+      "name": "schema-registry",
       "protocol": "auto",
       "port": 58581,
       "restart": true,
-      "localRoot": "${workspaceFolder}/resource-controller",
+      "localRoot": "${workspaceFolder}/schema-registry",
       "remoteRoot": "/service"
     },
     {
