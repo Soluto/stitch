@@ -66,7 +66,7 @@ func createResolver(f *ast.FieldDefinition) func(graphql.ResolveParams) (interfa
 	}
 
 	resolver = (&middlewares.OverrideContext{}).Wrap(resolver)
-	resolver = middlewares.CreateRequestTransformer((&middlewares.Log{}).Transform)(resolver)
+	resolver = middlewares.Log.Init(f).Wrap(resolver)
 
 	return resolver
 }

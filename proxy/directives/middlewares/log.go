@@ -4,25 +4,28 @@ import (
 	"context"
 	"fmt"
 	"github.com/graphql-go/graphql"
+	"github.com/vektah/gqlparser/ast"
 )
 
-type Log struct {
-}
+var Log *RequestTransformer = NewRequestTransformer(
+	func(f *ast.FieldDefinition) RequestTransform {
+		return func(g graphql.ResolveParams) graphql.ResolveParams {
+			fmt.Println("got new request with params")
+			fmt.Printf("%+v\n", g)
+			nc := context.WithValue(g.Context, "override", "abc")
 
-func (s *Log) Transform(g graphql.ResolveParams) graphql.ResolveParams {
-	fmt.Println("got new request with params")
-	fmt.Printf("%+v\n", g)
-	nc := context.WithValue(g.Context, "override", "abc")
+			ng := graphql.ResolveParams{
+				Args:    g.Args,
+				Context: nc,
+				Info:    g.Info,
+				Source:  g.Source,
+			}
 
-	ng := graphql.ResolveParams{
-		Args:    g.Args,
-		Context: nc,
-		Info:    g.Info,
-		Source:  g.Source,
-	}
-
-	return ng
-}
+			return ng
+		}
+	},
+	"directive @log on FIELD_DEFINITION",
+)
 
 type OverrideContext struct{}
 
