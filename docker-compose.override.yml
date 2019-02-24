@@ -10,6 +10,6 @@ services:
       - debug
     volumes:
       - ./schema-registry/src:/service/src
-      - /service/node_modules
+      - ./schema-registry/node_modules:/service/node_modules
     ports:
       - 58581:5858
