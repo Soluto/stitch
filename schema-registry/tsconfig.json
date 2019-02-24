@@ -6,6 +6,7 @@
     "lib": ["dom", "es2017"],
     "sourceMap": true,
     "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true
   }
 }

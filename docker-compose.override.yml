@@ -9,7 +9,7 @@ services:
       - yarn
       - debug
     volumes:
-      - ./schema-registry:/service
+      - ./schema-registry/src:/service/src
       - /service/node_modules
     ports:
       - 58581:5858
