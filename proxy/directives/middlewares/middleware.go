@@ -4,8 +4,14 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
+// Resolver represents the GraphQL field resolver signature
+type Resolver = func(graphql.ResolveParams) (interface{}, error)
+
+// Wrapper is a middleware resolver srapping function
+type Wrapper = func(next Resolver) Resolver
+
 type Middleware interface {
-	Wrap(next func(graphql.ResolveParams) (interface{}, error)) func(graphql.ResolveParams) (interface{}, error)
+	Wrap(next Resolver) Resolver
 }
 
 type RequestTransformer interface {
@@ -13,25 +19,25 @@ type RequestTransformer interface {
 }
 
 type PreProcessingMiddleware struct {
-	transformer RequestTransformer
+	RequestTransformer
 }
 
-func CreateValueResolver(resolver func(graphql.ResolveParams) (interface{}, error)) func(next func(g graphql.ResolveParams) (interface{}, error)) func(graphql.ResolveParams) (interface{}, error) {
-	return func(next func(graphql.ResolveParams) (interface{}, error)) func(graphql.ResolveParams) (interface{}, error) {
+func CreateValueResolver(resolver Resolver) Wrapper {
+	return func(next Resolver) Resolver {
 		return resolver
 	}
 }
 
-func (p *PreProcessingMiddleware) CreateRequestTransformer() func(next func(g graphql.ResolveParams) (interface{}, error)) func(graphql.ResolveParams) (interface{}, error) {
-	return func(next func(graphql.ResolveParams) (interface{}, error)) func(graphql.ResolveParams) (interface{}, error) {
+func (p *PreProcessingMiddleware) CreateRequestTransformer() Wrapper {
+	return func(next Resolver) Resolver {
 		return func(g graphql.ResolveParams) (interface{}, error) {
-			return next(p.transformer.transform(g))
+			return next(p.transform(g))
 		}
 	}
 }
 
-func CreateResultTransformer(transformer func(graphql.ResolveParams, interface{}) interface{}) func(next func(g graphql.ResolveParams) (interface{}, error)) func(graphql.ResolveParams) (interface{}, error) {
-	return func(next func(graphql.ResolveParams) (interface{}, error)) func(graphql.ResolveParams) (interface{}, error) {
+func CreateResultTransformer(transformer func(graphql.ResolveParams, interface{}) interface{}) Wrapper {
+	return func(next Resolver) Resolver {
 		return func(g graphql.ResolveParams) (interface{}, error) {
 			value, err := next(g)
 			if err != nil {
