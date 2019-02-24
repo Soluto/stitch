@@ -1,0 +1,13 @@
+version: "3.7"
+
+services:
+  graphql-gateway.resource-controller:
+    build: 
+      args: 
+        target: DEBUG
+    command: 
+      - yarn
+      - debug
+    volumes: 
+      - ./app/resource-controller/src:/service/src
+      - /service/node_modules

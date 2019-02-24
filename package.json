@@ -1,0 +1,10 @@
+{
+  "name": "graphql-gateway",
+  "version": "1.0.0",
+  "description": "GraphQL Gatway for distributed resolved schema",
+  "repository": "https://github.com/Soluto-Private/graphql-gateway",
+  "license": "MIT",
+  "scripts": {
+    "start": "docker-compose up"
+  }
+}
