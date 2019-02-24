@@ -66,7 +66,7 @@ func createResolver(f *ast.FieldDefinition) func(graphql.ResolveParams) (interfa
 	}
 
 	resolver = (&middlewares.OverrideContext{}).Wrap(resolver)
-	resolver = (&middlewares.PreProcessingMiddleware(&middlewares.Log{})).Wrap(resolver)
+	resolver = middlewares.CreateRequestTransformer((&middlewares.Log{}).Transform)(resolver)
 
 	return resolver
 }
@@ -89,7 +89,7 @@ func convertSchemaEnum(d *ast.Definition, c context) *graphql.Enum {
 
 	values := make(map[string]*graphql.EnumValueConfig)
 
-	for i, v := range d.EnumValues {
+	for _, v := range d.EnumValues {
 		enumValue := new(graphql.EnumValueConfig)
 		enumValue.Value = v.Name
 		enumValue.Description = v.Description
@@ -112,7 +112,7 @@ func convertSchemaUnion(d *ast.Definition, c context) *graphql.Union {
 
 	types := []*graphql.Object{}
 
-	for i, t := range d.Types {
+	for _, t := range d.Types {
 		types = append(types, convertSchemaObject(c.schema.Types[t], c))
 	}
 

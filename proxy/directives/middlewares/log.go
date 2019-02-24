@@ -9,7 +9,7 @@ import (
 type Log struct {
 }
 
-func (s *Log) transform(g graphql.ResolveParams) graphql.ResolveParams {
+func (s *Log) Transform(g graphql.ResolveParams) graphql.ResolveParams {
 	fmt.Println("got new request with params")
 	fmt.Printf("%+v\n", g)
 	nc := context.WithValue(g.Context, "override", "abc")

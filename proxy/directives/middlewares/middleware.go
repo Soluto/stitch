@@ -14,13 +14,7 @@ type Middleware interface {
 	Wrap(next Resolver) Resolver
 }
 
-type RequestTransformer interface {
-	transform(p graphql.ResolveParams) graphql.ResolveParams
-}
-
-type PreProcessingMiddleware struct {
-	RequestTransformer
-}
+type RequestTransformer = func(p graphql.ResolveParams) graphql.ResolveParams
 
 func CreateValueResolver(resolver Resolver) Wrapper {
 	return func(next Resolver) Resolver {
@@ -28,10 +22,10 @@ func CreateValueResolver(resolver Resolver) Wrapper {
 	}
 }
 
-func (p *PreProcessingMiddleware) CreateRequestTransformer() Wrapper {
+func CreateRequestTransformer(r RequestTransformer) Wrapper {
 	return func(next Resolver) Resolver {
 		return func(g graphql.ResolveParams) (interface{}, error) {
-			return next(p.transform(g))
+			return next(r(g))
 		}
 	}
 }
