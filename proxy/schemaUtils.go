@@ -80,6 +80,29 @@ func convertSchemaField(f *ast.FieldDefinition, c context) *graphql.Field {
 	}
 }
 
+func convertSchemaEnum(d *ast.Definition, c context) *graphql.Enum {
+	enum, ok := c.enums[d.Name]
+
+	if ok {
+		return enum
+	}
+
+	values := make(map[string]*graphql.EnumValueConfig)
+
+	for i, v := range d.EnumValues {
+		enumValue := new(graphql.EnumValueConfig)
+		enumValue.Value = v.Name
+		enumValue.Description = v.Description
+		values[v.Name] = enumValue
+	}
+
+	enum = graphql.NewEnum(graphql.EnumConfig{Name: d.Name, Values: values, Description: d.Description})
+
+	c.enums[d.Name] = enum
+
+	return enum
+}
+
 func convertSchemaUnion(d *ast.Definition, c context) *graphql.Union {
 	union, ok := c.unions[d.Name]
 
