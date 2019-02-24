@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "Controller service for the GraphQL gateway schema",
   "main": "./dist/index.js",
-  "repository": "https://github.com/Soluto-Private/graphql-gateway/app/resource-controller",
+  "repository": "https://github.com/Soluto-Private/graphql-gateway/resource-controller",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -p ./src",
+    "build": "tsc",
     "start": "node ./dist/index.js",
-    "debug": "ts-node-dev --inspect=0.0.0.0:5858 -- ./src/index.ts"
+    "debug": "tsnd --inspect=0.0.0.0:5858 --respawn -- ./index.ts"
   },
   "devDependencies": {
     "ts-node-dev": "^1.0.0-pre.32",

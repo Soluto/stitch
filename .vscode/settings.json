@@ -1,7 +1,8 @@
 {
-    "files.autoSave": "onFocusChange",
-    "editor.tabSize": 2,
-    "editor.detectIndentation": false,
-    "editor.insertSpaces": true,
-    "go.formatTool": "gofmt"
-  }
+  "files.autoSave": "onFocusChange",
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "editor.insertSpaces": true,
+  "editor.formatOnSave": true,
+  "go.formatTool": "gofmt"
+}

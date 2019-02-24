@@ -2,9 +2,9 @@ version: "3.7"
 
 services:
   graphql-gateway.resource-controller:
-    build: 
-      context: ./app/resource-controller
-      args: 
+    build:
+      context: ./resource-controller
+      args:
         target: PRODUCTION
     healthcheck:
       disable: true
