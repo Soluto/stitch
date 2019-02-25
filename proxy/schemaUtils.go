@@ -15,7 +15,7 @@ type context struct {
 	enums      map[string]*graphql.Enum
 }
 
-var MISSING_RESOLVER_ERROR error = fmt.Errorf("missing resolver")
+var errMissingResolver = fmt.Errorf("missing resolver")
 
 func convertOutputType(t *ast.Type, c context) graphql.Type {
 	switch name := t.Name(); name {
@@ -47,7 +47,7 @@ func convertOutputType(t *ast.Type, c context) graphql.Type {
 			panic("Custom scalar handling not implemented")
 		}
 		if definition.Kind == ast.Enum {
-			panic("Enum handling not implemented")
+			return convertSchemaEnum(definition, c)
 		}
 
 		panic("Unreachable code")
@@ -55,7 +55,7 @@ func convertOutputType(t *ast.Type, c context) graphql.Type {
 }
 
 func createResolver(f *ast.FieldDefinition) func(graphql.ResolveParams) (interface{}, error) {
-	var resolver middlewares.Resolver = func(graphql.ResolveParams) (interface{}, error) { return nil, MISSING_RESOLVER_ERROR }
+	var resolver middlewares.Resolver = func(graphql.ResolveParams) (interface{}, error) { return nil, errMissingResolver }
 
 	for _, d := range f.Directives {
 		if d.Name == "stub" {
@@ -130,7 +130,7 @@ func convertSchemaInterface(d *ast.Definition, c context) *graphql.Interface {
 		return object
 	}
 
-	fieldsThunk := func() map[string]*graphql.Field {
+	fieldsThunk := graphql.FieldsThunk(func() graphql.Fields {
 		fields := make(map[string]*graphql.Field)
 		for _, field := range d.Fields {
 			if field.Name[:2] == "__" {
@@ -139,7 +139,7 @@ func convertSchemaInterface(d *ast.Definition, c context) *graphql.Interface {
 			fields[field.Name] = convertSchemaField(field, c)
 		}
 		return fields
-	}
+	})
 
 	object = graphql.NewInterface(graphql.InterfaceConfig{Name: d.Name, Fields: fieldsThunk, Description: d.Description})
 
@@ -155,7 +155,7 @@ func convertSchemaObject(d *ast.Definition, c context) *graphql.Object {
 		return object
 	}
 
-	fieldsThunk := func() map[string]*graphql.Field {
+	fieldsThunk := graphql.FieldsThunk(func() graphql.Fields {
 		fields := make(map[string]*graphql.Field)
 		for _, field := range d.Fields {
 			if field.Name[:2] == "__" {
@@ -164,7 +164,7 @@ func convertSchemaObject(d *ast.Definition, c context) *graphql.Object {
 			fields[field.Name] = convertSchemaField(field, c)
 		}
 		return fields
-	}
+	})
 
 	object = graphql.NewObject(graphql.ObjectConfig{Name: d.Name, Fields: fieldsThunk, Description: d.Description})
 
