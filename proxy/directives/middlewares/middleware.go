@@ -4,41 +4,45 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
-// Resolver represents the GraphQL field resolver signature
-type Resolver = func(graphql.ResolveParams) (interface{}, error)
-
-// Wrapper is a middleware resolver srapping function
-type Wrapper = func(next Resolver) Resolver
-
 type Middleware interface {
 	Wrap(next Resolver) Resolver
 }
 
-type RequestTransformer = func(p graphql.ResolveParams) graphql.ResolveParams
+type RequestTransformerFunc func(p graphql.ResolveParams) graphql.ResolveParams
 
-func CreateValueResolver(resolver Resolver) Wrapper {
-	return func(next Resolver) Resolver {
-		return resolver
-	}
+type ResultTransformerFunc func(p graphql.ResolveParams, v interface{}) interface{}
+
+type ResolverFunc func(graphql.ResolveParams) (interface{}, error)
+
+type Resolver interface {
+	Resolve(p graphql.ResolveParams) (interface{}, error)
 }
 
-func CreateRequestTransformer(r RequestTransformer) Wrapper {
-	return func(next Resolver) Resolver {
-		return func(g graphql.ResolveParams) (interface{}, error) {
-			return next(r(g))
-		}
-	}
+func (r ResolverFunc) Resolve(p graphql.ResolveParams) (interface{}, error) {
+	return r(p)
 }
 
-func CreateResultTransformer(transformer func(graphql.ResolveParams, interface{}) interface{}) Wrapper {
-	return func(next Resolver) Resolver {
-		return func(g graphql.ResolveParams) (interface{}, error) {
-			value, err := next(g)
-			if err != nil {
-				return nil, err
-			}
-			newValue := transformer(g, value)
-			return newValue, err
-		}
+func (r RequestTransformerFunc) Wrap(next Resolver) Resolver {
+	return ResolverFunc(func(g graphql.ResolveParams) (interface{}, error) {
+		return next.Resolve(r(g))
+	})
+}
+
+func (r ResolverFunc) Wrap(wares ...Middleware) Resolver {
+	var f Resolver = r
+	for _, m := range wares {
+		f = m.Wrap(r)
 	}
+	return f
+}
+
+func (r ResultTransformerFunc) Wrap(next Resolver) Resolver {
+	return ResolverFunc(func(g graphql.ResolveParams) (interface{}, error) {
+		value, err := next.Resolve(g)
+		if err != nil {
+			return nil, err
+		}
+		newValue := r(g, value)
+		return newValue, err
+	})
 }

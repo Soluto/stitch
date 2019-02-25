@@ -8,8 +8,6 @@ type Stub struct {
 	Value interface{}
 }
 
-func (s *Stub) Wrap(next func(graphql.ResolveParams) (interface{}, error)) func(graphql.ResolveParams) (interface{}, error) {
-	return CreateValueResolver(func(g graphql.ResolveParams) (interface{}, error) {
-		return s.Value, nil
-	})(next)
+func (s *Stub) Resolve(p graphql.ResolveParams) (interface{}, error) {
+	return s.Value, nil
 }
