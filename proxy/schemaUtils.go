@@ -55,7 +55,7 @@ func convertOutputType(t *ast.Type, c context) graphql.Type {
 }
 
 func createResolver(f *ast.FieldDefinition) func(graphql.ResolveParams) (interface{}, error) {
-	var resolver middlewares.ResolverFunc = func(graphql.ResolveParams) (interface{}, error) { return nil, MISSING_RESOLVER_ERROR }
+	var resolver middlewares.Resolver = func(graphql.ResolveParams) (interface{}, error) { return nil, MISSING_RESOLVER_ERROR }
 
 	for _, d := range f.Directives {
 		if d.Name == "stub" {
@@ -65,9 +65,10 @@ func createResolver(f *ast.FieldDefinition) func(graphql.ResolveParams) (interfa
 		}
 	}
 
-	funcResolver := resolver.Wrap(middlewares.&Log.Create(f), middlewares.OverrideContext)
+	resolver = middlewares.OverrideContext.CreateMiddleware(f).Wrap(resolver)
+	resolver = middlewares.Log.CreateMiddleware(f).Wrap(resolver)
 
-	return funcResolver.Resolve
+	return resolver
 }
 
 func convertSchemaField(f *ast.FieldDefinition, c context) *graphql.Field {
