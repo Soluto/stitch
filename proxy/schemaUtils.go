@@ -174,15 +174,21 @@ func convertSchemaObject(d *ast.Definition, c context) *graphql.Object {
 }
 
 // ConvertSchema converts schema definition to a graphql schema
-func ConvertSchema(schema *ast.Schema) (*graphql.Schema, error) {
-	es, err := graphql.NewSchema(graphql.SchemaConfig{
-		Query: convertSchemaObject(schema.Query, context{
-			schema,
+func ConvertSchema(astSchema *ast.Schema) (schemaPtr *graphql.Schema, err error) {
+	defer Recovery(&err)
+
+	schema, err := graphql.NewSchema(graphql.SchemaConfig{
+		Query: convertSchemaObject(astSchema.Query, context{
+			astSchema,
 			make(map[string]*graphql.Object),
 			make(map[string]*graphql.Interface),
 			make(map[string]*graphql.Union),
 			make(map[string]*graphql.Enum),
 		}),
 	})
-	return &es, err
+
+	schemaPtr = new(graphql.Schema)
+	*schemaPtr = schema
+
+	return
 }

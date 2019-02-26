@@ -3,33 +3,22 @@ package main
 import (
 	"fmt"
 	"github.com/graphql-go/handler"
-	"github.com/vektah/gqlparser"
-	"github.com/vektah/gqlparser/ast"
 	"net/http"
 )
 
 func main() {
 	fmt.Print("starting")
-	schema, err := gqlparser.LoadSchema(&ast.Source{
-		Name: "test.gql",
-		Input: `directive @stub(value: String) on FIELD_DEFINITION
 
-				type Query { 
-					hello: String @stub(value: "world")  
-				}`,
-	})
+	schema, err := GetSchema()
 
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Printf("%+v\n", schema)
-	es, gqlErr := ConvertSchema(schema)
 
-	if gqlErr != nil {
-	}
+	fmt.Printf("%+v\n", schema)
 
 	h := handler.New(&handler.Config{
-		Schema:     es,
+		Schema:     schema,
 		Pretty:     true,
 		Playground: true,
 		GraphiQL:   false,
