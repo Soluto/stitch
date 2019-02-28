@@ -8,7 +8,6 @@ app.get("/:sourceName", async (req: express.Request, res: express.Response) => {
   try {
     const schemas = await sources[req.params.sourceName].getSchemas();
     res.send(schemas);
-    return;
   } catch (error) {
     console.warn(
       `Failed to get schema from source - ${req.params.sourceName}`,
@@ -17,7 +16,6 @@ app.get("/:sourceName", async (req: express.Request, res: express.Response) => {
       }
     );
     res.sendStatus(500);
-    return;
   }
 });
 
@@ -32,7 +30,6 @@ app
           req.body
         );
         res.sendStatus(200);
-        return;
       } catch (error) {
         console.warn(
           `Failed to register schema to source - ${req.params.sourceName}`,
@@ -42,7 +39,6 @@ app
           }
         );
         res.sendStatus(500);
-        return;
       }
     }
   );
