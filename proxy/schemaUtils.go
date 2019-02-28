@@ -5,6 +5,7 @@ import (
 	graphql "github.com/graphql-go/graphql"
 	"github.com/vektah/gqlparser/ast"
 	"graphql-gateway/directives/middlewares"
+	"reflect"
 )
 
 type context struct {
@@ -54,21 +55,30 @@ func convertOutputType(t *ast.Type, c context) graphql.Type {
 	}
 }
 
-func createResolver(f *ast.FieldDefinition) func(graphql.ResolveParams) (interface{}, error) {
-	var resolver middlewares.Resolver = func(graphql.ResolveParams) (interface{}, error) { return nil, errMissingResolver }
+func createResolver(f *ast.FieldDefinition) middlewares.Resolver {
+	resolver := createIdentityResolver(f.Name)
 
 	for _, d := range f.Directives {
-		if d.Name == "stub" {
-			resolver = (&middlewares.Stub{
-				Value: d.Arguments.ForName("value").Value.Raw,
-			}).Resolve
+		middlewareDefinition, ok := middlewares.Directives[d.Name]
+
+		if !ok {
+			continue
 		}
+
+		middleware := middlewareDefinition.CreateMiddleware(f, d)
+
+		resolver = middleware.Wrap(resolver)
 	}
 
-	resolver = middlewares.OverrideContext.CreateMiddleware(f).Wrap(resolver)
-	resolver = middlewares.Log.CreateMiddleware(f).Wrap(resolver)
-
 	return resolver
+}
+
+func createIdentityResolver(fieldName string) middlewares.Resolver {
+	return func(p graphql.ResolveParams) (interface{}, error) {
+		r := reflect.ValueOf(p.Source)
+		f := reflect.Indirect(r).FieldByName(fieldName)
+		return f.Interface(), nil
+	}
 }
 
 func convertSchemaField(f *ast.FieldDefinition, c context) *graphql.Field {

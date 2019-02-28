@@ -5,38 +5,42 @@ import (
 	"github.com/vektah/gqlparser/ast"
 )
 
-type DirectiveExtension interface {
-	SDL() string
-	CreateMiddleware(f *ast.FieldDefinition) Middleware
-}
-
 type Resolver = func(graphql.ResolveParams) (interface{}, error)
 
 type Middleware interface {
 	Wrap(next Resolver) Resolver
 }
 
-/*
-func CreateValueResolver(resolver Resolver) Wrapper {
-	return func(next Resolver) Resolver {
-		return resolver
-	}
+type DirectiveExtension interface {
+	SDL() string
+	CreateMiddleware(f *ast.FieldDefinition, d *ast.Directive) Middleware
 }
-*/
 
-/*
-func CreateResultTransformer(transformer func(graphql.ResolveParams, interface{}) interface{}) Wrapper {
-	return func(next Resolver) Resolver {
-		return func(g graphql.ResolveParams) (interface{}, error) {
-			value, err := next(g)
-			if err != nil {
-				return nil, err
-			}
-			newValue := transformer(g, value)
-			return newValue, err
-		}
-		newValue := r(g, value)
-		return newValue, err
-	})
+type SdlContainer struct {
+	Sdl string
 }
-*/
+
+func (s *SdlContainer) SDL() string {
+	return s.Sdl
+}
+
+type MiddlewareFactrory struct {
+	Init func(f *ast.FieldDefinition, d *ast.Directive) Middleware
+}
+
+func (mf *MiddlewareFactrory) CreateMiddleware(f *ast.FieldDefinition, d *ast.Directive) Middleware {
+	return mf.Init(f, d)
+}
+
+type DirectiveDefinitionContainer struct {
+	SdlContainer
+	MiddlewareFactrory
+}
+
+// CreateDirectiveDefintion initiates a DirectiveDefintion
+func CreateDirectiveDefintion(init func(*ast.FieldDefinition, *ast.Directive) Middleware, sdl string) *DirectiveDefinitionContainer {
+	r := new(DirectiveDefinitionContainer)
+	r.Sdl = sdl
+	r.Init = init
+	return r
+}

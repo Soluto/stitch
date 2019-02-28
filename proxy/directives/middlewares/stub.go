@@ -2,12 +2,15 @@ package middlewares
 
 import (
 	"github.com/graphql-go/graphql"
+	"github.com/vektah/gqlparser/ast"
 )
 
-type Stub struct {
-	Value interface{}
-}
-
-func (s *Stub) Resolve(p graphql.ResolveParams) (interface{}, error) {
-	return s.Value, nil
-}
+var stub DirectiveExtension = CreateDirectiveDefintion(
+	func(f *ast.FieldDefinition, d *ast.Directive) Middleware {
+		value := d.Arguments.ForName("value").Value.Raw
+		return Leaf(func(p graphql.ResolveParams) (interface{}, error) {
+			return value, nil
+		})
+	},
+	"directive @stub(value: String) on FIELD_DEFINITION",
+)

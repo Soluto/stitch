@@ -8,7 +8,7 @@ import (
 )
 
 var Log DirectiveExtension = CreateDirectiveDefintion(
-	func(f *ast.FieldDefinition) Middleware {
+	func(f *ast.FieldDefinition, d *ast.Directive) Middleware {
 		return RequestTransform(func(g graphql.ResolveParams) graphql.ResolveParams {
 			fmt.Println("got new request with params")
 			fmt.Printf("%+v\n", g)
@@ -28,8 +28,8 @@ var Log DirectiveExtension = CreateDirectiveDefintion(
 )
 
 var OverrideContext DirectiveExtension = CreateDirectiveDefintion(
-	func(f *ast.FieldDefinition) Middleware {
-		return ValueTransform(func(g graphql.ResolveParams, value interface{}) interface{} {
+	func(f *ast.FieldDefinition, d *ast.Directive) Middleware {
+		return ResultTransform(func(g graphql.ResolveParams, value interface{}) interface{} {
 			val := g.Context.Value("override")
 			if val == nil {
 				return val
