@@ -18,6 +18,7 @@ RUN apk add --no-cache curl
 COPY --from=dependencies /service/node_modules ./node_modules
 COPY --from=build /service/dist ./dist
 COPY --from=build /service/package.json .
+COPY --from=build /service/tsconfig.json .
 COPY --from=build /service/yarn.lock .
 ENV NODE_ENV=production
 
