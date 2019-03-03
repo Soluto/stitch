@@ -4,6 +4,7 @@ import (
 	"fmt"
 	graphql "github.com/graphql-go/graphql"
 	"github.com/vektah/gqlparser/ast"
+	"graphql-gateway/directives/common"
 	"graphql-gateway/directives/middlewares"
 	"reflect"
 )
@@ -59,7 +60,7 @@ func createResolver(f *ast.FieldDefinition) middlewares.Resolver {
 	resolver := createIdentityResolver(f.Name)
 
 	for _, d := range f.Directives {
-		middlewareDefinition, ok := middlewares.Directives[d.Name]
+		middlewareDefinition, ok := common.MiddlewareDefinitions[d.Name]
 
 		if !ok {
 			continue

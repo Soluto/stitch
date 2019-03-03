@@ -48,6 +48,14 @@ func getSdl() ([]source, error) {
 			name: "stub.gql",
 			sdl:  `directive @stub(value: String) on FIELD_DEFINITION`,
 		},
+		source{
+			name: "log.gql",
+			sdl:  `directive @log on FIELD_DEFINITION`,
+		},
+		source{
+			name: "overrideContext.gql",
+			sdl:  `directive @overrideContext(value: String) on FIELD_DEFINITION`,
+		},
 	}, nil
 }
 
