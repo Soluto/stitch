@@ -10,5 +10,6 @@ func getMiddlewareDefinitions() map[string]middlewares.MiddlewareDefinition {
 	directives["log"] = log
 	directives["overrideContext"] = overrideContext
 	directives["stub"] = stub
+	directives["http"] = httpMiddleware
 	return directives
 }

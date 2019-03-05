@@ -41,7 +41,16 @@ func getSdl() ([]source, error) {
 		source{
 			name: "test.gql",
 			sdl: `type Query { 
-				hello: String @stub(value: "world")  
+				hello: String @stub(value: "world")
+				testHttp(iddd: String): JsonPlaceholder
+				@http(url:"https://jsonplaceholder.typicode.com/todos/:iddd")
+			}
+			
+			type JsonPlaceholder {
+				userId: Int,
+				id: Int,
+				title: String,
+				completed: Boolean
 			}`,
 		},
 		source{
@@ -55,6 +64,25 @@ func getSdl() ([]source, error) {
 		source{
 			name: "overrideContext.gql",
 			sdl:  `directive @overrideContext(value: String) on FIELD_DEFINITION`,
+		},
+		source{
+			name: "http.gql",
+			sdl: `
+				input HttpNameValue {
+					name: String!
+					value: String!
+				}
+			
+				directive @http(
+					url: String!
+					method: String
+					contentType: String
+					query: [HttpNameValue!]
+					body: [HttpNameValue!]
+					timeout: Int
+					headers: [HttpNameValue!]
+				) on FIELD_DEFINITION
+			`,
 		},
 	}, nil
 }
