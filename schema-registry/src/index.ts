@@ -1,6 +1,6 @@
 import * as express from "express";
 import gqlSchemaRoute from "./routes/schema";
-import sync$ from "./sync-service";
+import { startGrpcServer } from "./sync/sync-grpc-server";
 
 const PORT = process.env.PORT || 4000;
 
@@ -12,9 +12,7 @@ app.use("/isAlive", async (_: express.Request, res: express.Response) =>
 app.use("/schema", gqlSchemaRoute);
 
 app.listen({ port: PORT }, () =>
-  console.log(`🚀 Server ready at http://localhost:${PORT}`)
+  console.log(`🚀 HTTP Server ready at http://localhost:${PORT}`)
 );
 
-sync$.subscribe(mergedSchema =>
-  console.log("Schema", JSON.stringify(mergedSchema, null, 2))
-);
+startGrpcServer();
