@@ -1,4 +1,4 @@
-import sources from "./sources-config";
+import sources from "../sources-config";
 import { defer, from, empty, Observable } from "rxjs";
 import {
   mergeMap,
@@ -7,13 +7,14 @@ import {
   repeat,
   map,
   scan,
-  filter
+  filter,
+  shareReplay
 } from "rxjs/operators";
 import {
   makeGqlDocumentFromGqlSources,
   GqlSources
-} from "./graphql/create-schema";
-import Source from "./sources";
+} from "../graphql/create-schema";
+import Source from "../sources";
 
 const wait = (duration: number) => concat(empty().pipe(delay(duration)));
 
@@ -39,7 +40,8 @@ const sync$ = from(Object.entries(sources)).pipe(
     }),
     {}
   ),
-  map(schemaBySource => makeGqlDocumentFromGqlSources(schemaBySource))
+  map(schemaBySource => makeGqlDocumentFromGqlSources(schemaBySource)),
+  shareReplay(1)
 );
 
 export default sync$;

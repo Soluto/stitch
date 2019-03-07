@@ -6,3 +6,5 @@ const remoteSources: { [source: string]: Source } = {
 };
 
 export default remoteSources;
+
+export const defaultSource = "file";

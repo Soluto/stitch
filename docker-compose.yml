@@ -1,6 +1,13 @@
 version: "3.7"
 
 services:
+  graphql-gateway.graphql-server:
+    build:
+      context: ./graphql-server
+    healthcheck:
+      disable: true
+    ports:
+      - 3000:8011
   graphql-gateway.schema-registry:
     build:
       context: ./schema-registry
@@ -10,6 +17,8 @@ services:
       disable: true
     environment:
       - PORT=80
+      - GRPC_PORT=81
       - NODE_ENV=dev
     ports:
-      - 4001:80
+      - 4000:80
+      - 4001:81

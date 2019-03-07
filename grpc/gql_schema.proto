@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package gqlschema;
+
+service GqlSchema {
+    rpc Subscribe(GqlSchemaSubscribeParams) returns (stream GqlSchemaMessage) {}
+}
+
+message GqlSchemaSubscribeParams {}
+
+message GqlSchemaMessage {
+    string schema = 1;
+}

@@ -3,10 +3,10 @@
     "target": "es2017",
     "module": "commonjs",
     "moduleResolution": "node",
-    "lib": ["dom", "es2017"],
+    "lib": ["es2017"],
     "sourceMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "strict": true
+    "allowJs": true
   }
 }
