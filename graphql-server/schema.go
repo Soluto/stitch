@@ -4,12 +4,35 @@ import (
 	graphql "github.com/graphql-go/graphql"
 	"github.com/vektah/gqlparser"
 	"github.com/vektah/gqlparser/ast"
+
+	"context"
+	"generated"
+	"google.golang.org/grpc"
+	"time"
+)
+
+const (
+	address = "localhost:4001"
 )
 
 // GetSchema grabs the resources needed and initiates the GraphQL schema object
 func GetSchema() (schema *graphql.Schema, err error) {
 	defer Recovery(&err)
 
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	c := NewGqlSchemaClient(conn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	r, err := c.Subscribe(ctx, &GqlSchemaSubscribeParams{})
+	if err != nil {
+		log.Fatalf("could not greet: %v", err)
+	}
+	r.
 	sources, err := getSdl()
 
 	if err != nil {

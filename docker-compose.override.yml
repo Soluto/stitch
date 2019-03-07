@@ -10,5 +10,7 @@ services:
       - debug
     volumes:
       - ./schema-registry/src:/service/src
+    environment:
+      - NODE_ENV=dev
     ports:
       - 58581:5858

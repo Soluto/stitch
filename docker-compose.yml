@@ -4,6 +4,8 @@ services:
   graphql-gateway.graphql-server:
     build:
       context: ./graphql-server
+    depends_on:
+      - graphql-gateway.schema-registry
     healthcheck:
       disable: true
     ports:
@@ -14,11 +16,13 @@ services:
       args:
         target: PRODUCTION
     healthcheck:
-      disable: true
+      test: ["CMD", "curl", "-f", "http://localhost/isAlive"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
     environment:
       - PORT=80
       - GRPC_PORT=81
-      - NODE_ENV=dev
     ports:
       - 4000:80
       - 4001:81
