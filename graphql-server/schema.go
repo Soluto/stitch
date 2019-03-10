@@ -6,13 +6,14 @@ import (
 	"github.com/vektah/gqlparser/ast"
 
 	"context"
-	"generated"
+	"fmt"
 	"google.golang.org/grpc"
-	"time"
+	"graphql-gateway/generated"
+	"io"
 )
 
 const (
-	address = "localhost:4001"
+	address = "graphql-gateway.schema-registry:81"
 )
 
 // GetSchema grabs the resources needed and initiates the GraphQL schema object
@@ -25,14 +26,30 @@ func GetSchema() (schema *graphql.Schema, err error) {
 	}
 	defer conn.Close()
 
-	c := NewGqlSchemaClient(conn)
+	c := gqlschema.NewGqlSchemaClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	r, err := c.Subscribe(ctx, &GqlSchemaSubscribeParams{})
+	stream, err := c.Subscribe(context.Background(), &gqlschema.GqlSchemaSubscribeParams{})
+	fmt.Println("connected")
 	if err != nil {
-		log.Fatalf("could not greet: %v", err)
+		return nil, err
 	}
-	r.
+	fmt.Println("no error")
+
+	for {
+		gqlSchemaMessage, err := stream.Recv()
+		fmt.Println("received message")
+
+		if err == io.EOF {
+			fmt.Println("received message EOF")
+			break
+		}
+		if err != nil {
+			fmt.Println("received message ERR")
+			return nil, err
+		}
+
+		fmt.Println(gqlSchemaMessage.Schema)
+	}
 	sources, err := getSdl()
 
 	if err != nil {

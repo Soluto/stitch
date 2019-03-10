@@ -13,4 +13,5 @@ services:
     environment:
       - NODE_ENV=dev
     ports:
+      - 4001:81
       - 58581:5858

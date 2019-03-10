@@ -1,6 +1,5 @@
 import * as grpc from "grpc";
 import sync$ from "./sync-service";
-import { print } from "graphql/language/printer";
 import {
   GqlSchemaMessage,
   GqlSchemaSubscribeParams
@@ -15,9 +14,9 @@ const PORT = process.env.GRPC_PORT || 4001;
 class GqlSchemaSubscriptionServer implements IGqlSchemaServer {
   subscribe(call: grpc.ServerWriteableStream<GqlSchemaSubscribeParams>) {
     const subscription = sync$.subscribe(
-      mergedSchema => {
+      schema => {
         const gqlSchema = new GqlSchemaMessage();
-        gqlSchema.setSchema(print(mergedSchema));
+        gqlSchema.setSchema(schema);
         call.write(gqlSchema);
       },
       () => {},

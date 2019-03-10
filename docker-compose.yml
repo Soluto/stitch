@@ -25,4 +25,3 @@ services:
       - GRPC_PORT=81
     ports:
       - 4000:80
-      - 4001:81

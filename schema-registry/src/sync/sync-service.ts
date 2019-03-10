@@ -8,13 +8,15 @@ import {
   map,
   scan,
   filter,
-  shareReplay
+  shareReplay,
+  distinctUntilChanged
 } from "rxjs/operators";
 import {
   makeGqlDocumentFromGqlSources,
   GqlSources
 } from "../graphql/create-schema";
 import Source from "../sources";
+import { print } from "graphql/language/printer";
 
 const wait = (duration: number) => concat(empty().pipe(delay(duration)));
 
@@ -41,6 +43,8 @@ const sync$ = from(Object.entries(sources)).pipe(
     {}
   ),
   map(schemaBySource => makeGqlDocumentFromGqlSources(schemaBySource)),
+  map(print),
+  distinctUntilChanged(),
   shareReplay(1)
 );
 
