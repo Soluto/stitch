@@ -12,6 +12,9 @@ RUN yarn --production false
 COPY . .
 RUN yarn build
 
+FROM build as tests
+RUN if [ $target != "DEBUG" ]; then yarn test; fi
+
 FROM base as release
 RUN apk add --no-cache curl
 
