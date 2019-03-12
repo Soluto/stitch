@@ -4,30 +4,68 @@ import (
 	graphql "github.com/graphql-go/graphql"
 	"github.com/vektah/gqlparser"
 	"github.com/vektah/gqlparser/ast"
+
+	"context"
+	"fmt"
+	"google.golang.org/grpc"
+	"graphql-gateway/generated"
+	"io"
 )
 
-// GetSchema grabs the resources needed and initiates the GraphQL schema object
-func GetSchema() (schema *graphql.Schema, err error) {
+const (
+	address = "graphql-gateway.schema-registry:81"
+)
+
+func subscribeToSchema(schemas chan *graphql.Schema) (err error) {
 	defer Recovery(&err)
 
-	sources, err := getSdl()
-
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
-		return nil, err
+		fmt.Println("error initiating GRPC channel")
+		return err
+	}
+	defer conn.Close()
+
+	gqlSchemaClient := gqlschema.NewGqlSchemaClient(conn)
+
+	stream, err := gqlSchemaClient.Subscribe(context.Background(), &gqlschema.GqlSchemaSubscribeParams{})
+	if err != nil {
+		fmt.Println("error subscribing to schema-registry")
+		return err
 	}
 
-	astSchema, err := parseSdl(sources)
+	for {
+		gqlSchemaMessage, err := stream.Recv()
 
-	if err != nil {
-		return nil, err
+		if err == io.EOF {
+			fmt.Println("got EOF")
+			break
+		}
+		if err != nil {
+			fmt.Println("error receiving message")
+			return err
+		}
+
+		sources, err := getSdl(gqlSchemaMessage.Schema)
+		if err != nil {
+			fmt.Println("error getting SDL from sources")
+			return err
+		}
+
+		astSchema, err := parseSdl(sources)
+		if err != nil {
+			fmt.Println("error parsing SDL")
+			return err
+		}
+
+		schema, err := ConvertSchema(astSchema)
+		if err != nil {
+			fmt.Println("error converting schema")
+			return err
+		}
+
+		schemas <- schema
 	}
-
-	schema, err = ConvertSchema(astSchema)
-
-	if err != nil {
-		return nil, err
-	}
-
 	return
 }
 
@@ -36,17 +74,15 @@ type source struct {
 	sdl  string
 }
 
-func getSdl() ([]source, error) {
+func getSdl(schemaRegistrySdl string) ([]source, error) {
 	return []source{
-		source{
-			name: "test.gql",
-			sdl: `type Query { 
-				hello: String @stub(value: "world")  
-			}`,
-		},
 		source{
 			name: "stub.gql",
 			sdl:  `directive @stub(value: String) on FIELD_DEFINITION`,
+		},
+		source{
+			name: "schema-registry",
+			sdl:  schemaRegistrySdl,
 		},
 	}, nil
 }

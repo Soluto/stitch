@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "start-example-client": "ts-node example-schema-subscriber-client",
-    "generate-node-files": "sh ./generate-node-files.sh"
+    "generate-grpc-files": "sh ./generate-grpc-files.sh"
   },
   "dependencies": {
     "grpc": "^1.19.0"
