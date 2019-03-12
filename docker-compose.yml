@@ -16,7 +16,7 @@ services:
       args:
         target: PRODUCTION
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/isAlive"]
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
       interval: 5s
       timeout: 3s
       retries: 10
