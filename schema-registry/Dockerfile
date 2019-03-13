@@ -2,8 +2,8 @@ FROM node:10-alpine as base
 WORKDIR /service
 
 FROM base as dependencies
-ARG target=RELEASE
-COPY package.json yarn.lock ./
+ARG target
+COPY package.json yarn.lock jest.config.js ./
 RUN yarn --production true
 RUN if [ $target = "DEBUG" ]; then yarn --pure-lockfile --production false; fi
 
@@ -11,6 +11,10 @@ FROM dependencies as build
 RUN yarn --production false
 COPY . .
 RUN yarn build
+
+FROM build as tests
+ARG target
+RUN if [ $target == "PRODUCTION" ]; then yarn test; fi
 
 FROM base as release
 RUN apk add --no-cache curl
