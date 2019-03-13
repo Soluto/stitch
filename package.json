@@ -5,6 +5,7 @@
   "repository": "https://github.com/Soluto-Private/graphql-gateway",
   "license": "MIT",
   "scripts": {
-    "start": "docker-compose up"
+    "start": "docker-compose up",
+    "grpc-compile": "sh ./generate-js-files.sh"
   }
 }

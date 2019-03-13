@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 4000;
 
 const app = express();
 
-app.use("/isAlive", async (_: express.Request, res: express.Response) =>
+app.use("/health", async (_: express.Request, res: express.Response) =>
   res.send(true)
 );
 app.use("/schema", gqlSchemaRoute);

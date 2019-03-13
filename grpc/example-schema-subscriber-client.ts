@@ -1,9 +1,9 @@
 import * as grpc from "grpc";
-import { GqlSchemaClient } from "./generated/gql_schema_grpc_pb";
+import { GqlSchemaClient } from "./generated-ts/gql_schema_grpc_pb";
 import {
   GqlSchemaMessage,
   GqlSchemaSubscribeParams
-} from "./generated/gql_schema_pb";
+} from "./generated-ts/gql_schema_pb";
 
 const client = new GqlSchemaClient(
   "localhost:4001",
