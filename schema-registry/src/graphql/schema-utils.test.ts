@@ -1,4 +1,4 @@
-import { mergeDocuments } from "../schema-utils";
+import { mergeDocuments } from "./schema-utils";
 import { print } from "graphql/language/printer";
 import gql from "graphql-tag";
 
