@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"google.golang.org/grpc"
 	"graphql-gateway/generated"
+	"graphql-gateway/utils"
 	"io"
 )
 
@@ -17,7 +18,7 @@ const (
 )
 
 func subscribeToSchema(schemas chan *graphql.Schema) (err error) {
-	defer Recovery(&err)
+	defer utils.Recovery(&err)
 
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {

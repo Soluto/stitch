@@ -6,6 +6,7 @@ import (
 	"github.com/vektah/gqlparser/ast"
 	"graphql-gateway/directives/common"
 	"graphql-gateway/directives/middlewares"
+	"graphql-gateway/utils"
 	"reflect"
 )
 
@@ -100,7 +101,7 @@ func createResolver(f *ast.FieldDefinition) middlewares.Resolver {
 
 func createIdentityResolver(fieldName string) middlewares.Resolver {
 	return func(p graphql.ResolveParams) (res interface{}, err error) {
-		defer Recovery(&err)
+		defer utils.Recovery(&err)
 
 		switch p.Source.(type) {
 
@@ -273,7 +274,7 @@ func convertSchemaObject(d *ast.Definition, c schemaContext) *graphql.Object {
 
 // ConvertSchema converts schema definition to a graphql schema
 func ConvertSchema(astSchema *ast.Schema) (schemaPtr *graphql.Schema, err error) {
-	defer Recovery(&err)
+	defer utils.Recovery(&err)
 
 	schema, err := graphql.NewSchema(graphql.SchemaConfig{
 		Query: convertSchemaObject(astSchema.Query, schemaContext{

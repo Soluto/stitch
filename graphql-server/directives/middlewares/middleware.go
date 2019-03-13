@@ -11,16 +11,16 @@ type Middleware interface {
 	Wrap(next Resolver) Resolver
 }
 
-type MiddlewareFactrory = func(*ast.FieldDefinition, *ast.Directive) Middleware
+type MiddlewareFactory = func(*ast.FieldDefinition, *ast.Directive) Middleware
 
 type MiddlewareDefinition interface {
 	CreateMiddleware(*ast.FieldDefinition, *ast.Directive) Middleware
 }
 
 type DirectiveDefinition struct {
-	MiddlewareFactrory MiddlewareFactrory
+	MiddlewareFactory MiddlewareFactory
 }
 
 func (dd DirectiveDefinition) CreateMiddleware(f *ast.FieldDefinition, d *ast.Directive) Middleware {
-	return dd.MiddlewareFactrory(f, d)
+	return dd.MiddlewareFactory(f, d)
 }

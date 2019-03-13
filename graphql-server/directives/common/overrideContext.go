@@ -7,7 +7,7 @@ import (
 )
 
 var overrideContext = middlewares.DirectiveDefinition{
-	MiddlewareFactrory: func(f *ast.FieldDefinition, d *ast.Directive) middlewares.Middleware {
+	MiddlewareFactory: func(f *ast.FieldDefinition, d *ast.Directive) middlewares.Middleware {
 		return middlewares.ResultTransform(func(g graphql.ResolveParams, value interface{}) interface{} {
 			val := g.Context.Value("override")
 

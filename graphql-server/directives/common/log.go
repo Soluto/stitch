@@ -9,7 +9,7 @@ import (
 )
 
 var log = middlewares.DirectiveDefinition{
-	MiddlewareFactrory: func(f *ast.FieldDefinition, d *ast.Directive) middlewares.Middleware {
+	MiddlewareFactory: func(f *ast.FieldDefinition, d *ast.Directive) middlewares.Middleware {
 		return middlewares.RequestTransform(func(g graphql.ResolveParams) graphql.ResolveParams {
 			fmt.Println("got new request with params")
 			fmt.Printf("%+v\n", g)
