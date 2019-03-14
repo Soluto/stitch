@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	graphql "github.com/graphql-go/graphql"
 	"github.com/graphql-go/handler"
 	"net/http"
 	"time"
@@ -13,7 +12,7 @@ func main() {
 
 	time.Sleep(10000 * time.Millisecond) // TODO: Remove after subscribeToSchema has a connect retry logic
 
-	schemas := make(chan *graphql.Schema)
+	schemas := make(chan schemaResult)
 	go subscribeToSchema(schemas)
 
 	var graphqlHttpHandler http.Handler = nil
@@ -22,10 +21,16 @@ func main() {
 		for {
 			schema := <-schemas
 			fmt.Println("got new schema")
+
+			if schema.err != nil {
+				fmt.Println("error", schema.err)
+				continue
+			}
+
 			fmt.Println("updating graphql server...")
 
 			graphqlHttpHandler = handler.New(&handler.Config{
-				Schema:     schema,
+				Schema:     schema.schema,
 				Pretty:     true,
 				Playground: true,
 				GraphiQL:   false,
