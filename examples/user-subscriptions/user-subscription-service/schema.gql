@@ -1,0 +1,9 @@
+type SubscriptionPlan {
+  plan: String!
+  expirationDate: String
+}
+
+type User {
+  subscription: SubscriptionPlan
+  # @http(url: "http://user-subscription/user-subscription/:id")
+}

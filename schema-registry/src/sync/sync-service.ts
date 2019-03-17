@@ -7,31 +7,31 @@ import {
   repeat,
   map,
   scan,
-  filter,
   shareReplay,
-  distinctUntilChanged
+  distinctUntilChanged,
+  tap,
+  filter,
+  catchError
 } from "rxjs/operators";
 import {
   makeGqlDocumentFromGqlSources,
   GqlSources
 } from "../graphql/create-schema";
-import Source from "../sources";
 import { print } from "graphql/language/printer";
 
-const wait = (duration: number) => concat(empty().pipe(delay(duration)));
-
-const getSchemaFromSource = (source: Source) =>
-  defer(() => source.getSchemas()).pipe(
-    map(schemaByNames => Object.values(schemaByNames).join("\n"))
-  );
+const emitAndWait = (duration: number) => concat(empty().pipe(delay(duration)));
 
 const sync$ = from(Object.entries(sources)).pipe(
   mergeMap(
     ([sourceName, source]) =>
-      getSchemaFromSource(source).pipe(
-        filter(schema => !!schema),
-        map(schema => [sourceName, schema]),
-        wait(5000) as any,
+      defer(() => source.getSchemas()).pipe(
+        mergeMap(schemaByName => from(Object.entries(schemaByName))),
+        map(([name, schema]) => [`${sourceName}.${name}`, schema]),
+        emitAndWait(5000) as any,
+        catchError(err => {
+          console.warn("Error getting schema from source", source, err);
+          return empty();
+        }),
         repeat()
       ) as Observable<[string, string]>
   ),

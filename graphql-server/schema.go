@@ -43,24 +43,29 @@ func subscribeToSchema(schemas chan *graphql.Schema) (err error) {
 		}
 		if err != nil {
 			fmt.Println("error receiving message")
+			fmt.Println(err)
 			return err
 		}
 
 		sources, err := getSdl(gqlSchemaMessage.Schema)
 		if err != nil {
 			fmt.Println("error getting SDL from sources")
+			fmt.Println(err)
 			return err
 		}
 
 		astSchema, err := parseSdl(sources)
 		if err != nil {
 			fmt.Println("error parsing SDL")
+			fmt.Println(err)
 			return err
 		}
 
 		schema, err := ConvertSchema(astSchema)
 		if err != nil {
 			fmt.Println("error converting schema")
+			fmt.Println(err)
+			fmt.Println(astSchema)
 			return err
 		}
 
