@@ -65,7 +65,6 @@ func subscribeToSchema(schemas chan *graphql.Schema) (err error) {
 		if err != nil {
 			fmt.Println("error converting schema")
 			fmt.Println(err)
-			fmt.Println(astSchema)
 			return err
 		}
 
