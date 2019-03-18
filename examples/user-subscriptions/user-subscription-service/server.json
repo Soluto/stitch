@@ -1,5 +1,5 @@
 {
   "user-subscription": [
-    { "id": 1, "plan": "trial", "expirationDate": "2019-01-01T00:00:00Z" }
+    { "id": "1", "plan": "trial", "expirationDate": "2019-01-01T00:00:00Z" }
   ]
 }
