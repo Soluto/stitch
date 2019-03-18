@@ -11,6 +11,7 @@ import (
 	"graphql-gateway/generated"
 	"graphql-gateway/utils"
 	"io"
+	"time"
 )
 
 const (
@@ -34,9 +35,9 @@ func subscribeToSchema(schemas chan schemaResult) (err error) {
 
 	gqlSchemaClient := gqlschema.NewGqlSchemaClient(conn)
 
-	stream, err := gqlSchemaClient.Subscribe(context.Background(), &gqlschema.GqlSchemaSubscribeParams{})
+	stream, err := subscribe(gqlSchemaClient)
 	if err != nil {
-		fmt.Println("error subscribing to schema-registry")
+		fmt.Println("error subscribing to schema-registry", err)
 		return err
 	}
 
@@ -83,6 +84,19 @@ func subscribeToSchema(schemas chan schemaResult) (err error) {
 		schemas <- schemaResult{
 			schema: schema,
 			err:    nil,
+		}
+	}
+	return
+}
+
+func subscribe(client gqlschema.GqlSchemaClient) (stream gqlschema.GqlSchema_SubscribeClient, err error) {
+	for i := 0; i < 3; i++ {
+		stream, err = client.Subscribe(context.Background(), &gqlschema.GqlSchemaSubscribeParams{})
+		if err == nil {
+			break
+		}
+		if i+1 < 3 {
+			time.Sleep(3000 * time.Millisecond)
 		}
 	}
 	return

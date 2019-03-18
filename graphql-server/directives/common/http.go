@@ -237,7 +237,7 @@ func replace(t string, dictionaries ...dictionary) string {
 			val, ok := d[key]
 
 			if ok {
-				return val.(string)
+				return fmt.Sprint(val)
 			}
 		}
 

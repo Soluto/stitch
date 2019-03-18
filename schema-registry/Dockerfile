@@ -3,7 +3,7 @@ WORKDIR /service
 
 FROM base as dependencies
 ARG target
-COPY package.json yarn.lock jest.config.js ./
+COPY package.json yarn.lock jest.config.js resources ./
 RUN yarn --production true
 RUN if [ $target = "DEBUG" ]; then yarn --pure-lockfile --production false; fi
 
@@ -24,6 +24,7 @@ COPY --from=build /service/dist ./dist
 COPY --from=build /service/package.json .
 COPY --from=build /service/tsconfig.json .
 COPY --from=build /service/yarn.lock .
+COPY --from=build /service/resources .
 ENV NODE_ENV=production
 
 CMD [ "yarn", "start" ]
