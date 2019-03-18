@@ -7,6 +7,8 @@ services:
       - ./user-service:/data
     entrypoint:
       - json-server
+      - --port
+      - "80"
       - server.json
   user-subscription:
     image: clue/json-server
@@ -14,7 +16,12 @@ services:
       - ./user-subscription-service:/data
     entrypoint:
       - json-server
+      - --port
+      - "80"
       - server.json
+    ports:
+      - 8888:80
+
   graphql-gateway.graphql-server:
     build:
       context: ../../graphql-server

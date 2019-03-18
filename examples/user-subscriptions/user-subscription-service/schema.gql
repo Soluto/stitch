@@ -5,5 +5,5 @@ type SubscriptionPlan {
 
 type User {
   subscription: SubscriptionPlan
-  # @http(url: "http://user-subscription/user-subscription/:id")
+    @http(url: "http://user-subscription/user-subscription/:id")
 }

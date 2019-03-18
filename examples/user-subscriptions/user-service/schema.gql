@@ -5,11 +5,10 @@ type User {
 }
 
 type Query {
-  user(id: ID!): User
-  # @http(url: "http://user/users/:id")
+  user(id: ID!): User @http(url: "http://user/users/:id")
 }
 
 type Mutation {
   createUser(firstName: String!, lastName: String): String
-  # @http(url: "http://user/users/:id", method: "POST")
+    @http(url: "http://user/users/:id", method: "POST")
 }
