@@ -1,0 +1,27 @@
+version: "2.4"
+
+services:
+  graphql-gateway.graphql-server:
+    build:
+      context: ../../graphql-server
+    depends_on:
+      - graphql-gateway.schema-registry
+    healthcheck:
+      disable: true
+    ports:
+      - 3000:8011
+  graphql-gateway.schema-registry:
+    build:
+      context: ../../schema-registry
+      args:
+        target: PRODUCTION
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    environment:
+      - PORT=80
+      - GRPC_PORT=81
+    ports:
+      - 4000:80
