@@ -22,6 +22,19 @@ type schemaContext struct {
 var errMissingResolver = fmt.Errorf("missing resolver")
 
 func convertType(t *ast.Type, c schemaContext) graphql.Type {
+	if t.Elem != nil {
+		if t.NonNull {
+			return graphql.NewNonNull(graphql.NewList(convertType(t.Elem, c)))
+		}
+		return graphql.NewList(convertType(t.Elem, c))
+	} else if t.NonNull {
+		return graphql.NewNonNull(convertNamedType(t, c))
+	}
+
+	return convertNamedType(t, c)
+}
+
+func convertNamedType(t *ast.Type, c schemaContext) graphql.Type {
 	switch name := t.Name(); name {
 	case "ID":
 		return graphql.ID
