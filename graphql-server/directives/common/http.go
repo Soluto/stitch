@@ -45,7 +45,7 @@ var httpMiddleware = middlewares.DirectiveDefinition{
 				return nil, err
 			}
 
-			return result.(map[string]interface{}), nil
+			return result, nil
 		})
 	},
 }
