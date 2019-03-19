@@ -12,8 +12,15 @@ type User {
   phone: String
   website: String
   company: Company
+
   todos: [Todo]
     @http(url: "https://jsonplaceholder.typicode.com/todos?userId=:id")
+
+  albums: [Album]
+    @http(url: "https://jsonplaceholder.typicode.com/albums?userId=:id")
+
+  posts: [Post]
+    @http(url: "https://jsonplaceholder.typicode.com/posts?userId=:id")
 }
 
 type Address {
@@ -37,7 +44,35 @@ type Company {
 
 type Todo {
   id: ID!
-  userId: String!
   title: String!
   completed: Boolean!
+}
+
+type Album {
+  id: ID!
+  title: String!
+  photos: [Photo]
+    @http(url: "https://jsonplaceholder.typicode.com/photos?albumId=:id")
+}
+
+type Photo {
+  id: ID!
+  title: String!
+  url: String!
+  thumbnailUrl: String!
+}
+
+type Post {
+  id: ID!
+  title: String!
+  body: String!
+  comments: [Comment]
+    @http(url: "https://jsonplaceholder.typicode.com/comments?postId=:id")
+}
+
+type Comment {
+  id: ID!
+  name: String!
+  email: String!
+  body: String!
 }
