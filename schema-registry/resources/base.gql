@@ -1,0 +1,31 @@
+type Query { 
+    hello: String @stub(value: "world")
+    testHttp(iddd: String): JsonPlaceholder
+    @http(url:"https://jsonplaceholder.typicode.com/todos/:iddd")
+}
+
+type JsonPlaceholder {
+    userId: Int,
+    id: Int,
+    title: String,
+    completed: Boolean
+}
+
+directive @stub(value: String) on FIELD_DEFINITION
+directive @log on FIELD_DEFINITION
+directive @overrideContext(value: String) on FIELD_DEFINITION
+
+input HttpNameValue {
+    name: String!
+    value: String!
+}
+
+directive @http(
+    url: String!
+    method: String
+    contentType: String
+    query: [HttpNameValue!]
+    body: [HttpNameValue!]
+    timeout: Int
+    headers: [HttpNameValue!]
+) on FIELD_DEFINITION
