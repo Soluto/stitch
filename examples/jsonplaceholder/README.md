@@ -1,6 +1,6 @@
 # Description
 
-This example demonstrate how we can take an existing JSON API and GraphQLfy it **without writing any code!**
+This example demonstrate how we can take an existing JSON API and GraphQLify it **without writing any code!**
 
 Existing rest API description:
 
