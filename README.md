@@ -4,8 +4,8 @@ It allows you to create a unified GraphQL API in a microservices architecture. E
 
 graphql-gateway is composed of these components:
 
-- **schema-registry** - Continuously collects, validates and unifies all the schema parts.
-- **graphql-server** - A single GraphQL API executed with the unified schema.
+- **schema-registry** - Continuously collects, validates and unifies all the schema parts
+- **graphql-server** - A single GraphQL API executed with the unified schema
 
 ## Example
 
