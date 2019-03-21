@@ -1,6 +1,8 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import sources, { defaultSource } from "../sources-config";
+import sync$ from "../sync/sync-service";
+import { take } from "rxjs/operators";
 
 const app = express();
 
@@ -39,7 +41,7 @@ app
   .post("/:sourceName/:name", (req, res) =>
     postSource(req.params.sourceName, req, res)
   )
-  .get("/", (_, res) => getFromSource(defaultSource, res))
+  .get("/", async (_, res) => res.send(await sync$.pipe(take(1)).toPromise()))
   .post("/:name", (req, res) => postSource(defaultSource, req, res));
 
 export default app;

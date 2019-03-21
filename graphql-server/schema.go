@@ -63,7 +63,6 @@ func subscribeToSchema(schemas chan schemaResult) (err error) {
 		})
 		if err != nil {
 			fmt.Println("error parsing SDL")
-			fmt.Println("err", err)
 			schemas <- schemaResult{
 				schema: nil,
 				err:    err,

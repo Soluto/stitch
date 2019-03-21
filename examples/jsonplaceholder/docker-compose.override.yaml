@@ -1,0 +1,11 @@
+version: "2.4"
+
+services:
+  schema-registration:
+    image: byrnedo/alpine-curl
+    volumes:
+      - .:/data
+    command: -X POST --header "Content-Type:text/plain" -d @/data/schema.gql http://graphql-gateway.schema-registry/schema/jsonplaceholder
+    depends_on:
+      graphql-gateway.schema-registry:
+        condition: service_healthy

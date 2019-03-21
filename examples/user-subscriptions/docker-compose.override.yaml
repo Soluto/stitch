@@ -1,0 +1,19 @@
+version: "2.4"
+
+services:
+  user-schema-registration:
+    image: byrnedo/alpine-curl
+    volumes:
+      - ./user-service:/data
+    command: -X POST --header "Content-Type:text/plain" -d @/data/schema.gql http://graphql-gateway.schema-registry/schema/user
+    depends_on:
+      graphql-gateway.schema-registry:
+        condition: service_healthy
+  user-subscription-registration:
+    image: byrnedo/alpine-curl
+    volumes:
+      - ./user-subscription-service:/data
+    command: -X POST --header "Content-Type:text/plain" -d @/data/schema.gql http://graphql-gateway.schema-registry/schema/user-subscription
+    depends_on:
+      graphql-gateway.schema-registry:
+        condition: service_healthy
