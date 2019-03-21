@@ -4,21 +4,37 @@ import (
 	"fmt"
 	graphql "github.com/graphql-go/graphql"
 	"github.com/vektah/gqlparser/ast"
+	"graphql-gateway/directives/common"
 	"graphql-gateway/directives/middlewares"
+	"graphql-gateway/utils"
 	"reflect"
 )
 
-type Context struct {
+type schemaContext struct {
 	schema     *ast.Schema
 	objects    map[string]*graphql.Object
 	interfaces map[string]*graphql.Interface
 	unions     map[string]*graphql.Union
 	enums      map[string]*graphql.Enum
+	inputs     map[string]*graphql.InputObject
 }
 
 var errMissingResolver = fmt.Errorf("missing resolver")
 
-func convertOutputType(t *ast.Type, c Context) graphql.Type {
+func convertType(t *ast.Type, c schemaContext) graphql.Type {
+	if t.Elem != nil {
+		if t.NonNull {
+			return graphql.NewNonNull(graphql.NewList(convertType(t.Elem, c)))
+		}
+		return graphql.NewList(convertType(t.Elem, c))
+	} else if t.NonNull {
+		return graphql.NewNonNull(convertNamedType(t, c))
+	}
+
+	return convertNamedType(t, c)
+}
+
+func convertNamedType(t *ast.Type, c schemaContext) graphql.Type {
 	switch name := t.Name(); name {
 	case "ID":
 		return graphql.ID
@@ -38,6 +54,9 @@ func convertOutputType(t *ast.Type, c Context) graphql.Type {
 		if definition.Kind == ast.Object {
 			return convertSchemaObject(definition, c)
 		}
+		if definition.Kind == ast.InputObject {
+			return convertSchemaInputObject(definition, c)
+		}
 		if definition.Kind == ast.Interface {
 			return convertSchemaInterface(definition, c)
 		}
@@ -55,11 +74,31 @@ func convertOutputType(t *ast.Type, c Context) graphql.Type {
 	}
 }
 
+func convertFieldArgs(a ast.ArgumentDefinitionList, c schemaContext) (graphql.FieldConfigArgument, error) {
+	args := make(map[string]*graphql.ArgumentConfig)
+
+	for _, d := range a {
+		defaultValue, err := d.DefaultValue.Value(make(map[string]interface{}))
+
+		if err != nil {
+			return nil, err
+		}
+
+		args[d.Name] = &graphql.ArgumentConfig{
+			DefaultValue: defaultValue,
+			Description:  d.Description,
+			Type:         convertType(d.Type, c),
+		}
+	}
+
+	return args, nil
+}
+
 func createResolver(f *ast.FieldDefinition) middlewares.Resolver {
 	resolver := createIdentityResolver(f.Name)
 
 	for _, d := range f.Directives {
-		middlewareDefinition, ok := middlewares.Directives[d.Name]
+		middlewareDefinition, ok := common.MiddlewareDefinitions[d.Name]
 
 		if !ok {
 			continue
@@ -74,23 +113,41 @@ func createResolver(f *ast.FieldDefinition) middlewares.Resolver {
 }
 
 func createIdentityResolver(fieldName string) middlewares.Resolver {
-	return func(p graphql.ResolveParams) (interface{}, error) {
-		r := reflect.ValueOf(p.Source)
-		f := reflect.Indirect(r).FieldByName(fieldName)
-		return f.Interface(), nil
+	return func(p graphql.ResolveParams) (res interface{}, err error) {
+		defer utils.Recovery(&err)
+
+		switch p.Source.(type) {
+
+		case map[string]interface{}:
+			m := p.Source.(map[string]interface{})
+			res = m[fieldName]
+
+		default:
+			value := reflect.ValueOf(p.Source)
+			f := reflect.Indirect(value).FieldByName(fieldName)
+			res = f.Interface()
+		}
+
+		return
 	}
 }
 
-func convertSchemaField(f *ast.FieldDefinition, c Context) *graphql.Field {
+func convertSchemaField(f *ast.FieldDefinition, c schemaContext) (*graphql.Field, error) {
+	args, err := convertFieldArgs(f.Arguments, c)
+
+	if err != nil {
+		return nil, err
+	}
+
 	return &graphql.Field{
-
 		Description: f.Description,
-		Type:        convertOutputType(f.Type, c),
+		Type:        convertType(f.Type, c),
 		Resolve:     createResolver(f),
-	}
+		Args:        args,
+	}, nil
 }
 
-func convertSchemaEnum(d *ast.Definition, c Context) *graphql.Enum {
+func convertSchemaEnum(d *ast.Definition, c schemaContext) *graphql.Enum {
 	enum, ok := c.enums[d.Name]
 
 	if ok {
@@ -113,7 +170,40 @@ func convertSchemaEnum(d *ast.Definition, c Context) *graphql.Enum {
 	return enum
 }
 
-func convertSchemaUnion(d *ast.Definition, c Context) *graphql.Union {
+func convertSchemaInputObject(d *ast.Definition, c schemaContext) *graphql.InputObject {
+	object, ok := c.inputs[d.Name]
+
+	if ok {
+		return object
+	}
+
+	fieldsThunk := graphql.InputObjectConfigFieldMapThunk(func() graphql.InputObjectConfigFieldMap {
+		fields := make(map[string]*graphql.InputObjectFieldConfig)
+		for _, field := range d.Fields {
+			if field.Name[:2] == "__" {
+				continue
+			}
+
+			fields[field.Name] = convertSchemaInputField(field, c)
+		}
+		return fields
+	})
+
+	object = graphql.NewInputObject(graphql.InputObjectConfig{Name: d.Name, Fields: fieldsThunk, Description: d.Description})
+
+	c.inputs[d.Name] = object
+
+	return object
+}
+
+func convertSchemaInputField(f *ast.FieldDefinition, c schemaContext) *graphql.InputObjectFieldConfig {
+	return &graphql.InputObjectFieldConfig{
+		Description: f.Description,
+		Type:        convertType(f.Type, c),
+	}
+}
+
+func convertSchemaUnion(d *ast.Definition, c schemaContext) *graphql.Union {
 	union, ok := c.unions[d.Name]
 
 	if ok {
@@ -133,7 +223,7 @@ func convertSchemaUnion(d *ast.Definition, c Context) *graphql.Union {
 	return union
 }
 
-func convertSchemaInterface(d *ast.Definition, c Context) *graphql.Interface {
+func convertSchemaInterface(d *ast.Definition, c schemaContext) *graphql.Interface {
 	object, ok := c.interfaces[d.Name]
 
 	if ok {
@@ -146,7 +236,13 @@ func convertSchemaInterface(d *ast.Definition, c Context) *graphql.Interface {
 			if field.Name[:2] == "__" {
 				continue
 			}
-			fields[field.Name] = convertSchemaField(field, c)
+
+			schemaField, err := convertSchemaField(field, c)
+			if err != nil {
+				panic(err)
+			}
+
+			fields[field.Name] = schemaField
 		}
 		return fields
 	})
@@ -158,7 +254,7 @@ func convertSchemaInterface(d *ast.Definition, c Context) *graphql.Interface {
 	return object
 }
 
-func convertSchemaObject(d *ast.Definition, c Context) *graphql.Object {
+func convertSchemaObject(d *ast.Definition, c schemaContext) *graphql.Object {
 	object, ok := c.objects[d.Name]
 
 	if ok {
@@ -171,7 +267,13 @@ func convertSchemaObject(d *ast.Definition, c Context) *graphql.Object {
 			if field.Name[:2] == "__" {
 				continue
 			}
-			fields[field.Name] = convertSchemaField(field, c)
+
+			schemaField, err := convertSchemaField(field, c)
+			if err != nil {
+				panic(err)
+			}
+
+			fields[field.Name] = schemaField
 		}
 		return fields
 	})
@@ -185,15 +287,16 @@ func convertSchemaObject(d *ast.Definition, c Context) *graphql.Object {
 
 // ConvertSchema converts schema definition to a graphql schema
 func ConvertSchema(astSchema *ast.Schema) (schemaPtr *graphql.Schema, err error) {
-	defer Recovery(&err)
+	defer utils.Recovery(&err)
 
 	schema, err := graphql.NewSchema(graphql.SchemaConfig{
-		Query: convertSchemaObject(astSchema.Query, Context{
+		Query: convertSchemaObject(astSchema.Query, schemaContext{
 			astSchema,
 			make(map[string]*graphql.Object),
 			make(map[string]*graphql.Interface),
 			make(map[string]*graphql.Union),
 			make(map[string]*graphql.Enum),
+			make(map[string]*graphql.InputObject),
 		}),
 	})
 

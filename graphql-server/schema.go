@@ -9,15 +9,22 @@ import (
 	"fmt"
 	"google.golang.org/grpc"
 	"graphql-gateway/generated"
+	"graphql-gateway/utils"
 	"io"
+	"time"
 )
 
 const (
 	address = "graphql-gateway.schema-registry:81"
 )
 
-func subscribeToSchema(schemas chan *graphql.Schema) (err error) {
-	defer Recovery(&err)
+type schemaResult struct {
+	schema *graphql.Schema
+	err    error
+}
+
+func subscribeToSchema(schemas chan schemaResult) (err error) {
+	defer utils.Recovery(&err)
 
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
@@ -28,9 +35,9 @@ func subscribeToSchema(schemas chan *graphql.Schema) (err error) {
 
 	gqlSchemaClient := gqlschema.NewGqlSchemaClient(conn)
 
-	stream, err := gqlSchemaClient.Subscribe(context.Background(), &gqlschema.GqlSchemaSubscribeParams{})
+	stream, err := subscribe(gqlSchemaClient)
 	if err != nil {
-		fmt.Println("error subscribing to schema-registry")
+		fmt.Println("error subscribing to schema-registry", err)
 		return err
 	}
 
@@ -43,32 +50,53 @@ func subscribeToSchema(schemas chan *graphql.Schema) (err error) {
 		}
 		if err != nil {
 			fmt.Println("error receiving message")
-			fmt.Println(err)
+			schemas <- schemaResult{
+				schema: nil,
+				err:    err,
+			}
 			return err
 		}
 
-		sources, err := getSdl(gqlSchemaMessage.Schema)
-		if err != nil {
-			fmt.Println("error getting SDL from sources")
-			fmt.Println(err)
-			return err
-		}
-
-		astSchema, err := parseSdl(sources)
+		astSchema, err := parseSdl(source{
+			name: "schema regisrty sdl",
+			sdl:  gqlSchemaMessage.Schema,
+		})
 		if err != nil {
 			fmt.Println("error parsing SDL")
-			fmt.Println(err)
+			schemas <- schemaResult{
+				schema: nil,
+				err:    err,
+			}
 			return err
 		}
 
 		schema, err := ConvertSchema(astSchema)
 		if err != nil {
 			fmt.Println("error converting schema")
-			fmt.Println(err)
+			schemas <- schemaResult{
+				schema: nil,
+				err:    err,
+			}
 			return err
 		}
 
-		schemas <- schema
+		schemas <- schemaResult{
+			schema: schema,
+			err:    nil,
+		}
+	}
+	return
+}
+
+func subscribe(client gqlschema.GqlSchemaClient) (stream gqlschema.GqlSchema_SubscribeClient, err error) {
+	for i := 0; i < 3; i++ {
+		stream, err = client.Subscribe(context.Background(), &gqlschema.GqlSchemaSubscribeParams{})
+		if err == nil {
+			break
+		}
+		if i+1 < 3 {
+			time.Sleep(3000 * time.Millisecond)
+		}
 	}
 	return
 }
@@ -78,30 +106,11 @@ type source struct {
 	sdl  string
 }
 
-func getSdl(schemaRegistrySdl string) ([]source, error) {
-	return []source{
-		source{
-			name: "stub.gql",
-			sdl:  `directive @stub(value: String) on FIELD_DEFINITION`,
-		},
-		source{
-			name: "schema-registry",
-			sdl:  schemaRegistrySdl,
-		},
-	}, nil
-}
-
-func parseSdl(sources []source) (*ast.Schema, error) {
-	astSources := make([]*ast.Source, len(sources))
-
-	for i := range sources {
-		astSources[i] = &ast.Source{
-			Name:  sources[i].name,
-			Input: sources[i].sdl,
-		}
-	}
-
-	schema, err := gqlparser.LoadSchema(astSources...)
+func parseSdl(s source) (*ast.Schema, error) {
+	schema, err := gqlparser.LoadSchema(&ast.Source{
+		Name:  s.name,
+		Input: s.sdl,
+	})
 
 	if err != nil {
 		return nil, err
