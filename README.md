@@ -7,6 +7,9 @@ graphql-gateway is composed of these components:
 - **schema-registry** - Continuously collects, validates and unifies all the schema parts.
 - **graphql-server** - A single GraphQL API executed with the unified schema.
 
+## Disclaimer
+This deployment is **NOT** intended for a production environment. It is still a reference implementation and we plan to add some production-ready features like authantication & authorization soon.
+
 ## Example
 
 ### User Service
