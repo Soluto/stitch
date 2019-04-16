@@ -11,11 +11,20 @@ import (
 	"graphql-gateway/generated"
 	"graphql-gateway/utils"
 	"io"
+	"os"
 	"time"
 )
 
-const (
-	address = "graphql-gateway.schema-registry:81"
+func getenv(key, fallback string) string {
+	value := os.Getenv(key)
+	if len(value) == 0 {
+		return fallback
+	}
+	return value
+}
+
+var (
+	address = getenv("SCHEMA_REGISTRY_URL", "graphql-gateway.schema-registry:81")
 )
 
 type schemaResult struct {

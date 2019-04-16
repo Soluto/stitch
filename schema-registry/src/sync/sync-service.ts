@@ -21,7 +21,9 @@ import { print } from "graphql/language/printer";
 
 const emitAndWait = (duration: number) => concat(empty().pipe(delay(duration)));
 
-const sync$ = from(Object.entries(sources)).pipe(
+export const schemas$: Observable<{ [source: string]: string }> = from(
+  Object.entries(sources)
+).pipe(
   mergeMap(
     ([sourceName, source]) =>
       defer(() => source.getSchemas()).pipe(
@@ -42,6 +44,10 @@ const sync$ = from(Object.entries(sources)).pipe(
     }),
     {}
   ),
+  shareReplay(1)
+);
+
+const sync$ = schemas$.pipe(
   map(schemaBySource => makeGqlDocumentFromGqlSources(schemaBySource)),
   map(print),
   distinctUntilChanged(),

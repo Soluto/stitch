@@ -20,6 +20,7 @@
     "graphql": "^14.1.1",
     "graphql-tag": "^2.10.1",
     "grpc": "^1.19.0",
+    "nconf": "^0.10.0",
     "node-fetch": "^2.3.0",
     "ramda": "^0.26.1",
     "rxjs": "^6.4.0"
@@ -30,6 +31,7 @@
     "@types/google-protobuf": "^3.2.7",
     "@types/graphql": "^14.0.7",
     "@types/jest": "^24.0.11",
+    "@types/nconf": "^0.10.0",
     "@types/node-fetch": "^2.1.6",
     "@types/protobufjs": "^6.0.0",
     "@types/ramda": "^0.25.50",
