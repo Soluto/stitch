@@ -6,7 +6,6 @@ spec:
   gql: | 
     type User {
       id: ID!
-      od400: String
       firstName: String
       lastName: String
     }
