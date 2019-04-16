@@ -12,9 +12,11 @@ const validateSource = async (
   res: express.Response
 ) => {
   try {
+    console.log("got validation request");
     const schemas = await schemas$.pipe(take(1)).toPromise();
     schemas[`${req.params.sourceName}.${req[req.params.name]}`] = req.body;
     makeGqlDocumentFromGqlSources(schemas);
+    res.sendStatus(200);
   } catch (error) {
     console.warn(`Failed to validate source - ${source}`, {
       name: req.params.name,

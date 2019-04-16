@@ -6,6 +6,7 @@ import {
 import crd = require("./crd.json");
 import createKubeSource from "./remote-source";
 import "array-flat-polyfill";
+import admission from "./admission";
 
 const PORT = process.env.PORT || 3000; // Replace this
 
@@ -43,3 +44,5 @@ app.get("/", async (_: express.Request, res: express.Response) => {
 app.listen({ port: PORT }, () =>
   console.log(`K8S gql controller ready at http://localhost:${PORT}`)
 );
+
+admission.start();

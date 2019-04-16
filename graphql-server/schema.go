@@ -67,7 +67,7 @@ func subscribeToSchema(schemas chan schemaResult) (err error) {
 		}
 
 		astSchema, err := parseSdl(source{
-			name: "schema regisrty sdl",
+			name: "schema registry sdl",
 			sdl:  gqlSchemaMessage.Schema,
 		})
 		if err != nil {

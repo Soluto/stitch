@@ -5,14 +5,15 @@ import fetch from "node-fetch";
 
 var options = {
   key: process.env.PLATFORM_SSL_KEY,
-  cert: process.env.PLATFORM_SSL_CRT,
-  graphqlRegistryUrl: process.env.GRAPHQL_REGISTRY_URL,
+  cert: process.env.PLATFORM_SSL_CERT,
+  graphqlRegistryUrl: process.env.SCHEMA_REGISTRY_URL,
   sourceName: process.env.GRAPHQL_SOURCE_NAME || "kubernetes"
 };
 
 const app = express();
 
 const error = (res, reason) => {
+  console.error(reason);
   return res.json({
     response: {
       allowed: false,
@@ -26,7 +27,7 @@ const error = (res, reason) => {
   });
 };
 
-app.use("/gql-schema/validate", bodyParser.json(), async (req, res) => {
+app.use("/validate", bodyParser.json(), async (req, res) => {
   if (!req.body) return error(res, "No body");
   const { kind, request } = req.body;
 
@@ -42,10 +43,18 @@ app.use("/gql-schema/validate", bodyParser.json(), async (req, res) => {
   }`;
 
   try {
-    await fetch(`${options.graphqlRegistryUrl}/${source}`, {
-      method: "POST",
-      body: gqlSchema
-    });
+    console.log(`validating new schema: ${source}`);
+    const result = await fetch(
+      `${options.graphqlRegistryUrl}/validate/${options.sourceName}/${source}`,
+      {
+        method: "POST",
+        body: gqlSchema
+      }
+    );
+    if (!result.ok) {
+      throw new Error(`${result.status}: ${result.statusText}`);
+    }
+    console.log(`${source} is valid`);
   } catch (e) {
     return error(res, e);
   }
