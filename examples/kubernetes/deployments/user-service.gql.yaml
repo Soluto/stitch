@@ -15,7 +15,7 @@ spec:
     }
 
     type Mutation {
-      createUser(id: ID!, firstName: String!, lastName: String): String
-        @http(url: "http://user-service.default/users/:id", method: "POST")
+      createUser(firstName: String!, lastName: String): User
+      @http(url: "http://user-service.default/users", method: "POST")
     }
 ---

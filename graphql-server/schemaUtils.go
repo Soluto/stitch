@@ -293,23 +293,18 @@ func convertSchemaObject(d *ast.Definition, c schemaContext) *graphql.Object {
 func ConvertSchema(astSchema *ast.Schema) (schemaPtr *graphql.Schema, err error) {
 	defer utils.Recovery(&err)
 
+	schemaCtx := schemaContext{
+		astSchema,
+		make(map[string]*graphql.Object),
+		make(map[string]*graphql.Interface),
+		make(map[string]*graphql.Union),
+		make(map[string]*graphql.Enum),
+		make(map[string]*graphql.InputObject),
+	}
+
 	schema, err := graphql.NewSchema(graphql.SchemaConfig{
-		Query: convertSchemaObject(astSchema.Query, schemaContext{
-			astSchema,
-			make(map[string]*graphql.Object),
-			make(map[string]*graphql.Interface),
-			make(map[string]*graphql.Union),
-			make(map[string]*graphql.Enum),
-			make(map[string]*graphql.InputObject),
-		}),
-		Mutation: convertSchemaObject(astSchema.Mutation, schemaContext{
-			astSchema,
-			make(map[string]*graphql.Object),
-			make(map[string]*graphql.Interface),
-			make(map[string]*graphql.Union),
-			make(map[string]*graphql.Enum),
-			make(map[string]*graphql.InputObject),
-		}),
+		Query:    convertSchemaObject(astSchema.Query, schemaCtx),
+		Mutation: convertSchemaObject(astSchema.Mutation, schemaCtx),
 	})
 
 	schemaPtr = new(graphql.Schema)
