@@ -255,6 +255,10 @@ func convertSchemaInterface(d *ast.Definition, c schemaContext) *graphql.Interfa
 }
 
 func convertSchemaObject(d *ast.Definition, c schemaContext) *graphql.Object {
+	if d == nil {
+		return nil
+	}
+
 	object, ok := c.objects[d.Name]
 
 	if ok {
@@ -291,6 +295,14 @@ func ConvertSchema(astSchema *ast.Schema) (schemaPtr *graphql.Schema, err error)
 
 	schema, err := graphql.NewSchema(graphql.SchemaConfig{
 		Query: convertSchemaObject(astSchema.Query, schemaContext{
+			astSchema,
+			make(map[string]*graphql.Object),
+			make(map[string]*graphql.Interface),
+			make(map[string]*graphql.Union),
+			make(map[string]*graphql.Enum),
+			make(map[string]*graphql.InputObject),
+		}),
+		Mutation: convertSchemaObject(astSchema.Mutation, schemaContext{
 			astSchema,
 			make(map[string]*graphql.Object),
 			make(map[string]*graphql.Interface),

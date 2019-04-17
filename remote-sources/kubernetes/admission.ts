@@ -7,7 +7,7 @@ var options = {
   key: process.env.PLATFORM_SSL_KEY,
   cert: process.env.PLATFORM_SSL_CERT,
   graphqlRegistryUrl: process.env.SCHEMA_REGISTRY_URL,
-  sourceName: process.env.GRAPHQL_SOURCE_NAME || "kubernetes"
+  sourceName: process.env.GRAPHQL_SOURCE_NAME || "KUBERNETES"
 };
 
 const app = express();
