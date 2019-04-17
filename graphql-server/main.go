@@ -10,10 +10,26 @@ import (
 func main() {
 	fmt.Println("starting...")
 
-	time.Sleep(10000 * time.Millisecond) // TODO: Remove after subscribeToSchema has a connect retry logic
+	time.Sleep(10 * time.Second) // TODO: Remove after subscribeToSchema has a connect retry logic
 
 	schemas := make(chan schemaResult)
-	go subscribeToSchema(schemas)
+	go func() {
+		failures := 0
+		for {
+			start := time.Now()
+			subscribeToSchema(schemas)
+			elapsed := time.Since(start)
+			if elapsed < (10 * time.Second) {
+				failures++
+			} else {
+				failures = 0
+			}
+			if failures == 5 {
+				panic("Failed to connect to grpc channel")
+			}
+			time.Sleep(5 * time.Second)
+		}
+	}()
 
 	var graphqlHttpHandler http.Handler = nil
 
