@@ -52,7 +52,7 @@ data:
           ]
         }
 ---
-apiVersion: graph.soluto/v1
+apiVersion: graphql.gateway/v1
 kind: GqlSchema
 metadata:
   name: user-subscription-service

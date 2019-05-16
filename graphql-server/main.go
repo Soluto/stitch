@@ -10,8 +10,6 @@ import (
 func main() {
 	fmt.Println("starting...")
 
-	time.Sleep(10 * time.Second) // TODO: Remove after subscribeToSchema has a connect retry logic
-
 	schemas := make(chan schemaResult)
 	go func() {
 		failures := 0

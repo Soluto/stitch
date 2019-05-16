@@ -132,7 +132,7 @@ webhooks:
   - name: schema-validation-webhook.graph.platform
     rules:
       - apiGroups:
-          - "graph.soluto"
+          - "graphql.gateway"
         apiVersions:
           - "*"
         operations:

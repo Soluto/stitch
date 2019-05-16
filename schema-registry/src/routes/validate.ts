@@ -12,9 +12,8 @@ const validateSource = async (
   res: express.Response
 ) => {
   try {
-    console.log("got validation request");
+    console.log(`got validation request - ${source}`);
     const schemas = await schemas$.pipe(take(1)).toPromise();
-    console.log(Object.keys(schemas));
     schemas[`${source}.${req.params.name}`] = req.body;
     makeGqlDocumentFromGqlSources(schemas);
     res.sendStatus(200);

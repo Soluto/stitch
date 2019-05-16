@@ -7,7 +7,7 @@ export default (client: KubernetesClient.ApiRoot) =>
       const namespaces = nsResults.body.items.map((x: any) => x.metadata.name);
       const gqlResults = await Promise.all(
         namespaces.map(ns =>
-          client.apis["graph.soluto"].v1.namespaces(ns).gqlschemas.get()
+          client.apis["graphql.gateway"].v1.namespaces(ns).gqlschemas.get()
         )
       );
 
