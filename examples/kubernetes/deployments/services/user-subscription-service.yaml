@@ -52,19 +52,3 @@ data:
           ]
         }
 ---
-apiVersion: graphql.gateway/v1
-kind: GqlSchema
-metadata:
-  name: user-subscription-service
-spec:
-  gql: | 
-    type SubscriptionPlan {
-      plan: String!
-      expirationDate: String
-    }
-
-    type User {
-      subscription: SubscriptionPlan
-        @http(url: "http://user-subscription-service.default/user-subscription/:id")
-    }
----

@@ -3,7 +3,7 @@ kind: GqlSchema
 metadata:
   name: user-service
 spec:
-  gql: | 
+  gql: |
     type User {
       id: ID!
       firstName: String
@@ -18,4 +18,3 @@ spec:
       createUser(firstName: String!, lastName: String): User
       @http(url: "http://user-service.default/users", method: "POST")
     }
----

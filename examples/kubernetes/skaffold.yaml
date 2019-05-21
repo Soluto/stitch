@@ -1,4 +1,4 @@
-apiVersion: skaffold/v1beta8
+apiVersion: skaffold/v1beta10
 kind: Config
 build:
   artifacts:
@@ -17,5 +17,17 @@ build:
 deploy:
   kubectl:
     manifests:
-    - ../../remote-sources/kubernetes/crd.json
-    - ./deployments/**.yaml
+    - ./deployments/infra/rbac.yaml
+
+    - ./deployments/infra/admission-tls-secret.yaml
+    - ./deployments/infra/schema-registry.yaml
+    - ./deployments/infra/gql-controller.yaml
+    - ./deployments/infra/gateway.yaml
+
+    - ./deployments/infra/webhook.yaml
+
+    - ./deployments/services/user-service.yaml
+    - ./deployments/services/user-subscription-service.yaml
+
+    - ./deployments/schemas/user-service.gql.yaml
+    - ./deployments/schemas/user-subscription-service.gql.yaml
