@@ -1,0 +1,25 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: gql-reader
+rules:
+- apiGroups: ["graphql.gateway"]
+  resources: ["*"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gql-reader-gql-controller
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace:  graphql
+roleRef:
+  kind: ClusterRole
+  name: gql-reader
+  apiGroup: rbac.authorization.k8s.io
+

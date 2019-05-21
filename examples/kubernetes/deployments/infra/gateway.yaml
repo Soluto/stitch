@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+  namespace: graphql
+spec:
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      containers:
+      - name: graphql-gateway
+        image: graphql-gateway
+        env:
+          - name: SCHEMA_REGISTRY_URL
+            value: 'schema-registry:81'
+        imagePullPolicy: Never
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: graphql
+  name: gateway
+spec:
+  selector:
+    app: gateway
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8011
