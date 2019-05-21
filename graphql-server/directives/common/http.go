@@ -16,40 +16,6 @@ import (
 	"time"
 )
 
-var httpMiddleware = middlewares.DirectiveDefinition{
-	MiddlewareFactory: func(f *ast.FieldDefinition, d *ast.Directive) middlewares.Middleware {
-		params := parseHTTPParams(d)
-		client := createHTTPClient(params.timeout)
-		return middlewares.Leaf(func(g graphql.ResolveParams) (interface{}, error) {
-			request, err := createHTTPRequest(params, g)
-			if err != nil {
-				return nil, err
-			}
-
-			response, err := client.Do(request)
-			if err != nil {
-				return nil, err
-			}
-
-			defer response.Body.Close()
-
-			buffer, err := ioutil.ReadAll(response.Body)
-			if err != nil {
-				return nil, err
-			}
-
-			var result interface{}
-
-			err = json.Unmarshal(buffer, &result)
-			if err != nil {
-				return nil, err
-			}
-
-			return result, nil
-		})
-	},
-}
-
 type httpParams struct {
 	templateURL string
 	method      string
@@ -66,6 +32,25 @@ type nameValue struct {
 }
 
 type dictionary = map[string]interface{}
+
+type httpClient interface {
+	Do(*http.Request) (*http.Response, error)
+}
+
+var httpMiddleware = middlewares.DirectiveDefinition{
+	MiddlewareFactory: func(f *ast.FieldDefinition, d *ast.Directive) middlewares.Middleware {
+		params := parseHTTPParams(d)
+		client := createHTTPClient(params.timeout)
+		return middlewares.Leaf(func(rp graphql.ResolveParams) (interface{}, error) {
+			request, err := createHTTPRequest(params, rp)
+			if err != nil {
+				return nil, err
+			}
+
+			return doHTTP(request, &client)
+		})
+	},
+}
 
 func parseHTTPParams(d *ast.Directive) httpParams {
 	params := httpParams{}
@@ -139,8 +124,8 @@ func createHTTPClient(timeout int) http.Client {
 	}
 }
 
-func createHTTPRequest(p httpParams, g graphql.ResolveParams) (*http.Request, error) {
-	args, input, source := getArgs(g)
+func createHTTPRequest(p httpParams, rp graphql.ResolveParams) (*http.Request, error) {
+	args, input, source := getArgs(rp)
 
 	URL := getURL(p.templateURL, p.queryParams, args, input, source)
 
@@ -168,6 +153,29 @@ func createHTTPRequest(p httpParams, g graphql.ResolveParams) (*http.Request, er
 	}
 
 	return request, nil
+}
+
+func doHTTP(request *http.Request, client httpClient) (interface{}, error) {
+	response, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+
+	defer response.Body.Close()
+
+	buffer, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var result interface{}
+
+	err = json.Unmarshal(buffer, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func getArgs(g graphql.ResolveParams) (args dictionary, input dictionary, source dictionary) {
