@@ -1,0 +1,43 @@
+{
+  "apiVersion": "apiextensions.k8s.io/v1beta1",
+  "kind": "CustomResourceDefinition",
+  "metadata": {
+    "name": "gqlschemas.graphql.gateway"
+  },
+  "spec": {
+    "group": "graphql.gateway",
+    "names": {
+      "kind": "GqlSchema",
+      "listKind": "GqlSchemaList",
+      "plural": "gqlschemas",
+      "singular": "gqlschema",
+      "shortNames": ["gqls", "gql"]
+    },
+    "scope": "Namespaced",
+    "version": "v1",
+    "additionalPrinterColumns": [
+      {
+        "name": "Gql",
+        "type": "string",
+        "description": "The Gql schema",
+        "JSONPath": ".spec.gql"
+      }
+    ],
+    "validation": {
+      "openAPIV3Schema": {
+        "properties": {
+          "spec": {
+            "properties": {
+              "gql": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "subresources": {
+      "status": {}
+    }
+  }
+}

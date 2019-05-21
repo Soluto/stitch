@@ -7,41 +7,50 @@ import {
   repeat,
   map,
   scan,
-  filter,
   shareReplay,
-  distinctUntilChanged
+  distinctUntilChanged,
+  tap,
+  filter,
+  catchError,
+  combineAll
 } from "rxjs/operators";
 import {
   makeGqlDocumentFromGqlSources,
   GqlSources
 } from "../graphql/create-schema";
-import Source from "../sources";
 import { print } from "graphql/language/printer";
 
-const wait = (duration: number) => concat(empty().pipe(delay(duration)));
+const emitAndWait = (duration: number) => concat(empty().pipe(delay(duration)));
 
-const getSchemaFromSource = (source: Source) =>
-  defer(() => source.getSchemas()).pipe(
-    map(schemaByNames => Object.values(schemaByNames).join("\n"))
-  );
+export const schemas$: Observable<GqlSources> = from(
+  Object.entries(sources)
+).pipe(
+  map(([sourceName, source]) =>
+    defer(() => source.getSchemas()).pipe(
+      mergeMap(schemaByName => from(Object.entries(schemaByName))),
+      map(([name, schema]) => [`${sourceName}.${name}`, schema]),
+      emitAndWait(5000) as any,
+      catchError(err => {
+        console.warn("Error getting schema from source", source, err);
+        return empty();
+      }),
+      repeat(),
+      scan(
+        (schemaBySources: GqlSources, [source, schema]: [string, string]) =>
+          ({
+            ...schemaBySources,
+            [source]: schema
+          } as GqlSources),
+        {}
+      )
+    )
+  ),
+  combineAll(),
+  map(schemas => schemas.reduce((acc, next) => ({ ...acc, ...next }))),
+  shareReplay(1)
+);
 
-const sync$ = from(Object.entries(sources)).pipe(
-  mergeMap(
-    ([sourceName, source]) =>
-      getSchemaFromSource(source).pipe(
-        filter(schema => !!schema),
-        map(schema => [sourceName, schema]),
-        wait(5000) as any,
-        repeat()
-      ) as Observable<[string, string]>
-  ),
-  scan(
-    (schemaBySources: GqlSources, [source, schema]: [string, string]) => ({
-      ...schemaBySources,
-      [source]: schema
-    }),
-    {}
-  ),
+const sync$ = schemas$.pipe(
   map(schemaBySource => makeGqlDocumentFromGqlSources(schemaBySource)),
   map(print),
   distinctUntilChanged(),

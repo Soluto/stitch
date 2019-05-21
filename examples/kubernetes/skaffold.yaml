@@ -1,0 +1,21 @@
+apiVersion: skaffold/v1beta8
+kind: Config
+build:
+  artifacts:
+  - image: graphql-gateway
+    context: ../../graphql-server
+    docker:
+      dockerfile: dockerfile
+  - image: schema-registry
+    context: ../../schema-registry
+    docker:
+      dockerfile: dockerfile
+  - image: gql-controller
+    context: ../../remote-sources/kubernetes
+    docker:
+      dockerfile: dockerfile
+deploy:
+  kubectl:
+    manifests:
+    - ../../remote-sources/kubernetes/crd.json
+    - ./deployments/**.yaml

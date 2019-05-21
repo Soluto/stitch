@@ -1,0 +1,21 @@
+apiVersion: graphql.gateway/v1
+kind: GqlSchema
+metadata:
+  name: user-service
+spec:
+  gql: | 
+    type User {
+      id: ID!
+      firstName: String
+      lastName: String
+    }
+
+    type Query {
+      user(id: ID!): User @http(url: "http://user-service.default/users/:id")
+    }
+
+    type Mutation {
+      createUser(firstName: String!, lastName: String): User
+      @http(url: "http://user-service.default/users", method: "POST")
+    }
+---

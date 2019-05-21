@@ -1,0 +1,14 @@
+type User {
+  id: ID!
+  firstName: String
+  lastName: String
+}
+
+type Query {
+  user(id: ID!): User @http(url: "http://user/users/:id")
+}
+
+type Mutation {
+  createUser(firstName: String!, lastName: String): String
+    @http(url: "http://user/users/:id", method: "POST")
+}

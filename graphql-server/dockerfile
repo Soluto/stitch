@@ -1,7 +1,12 @@
 FROM golang:latest as base
 RUN mkdir /app 
+WORKDIR /app
+
+ADD go.mod /app/go.mod
+ADD go.sum /app/go.sum
+
+RUN go mod download
 ADD . /app/ 
-WORKDIR /app 
 
 FROM base as build
 RUN go build -o main . 

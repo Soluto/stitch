@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "lib": ["es2017", "esnext"],
+    "sourceMap": true,
+    "outDir": "./dist",
+    "allowJs": true
+  }
+}

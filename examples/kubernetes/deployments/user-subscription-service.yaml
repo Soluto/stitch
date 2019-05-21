@@ -1,0 +1,70 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-subscription-service
+spec:
+  selector:
+    matchLabels:
+      app: user-subscription-service
+  template:
+    metadata:
+      labels:
+        app: user-subscription-service
+    spec:
+      containers:
+      - name: user-subscription-service
+        image: clue/json-server
+        volumeMounts:
+          - name: data
+            mountPath: data
+        command:
+          - json-server
+          - --port
+          - "80"
+          - server.json
+      volumes:
+        - name: data
+          configMap:
+            name: user-subscription-service
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: user-subscription-service
+spec:
+  selector:
+    app: user-subscription-service
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-subscription-service
+data:
+  server.json: |
+        {
+          "user-subscription": [
+            { "id": "1", "plan": "trial", "expirationDate": "2019-01-01T00:00:00Z" }
+          ]
+        }
+---
+apiVersion: graphql.gateway/v1
+kind: GqlSchema
+metadata:
+  name: user-subscription-service
+spec:
+  gql: | 
+    type SubscriptionPlan {
+      plan: String!
+      expirationDate: String
+    }
+
+    type User {
+      subscription: SubscriptionPlan
+        @http(url: "http://user-subscription-service.default/user-subscription/:id")
+    }
+---
