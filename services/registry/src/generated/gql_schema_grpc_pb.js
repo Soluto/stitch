@@ -2,7 +2,7 @@
 
 'use strict';
 var grpc = require('grpc');
-var gql_schema_pb = require('./gql_schema_pb.js.js');
+var gql_schema_pb = require('./gql_schema_pb.js');
 
 function serialize_gqlschema_GqlSchemaMessage(arg) {
     if (!(arg instanceof gql_schema_pb.GqlSchemaMessage)) {
