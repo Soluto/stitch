@@ -3,7 +3,7 @@ version: "2.4"
 services:
   graphql-gateway.graphql-server:
     build:
-      context: ../../graphql-server
+      context: ../../services/graphql-server
     depends_on:
       - graphql-gateway.schema-registry
     healthcheck:
@@ -12,7 +12,7 @@ services:
       - 3000:8011
   graphql-gateway.schema-registry:
     build:
-      context: ../../schema-registry
+      context: ../../services/schema-registry
       args:
         target: PRODUCTION
     healthcheck:

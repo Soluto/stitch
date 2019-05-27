@@ -3,11 +3,11 @@ kind: Config
 build:
   artifacts:
   - image: graphql-gateway
-    context: ../../graphql-server
+    context: ../../services/graphql-server
     docker:
       dockerfile: dockerfile
   - image: schema-registry
-    context: ../../schema-registry
+    context: ../../services/schema-registry
     docker:
       dockerfile: dockerfile
   - image: gql-controller

@@ -9,7 +9,7 @@ services:
       - yarn
       - debug
     volumes:
-      - ./schema-registry/src:/service/src
+      - ./services/schema-registry/src:/service/src
     environment:
       - NODE_ENV=dev
     ports:

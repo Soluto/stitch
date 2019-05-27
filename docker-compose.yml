@@ -3,16 +3,17 @@ version: "3.7"
 services:
   graphql-gateway.graphql-server:
     build:
-      context: ./graphql-server
+      context: ./services/graphql-server
     depends_on:
       - graphql-gateway.schema-registry
     healthcheck:
       disable: true
     ports:
       - 3000:8011
+
   graphql-gateway.schema-registry:
     build:
-      context: ./schema-registry
+      context: ./services/schema-registry
       args:
         target: PRODUCTION
     healthcheck:

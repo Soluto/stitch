@@ -13,7 +13,7 @@ grpc_tools_node_protoc \
   -I . \
   ./*.proto
 
-cp -R generated-ts/ ../schema-registry/src/generated
+cp -R generated-ts/ ../services/schema-registry/src/generated
 
 protoc -I ./ gql_schema.proto --go_out=plugins=grpc:./generated-go
 cp -R generated-go/ ../graphql-server/generated
