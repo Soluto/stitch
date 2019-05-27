@@ -1,11 +1,35 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go/request"
 	"github.com/graphql-go/handler"
 	"net/http"
 	"time"
 )
+
+func contextWithClaims(r *http.Request) context.Context {
+	tokenStr, err := request.OAuth2Extractor.ExtractToken(r)
+
+	if err != nil {
+		return r.Context()
+	}
+
+	parser := new(jwt.Parser)
+	claims := jwt.MapClaims{}
+
+	//This is only valid because Airbag handle authentication, otherwise
+	// - this can be a serious security issue
+	_, _, err = parser.ParseUnverified(tokenStr, claims)
+
+	if err != nil {
+		return r.Context()
+	}
+
+	return context.WithValue(r.Context(), "claims", claims)
+}
 
 func main() {
 	fmt.Println("starting...")
@@ -53,8 +77,9 @@ func main() {
 	}()
 
 	mainHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		newRequest := r.WithContext(contextWithClaims(r))
 		if graphqlHttpHandler != nil {
-			graphqlHttpHandler.ServeHTTP(w, r)
+			graphqlHttpHandler.ServeHTTP(w, newRequest)
 		}
 	})
 

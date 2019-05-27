@@ -11,5 +11,6 @@ func getMiddlewareDefinitions() map[string]middlewares.MiddlewareDefinition {
 	directives["overrideContext"] = overrideContext
 	directives["stub"] = stub
 	directives["http"] = httpMiddleware
+	directives["opa"] = opa
 	return directives
 }
