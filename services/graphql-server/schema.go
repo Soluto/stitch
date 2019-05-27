@@ -24,7 +24,7 @@ func getenv(key, fallback string) string {
 }
 
 var (
-	address = getenv("SCHEMA_REGISTRY_URL", "graphql-gateway.schema-registry:81")
+	address = getenv("SCHEMA_REGISTRY_URL", "graphql-gateway.registry:81")
 )
 
 type schemaResult struct {
@@ -46,7 +46,7 @@ func subscribeToSchema(schemas chan schemaResult) (err error) {
 
 	stream, err := subscribe(gqlSchemaClient)
 	if err != nil {
-		fmt.Println("error subscribing to schema-registry", err)
+		fmt.Println("error subscribing to registry", err)
 		return err
 	}
 

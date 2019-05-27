@@ -3,11 +3,11 @@
     "configurations": [{
             "type": "node",
             "request": "attach",
-            "name": "schema-registry",
+            "name": "registry",
             "protocol": "auto",
             "port": 58581,
             "restart": true,
-            "localRoot": "${workspaceFolder}/services/schema-registry",
+            "localRoot": "${workspaceFolder}/services/registry",
             "remoteRoot": "/service"
         },
         {

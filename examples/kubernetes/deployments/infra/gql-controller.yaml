@@ -17,7 +17,7 @@ spec:
         image: gql-controller
         env:
           - name: SCHEMA_REGISTRY_URL
-            value: 'http://schema-registry'
+            value: 'http://registry'
           - name: PORT
             value: "80"
         imagePullPolicy: Never
