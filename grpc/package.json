@@ -1,19 +1,19 @@
 {
-  "name": "graphql-gateway-grpc",
-  "version": "1.0.0",
-  "license": "MIT",
-  "scripts": {
-    "start-example-client": "ts-node example-schema-subscriber-client",
-    "generate-grpc-files": "sh ./generate-grpc-files.sh"
-  },
-  "dependencies": {
-    "grpc": "^1.19.0"
-  },
-  "devDependencies": {
-    "ts-node": "8.0.2",
-    "grpc-tools": "^1.7.1",
-    "grpc_tools_node_protoc_ts": "^2.5.0",
-    "protobufjs": "^6.8.8",
-    "typescript": "^3.3.3333"
-  }
+    "name": "graphql-gateway-grpc",
+    "version": "1.0.0",
+    "license": "MIT",
+    "scripts": {
+        "start-example-client": "ts-node example-schema-subscriber-client",
+        "generate-grpc-files": "sh ./generate-grpc-files.sh"
+    },
+    "dependencies": {
+        "grpc": "^1.21.1"
+    },
+    "devDependencies": {
+        "ts-node": "8.2.0",
+        "grpc-tools": "^1.7.3",
+        "grpc_tools_node_protoc_ts": "^2.5.1",
+        "protobufjs": "^6.8.8",
+        "typescript": "^3.4.5"
+    }
 }
