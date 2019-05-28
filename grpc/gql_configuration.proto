@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package gqlschema;
+package gqlconfig;
 
 service GqlConfiguration {
     rpc Subscribe(GqlConfigurationSubscribeParams) returns (stream GqlConfigurationMessage) {}

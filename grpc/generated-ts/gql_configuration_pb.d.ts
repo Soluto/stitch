@@ -1,4 +1,4 @@
-// package: gqlschema
+// package: gqlconfig
 // file: gql_configuration.proto
 
 /* tslint:disable */

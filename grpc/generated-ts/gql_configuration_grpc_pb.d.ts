@@ -1,4 +1,4 @@
-// package: gqlschema
+// package: gqlconfig
 // file: gql_configuration.proto
 
 /* tslint:disable */
@@ -11,7 +11,7 @@ interface IGqlConfigurationService extends grpc.ServiceDefinition<grpc.UntypedSe
 }
 
 interface IGqlConfigurationService_ISubscribe extends grpc.MethodDefinition<gql_configuration_pb.GqlConfigurationSubscribeParams, gql_configuration_pb.GqlConfigurationMessage> {
-    path: string; // "/gqlschema.GqlConfiguration/Subscribe"
+    path: string; // "/gqlconfig.GqlConfiguration/Subscribe"
     requestStream: boolean; // false
     responseStream: boolean; // true
     requestSerialize: grpc.serialize<gql_configuration_pb.GqlConfigurationSubscribeParams>;
