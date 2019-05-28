@@ -24,7 +24,7 @@ func getenv(key, fallback string) string {
 }
 
 var (
-	address = getenv("SCHEMA_REGISTRY_URL", "graphql-gateway.registry:81")
+	address = getenv("REGISTRY_URL", "graphql-gateway.registry:81")
 )
 
 type schemaResult struct {

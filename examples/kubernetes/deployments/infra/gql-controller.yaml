@@ -16,7 +16,7 @@ spec:
       - name: gql-controller
         image: gql-controller
         env:
-          - name: SCHEMA_REGISTRY_URL
+          - name: REGISTRY_URL
             value: 'http://registry'
           - name: PORT
             value: "80"
