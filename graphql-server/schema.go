@@ -42,16 +42,16 @@ func subscribeToSchema(schemas chan schemaResult) (err error) {
 	}
 	defer conn.Close()
 
-	gqlSchemaClient := gqlschema.NewGqlSchemaClient(conn)
+	gqlConfigurationClient := gqlconfig.NewGqlConfigurationClient(conn)
 
-	stream, err := subscribe(gqlSchemaClient)
+	stream, err := subscribe(gqlConfigurationClient)
 	if err != nil {
 		fmt.Println("error subscribing to schema-registry", err)
 		return err
 	}
 
 	for {
-		gqlSchemaMessage, err := stream.Recv()
+		gqlConfigurationMessage, err := stream.Recv()
 
 		if err == io.EOF {
 			fmt.Println("got EOF")
@@ -68,7 +68,7 @@ func subscribeToSchema(schemas chan schemaResult) (err error) {
 
 		astSchema, err := parseSdl(source{
 			name: "schema registry sdl",
-			sdl:  gqlSchemaMessage.Schema,
+			sdl:  gqlConfigurationMessage.Schema.Gql,
 		})
 		if err != nil {
 			fmt.Println("error parsing SDL")
@@ -97,9 +97,9 @@ func subscribeToSchema(schemas chan schemaResult) (err error) {
 	return
 }
 
-func subscribe(client gqlschema.GqlSchemaClient) (stream gqlschema.GqlSchema_SubscribeClient, err error) {
+func subscribe(client gqlconfig.GqlConfigurationClient) (stream gqlconfig.GqlConfiguration_SubscribeClient, err error) {
 	for i := 0; i < 3; i++ {
-		stream, err = client.Subscribe(context.Background(), &gqlschema.GqlSchemaSubscribeParams{})
+		stream, err = client.Subscribe(context.Background(), &gqlconfig.GqlConfigurationSubscribeParams{})
 		if err == nil {
 			break
 		}
