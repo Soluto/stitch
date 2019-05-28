@@ -15,5 +15,5 @@ grpc_tools_node_protoc \
 
 cp -R generated-ts/ ../schema-registry/src/generated
 
-protoc -I ./ gql_schema.proto --go_out=plugins=grpc:./generated-go
+protoc -I ./ gql_configuration.proto --go_out=plugins=grpc:./generated-go
 cp -R generated-go/ ../graphql-server/generated
