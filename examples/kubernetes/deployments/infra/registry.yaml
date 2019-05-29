@@ -2,19 +2,19 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: graphql
-  name: schema-registry
+  name: registry
 spec:
   selector:
     matchLabels:
-      app: schema-registry
+      app: registry
   template:
     metadata:
       labels:
-        app: schema-registry
+        app: registry
     spec:
       containers:
-      - name: schema-registry
-        image: schema-registry
+      - name: registry
+        image: registry
         env:
           - name: PORT
             value: "80"
@@ -28,10 +28,10 @@ kind: Service
 apiVersion: v1
 metadata:
   namespace: graphql
-  name: schema-registry
+  name: registry
 spec:
   selector:
-    app: schema-registry
+    app: registry
   ports:
     - name: http
       port: 80

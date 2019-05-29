@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  graphql-gateway.schema-registry:
+  graphql-gateway.registry:
     build:
       args:
         target: DEBUG
@@ -9,7 +9,7 @@ services:
       - yarn
       - debug
     volumes:
-      - ./schema-registry/src:/service/src
+      - ./services/registry/src:/service/src
     environment:
       - NODE_ENV=dev
     ports:
