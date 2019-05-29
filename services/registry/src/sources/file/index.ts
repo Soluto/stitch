@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import Source from "..";
+import Source from "../../sources";
 import * as util from "util";
 import * as glob from "glob"
 
