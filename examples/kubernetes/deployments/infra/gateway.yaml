@@ -16,8 +16,8 @@ spec:
       - name: graphql-gateway
         image: graphql-gateway
         env:
-          - name: SCHEMA_REGISTRY_URL
-            value: 'schema-registry:81'
+          - name: REGISTRY_URL
+            value: 'registry:81'
         imagePullPolicy: Never
 ---
 kind: Service

@@ -1,9 +1,9 @@
 {
-  "name": "schema-registry",
+  "name": "registry",
   "version": "1.0.0",
   "description": "Registery for the GraphQL gateway schema",
   "main": "./dist/src/index.js",
-  "repository": "https://github.com/Soluto-Private/graphql-gateway/schema-registry",
+  "repository": "https://github.com/Soluto-Private/graphql-gateway/registry",
   "license": "MIT",
   "scripts": {
     "build": "tsc",

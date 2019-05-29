@@ -3,11 +3,11 @@ kind: Config
 build:
   artifacts:
   - image: graphql-gateway
-    context: ../../graphql-server
+    context: ../../services/graphql-server
     docker:
       dockerfile: dockerfile
-  - image: schema-registry
-    context: ../../schema-registry
+  - image: registry
+    context: ../../services/registry
     docker:
       dockerfile: dockerfile
   - image: gql-controller
@@ -20,7 +20,7 @@ deploy:
     - ./deployments/infra/rbac.yaml
 
     - ./deployments/infra/admission-tls-secret.yaml
-    - ./deployments/infra/schema-registry.yaml
+    - ./deployments/infra/registry.yaml
     - ./deployments/infra/gql-controller.yaml
     - ./deployments/infra/gateway.yaml
 

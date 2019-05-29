@@ -24,16 +24,16 @@ services:
 
   graphql-gateway.graphql-server:
     build:
-      context: ../../graphql-server
+      context: ../../services/graphql-server
     depends_on:
-      - graphql-gateway.schema-registry
+      - graphql-gateway.registry
     healthcheck:
       disable: true
     ports:
       - 3000:8011
-  graphql-gateway.schema-registry:
+  graphql-gateway.registry:
     build:
-      context: ../../schema-registry
+      context: ../../services/registry
       args:
         target: PRODUCTION
     healthcheck:

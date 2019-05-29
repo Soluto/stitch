@@ -17,10 +17,10 @@ grpc_tools_node_protoc \
   ./*.proto
 
 # Clean TS folder in schema-registry
-rm -rf ../schema-registry/src/generated/*
+rm -rf ../services/registry/src/generated/*
 
 # Copy generated files to schema-registry
-cp -R generated-ts/ ../schema-registry/src/generated
+cp -R generated-ts/ ../services/registry/src/generated
 
 # Clean Go output folder
 rm -rf ./generated-go/*
@@ -29,7 +29,7 @@ rm -rf ./generated-go/*
 protoc -I ./ gql_configuration.proto --go_out=plugins=grpc:./generated-go
 
 # Clean graphql-server folder
-rm -rf ../graphql-server/generated/*
+rm -rf ../services/graphql-server/generated/*
 
 # Copy generated files to graphql-server
-cp -R generated-go/ ../graphql-server/generated
+cp -R generated-go/ ../services/graphql-server/generated

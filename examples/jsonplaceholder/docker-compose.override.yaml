@@ -5,7 +5,7 @@ services:
     image: byrnedo/alpine-curl
     volumes:
       - .:/data
-    command: -X POST --header "Content-Type:text/plain" -d @/data/schema.gql http://graphql-gateway.schema-registry/schema/jsonplaceholder
+    command: -X POST --header "Content-Type:text/plain" -d @/data/schema.gql http://graphql-gateway.registry/schema/jsonplaceholder
     depends_on:
-      graphql-gateway.schema-registry:
+      graphql-gateway.registry:
         condition: service_healthy
