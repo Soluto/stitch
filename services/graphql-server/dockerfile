@@ -1,12 +1,12 @@
-FROM golang:latest as base
-RUN mkdir /app 
-WORKDIR /app
+FROM golang:1.12.5-stretch as base
+RUN mkdir /src
+WORKDIR /src
 
-ADD go.mod /app/go.mod
-ADD go.sum /app/go.sum
+COPY go.mod /src/go.mod
+COPY go.sum /src/go.sum
 
 RUN go mod download
-ADD . /app/ 
+COPY . /src/
 
 FROM base as build
 RUN go build -o main . 
@@ -14,5 +14,7 @@ RUN go build -o main .
 FROM build as tests
 RUN go test ./...
 
-FROM build as release
-CMD ["/app/main"]
+FROM gcr.io/distroless/base as release
+COPY --from=build /src/main /app/main
+
+ENTRYPOINT [ "/app/main" ]
