@@ -44,7 +44,7 @@ func main() {
 
 			fmt.Println("updating graphql server...")
 
-			graphqlHttpHandler = handler.New(&handler.Config{
+			graphqlHTTPHandler = handler.New(&handler.Config{
 				Schema:     gqlConfiguration.schema,
 				Pretty:     true,
 				Playground: true,
