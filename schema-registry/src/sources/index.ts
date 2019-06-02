@@ -1,21 +1,21 @@
 import fetch from "node-fetch";
 
 export default interface Source {
-  getSchemas(): Promise<{ [name: string]: string }>;
-  registerSchema(name: string, schema: string): Promise<void>;
+    getGqlObjects(kind: string): Promise<{ [name: string]: string }>;
+    registerGqlObject(name: string, kind: string, definition: string): Promise<void>;
 }
 
 export function remoteSource(remoteSourceHost: String): Source {
-  return {
-    async getSchemas() {
-      const res = await fetch(`${remoteSourceHost}`);
-      return await res.json();
-    },
-    async registerSchema(name: string, schema: string) {
-      await fetch(`${remoteSourceHost}/${name}`, {
-        method: "POST",
-        body: schema
-      });
-    }
-  };
+    return {
+        async getGqlObjects(kind: string) {
+            const res = await fetch(`${remoteSourceHost}/${kind}`);
+            return await res.json();
+        },
+        async registerGqlObject(name: string, kind: string, definition: string) {
+            await fetch(`${remoteSourceHost}/${kind}/${name}`, {
+                method: "POST",
+                body: definition,
+            });
+        }
+    };
 }

@@ -7,38 +7,39 @@ const globAsync = util.promisify(glob);
 
 const readFileAsync = util.promisify(fs.readFile);
 
-type NamedGqlSchema = {
+type NamedGqlObject = {
     name: string;
-    gqlSchema: string;
+    kind: string;
+    definition: string;
 };
 
 const remoteSource: Source = {
-    async getSchemas() {
-        const files = await globAsync("**/*.gql", {});
-        const getSchemaFromFiles: Promise<NamedGqlSchema>[] = files.map(
+    async getGqlObjects(kind: string): Promise<{ [name: string]: string }> {
+        const files = await globAsync(`./${kind}/*.json`, {});
+        const getGqlObjectFromFiles: Promise<NamedGqlObject>[] = files.map(
             async (file: string) => {
                 const fileNameMatch = file.match(/([^\/]+)(?=\.\w+$)/);
                 if (!fileNameMatch) throw "error extracting filename";
 
                 const [name] = fileNameMatch;
                 const fileBuffer = await readFileAsync(file, "utf8");
-                return { name: name, gqlSchema: fileBuffer };
+                return { name, kind, definition: fileBuffer };
             }
         );
 
-        const gqlByNames = await Promise.all(getSchemaFromFiles);
+        const gqlByNames = await Promise.all(getGqlObjectFromFiles);
 
         return gqlByNames.reduce(
-            (agg, { name, gqlSchema }) => ({
+            (agg, { name, definition }) => ({
                 ...agg,
-                [name]: gqlSchema
+                [name]: definition
             }),
             {}
         );
     },
 
-    async registerSchema(name: string, gqlSchema: string) {
-        await fs.writeFileSync(`./${name}.gql`, gqlSchema);
+    async registerGqlObject(name: string, kind: string, definition: string) {
+        await fs.writeFileSync(`./${kind}/${name}.gql`, definition, { encoding: "utf8" });
     }
 };
 

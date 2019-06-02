@@ -1,13 +1,13 @@
-import Source from "./source-type";
+import Source from "..";
 
 const remoteSource: Source = {
-  async getSchemas() {
-    throw "Not implemented";
-  },
+    async getGqlObjects(kind: string): Promise<{ [name: string]: string }> {
+        throw "Not implemented";
+    },
 
-  async registerSchema(name: string, gqlSchema: string) {
-    throw "Not implemented";
-  }
+    async registerGqlObject(name: string, kind: string, definition: string): Promise<void> {
+        throw "Not implemented";
+    }
 };
 
 export default remoteSource;
