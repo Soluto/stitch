@@ -1,4 +1,4 @@
 export default interface Source {
-  getSchemas(): Promise<{ [name: string]: string }>;
-  registerSchema(name: string, schema: string): Promise<void>;
+    getGqlObjects(kind: string): Promise<{ [name: string]: string }>;
+    registerGqlObject(name: string, kind: string, definition: string): Promise<void>;
 }
