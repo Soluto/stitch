@@ -5,7 +5,7 @@ const remoteSource: Source = {
         throw "Not implemented";
     },
 
-    async registerGqlObject(name: string, kind: string, definition: string): Promise<void> {
+    async putGqlObject(name: string, kind: string, definition: string): Promise<void> {
         throw "Not implemented";
     }
 };

@@ -39,7 +39,7 @@ const remoteSource: Source = {
         );
     },
 
-    async registerGqlObject(name: string, kind: string, definition: string) {
+    async putGqlObject(name: string, kind: string, definition: string) {
         await fs.writeFileSync(`./${kind}/${name}.gql`, definition, { encoding: "utf8" });
     }
 };

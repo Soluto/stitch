@@ -26,7 +26,7 @@ export default (client: KubernetesClient.ApiRoot): Source =>
             );
         },
 
-        async registerGqlObject(name: string, gqlSchema: string) {
+        async putGqlObject(name: string, gqlSchema: string) {
             throw "Not implemented";
         }
     });

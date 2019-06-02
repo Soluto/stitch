@@ -34,7 +34,7 @@ app
         const name = req.params.name;
         const definition = req.body;
         try {
-            await remoteSource.registerGqlObject(name, kind, definition);
+            await remoteSource.putGqlObject(name, kind, definition);
             res.sendStatus(200);
             return;
         } catch (error) {

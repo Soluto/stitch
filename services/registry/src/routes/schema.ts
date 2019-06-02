@@ -26,7 +26,7 @@ const postSource = async (
     res: express.Response
 ) => {
     try {
-        await sources[source].registerGqlObject(name, kind, definition);
+        await sources[source].putGqlObject(name, kind, definition);
         res.sendStatus(200);
     } catch (error) {
         console.warn(`Failed to register schema to source - ${source}`, {
