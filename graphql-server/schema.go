@@ -27,12 +27,12 @@ var (
 	address = getenv("SCHEMA_REGISTRY_URL", "graphql-gateway.schema-registry:81")
 )
 
-type schemaResult struct {
+type gqlConfigurationResult struct {
 	schema *graphql.Schema
 	err    error
 }
 
-func subscribeToSchema(schemas chan schemaResult) (err error) {
+func subscribeToGqlConfiguration(gqlConfigurations chan gqlConfigurationResult) (err error) {
 	defer utils.Recovery(&err)
 
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
@@ -59,7 +59,7 @@ func subscribeToSchema(schemas chan schemaResult) (err error) {
 		}
 		if err != nil {
 			fmt.Println("error receiving message")
-			schemas <- schemaResult{
+			gqlConfigurations <- gqlConfigurationResult{
 				schema: nil,
 				err:    err,
 			}
@@ -72,7 +72,7 @@ func subscribeToSchema(schemas chan schemaResult) (err error) {
 		})
 		if err != nil {
 			fmt.Println("error parsing SDL")
-			schemas <- schemaResult{
+			gqlConfigurations <- gqlConfigurationResult{
 				schema: nil,
 				err:    err,
 			}
@@ -82,14 +82,14 @@ func subscribeToSchema(schemas chan schemaResult) (err error) {
 		schema, err := ConvertSchema(astSchema)
 		if err != nil {
 			fmt.Println("error converting schema")
-			schemas <- schemaResult{
+			gqlConfigurations <- gqlConfigurationResult{
 				schema: nil,
 				err:    err,
 			}
 			return err
 		}
 
-		schemas <- schemaResult{
+		gqlConfigurations <- gqlConfigurationResult{
 			schema: schema,
 			err:    nil,
 		}

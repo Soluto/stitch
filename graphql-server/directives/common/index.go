@@ -2,7 +2,7 @@ package common
 
 import "graphql-gateway/directives/middlewares"
 
-// MiddlewareFactrories common
+// MiddlewareDefinitions common
 var MiddlewareDefinitions = getMiddlewareDefinitions()
 
 func getMiddlewareDefinitions() map[string]middlewares.MiddlewareDefinition {

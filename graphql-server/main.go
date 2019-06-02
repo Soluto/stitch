@@ -10,12 +10,12 @@ import (
 func main() {
 	fmt.Println("starting...")
 
-	schemas := make(chan schemaResult)
+	gqlConfigurations := make(chan gqlConfigurationResult)
 	go func() {
 		failures := 0
 		for {
 			start := time.Now()
-			subscribeToSchema(schemas)
+			subscribeToGqlConfiguration(gqlConfigurations)
 			elapsed := time.Since(start)
 			if elapsed < (10 * time.Second) {
 				failures++
@@ -33,18 +33,18 @@ func main() {
 
 	go func() {
 		for {
-			schema := <-schemas
-			fmt.Println("got new schema")
+			gqlConfiguration := <-gqlConfigurations
+			fmt.Println("Got new GQL configuration")
 
-			if schema.err != nil {
-				fmt.Println("error", schema.err)
+			if gqlConfiguration.err != nil {
+				fmt.Println("error", gqlConfiguration.err)
 				continue
 			}
 
 			fmt.Println("updating graphql server...")
 
 			graphqlHttpHandler = handler.New(&handler.Config{
-				Schema:     schema.schema,
+				Schema:     gqlConfiguration.schema,
 				Pretty:     true,
 				Playground: true,
 				GraphiQL:   false,
