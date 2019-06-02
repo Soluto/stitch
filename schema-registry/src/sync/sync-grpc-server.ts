@@ -1,5 +1,8 @@
 import * as grpc from "grpc";
-import sync$ from "./sync-service";
+import {
+    combineLatest
+} from "rxjs";
+import syncSchema$ from "./sync-service";
 import {
     GqlConfigurationMessage,
     GqlSchema,
@@ -12,12 +15,16 @@ import {
 
 const PORT = process.env.GRPC_PORT || 4001;
 
+const syncGqlConfiguration$ = combineLatest([
+    syncSchema$
+], (schema) => ({ schema }));
+
 class GqlConfigurationSubscriptionServer implements IGqlConfigurationServer {
     subscribe(call: grpc.ServerWriteableStream<GqlConfigurationSubscribeParams>) {
-        const subscription = sync$.subscribe(
-            schema => {
+        const subscription = syncGqlConfiguration$.subscribe(
+            configuration => {
                 const gqlSchema = new GqlSchema();
-                gqlSchema.setGql(schema);
+                gqlSchema.setGql(configuration.schema);
 
                 const gqlConfiguration = new GqlConfigurationMessage();
                 gqlConfiguration.setSchema(gqlSchema);

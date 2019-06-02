@@ -52,7 +52,7 @@ export const schemas$: Observable<GqlSources> = from(
     shareReplay(1)
 );
 
-const sync$ = schemas$.pipe(
+const syncSchema$ = schemas$.pipe(
     filter(a => Object.keys(a).length > 0),
     map(schemaBySource => makeGqlDocumentFromGqlSources(schemaBySource)),
     map(print),
@@ -60,4 +60,4 @@ const sync$ = schemas$.pipe(
     shareReplay(1)
 );
 
-export default sync$;
+export default syncSchema$;
