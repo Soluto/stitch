@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import Source from "..";
 import * as util from "util";
-import * as glob from "glob"
+import * as glob from "glob";
 
 const globAsync = util.promisify(glob);
 
@@ -15,8 +15,9 @@ type NamedGqlObject = {
 
 const remoteSource: Source = {
     async getGqlObjects(kind: string): Promise<{ [name: string]: string }> {
-        const files = await globAsync(`./${kind}/*.json`, {});
-        const getGqlObjectFromFiles: Promise<NamedGqlObject>[] = files.map(
+        const builtInObjects = await globAsync(`./builtin-resources/${kind}/*.gql`)
+        const files = await globAsync(`./${kind}/*.gql`, {});
+        const getGqlObjectFromFiles: Promise<NamedGqlObject>[] = [...builtInObjects, ...files].map(
             async (file: string) => {
                 const fileNameMatch = file.match(/([^\/]+)(?=\.\w+$)/);
                 if (!fileNameMatch) throw "error extracting filename";
