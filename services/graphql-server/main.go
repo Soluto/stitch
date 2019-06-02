@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/graphql-go/handler"
 	"net/http"
 	"time"
+
+	"github.com/graphql-go/handler"
 )
 
 func main() {
@@ -29,7 +30,7 @@ func main() {
 		}
 	}()
 
-	var graphqlHttpHandler http.Handler = nil
+	var graphqlHTTPHandler http.Handler
 
 	go func() {
 		for {
@@ -53,8 +54,10 @@ func main() {
 	}()
 
 	mainHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if graphqlHttpHandler != nil {
-			graphqlHttpHandler.ServeHTTP(w, r)
+		if graphqlHTTPHandler != nil {
+			graphqlHTTPHandler.ServeHTTP(w, r)
+		} else {
+			http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
 		}
 	})
 
