@@ -15,6 +15,7 @@ import {
 
 const PORT = process.env.GRPC_PORT || 4001;
 
+// TODO: make this more general
 const syncGqlConfiguration$ = combineLatest([
     syncSchema$
 ], (schema) => ({ schema }));
