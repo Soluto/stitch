@@ -12,14 +12,13 @@ app.use("/health", async (_: express.Request, res: express.Response) =>
     res.send(true)
 );
 
-app.get("/:kind", async (req: express.Request, res: express.Response) => {
-    const kind = req.params.kind;
+app.get("/", async (req: express.Request, res: express.Response) => {
     try {
-        const gqlObjects = await remoteSource.getGqlObjects(kind);
+        const gqlObjects = await remoteSource.getGqlObjects();
         res.send(gqlObjects);
         return;
     } catch (error) {
-        console.warn(`Failed to get ${kind} from source - ${REMOTE_SOURCE_NAME}`, {
+        console.warn(`Failed to get from source - ${REMOTE_SOURCE_NAME}`, {
             error
         });
         res.sendStatus(500);

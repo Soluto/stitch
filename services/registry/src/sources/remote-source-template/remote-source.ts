@@ -1,7 +1,7 @@
 import Source from "..";
 
 const remoteSource: Source = {
-    async getGqlObjects(kind: string): Promise<{ [name: string]: string }> {
+    async getGqlObjects(): Promise<{ [kind: string]: { [name: string]: string } }> {
         throw "Not implemented";
     },
 

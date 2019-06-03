@@ -1,14 +1,14 @@
 import fetch from "node-fetch";
 
 export default interface Source {
-    getGqlObjects(kind: string): Promise<{ [name: string]: string }>;
+    getGqlObjects(): Promise<{ [kind: string]: { [name: string]: string } }>;
     putGqlObject(name: string, kind: string, definition: string): Promise<void>;
 }
 
 export function remoteSource(remoteSourceHost: String): Source {
     return {
-        async getGqlObjects(kind: string) {
-            const res = await fetch(`${remoteSourceHost}/${kind}`);
+        async getGqlObjects() {
+            const res = await fetch(`${remoteSourceHost}`);
             return await res.json();
         },
         async putGqlObject(name: string, kind: string, definition: string) {

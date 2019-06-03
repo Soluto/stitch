@@ -27,7 +27,8 @@ export const schemas$: Observable<GqlSources> = from(
 ).pipe(
     map(([sourceName, source]) =>
         // FIXME: Not only schemas
-        defer(() => source.getGqlObjects("gqlschemas")).pipe(
+        defer(() => source.getGqlObjects()).pipe(
+            map(objs => objs["gqlschemas"]),
             mergeMap(schemaByName => from(Object.entries(schemaByName))),
             map(([name, schema]) => [`${sourceName}.${name}`, schema]),
             emitAndWait(5000) as any,

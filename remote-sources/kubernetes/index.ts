@@ -27,9 +27,9 @@ app.use("/health", async (_: express.Request, res: express.Response) =>
     res.send(true)
 );
 
-app.get("/:kind", async (req: express.Request, res: express.Response) => {
+app.get("/", async (_: express.Request, res: express.Response) => {
     try {
-        const schemas = await kubeSource.getGqlObjects(req.params.kind);
+        const schemas = await kubeSource.getGqlObjects();
         res.send(schemas);
         return;
     } catch (error) {

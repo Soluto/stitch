@@ -6,12 +6,12 @@ import { take } from "rxjs/operators";
 
 const app = express();
 
-const getFromSource = async (source: string, kind: string, res: express.Response) => {
+const getFromSource = async (source: string, res: express.Response) => {
     try {
-        const gqlObjects = await sources[source].getGqlObjects(kind);
+        const gqlObjects = await sources[source].getGqlObjects();
         res.send(gqlObjects);
     } catch (error) {
-        console.warn(`Failed to get ${kind} from source - ${source}`, {
+        console.warn(`Failed to get from source - ${source}`, {
             error
         });
         res.sendStatus(500);
@@ -40,7 +40,7 @@ const postSource = async (
 
 app
     .use(bodyParser.text())
-    .get("/:sourceName/:kind", (req, res) => getFromSource(req.params.sourceName, req.params.kind, res))
+    .get("/:sourceName", (req, res) => getFromSource(req.params.sourceName, res))
     .post("/:sourceName/:kind/:name", (req, res) => {
         const { sourceName, kind, name } = req.params;
         const definition = req.body;

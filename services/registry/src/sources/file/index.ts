@@ -15,33 +15,42 @@ type NamedGqlObject = {
 };
 
 const createSource = (folder: string): Source => ({
-    async getGqlObjects(kind: string): Promise<{ [name: string]: string }> {
-        const files = await globAsync(`${path.join(__dirname, folder)}/${kind}/*.gql`);
-        const getGqlObjectFromFiles: Promise<NamedGqlObject>[] = files.map(
-            async (file: string) => {
-                const fileNameMatch = file.match(/([^\/]+)(?=\.\w+$)/);
-                if (!fileNameMatch) throw "error extracting filename";
-
-                const [name] = fileNameMatch;
-                const fileBuffer = await readFileAsync(file, "utf8");
-                return { name, kind, definition: fileBuffer };
-            }
-        );
-
-        const gqlByNames = await Promise.all(getGqlObjectFromFiles);
-
-        return gqlByNames.reduce(
-            (agg, { name, definition }) => ({
-                ...agg,
-                [name]: definition
-            }),
-            {}
-        );
+    async getGqlObjects(): Promise<{ [kind: string]: { [name: string]: string } }> {
+        const dir = path.join(__dirname, folder);
+        const gqlObjectKinds = fs.readdirSync(dir);
+        const objectsByKind = await Promise.all(gqlObjectKinds.map(async kind => await getGqlObjectsByKind(dir, kind)))
+        return objectsByKind.reduce((acc, p) => ({ ...acc, [p.kind]: p.objects }), {});
     },
 
     async putGqlObject(name: string, kind: string, definition: string) {
         await fs.writeFileSync(`./${kind}/${name}.gql`, definition, { encoding: "utf8" });
     }
 });
+
+const getGqlObjectsByKind = async (folder: string, kind: string): Promise<{ kind: string, objects: { [name: string]: string } }> => {
+    const files = await globAsync(`${folder}/${kind}/**/*.gql`);
+    const getGqlObjectFromFiles: Promise<NamedGqlObject>[] = files.map(
+        async (file: string) => {
+            const fileNameMatch = file.match(/([^\/]+)(?=\.\w+$)/);
+            if (!fileNameMatch) throw "error extracting filename";
+
+            const [name] = fileNameMatch;
+            const fileBuffer = await readFileAsync(file, "utf8");
+            return { name, kind, definition: fileBuffer };
+        }
+    );
+
+    const gqlByNames = await Promise.all(getGqlObjectFromFiles);
+
+    const objects = gqlByNames.reduce(
+        (agg, { name, definition }) => ({
+            ...agg,
+            [name]: definition
+        }),
+        {}
+    );
+
+    return { kind, objects };
+};
 
 export default createSource;
