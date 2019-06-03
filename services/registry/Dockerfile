@@ -24,7 +24,7 @@ COPY --from=build /service/dist ./dist
 COPY --from=build /service/package.json .
 COPY --from=build /service/tsconfig.json .
 COPY --from=build /service/yarn.lock .
-COPY --from=build /service/builtin-resources .
+COPY --from=build /service/builtin-resources ./builtin-resources
 ENV NODE_ENV=production
 
 CMD [ "yarn", "start" ]
