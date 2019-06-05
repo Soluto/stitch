@@ -9,7 +9,9 @@ This is example of running the **agogos** in kubernetes cluster.
 1. Install [Docker](https://www.docker.com/get-started).
 2. Install [`kubectl`](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
 3. Configure `kubectl` to connect to a Kubernetes cluster.
-4. Install [skaffold](https://skaffold.dev/docs/getting-started/).
+4. Install something to ease local development:
+   1. Install [skaffold](https://skaffold.dev/docs/getting-started/).
+   2. Install [tilt](https://docs.tilt.dev/install.html).
 
 You can find all related instructions [here](https://skaffold.dev/docs/getting-started/).
 
@@ -27,10 +29,16 @@ You can find all related instructions [here](https://skaffold.dev/docs/getting-s
     kubectl apply -f ../../remote-sources/kubernetes/GqlSchemaCRD.yaml
     ```
 
-3. Run skaffold in the example's folder:
+3. If you've chosen Skaffold run this in the example's folder:
 
     ```bash
     skaffold dev
+    ```
+
+4. If you've chosen Tilt run this in the example's folder:
+
+    ```bash
+    tilt up
     ```
 
 ## Playing with GraphQL
