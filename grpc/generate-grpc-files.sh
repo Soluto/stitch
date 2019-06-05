@@ -1,3 +1,6 @@
+# Clean JS/TS output folder
+rm -rf ./generated-ts/*
+
 # Generate JavaScript
 grpc_tools_node_protoc \
   --js_out=import_style=commonjs,binary:./generated-ts \
@@ -13,7 +16,20 @@ grpc_tools_node_protoc \
   -I . \
   ./*.proto
 
+# Clean TS folder in schema-registry
+rm -rf ../services/registry/src/generated/*
+
+# Copy generated files to schema-registry
 cp -R generated-ts/ ../services/registry/src/generated
 
-protoc -I ./ gql_schema.proto --go_out=plugins=grpc:./generated-go
-cp -R generated-go/ ../graphql-server/generated
+# Clean Go output folder
+rm -rf ./generated-go/*
+
+# Generage Go
+protoc -I ./ gql_configuration.proto --go_out=plugins=grpc:./generated-go
+
+# Clean graphql-server folder
+rm -rf ../services/graphql-server/generated/*
+
+# Copy generated files to graphql-server
+cp -R generated-go/ ../services/graphql-server/generated

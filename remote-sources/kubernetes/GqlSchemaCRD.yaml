@@ -25,8 +25,6 @@ spec:
     openAPIV3Schema:
       properties:
         spec:
-          properties:
-            gql:
-              type: string
+          type: string
   subresources:
     status: {}

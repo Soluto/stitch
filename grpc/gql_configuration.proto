@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package gqlconfig;
+
+service GqlConfiguration {
+    rpc Subscribe(GqlConfigurationSubscribeParams) returns (stream GqlConfigurationMessage) {}
+}
+
+message GqlConfigurationSubscribeParams {}
+
+message GqlConfigurationMessage {
+    GqlSchema schema = 1;
+}
+
+message GqlSchema {
+    string gql = 1;
+}

@@ -1,32 +1,21 @@
+import * as KubernetesClient from "kubernetes-client";
 import Source from "./source-type";
+import config from "./config";
 
-export default (client: KubernetesClient.ApiRoot) =>
-  ({
-    async getSchemas() {
-      const nsResults = await client.api.v1.namespaces.get();
-      const namespaces = nsResults.body.items.map((x: any) => x.metadata.name);
-      const gqlResults = await Promise.all(
-        namespaces.map(ns =>
-          client.apis["graphql.gateway"].v1.namespaces(ns).gqlschemas.get()
-        )
-      );
+export default (client: KubernetesClient.ApiRoot): Source =>
+    ({
+        async getGqlObjects(): Promise<{ [kind: string]: { [name: string]: string } }> {
+            const namespace = client.apis[config.apiVersion].v1.namespaces(config.namespace);
+            const crdResults = await Promise.all(config.customResourceDefinitions.map(async kind => ({ kind, definition: await namespace[kind].get() })));
+            const crds = crdResults.map(r => ({ kind: r.kind, items: r.definition.body.items }));
+            return crds.map(getObjectDefinitionFromCrd).reduce((acc, o) => ({ ...acc, [o.kind]: o.definition }), {});
+        },
 
-      const schemas = gqlResults
-        .map((gql: any) =>
-          (gql.body.items as object[]).map((x: any) => ({
-            source: `${x.metadata.namespace}.${x.metadata.name}` as string,
-            gql: x.spec.gql as string
-          }))
-        )
-        .flat();
+        async putGqlObject(name: string, gqlSchema: string): Promise<void> {
+            throw "Not implemented";
+        }
+    });
 
-      return schemas.reduce(
-        (acc, { source, gql }) => ({ ...acc, [source]: gql }),
-        {}
-      );
-    },
-
-    async registerSchema(name: string, gqlSchema: string) {
-      throw "Not implemented";
-    }
-  } as Source);
+const getObjectSpecFromItem = item => ({ name: `${item.metadata.namespace}.${item.metadata.name}`, spec: item.spec });
+const getObjectSpecsDictionaryFromItems = items => items.map(getObjectSpecFromItem).reduce((acc, obj) => ({ ...acc, [obj.name]: obj.spec }), {});
+const getObjectDefinitionFromCrd = crdResult => ({ kind: crdResult.kind, definition: getObjectSpecsDictionaryFromItems(crdResult.items) });
