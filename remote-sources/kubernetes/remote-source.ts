@@ -17,5 +17,5 @@ export default (client: KubernetesClient.ApiRoot): Source =>
     });
 
 const getObjectSpecFromItem = item => ({ name: `${item.metadata.namespace}.${item.metadata.name}`, spec: item.spec });
-const getObjectSpecsDictionaryFromItems = items => items.map(getObjectSpecFromItem).reduce((acc, obj) => ({ ...acc, [obj.name]: obj.spec.gql }), {});
+const getObjectSpecsDictionaryFromItems = items => items.map(getObjectSpecFromItem).reduce((acc, obj) => ({ ...acc, [obj.name]: obj.spec }), {});
 const getObjectDefinitionFromCrd = crdResult => ({ kind: crdResult.kind, definition: getObjectSpecsDictionaryFromItems(crdResult.items) });

@@ -29,11 +29,11 @@ app.use("/health", async (_: express.Request, res: express.Response) =>
 
 app.get("/", async (_: express.Request, res: express.Response) => {
     try {
-        const schemas = await kubeSource.getGqlObjects();
-        res.send(schemas);
+        const gqlObjects = await kubeSource.getGqlObjects();
+        res.send(gqlObjects);
         return;
     } catch (error) {
-        console.warn(`Failed to get schema from source kubernetes`, {
+        console.warn(`Failed to get objects from source kubernetes`, {
             error
         });
         res.sendStatus(500);

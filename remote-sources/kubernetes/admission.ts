@@ -37,7 +37,7 @@ app.use("/validate", bodyParser.json(), async (req, res) => {
     if (request.object.kind !== "GqlSchema" || !request.object.spec)
         return error(res, "Accepting only GqlSchema validation request with spec");
 
-    const gqlSchema = request.object.spec.gql;
+    const gqlSchema = request.object.spec;
     const source = `${request.object.metadata.namespace}.${
         request.object.metadata.name
         }`;

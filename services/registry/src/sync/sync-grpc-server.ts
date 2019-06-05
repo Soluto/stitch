@@ -2,7 +2,7 @@ import * as grpc from "grpc";
 import {
     combineLatest
 } from "rxjs";
-import syncSchema$ from "./sync-service";
+import syncSchema$ from "./sync-gqlschemas";
 import {
     GqlConfigurationMessage,
     GqlSchema,

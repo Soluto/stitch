@@ -4,10 +4,7 @@ import Source from "./sources";
 import * as R from "ramda";
 import nconf = require("nconf");
 
-const remoteSources: { [source: string]: string } = R.map(
-    url => remoteSource(url),
-    nconf.get("REMOTESOURCE") || {}
-) as any;
+const remoteSources: { [source: string]: Source } = R.map(url => remoteSource(url), nconf.get("REMOTESOURCE") || {});
 
 // TODO: check relative and absolute paths
 const BUILTIN_RESOURCES_FOLDER = "../../../../builtin-resources";

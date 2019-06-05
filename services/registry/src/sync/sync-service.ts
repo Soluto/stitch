@@ -1,64 +1,57 @@
 import sources from "../sources-config";
-import { defer, from, empty, Observable } from "rxjs";
+import { defer, from, empty, Observable, OperatorFunction } from "rxjs";
 import {
-    mergeMap,
     concat,
     delay,
     repeat,
     map,
     scan,
     shareReplay,
-    distinctUntilChanged,
     catchError,
     combineAll,
     startWith,
-    filter,
 } from "rxjs/operators";
-import {
-    makeGqlDocumentFromGqlSources,
-    GqlSources
-} from "../graphql/create-schema";
-import { print } from "graphql/language/printer";
+
+type GqlObjsByName = { [name: string]: string };
+export type GqlObjByNameByKind = { [kind: string]: GqlObjsByName };
+type GqlObjsByNameByKindBySource = { [source: string]: GqlObjByNameByKind };
+
+const addSourceToName = (source: string, name: string): string => `${source}.${name}`;
+const renameKeys = (source: string, obj: GqlObjsByName): GqlObjsByName => Object.keys(obj).reduce((acc, key) => ({ ...acc, ...{ [addSourceToName(source, key)]: obj[key] } }), {});
+const renameSubKeys = (source: string, obj: GqlObjByNameByKind): GqlObjByNameByKind => Object.keys(obj).reduce((acc, key) => ({ ...acc, [key]: renameKeys(source, obj[key]) }), {});
+
+const safeMergeProperty = (obj: GqlObjByNameByKind, key: string, value: GqlObjsByName): GqlObjByNameByKind => obj[key] ? ({ ...obj, [key]: { ...obj[key], ...value } }) : ({ ...obj, [key]: value });
+const safeMergeObjects = (o1: GqlObjByNameByKind, o2: GqlObjByNameByKind): GqlObjByNameByKind => Object.entries(o2).reduce((acc, [key, value]) => safeMergeProperty(acc, key, value), o1);
 
 const emitAndWait = (duration: number) => concat(empty().pipe(delay(duration)));
 
-export const schemas$: Observable<GqlSources> = from(
-    Object.entries(sources)
-).pipe(
-    map(([sourceName, source]) =>
-        // FIXME: Not only schemas
-        defer(() => source.getGqlObjects()).pipe(
-            map(objs => objs["gqlschemas"]),
-            mergeMap(schemaByName => from(Object.entries(schemaByName))),
-            map(([name, schema]) => [`${sourceName}.${name}`, schema]),
-            emitAndWait(5000) as any,
-            catchError(err => {
-                console.warn("Error getting schema from source", source, err);
-                return empty();
-            }),
-            repeat(),
-            scan(
-                (schemaBySources: GqlSources, [source, schema]: [string, string]) =>
-                    ({
-                        ...schemaBySources,
-                        [source]: schema
-                    } as GqlSources),
-                {}
+const gqlObjects$: Observable<GqlObjByNameByKind> =
+    from(Object.entries(sources))
+        .pipe(
+            map(([sourceName, source]) =>
+                defer((): Promise<GqlObjByNameByKind> => source.getGqlObjects())
+                    .pipe(
+                        map(sourceData => renameSubKeys(sourceName, sourceData)),
+                        emitAndWait(5000) as OperatorFunction<GqlObjByNameByKind, GqlObjByNameByKind>,
+                        catchError(err => {
+                            console.warn("Error getting schema from source", source, err);
+                            return empty();
+                        }),
+                        repeat(),
+                        scan(
+                            (gqlObjBySources: GqlObjByNameByKind, [source, sourceData]: [string, string]) =>
+                                ({
+                                    ...gqlObjBySources,
+                                    [source]: sourceData
+                                } as GqlObjByNameByKind),
+                            {}
+                        ),
+                        startWith({} as GqlObjByNameByKind)
+                    )
             ),
-            startWith({} as GqlSources)
-        )
-    ),
-    combineAll(),
-    map(schemas => schemas.reduce((acc, next) => ({ ...acc, ...next }))),
-    shareReplay(1)
-);
+            combineAll(),
+            map(x => x.reduce((acc, next) => safeMergeObjects(acc, next)), {}),
+            shareReplay(1),
+        );
 
-const syncSchema$ = schemas$.pipe(
-    filter(a => Object.keys(a).length > 0),
-    map(schemaBySource => makeGqlDocumentFromGqlSources(schemaBySource)),
-    map(print),
-    distinctUntilChanged(),
-    shareReplay(1)
-);
-
-export default syncSchema$;
+export default gqlObjects$;
