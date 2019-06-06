@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: user-subscription-service
+  namespace: default
 spec:
   selector:
     matchLabels:
