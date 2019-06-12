@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gateway
-  namespace: graphql
+  namespace: agogos
 spec:
   selector:
     matchLabels:
@@ -23,7 +23,7 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  namespace: graphql
+  namespace: agogos
   name: gateway
 spec:
   selector:

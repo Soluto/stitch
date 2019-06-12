@@ -4,9 +4,9 @@ import (
 	"fmt"
 	graphql "github.com/graphql-go/graphql"
 	"github.com/vektah/gqlparser/ast"
-	"graphql-gateway/directives/common"
-	"graphql-gateway/directives/middlewares"
-	"graphql-gateway/utils"
+	"agogos/directives/common"
+	"agogos/directives/middlewares"
+	"agogos/utils"
 	"reflect"
 )
 

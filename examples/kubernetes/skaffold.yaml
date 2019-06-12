@@ -2,7 +2,7 @@ apiVersion: skaffold/v1beta10
 kind: Config
 build:
   artifacts:
-  - image: graphql-gateway
+  - image: agogos
     context: ../../services/graphql-server
     docker:
       dockerfile: dockerfile
@@ -29,5 +29,5 @@ deploy:
     - ./deployments/services/user-service.yaml
     - ./deployments/services/user-subscription-service.yaml
 
-    - ./deployments/schemas/user-service.gql.yaml
-    - ./deployments/schemas/user-subscription-service.gql.yaml
+    - ./deployments/crds/schemas/user-service.gql.yaml
+    - ./deployments/crds/schemas/user-subscription-service.gql.yaml

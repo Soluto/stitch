@@ -1,5 +1,5 @@
 {
-    "name": "graphql-gateway-grpc",
+    "name": "agogos-grpc",
     "version": "1.0.0",
     "license": "MIT",
     "scripts": {

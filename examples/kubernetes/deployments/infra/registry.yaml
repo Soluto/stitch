@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: graphql
+  namespace: agogos
   name: registry
 spec:
   selector:
@@ -27,7 +27,7 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  namespace: graphql
+  namespace: agogos
   name: registry
 spec:
   selector:

@@ -1,22 +1,33 @@
+k8s_yaml('./deployments/infra/namespace.yaml')
+
+k8s_yaml([
+    '../../remote-sources/kubernetes/GqlSchemaCRD.yaml',
+])
+
 k8s_yaml([
     './deployments/infra/rbac.yaml',
+    './deployments/infra/gql-controller.yaml',
     './deployments/infra/admission-tls-secret.yaml',
     './deployments/infra/registry.yaml',
-    './deployments/infra/gql-controller.yaml',
     './deployments/infra/gateway.yaml',
 
     './deployments/infra/webhook.yaml',
+])
 
+
+k8s_yaml('./deployments/services/user-namespace.yaml')
+k8s_yaml([
     './deployments/services/user-service.yaml',
     './deployments/services/user-subscription-service.yaml',
+])
 
-    './deployments/schemas/user-service.gql.yaml',
-    './deployments/schemas/user-subscription-service.gql.yaml'
+k8s_yaml([
+    './deployments/crds/schemas/user-service.gql.yaml',
+    './deployments/crds/schemas/user-subscription-service.gql.yaml'
 ])
 
 docker_build('graphql-gateway', '../../services/graphql-server')
 docker_build('registry', '../../services/registry')
 docker_build('gql-controller', '../../remote-sources/kubernetes')
-
 
 k8s_resource('gateway', port_forwards=['8011:8011'])

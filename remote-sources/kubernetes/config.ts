@@ -1,6 +1,6 @@
 export default {
-    namespace: "graphql",
-    apiVersion: "graphql.gateway",
+    namespace: "agogos",
+    apiVersion: "agogos.soluto",
     customResourceDefinitions: [
         "gqlschemas",
     ],

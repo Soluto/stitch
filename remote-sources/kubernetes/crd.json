@@ -2,10 +2,10 @@
     "apiVersion": "apiextensions.k8s.io/v1beta1",
     "kind": "CustomResourceDefinition",
     "metadata": {
-        "name": "gqlschemas.graphql.gateway"
+        "name": "gqlschemas.agogos"
     },
     "spec": {
-        "group": "graphql.gateway",
+        "group": "agogos",
         "names": {
             "kind": "GqlSchema",
             "listKind": "GqlSchemaList",

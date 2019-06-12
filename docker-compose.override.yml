@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  graphql-gateway.registry:
+  agogos.registry:
     build:
       args:
         target: DEBUG

@@ -1,6 +1,6 @@
 package common
 
-import "graphql-gateway/directives/middlewares"
+import "agogos/directives/middlewares"
 
 // MiddlewareDefinitions common
 var MiddlewareDefinitions = getMiddlewareDefinitions()
