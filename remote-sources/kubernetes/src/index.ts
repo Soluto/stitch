@@ -1,6 +1,5 @@
 import * as express from "express";
 import * as k8s from "@kubernetes/client-node";
-import crd = require("./crd.json");
 import createKubeSource from "./remote-source";
 import "array-flat-polyfill";
 import admission from "./admission";
