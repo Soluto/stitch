@@ -9,7 +9,8 @@ RUN if [ $target = "DEBUG" ]; then yarn --pure-lockfile --production false; fi
 
 FROM dependencies as build
 RUN yarn --production false
-COPY . .
+COPY ./src ./src
+COPY tsconfig.json ./
 RUN yarn build
 
 FROM build as tests

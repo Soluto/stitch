@@ -1,8 +1,5 @@
 import * as express from "express";
-import {
-    config as kubeConfig,
-    Client1_10 as KubeClient
-} from "kubernetes-client";
+import * as k8s from "@kubernetes/client-node";
 import crd = require("./crd.json");
 import createKubeSource from "./remote-source";
 import "array-flat-polyfill";
@@ -10,11 +7,10 @@ import admission from "./admission";
 
 const PORT = process.env.PORT || 3000; // Replace this
 
-function createKubeClient() {
-    const config = kubeConfig.getInCluster();
-    const client = new KubeClient({ config });
-    client.addCustomResourceDefinition(crd);
-    return client;
+const createKubeClient = (): k8s.CustomObjectsApi => {
+    const kc = new k8s.KubeConfig();
+    kc.loadFromCluster();
+    return kc.makeApiClient(k8s.CustomObjectsApi);
 }
 
 const kubeClient = createKubeClient();
