@@ -1,4 +1,4 @@
-apiVersion: agogos.soluto/v1
+apiVersion: agogos.soluto.com/v1
 kind: GqlSchema
 metadata:
   name: user-service

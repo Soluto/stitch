@@ -3,7 +3,7 @@ kind: ClusterRole
 metadata:
   name: gql-reader
 rules:
-- apiGroups: ["agogos.soluto"]
+- apiGroups: ["agogos.soluto.com"]
   resources: ["*"]
   verbs: ["get", "watch", "list"]
 - apiGroups: [""]
