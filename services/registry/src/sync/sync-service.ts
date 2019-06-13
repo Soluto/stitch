@@ -38,14 +38,6 @@ const gqlObjects$: Observable<GqlObjByNameByKind> =
                             return empty();
                         }),
                         repeat(),
-                        scan(
-                            (gqlObjBySources: GqlObjByNameByKind, [source, sourceData]: [string, string]) =>
-                                ({
-                                    ...gqlObjBySources,
-                                    [source]: sourceData
-                                } as GqlObjByNameByKind),
-                            {}
-                        ),
                         startWith({} as GqlObjByNameByKind)
                     )
             ),

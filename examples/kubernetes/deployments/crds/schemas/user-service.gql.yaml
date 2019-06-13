@@ -1,4 +1,4 @@
-apiVersion: graphql.gateway/v1
+apiVersion: agogos.soluto.com/v1
 kind: GqlSchema
 metadata:
   name: user-service
@@ -10,10 +10,10 @@ spec: |
   }
 
   type Query {
-    user(id: ID!): User @http(url: "http://user-service.default/users/:id")
+    user(id: ID!): User @http(url: "http://user-service.user-namespace/users/:id")
   }
 
   type Mutation {
     createUser(firstName: String!, lastName: String): User
-    @http(url: "http://user-service.default/users", method: "POST")
+    @http(url: "http://user-service.user-namespace/users", method: "POST")
   }

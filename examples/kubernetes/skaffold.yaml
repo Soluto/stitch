@@ -2,7 +2,7 @@ apiVersion: skaffold/v1beta10
 kind: Config
 build:
   artifacts:
-  - image: graphql-gateway
+  - image: agogos
     context: ../../services/graphql-server
     docker:
       dockerfile: dockerfile

@@ -1,4 +1,4 @@
-module graphql-gateway
+module agogos
 
 require (
 	github.com/golang/protobuf v1.3.0
