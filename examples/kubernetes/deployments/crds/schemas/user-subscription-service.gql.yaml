@@ -10,5 +10,5 @@ spec: |
 
   type User {
     subscription: SubscriptionPlan
-      @http(url: "http://user-subscription-service.default/user-subscription/:id")
+      @http(url: "http://user-subscription-service.user-namespace/user-subscription/:id")
   }
