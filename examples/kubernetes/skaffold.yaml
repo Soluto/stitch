@@ -19,15 +19,21 @@ deploy:
     manifests:
     - ./deployments/infra/rbac.yaml
 
+    - ./deployments/infra/auth-secret.yaml
     - ./deployments/infra/admission-tls-secret.yaml
+
     - ./deployments/infra/registry.yaml
     - ./deployments/infra/gql-controller.yaml
     - ./deployments/infra/gateway.yaml
 
     - ./deployments/infra/webhook.yaml
 
+    - ./deployments/mocks/identity-server-mock.yaml
+
     - ./deployments/services/user-service.yaml
     - ./deployments/services/user-subscription-service.yaml
 
-    - ./deployments/schemas/user-service.gql.yaml
-    - ./deployments/schemas/user-subscription-service.gql.yaml
+    - ./deployments/crds/schemas/user-service.gql.yaml
+    - ./deployments/crds/schemas/user-subscription-service.gql.yaml
+    - ./deployments/crds/endpoints/user-service.endpoint.yaml
+    - ./deployments/crds/authProviders/user-service.authProvider.yaml

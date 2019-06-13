@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identity-server-mock
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: identity-server-mock
+  template:
+    metadata:
+      labels:
+        app: identity-server-mock
+    spec:
+      containers:
+      - name: identity-server-mock
+        image: soluto/oidc-server-mock
+        env:
+          - name: CLIENT_CREDENTIALS_CLIENT_ID
+            value: agogos_client_id
+          - name: CLIENT_CREDENTIALS_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: agogos-credentials
+                key: client_secret
+          - name: API_RESOURCE
+            value: user-service-scope
+      volumes:
+        - name: agogos-credentials
+          secret:
+            secretName: auth-secret
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: user-service
+spec:
+  selector:
+    app: user-service
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-service
+data:
+  server.json: |
+        {
+          "users": [{ "id": "1", "firstName": "john", "lastName": "doe" }]
+        }
+---

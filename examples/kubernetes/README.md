@@ -25,6 +25,8 @@ You can find all related instructions [here](https://skaffold.dev/docs/getting-s
 
     ```bash
     kubectl apply -f ../../remote-sources/kubernetes/GqlSchemaCRD.yaml
+    kubectl apply -f ../../remote-sources/kubernetes/GqlEndpointCRD.yaml
+    kubectl apply -f ../../remote-sources/kubernetes/GqlAuthProviderCRD.yaml
     ```
 
 3. Run skaffold in the example's folder:
