@@ -1,7 +1,7 @@
 import { take, map } from "rxjs/operators";
 
 import gqlObjects$ from "../sync/sync-service";
-import { makeGqlDocumentFromGqlSources } from "../sync/sync-gqlschemas";
+import { makeGqlDocumentFromGqlSources } from "../sync/sync-gqlSchemas";
 
 const validateSchema = async (
     source: string,

@@ -1,6 +1,6 @@
 export default {
     namespace: "agogos",
-    apiGroup: "agogos.soluto.com",
+    apiGroup: "agogos.app",
     apiVersion: "v1",
     customResourceDefinitions: [
         "gqlschemas",
