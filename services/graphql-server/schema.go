@@ -8,8 +8,8 @@ import (
 	"context"
 	"fmt"
 	"google.golang.org/grpc"
-	"graphql-gateway/generated"
-	"graphql-gateway/utils"
+	"agogos/generated"
+	"agogos/utils"
 	"io"
 	"os"
 	"time"
@@ -24,7 +24,7 @@ func getenv(key, fallback string) string {
 }
 
 var (
-	address = getenv("REGISTRY_URL", "graphql-gateway.registry:81")
+	address = getenv("REGISTRY_URL", "agogos.registry:81")
 )
 
 type gqlConfigurationResult struct {

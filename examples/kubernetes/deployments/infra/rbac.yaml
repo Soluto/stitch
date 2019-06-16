@@ -3,7 +3,7 @@ kind: ClusterRole
 metadata:
   name: gql-reader
 rules:
-- apiGroups: ["graphql.gateway"]
+- apiGroups: ["agogos.app"]
   resources: ["*"]
   verbs: ["get", "watch", "list"]
 - apiGroups: [""]
@@ -17,7 +17,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: default
-  namespace:  graphql
+  namespace:  agogos
 roleRef:
   kind: ClusterRole
   name: gql-reader

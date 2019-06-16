@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Registery for the GraphQL gateway schema",
   "main": "./dist/src/index.js",
-  "repository": "https://github.com/Soluto-Private/graphql-gateway/registry",
+  "repository": "https://github.com/Soluto-Private/agogos/registry",
   "license": "MIT",
   "scripts": {
     "build": "tsc",

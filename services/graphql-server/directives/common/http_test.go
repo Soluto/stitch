@@ -7,7 +7,7 @@ import (
 	"github.com/graphql-go/graphql"
 	"github.com/vektah/gqlparser"
 	"github.com/vektah/gqlparser/ast"
-	"graphql-gateway/utils"
+	"agogos/utils"
 	"io/ioutil"
 	"net/http"
 	"testing"

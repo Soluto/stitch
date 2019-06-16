@@ -22,16 +22,16 @@ services:
     ports:
       - 8888:80
 
-  graphql-gateway.graphql-server:
+  agogos.graphql-server:
     build:
       context: ../../services/graphql-server
     depends_on:
-      - graphql-gateway.registry
+      - agogos.registry
     healthcheck:
       disable: true
     ports:
       - 3000:8011
-  graphql-gateway.registry:
+  agogos.registry:
     build:
       context: ../../services/registry
       args:

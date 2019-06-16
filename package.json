@@ -1,8 +1,8 @@
 {
-  "name": "graphql-gateway",
+  "name": "agogos",
   "version": "1.0.0",
   "description": "GraphQL Gatway for distributed resolved schema",
-  "repository": "https://github.com/Soluto-Private/graphql-gateway",
+  "repository": "https://github.com/Soluto-Private/agogos",
   "license": "MIT",
   "scripts": {
     "start": "docker-compose up",

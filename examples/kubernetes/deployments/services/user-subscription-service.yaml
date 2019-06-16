@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: user-subscription-service
-  namespace: default
+  namespace: user-namespace
 spec:
   selector:
     matchLabels:
@@ -33,6 +33,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: user-subscription-service
+  namespace: user-namespace
 spec:
   selector:
     app: user-subscription-service
@@ -45,6 +46,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: user-subscription-service
+  namespace: user-namespace
 data:
   server.json: |
         {

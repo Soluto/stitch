@@ -1,8 +1,8 @@
-# graphql-gateway
+# agogos
 
 It allows you to create a unified GraphQL API in a microservices architecture. Each microservice contributes to a single unified schema.
 
-graphql-gateway is composed of these components:
+agogos is composed of these components:
 
 - **registry** - Continuously collects, validates and unifies all the schema parts
 - **graphql-server** - A single GraphQL API executed with the unified schema

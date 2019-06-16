@@ -1,4 +1,4 @@
-apiVersion: graphql.gateway/v1
+apiVersion: agogos.app/v1
 kind: GqlSchema
 metadata:
   name: user-subscription-service
@@ -10,5 +10,5 @@ spec: |
 
   type User {
     subscription: SubscriptionPlan
-      @http(url: "http://user-subscription-service.default/user-subscription/:id")
+      @http(url: "http://user-subscription-service.user-namespace/user-subscription/:id")
   }

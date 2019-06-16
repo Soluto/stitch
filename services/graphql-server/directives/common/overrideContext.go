@@ -3,7 +3,7 @@ package common
 import (
 	"github.com/graphql-go/graphql"
 	"github.com/vektah/gqlparser/ast"
-	"graphql-gateway/directives/middlewares"
+	"agogos/directives/middlewares"
 )
 
 var overrideContext = middlewares.DirectiveDefinition{
