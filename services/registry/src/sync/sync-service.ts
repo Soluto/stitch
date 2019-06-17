@@ -12,7 +12,7 @@ import {
     startWith,
 } from "rxjs/operators";
 
-type GqlObjsByName = { [name: string]: string };
+type GqlObjsByName = { [name: string]: any };
 export type GqlObjByNameByKind = { [kind: string]: GqlObjsByName };
 type GqlObjsByNameByKindBySource = { [source: string]: GqlObjByNameByKind };
 

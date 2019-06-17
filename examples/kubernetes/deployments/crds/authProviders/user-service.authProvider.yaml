@@ -1,13 +1,13 @@
 apiVersion: agogos.app/v1
 kind: GqlAuthProvider
 metadata:
-    name: user-service-auth provider
+    name: user-service-auth-provider
 spec:
   type: oauth2/client_credentials
-  authority: "http://oidc-server-mock"
+  authority: "http://oidc-server-mock/connect/token"
   client_id: agogos_client_id
   client_secret:
     valueFrom:
-    secretKeyRef:
-      secretName: auth-secret
-      key: client_secret
+      secretKeyRef:
+        secretName: agogos-credentials
+        key: client_secret

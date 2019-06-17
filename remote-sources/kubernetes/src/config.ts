@@ -4,5 +4,7 @@ export default {
     apiVersion: "v1",
     customResourceDefinitions: [
         "gqlschemas",
+        "gqlendpoints",
+        "gqlauthproviders",
     ],
 };

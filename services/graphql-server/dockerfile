@@ -9,12 +9,12 @@ RUN go mod download
 COPY . /src/
 
 FROM base as build
-RUN go build -o main . 
+RUN go build -o agogos .
 
 FROM build as tests
 RUN go test ./...
 
 FROM gcr.io/distroless/base as release
-COPY --from=build /src/main /app/main
+COPY --from=build /src/agogos /app/agogos
 
-ENTRYPOINT [ "/app/main" ]
+ENTRYPOINT [ "/app/agogos" ]

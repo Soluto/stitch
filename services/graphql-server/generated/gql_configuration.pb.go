@@ -24,6 +24,28 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+type AuthenticationType int32
+
+const (
+	AuthenticationType_client_credentials AuthenticationType = 0
+)
+
+var AuthenticationType_name = map[int32]string{
+	0: "client_credentials",
+}
+
+var AuthenticationType_value = map[string]int32{
+	"client_credentials": 0,
+}
+
+func (x AuthenticationType) String() string {
+	return proto.EnumName(AuthenticationType_name, int32(x))
+}
+
+func (AuthenticationType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_c11b78add49bf2c8, []int{0}
+}
+
 type GqlConfigurationSubscribeParams struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -56,10 +78,12 @@ func (m *GqlConfigurationSubscribeParams) XXX_DiscardUnknown() {
 var xxx_messageInfo_GqlConfigurationSubscribeParams proto.InternalMessageInfo
 
 type GqlConfigurationMessage struct {
-	Schema               *GqlSchema `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
-	XXX_unrecognized     []byte     `json:"-"`
-	XXX_sizecache        int32      `json:"-"`
+	Schema               *GqlSchema         `protobuf:"bytes,1,opt,name=schema,proto3" json:"schema,omitempty"`
+	Endpoints            []*GqlEndpoint     `protobuf:"bytes,2,rep,name=endpoints,proto3" json:"endpoints,omitempty"`
+	AuthProviders        []*GqlAuthProvider `protobuf:"bytes,3,rep,name=authProviders,proto3" json:"authProviders,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_unrecognized     []byte             `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
 }
 
 func (m *GqlConfigurationMessage) Reset()         { *m = GqlConfigurationMessage{} }
@@ -90,6 +114,20 @@ var xxx_messageInfo_GqlConfigurationMessage proto.InternalMessageInfo
 func (m *GqlConfigurationMessage) GetSchema() *GqlSchema {
 	if m != nil {
 		return m.Schema
+	}
+	return nil
+}
+
+func (m *GqlConfigurationMessage) GetEndpoints() []*GqlEndpoint {
+	if m != nil {
+		return m.Endpoints
+	}
+	return nil
+}
+
+func (m *GqlConfigurationMessage) GetAuthProviders() []*GqlAuthProvider {
+	if m != nil {
+		return m.AuthProviders
 	}
 	return nil
 }
@@ -133,28 +171,210 @@ func (m *GqlSchema) GetGql() string {
 	return ""
 }
 
+type GqlEndpoint struct {
+	Host                 string                     `protobuf:"bytes,1,opt,name=host,proto3" json:"host,omitempty"`
+	Auth                 *GqlEndpointAuthentication `protobuf:"bytes,3,opt,name=auth,proto3" json:"auth,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                   `json:"-"`
+	XXX_unrecognized     []byte                     `json:"-"`
+	XXX_sizecache        int32                      `json:"-"`
+}
+
+func (m *GqlEndpoint) Reset()         { *m = GqlEndpoint{} }
+func (m *GqlEndpoint) String() string { return proto.CompactTextString(m) }
+func (*GqlEndpoint) ProtoMessage()    {}
+func (*GqlEndpoint) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c11b78add49bf2c8, []int{3}
+}
+
+func (m *GqlEndpoint) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GqlEndpoint.Unmarshal(m, b)
+}
+func (m *GqlEndpoint) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GqlEndpoint.Marshal(b, m, deterministic)
+}
+func (m *GqlEndpoint) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GqlEndpoint.Merge(m, src)
+}
+func (m *GqlEndpoint) XXX_Size() int {
+	return xxx_messageInfo_GqlEndpoint.Size(m)
+}
+func (m *GqlEndpoint) XXX_DiscardUnknown() {
+	xxx_messageInfo_GqlEndpoint.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GqlEndpoint proto.InternalMessageInfo
+
+func (m *GqlEndpoint) GetHost() string {
+	if m != nil {
+		return m.Host
+	}
+	return ""
+}
+
+func (m *GqlEndpoint) GetAuth() *GqlEndpointAuthentication {
+	if m != nil {
+		return m.Auth
+	}
+	return nil
+}
+
+type GqlEndpointAuthentication struct {
+	Type                 AuthenticationType `protobuf:"varint,1,opt,name=type,proto3,enum=gqlconfig.AuthenticationType" json:"type,omitempty"`
+	Authority            string             `protobuf:"bytes,2,opt,name=authority,proto3" json:"authority,omitempty"`
+	Scope                string             `protobuf:"bytes,3,opt,name=scope,proto3" json:"scope,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_unrecognized     []byte             `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
+}
+
+func (m *GqlEndpointAuthentication) Reset()         { *m = GqlEndpointAuthentication{} }
+func (m *GqlEndpointAuthentication) String() string { return proto.CompactTextString(m) }
+func (*GqlEndpointAuthentication) ProtoMessage()    {}
+func (*GqlEndpointAuthentication) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c11b78add49bf2c8, []int{4}
+}
+
+func (m *GqlEndpointAuthentication) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GqlEndpointAuthentication.Unmarshal(m, b)
+}
+func (m *GqlEndpointAuthentication) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GqlEndpointAuthentication.Marshal(b, m, deterministic)
+}
+func (m *GqlEndpointAuthentication) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GqlEndpointAuthentication.Merge(m, src)
+}
+func (m *GqlEndpointAuthentication) XXX_Size() int {
+	return xxx_messageInfo_GqlEndpointAuthentication.Size(m)
+}
+func (m *GqlEndpointAuthentication) XXX_DiscardUnknown() {
+	xxx_messageInfo_GqlEndpointAuthentication.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GqlEndpointAuthentication proto.InternalMessageInfo
+
+func (m *GqlEndpointAuthentication) GetType() AuthenticationType {
+	if m != nil {
+		return m.Type
+	}
+	return AuthenticationType_client_credentials
+}
+
+func (m *GqlEndpointAuthentication) GetAuthority() string {
+	if m != nil {
+		return m.Authority
+	}
+	return ""
+}
+
+func (m *GqlEndpointAuthentication) GetScope() string {
+	if m != nil {
+		return m.Scope
+	}
+	return ""
+}
+
+type GqlAuthProvider struct {
+	Type                 AuthenticationType `protobuf:"varint,1,opt,name=type,proto3,enum=gqlconfig.AuthenticationType" json:"type,omitempty"`
+	Authority            string             `protobuf:"bytes,2,opt,name=authority,proto3" json:"authority,omitempty"`
+	ClientId             string             `protobuf:"bytes,3,opt,name=clientId,proto3" json:"clientId,omitempty"`
+	ClientSecret         string             `protobuf:"bytes,4,opt,name=clientSecret,proto3" json:"clientSecret,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_unrecognized     []byte             `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
+}
+
+func (m *GqlAuthProvider) Reset()         { *m = GqlAuthProvider{} }
+func (m *GqlAuthProvider) String() string { return proto.CompactTextString(m) }
+func (*GqlAuthProvider) ProtoMessage()    {}
+func (*GqlAuthProvider) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c11b78add49bf2c8, []int{5}
+}
+
+func (m *GqlAuthProvider) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GqlAuthProvider.Unmarshal(m, b)
+}
+func (m *GqlAuthProvider) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GqlAuthProvider.Marshal(b, m, deterministic)
+}
+func (m *GqlAuthProvider) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GqlAuthProvider.Merge(m, src)
+}
+func (m *GqlAuthProvider) XXX_Size() int {
+	return xxx_messageInfo_GqlAuthProvider.Size(m)
+}
+func (m *GqlAuthProvider) XXX_DiscardUnknown() {
+	xxx_messageInfo_GqlAuthProvider.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GqlAuthProvider proto.InternalMessageInfo
+
+func (m *GqlAuthProvider) GetType() AuthenticationType {
+	if m != nil {
+		return m.Type
+	}
+	return AuthenticationType_client_credentials
+}
+
+func (m *GqlAuthProvider) GetAuthority() string {
+	if m != nil {
+		return m.Authority
+	}
+	return ""
+}
+
+func (m *GqlAuthProvider) GetClientId() string {
+	if m != nil {
+		return m.ClientId
+	}
+	return ""
+}
+
+func (m *GqlAuthProvider) GetClientSecret() string {
+	if m != nil {
+		return m.ClientSecret
+	}
+	return ""
+}
+
 func init() {
+	proto.RegisterEnum("gqlconfig.AuthenticationType", AuthenticationType_name, AuthenticationType_value)
 	proto.RegisterType((*GqlConfigurationSubscribeParams)(nil), "gqlconfig.GqlConfigurationSubscribeParams")
 	proto.RegisterType((*GqlConfigurationMessage)(nil), "gqlconfig.GqlConfigurationMessage")
 	proto.RegisterType((*GqlSchema)(nil), "gqlconfig.GqlSchema")
+	proto.RegisterType((*GqlEndpoint)(nil), "gqlconfig.GqlEndpoint")
+	proto.RegisterType((*GqlEndpointAuthentication)(nil), "gqlconfig.GqlEndpointAuthentication")
+	proto.RegisterType((*GqlAuthProvider)(nil), "gqlconfig.GqlAuthProvider")
 }
 
 func init() { proto.RegisterFile("gql_configuration.proto", fileDescriptor_c11b78add49bf2c8) }
 
 var fileDescriptor_c11b78add49bf2c8 = []byte{
-	// 179 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0x4f, 0x2f, 0xcc, 0x89,
-	0x4f, 0xce, 0xcf, 0x4b, 0xcb, 0x4c, 0x2f, 0x2d, 0x4a, 0x2c, 0xc9, 0xcc, 0xcf, 0xd3, 0x2b, 0x28,
-	0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x4c, 0x2f, 0xcc, 0x81, 0x88, 0x2b, 0x29, 0x72, 0xc9, 0xbb, 0x17,
-	0xe6, 0x38, 0x23, 0x2b, 0x0a, 0x2e, 0x4d, 0x2a, 0x4e, 0x2e, 0xca, 0x4c, 0x4a, 0x0d, 0x48, 0x2c,
-	0x4a, 0xcc, 0x2d, 0x56, 0x72, 0xe7, 0x12, 0x47, 0x57, 0xe2, 0x9b, 0x5a, 0x5c, 0x9c, 0x98, 0x9e,
-	0x2a, 0xa4, 0xc3, 0xc5, 0x56, 0x9c, 0x9c, 0x91, 0x9a, 0x9b, 0x28, 0xc1, 0xa8, 0xc0, 0xa8, 0xc1,
-	0x6d, 0x24, 0xa2, 0x07, 0x37, 0x59, 0xcf, 0xbd, 0x30, 0x27, 0x18, 0x2c, 0x17, 0x04, 0x55, 0xa3,
-	0x24, 0xcb, 0xc5, 0x09, 0x17, 0x14, 0x12, 0xe0, 0x62, 0x4e, 0x2f, 0xcc, 0x01, 0xeb, 0xe3, 0x0c,
-	0x02, 0x31, 0x8d, 0x8a, 0xb9, 0x04, 0xd0, 0xed, 0x11, 0x8a, 0xe7, 0xe2, 0x84, 0x3b, 0x47, 0x48,
-	0x0b, 0xd5, 0x74, 0x7c, 0x8e, 0x96, 0x52, 0xc2, 0xa3, 0x16, 0xea, 0x7a, 0x25, 0x06, 0x03, 0xc6,
-	0x24, 0x36, 0x70, 0x88, 0x18, 0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0x43, 0x2d, 0xf4, 0x77, 0x2c,
-	0x01, 0x00, 0x00,
+	// 397 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x93, 0x4f, 0xcf, 0xd2, 0x40,
+	0x10, 0xc6, 0x29, 0xad, 0xc4, 0x0e, 0xfe, 0x21, 0x13, 0x02, 0x95, 0x48, 0xc4, 0x8d, 0x07, 0x42,
+	0x08, 0xd1, 0xea, 0xc1, 0xa3, 0xc6, 0x18, 0xe2, 0xc1, 0x84, 0x14, 0x6f, 0x1e, 0x48, 0xd9, 0xae,
+	0x65, 0x93, 0xd2, 0x6d, 0x77, 0x17, 0x13, 0xae, 0x7e, 0x14, 0xbf, 0x88, 0x5f, 0xcd, 0x74, 0xdb,
+	0x94, 0x16, 0x7d, 0x39, 0xbd, 0xb7, 0xd9, 0x99, 0xdf, 0xcc, 0xf3, 0x74, 0x3b, 0x0b, 0xe3, 0x38,
+	0x4f, 0x76, 0x54, 0xa4, 0x3f, 0x78, 0x7c, 0x92, 0xa1, 0xe6, 0x22, 0x5d, 0x65, 0x52, 0x68, 0x81,
+	0x6e, 0x9c, 0x27, 0x65, 0x9e, 0xbc, 0x84, 0x17, 0xeb, 0x3c, 0xf9, 0xd4, 0x84, 0xb6, 0xa7, 0xbd,
+	0xa2, 0x92, 0xef, 0xd9, 0x26, 0x94, 0xe1, 0x51, 0x91, 0x3f, 0x16, 0x8c, 0xaf, 0x99, 0xaf, 0x4c,
+	0xa9, 0x30, 0x66, 0xb8, 0x84, 0x9e, 0xa2, 0x07, 0x76, 0x0c, 0x3d, 0x6b, 0x66, 0xcd, 0xfb, 0xfe,
+	0x70, 0x55, 0x8f, 0x5e, 0xad, 0xf3, 0x64, 0x6b, 0x6a, 0x41, 0xc5, 0xe0, 0x3b, 0x70, 0x59, 0x1a,
+	0x65, 0x82, 0xa7, 0x5a, 0x79, 0xdd, 0x99, 0x3d, 0xef, 0xfb, 0xa3, 0x76, 0xc3, 0xe7, 0xaa, 0x1c,
+	0x5c, 0x40, 0xfc, 0x00, 0x8f, 0xc3, 0x93, 0x3e, 0x6c, 0xa4, 0xf8, 0xc9, 0x23, 0x26, 0x95, 0x67,
+	0x9b, 0xce, 0x49, 0xbb, 0xf3, 0x63, 0x03, 0x09, 0xda, 0x0d, 0x64, 0x0a, 0x6e, 0x6d, 0x06, 0x07,
+	0x60, 0xc7, 0x79, 0x62, 0xfc, 0xba, 0x41, 0x11, 0x92, 0xef, 0xd0, 0x6f, 0x48, 0x23, 0x82, 0x73,
+	0x10, 0x4a, 0x57, 0x84, 0x89, 0xf1, 0x3d, 0x38, 0xc5, 0x48, 0xcf, 0x36, 0x5f, 0xf9, 0xea, 0xff,
+	0xa6, 0x0b, 0x0b, 0x2c, 0xd5, 0x9c, 0x9a, 0x2b, 0x0a, 0x4c, 0x07, 0xf9, 0x65, 0xc1, 0xb3, 0x3b,
+	0x19, 0x7c, 0x03, 0x8e, 0x3e, 0x67, 0xcc, 0x68, 0x3d, 0xf1, 0xa7, 0x8d, 0xb9, 0x6d, 0xf0, 0xdb,
+	0x39, 0x63, 0x81, 0x41, 0xf1, 0x39, 0xb8, 0xc5, 0x60, 0x21, 0xb9, 0x3e, 0x7b, 0x5d, 0xe3, 0xf1,
+	0x92, 0xc0, 0x21, 0x3c, 0x50, 0x54, 0x64, 0xcc, 0x38, 0x75, 0x83, 0xf2, 0x40, 0x7e, 0x5b, 0xf0,
+	0xf4, 0xea, 0x8e, 0xee, 0x5f, 0x7a, 0x02, 0x0f, 0x69, 0xc2, 0x59, 0xaa, 0xbf, 0x44, 0x95, 0x7a,
+	0x7d, 0x46, 0x02, 0x8f, 0xca, 0x78, 0xcb, 0xa8, 0x64, 0xda, 0x73, 0x4c, 0xbd, 0x95, 0x5b, 0x2c,
+	0x01, 0xff, 0x55, 0xc6, 0x11, 0x60, 0x49, 0xed, 0xa8, 0x64, 0x51, 0x51, 0x0c, 0x13, 0x35, 0xe8,
+	0xf8, 0x0a, 0x06, 0xd7, 0x4b, 0x89, 0x3b, 0x70, 0xeb, 0xe5, 0xc5, 0x45, 0xfb, 0x27, 0xdd, 0x5a,
+	0xf1, 0x09, 0xb9, 0xc1, 0x56, 0xab, 0x4e, 0x3a, 0xaf, 0xad, 0x7d, 0xcf, 0xbc, 0x9f, 0xb7, 0x7f,
+	0x03, 0x00, 0x00, 0xff, 0xff, 0xe9, 0xbf, 0xb2, 0x39, 0x5a, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.

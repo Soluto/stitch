@@ -1,15 +1,13 @@
-apiVersion: agogos.soluto.com/v1
+apiVersion: agogos.app/v1
 kind: GqlEndpoint
 metadata:
   name: user-service-endpoint
 spec:
-  matchHosts:
-  - user-service
-  host: "http://user-service.user-namespace"
+  host: "user-service.user-namespace"
   headers:
   - name: "X-API-CLIENT"
     value: agogos
   auth:
     type: oauth2/client_credentials
-    authority: "http://oidc-server-mock"
+    authority: "http://oidc-server-mock/connect/token"
     scope: user-service-scope

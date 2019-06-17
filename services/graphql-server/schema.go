@@ -13,6 +13,9 @@ import (
 	"io"
 	"os"
 	"time"
+
+	endpoints "agogos/extensions/endpoints"
+	authproviders "agogos/extensions/authproviders"
 )
 
 func getenv(key, fallback string) string {
@@ -65,6 +68,9 @@ func subscribeToGqlConfiguration(gqlConfigurations chan gqlConfigurationResult) 
 			}
 			return err
 		}
+
+		endpoints.Init(gqlConfigurationMessage.Endpoints)
+		authproviders.Init(gqlConfigurationMessage.AuthProviders)
 
 		astSchema, err := parseSdl(source{
 			name: "schema registry sdl",

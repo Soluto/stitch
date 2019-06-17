@@ -10,8 +10,32 @@ message GqlConfigurationSubscribeParams {}
 
 message GqlConfigurationMessage {
     GqlSchema schema = 1;
+    repeated GqlEndpoint endpoints = 2;
+    repeated GqlAuthProvider authProviders = 3;
 }
 
 message GqlSchema {
     string gql = 1;
+}
+
+message GqlEndpoint {
+    string host = 1;
+    GqlEndpointAuthentication auth = 3;
+}
+
+message GqlEndpointAuthentication {
+    AuthenticationType type = 1;
+    string authority = 2;
+    string scope = 3;
+}
+
+message GqlAuthProvider {
+    AuthenticationType type = 1;
+    string authority = 2;
+    string clientId = 3;
+    string clientSecret = 4;
+}
+
+enum AuthenticationType {
+    client_credentials = 0;
 }

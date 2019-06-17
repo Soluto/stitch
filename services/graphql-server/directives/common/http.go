@@ -1,19 +1,21 @@
 package common
 
 import (
+	"agogos/directives/middlewares"
+	"agogos/extensions/endpoints"
+	"agogos/utils"
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/graphql-go/graphql"
-	"github.com/vektah/gqlparser/ast"
-	"agogos/directives/middlewares"
-	"agogos/utils"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/graphql-go/graphql"
+	"github.com/vektah/gqlparser/ast"
 )
 
 type httpParams struct {
@@ -150,6 +152,12 @@ func createHTTPRequest(p httpParams, rp graphql.ResolveParams) (*http.Request, e
 
 	if p.method != "GET" && p.contentType == "json" {
 		request.Header.Set("Content-Type", "application/json")
+	}
+
+	// TODO: Make endpoints not connected directly to specific directive
+	ep, ok := endpoints.Get(request.URL.Host)
+	if ok {
+		ep.ApplyEndpoint(request)
 	}
 
 	return request, nil

@@ -1,9 +1,9 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: gqlendpoints.agogos.soluto.com
+  name: gqlendpoints.agogos.app
 spec:
-  group: agogos.soluto.com
+  group: agogos.app
   versions:
     - name: v1
       served: true
@@ -30,10 +30,6 @@ spec:
       properties:
         spec:
           properties:
-            matchHosts:
-              type: array
-              items:
-                type: string
             host:
               type: string
             auth:

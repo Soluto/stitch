@@ -19,7 +19,7 @@ deploy:
     manifests:
     - ./deployments/infra/rbac.yaml
 
-    - ./deployments/infra/auth-secret.yaml
+    - ./deployments/infra/agogos-credentials.yaml
     - ./deployments/infra/admission-tls-secret.yaml
 
     - ./deployments/infra/registry.yaml
@@ -28,7 +28,7 @@ deploy:
 
     - ./deployments/infra/webhook.yaml
 
-    - ./deployments/mocks/identity-server-mock.yaml
+    - ./deployments/mocks/oidc-server-mock.yaml
 
     - ./deployments/services/user-service.yaml
     - ./deployments/services/user-subscription-service.yaml
