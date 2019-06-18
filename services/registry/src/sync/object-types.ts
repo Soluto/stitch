@@ -1,4 +1,6 @@
-export type GqlSchemaConfig = string;
+export type GqlSchemaConfig = {
+    definition: string
+};
 
 export type GqlEndpointConfig = {
     host: string,

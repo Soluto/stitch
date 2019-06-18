@@ -1,8 +1,9 @@
 import fetch from "node-fetch";
+import { GqlAgogosObjectConfig } from "../sync/object-types";
 
 export default interface Source {
-    getGqlObjects(): Promise<{ [kind: string]: { [name: string]: string } }>;
-    putGqlObject(name: string, kind: string, definition: string): Promise<void>;
+    getGqlObjects(): Promise<{ [kind: string]: { [name: string]: GqlAgogosObjectConfig } }>;
+    putGqlObject(name: string, kind: string, definition: GqlAgogosObjectConfig): Promise<void>;
 }
 
 export function remoteSource(remoteSourceHost: String): Source {
@@ -11,10 +12,10 @@ export function remoteSource(remoteSourceHost: String): Source {
             const res = await fetch(`${remoteSourceHost}`);
             return await res.json();
         },
-        async putGqlObject(name: string, kind: string, definition: string) {
+        async putGqlObject(name: string, kind: string, definition: GqlAgogosObjectConfig) {
             await fetch(`${remoteSourceHost}/${kind}/${name}`, {
                 method: "POST",
-                body: definition,
+                body: JSON.stringify(definition),
             });
         }
     };

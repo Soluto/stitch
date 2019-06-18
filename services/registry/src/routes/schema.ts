@@ -3,6 +3,7 @@ import * as bodyParser from "body-parser";
 import sources, { defaultSource } from "../sources-config";
 import syncSchema$ from "../sync/sync-service";
 import { take } from "rxjs/operators";
+import { GqlAgogosObjectConfig } from "../sync/object-types";
 
 const app = express();
 
@@ -22,7 +23,7 @@ const postSource = async (
     source: string,
     kind: string,
     name: string,
-    definition: string,
+    definition: GqlAgogosObjectConfig,
     res: express.Response
 ) => {
     try {

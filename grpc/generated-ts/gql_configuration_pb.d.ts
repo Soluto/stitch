@@ -59,8 +59,8 @@ export namespace GqlConfigurationMessage {
 }
 
 export class GqlSchema extends jspb.Message { 
-    getGql(): string;
-    setGql(value: string): void;
+    getDefinition(): string;
+    setDefinition(value: string): void;
 
 
     serializeBinary(): Uint8Array;
@@ -75,7 +75,7 @@ export class GqlSchema extends jspb.Message {
 
 export namespace GqlSchema {
     export type AsObject = {
-        gql: string,
+        definition: string,
     }
 }
 

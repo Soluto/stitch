@@ -6,7 +6,7 @@ import { GqlAgogosObjectConfig } from "./object-types";
 
 export default (client: k8s.CustomObjectsApi): Source =>
     ({
-        async getGqlObjects(): Promise<{ [kind: string]: { [name: string]: string } }> {
+        async getGqlObjects(): Promise<{ [kind: string]: { [name: string]: GqlAgogosObjectConfig } }> {
             const crds = await Promise.all(config.customResourceDefinitions.map(async kind => ({
                 kind,
                 definition: await getGqlObjectsByKind(kind, client),
@@ -14,7 +14,7 @@ export default (client: k8s.CustomObjectsApi): Source =>
             return crds.reduce((acc, o) => ({ ...acc, [o.kind]: o.definition }), {});
         },
 
-        async putGqlObject(name: string, gqlSchema: string): Promise<void> {
+        async putGqlObject(name: string, kind: string, definition: GqlAgogosObjectConfig): Promise<void> {
             throw "Not implemented";
         }
     });

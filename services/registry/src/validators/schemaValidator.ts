@@ -13,7 +13,7 @@ const validateSchema = async (
             map(x => x.gqlschemas),
             take(1),
         ).toPromise();
-    schemas[`${source}.${name}`] = definition;
+    schemas[`${source}.${name}`] = { definition };
     makeGqlDocumentFromGqlSources(schemas);
 };
 

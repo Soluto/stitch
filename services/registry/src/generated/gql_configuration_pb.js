@@ -438,7 +438,7 @@ proto.gqlconfig.GqlSchema.prototype.toObject = function(opt_includeInstance) {
  */
 proto.gqlconfig.GqlSchema.toObject = function(includeInstance, msg) {
   var f, obj = {
-    gql: jspb.Message.getFieldWithDefault(msg, 1, "")
+    definition: jspb.Message.getFieldWithDefault(msg, 1, "")
   };
 
   if (includeInstance) {
@@ -477,7 +477,7 @@ proto.gqlconfig.GqlSchema.deserializeBinaryFromReader = function(msg, reader) {
     switch (field) {
     case 1:
       var value = /** @type {string} */ (reader.readString());
-      msg.setGql(value);
+      msg.setDefinition(value);
       break;
     default:
       reader.skipField();
@@ -508,7 +508,7 @@ proto.gqlconfig.GqlSchema.prototype.serializeBinary = function() {
  */
 proto.gqlconfig.GqlSchema.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getGql();
+  f = message.getDefinition();
   if (f.length > 0) {
     writer.writeString(
       1,
@@ -519,16 +519,16 @@ proto.gqlconfig.GqlSchema.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional string gql = 1;
+ * optional string definition = 1;
  * @return {string}
  */
-proto.gqlconfig.GqlSchema.prototype.getGql = function() {
+proto.gqlconfig.GqlSchema.prototype.getDefinition = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /** @param {string} value */
-proto.gqlconfig.GqlSchema.prototype.setGql = function(value) {
+proto.gqlconfig.GqlSchema.prototype.setDefinition = function(value) {
   jspb.Message.setProto3StringField(this, 1, value);
 };
 

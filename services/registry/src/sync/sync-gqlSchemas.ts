@@ -11,8 +11,8 @@ import gqlObjects$, { GqlObjsByName } from "./sync-service";
 import gql from "graphql-tag";
 import { mergeDocuments } from "../graphql/schema-utils";
 import { DocumentNode } from "graphql";
-
-export type GqlSchemas = { [source: string]: string };
+import { GqlSchemaConfig } from "./object-types";
+import { GqlSchema } from "../generated/gql_configuration_pb";
 
 function parseGqlSource(schemaName: string, schema: string) {
     try {
@@ -39,7 +39,7 @@ function mergeAllDocuments(docs: DocumentNode[]) {
 }
 
 export const makeGqlDocumentFromGqlSources = (gqlSchemas: GqlObjsByName) => {
-    const documentNodes = Object.entries(gqlSchemas).map(([schemaName, schema]) => parseGqlSource(schemaName, schema as string));
+    const documentNodes = Object.entries(gqlSchemas).map(([schemaName, schema]: [string, GqlSchemaConfig]) => parseGqlSource(schemaName, schema.definition));
     return mergeAllDocuments(documentNodes);
 };
 

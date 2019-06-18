@@ -3,6 +3,8 @@ import Source from "../../sources";
 import * as util from "util";
 import * as glob from "glob";
 import * as path from "path";
+import { GqlAgogosObjectConfig } from "../../sync/object-types";
+import extractDefinition from "./extraction";
 
 const globAsync = util.promisify(glob);
 
@@ -11,18 +13,18 @@ const readFileAsync = util.promisify(fs.readFile);
 type NamedGqlObject = {
     name: string;
     kind: string;
-    definition: string;
+    definition: GqlAgogosObjectConfig;
 };
 
 const createSource = (folder: string): Source => ({
-    async getGqlObjects(): Promise<{ [kind: string]: { [name: string]: string } }> {
+    async getGqlObjects(): Promise<{ [kind: string]: { [name: string]: GqlAgogosObjectConfig } }> {
         const dir = path.join(__dirname, folder);
         const gqlObjectKinds = fs.readdirSync(dir);
         const objectsByKind = await Promise.all(gqlObjectKinds.map(async kind => await getGqlObjectsByKind(dir, kind)))
         return objectsByKind.reduce((acc, p) => ({ ...acc, [p.kind]: p.objects }), {});
     },
 
-    async putGqlObject(name: string, kind: string, definition: string) {
+    async putGqlObject(name: string, kind: string, definition: GqlAgogosObjectConfig) {
         await fs.writeFileSync(`./${kind}/${name}.gql`, definition, { encoding: "utf8" });
     }
 });
@@ -36,7 +38,8 @@ const getGqlObjectsByKind = async (folder: string, kind: string): Promise<{ kind
 
             const [name] = fileNameMatch;
             const fileBuffer = await readFileAsync(file, "utf8");
-            return { name, kind, definition: fileBuffer };
+            const definition = extractDefinition(kind, fileBuffer);
+            return { name, kind, definition };
         }
     );
 
