@@ -1,7 +1,7 @@
 package authproviders
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 
 	"golang.org/x/net/context"
@@ -27,7 +27,8 @@ func (ap *clientCredentialsAuthProvider) AddAuthentication(req *http.Request) {
 	}
 	tok, err := conf.Token(context.Background())
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("Failed to retrieve token from %s:\n %v", ap.authority, err)
+		return
 	}
 	tok.SetAuthHeader(req)
 }

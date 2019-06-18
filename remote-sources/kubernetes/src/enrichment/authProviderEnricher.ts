@@ -1,12 +1,13 @@
 import k8s = require("@kubernetes/client-node");
 import config from "../config";
+import { GqlAuthProviderConfig } from "../object-types";
 
 const k8sConfig = new k8s.KubeConfig();
 k8sConfig.loadFromCluster();
 
 const client = k8sConfig.makeApiClient(k8s.CoreV1Api);
 
-export default async (authProvider: any): Promise<any> => {
+export default async (authProvider: GqlAuthProviderConfig): Promise<GqlAuthProviderConfig> => {
     if (typeof authProvider.client_secret === "string") {
         return authProvider;
     }
@@ -23,6 +24,6 @@ export default async (authProvider: any): Promise<any> => {
         return enrichedAuthProvider;
     }
 
-    console.log("Something wrong with authProvider...");
+    console.warn(`Something wrong with ${authProvider.type} for ${authProvider.authority} authentication provider...`);
     return authProvider;
 };

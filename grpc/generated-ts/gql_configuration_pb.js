@@ -11,7 +11,6 @@ var jspb = require('google-protobuf');
 var goog = jspb;
 var global = Function('return this')();
 
-goog.exportSymbol('proto.gqlconfig.AuthenticationType', null, global);
 goog.exportSymbol('proto.gqlconfig.GqlAuthProvider', null, global);
 goog.exportSymbol('proto.gqlconfig.GqlConfigurationMessage', null, global);
 goog.exportSymbol('proto.gqlconfig.GqlConfigurationSubscribeParams', null, global);
@@ -191,7 +190,7 @@ proto.gqlconfig.GqlConfigurationMessage.toObject = function(includeInstance, msg
     schema: (f = msg.getSchema()) && proto.gqlconfig.GqlSchema.toObject(includeInstance, f),
     endpointsList: jspb.Message.toObjectList(msg.getEndpointsList(),
     proto.gqlconfig.GqlEndpoint.toObject, includeInstance),
-    authprovidersList: jspb.Message.toObjectList(msg.getAuthprovidersList(),
+    authProvidersList: jspb.Message.toObjectList(msg.getAuthProvidersList(),
     proto.gqlconfig.GqlAuthProvider.toObject, includeInstance)
   };
 
@@ -242,7 +241,7 @@ proto.gqlconfig.GqlConfigurationMessage.deserializeBinaryFromReader = function(m
     case 3:
       var value = new proto.gqlconfig.GqlAuthProvider;
       reader.readMessage(value,proto.gqlconfig.GqlAuthProvider.deserializeBinaryFromReader);
-      msg.addAuthproviders(value);
+      msg.addAuthProviders(value);
       break;
     default:
       reader.skipField();
@@ -289,7 +288,7 @@ proto.gqlconfig.GqlConfigurationMessage.serializeBinaryToWriter = function(messa
       proto.gqlconfig.GqlEndpoint.serializeBinaryToWriter
     );
   }
-  f = message.getAuthprovidersList();
+  f = message.getAuthProvidersList();
   if (f.length > 0) {
     writer.writeRepeatedMessage(
       3,
@@ -362,17 +361,17 @@ proto.gqlconfig.GqlConfigurationMessage.prototype.clearEndpointsList = function(
 
 
 /**
- * repeated GqlAuthProvider authProviders = 3;
+ * repeated GqlAuthProvider auth_providers = 3;
  * @return {!Array<!proto.gqlconfig.GqlAuthProvider>}
  */
-proto.gqlconfig.GqlConfigurationMessage.prototype.getAuthprovidersList = function() {
+proto.gqlconfig.GqlConfigurationMessage.prototype.getAuthProvidersList = function() {
   return /** @type{!Array<!proto.gqlconfig.GqlAuthProvider>} */ (
     jspb.Message.getRepeatedWrapperField(this, proto.gqlconfig.GqlAuthProvider, 3));
 };
 
 
 /** @param {!Array<!proto.gqlconfig.GqlAuthProvider>} value */
-proto.gqlconfig.GqlConfigurationMessage.prototype.setAuthprovidersList = function(value) {
+proto.gqlconfig.GqlConfigurationMessage.prototype.setAuthProvidersList = function(value) {
   jspb.Message.setRepeatedWrapperField(this, 3, value);
 };
 
@@ -382,13 +381,13 @@ proto.gqlconfig.GqlConfigurationMessage.prototype.setAuthprovidersList = functio
  * @param {number=} opt_index
  * @return {!proto.gqlconfig.GqlAuthProvider}
  */
-proto.gqlconfig.GqlConfigurationMessage.prototype.addAuthproviders = function(opt_value, opt_index) {
+proto.gqlconfig.GqlConfigurationMessage.prototype.addAuthProviders = function(opt_value, opt_index) {
   return jspb.Message.addToRepeatedWrapperField(this, 3, opt_value, proto.gqlconfig.GqlAuthProvider, opt_index);
 };
 
 
-proto.gqlconfig.GqlConfigurationMessage.prototype.clearAuthprovidersList = function() {
-  this.setAuthprovidersList([]);
+proto.gqlconfig.GqlConfigurationMessage.prototype.clearAuthProvidersList = function() {
+  this.setAuthProvidersList([]);
 };
 
 
@@ -623,7 +622,7 @@ proto.gqlconfig.GqlEndpoint.deserializeBinaryFromReader = function(msg, reader) 
       var value = /** @type {string} */ (reader.readString());
       msg.setHost(value);
       break;
-    case 3:
+    case 2:
       var value = new proto.gqlconfig.GqlEndpointAuthentication;
       reader.readMessage(value,proto.gqlconfig.GqlEndpointAuthentication.deserializeBinaryFromReader);
       msg.setAuth(value);
@@ -667,7 +666,7 @@ proto.gqlconfig.GqlEndpoint.serializeBinaryToWriter = function(message, writer) 
   f = message.getAuth();
   if (f != null) {
     writer.writeMessage(
-      3,
+      2,
       f,
       proto.gqlconfig.GqlEndpointAuthentication.serializeBinaryToWriter
     );
@@ -691,18 +690,18 @@ proto.gqlconfig.GqlEndpoint.prototype.setHost = function(value) {
 
 
 /**
- * optional GqlEndpointAuthentication auth = 3;
+ * optional GqlEndpointAuthentication auth = 2;
  * @return {?proto.gqlconfig.GqlEndpointAuthentication}
  */
 proto.gqlconfig.GqlEndpoint.prototype.getAuth = function() {
   return /** @type{?proto.gqlconfig.GqlEndpointAuthentication} */ (
-    jspb.Message.getWrapperField(this, proto.gqlconfig.GqlEndpointAuthentication, 3));
+    jspb.Message.getWrapperField(this, proto.gqlconfig.GqlEndpointAuthentication, 2));
 };
 
 
 /** @param {?proto.gqlconfig.GqlEndpointAuthentication|undefined} value */
 proto.gqlconfig.GqlEndpoint.prototype.setAuth = function(value) {
-  jspb.Message.setWrapperField(this, 3, value);
+  jspb.Message.setWrapperField(this, 2, value);
 };
 
 
@@ -716,7 +715,7 @@ proto.gqlconfig.GqlEndpoint.prototype.clearAuth = function() {
  * @return {boolean}
  */
 proto.gqlconfig.GqlEndpoint.prototype.hasAuth = function() {
-  return jspb.Message.getField(this, 3) != null;
+  return jspb.Message.getField(this, 2) != null;
 };
 
 
@@ -767,7 +766,7 @@ proto.gqlconfig.GqlEndpointAuthentication.prototype.toObject = function(opt_incl
  */
 proto.gqlconfig.GqlEndpointAuthentication.toObject = function(includeInstance, msg) {
   var f, obj = {
-    type: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    authType: jspb.Message.getFieldWithDefault(msg, 1, ""),
     authority: jspb.Message.getFieldWithDefault(msg, 2, ""),
     scope: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
@@ -807,8 +806,8 @@ proto.gqlconfig.GqlEndpointAuthentication.deserializeBinaryFromReader = function
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {!proto.gqlconfig.AuthenticationType} */ (reader.readEnum());
-      msg.setType(value);
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAuthType(value);
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
@@ -847,9 +846,9 @@ proto.gqlconfig.GqlEndpointAuthentication.prototype.serializeBinary = function()
  */
 proto.gqlconfig.GqlEndpointAuthentication.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getType();
-  if (f !== 0.0) {
-    writer.writeEnum(
+  f = message.getAuthType();
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -872,17 +871,17 @@ proto.gqlconfig.GqlEndpointAuthentication.serializeBinaryToWriter = function(mes
 
 
 /**
- * optional AuthenticationType type = 1;
- * @return {!proto.gqlconfig.AuthenticationType}
+ * optional string auth_type = 1;
+ * @return {string}
  */
-proto.gqlconfig.GqlEndpointAuthentication.prototype.getType = function() {
-  return /** @type {!proto.gqlconfig.AuthenticationType} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+proto.gqlconfig.GqlEndpointAuthentication.prototype.getAuthType = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {!proto.gqlconfig.AuthenticationType} value */
-proto.gqlconfig.GqlEndpointAuthentication.prototype.setType = function(value) {
-  jspb.Message.setProto3EnumField(this, 1, value);
+/** @param {string} value */
+proto.gqlconfig.GqlEndpointAuthentication.prototype.setAuthType = function(value) {
+  jspb.Message.setProto3StringField(this, 1, value);
 };
 
 
@@ -963,10 +962,10 @@ proto.gqlconfig.GqlAuthProvider.prototype.toObject = function(opt_includeInstanc
  */
 proto.gqlconfig.GqlAuthProvider.toObject = function(includeInstance, msg) {
   var f, obj = {
-    type: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    authType: jspb.Message.getFieldWithDefault(msg, 1, ""),
     authority: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    clientid: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    clientsecret: jspb.Message.getFieldWithDefault(msg, 4, "")
+    clientId: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    clientSecret: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
   if (includeInstance) {
@@ -1004,8 +1003,8 @@ proto.gqlconfig.GqlAuthProvider.deserializeBinaryFromReader = function(msg, read
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = /** @type {!proto.gqlconfig.AuthenticationType} */ (reader.readEnum());
-      msg.setType(value);
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAuthType(value);
       break;
     case 2:
       var value = /** @type {string} */ (reader.readString());
@@ -1013,11 +1012,11 @@ proto.gqlconfig.GqlAuthProvider.deserializeBinaryFromReader = function(msg, read
       break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
-      msg.setClientid(value);
+      msg.setClientId(value);
       break;
     case 4:
       var value = /** @type {string} */ (reader.readString());
-      msg.setClientsecret(value);
+      msg.setClientSecret(value);
       break;
     default:
       reader.skipField();
@@ -1048,9 +1047,9 @@ proto.gqlconfig.GqlAuthProvider.prototype.serializeBinary = function() {
  */
 proto.gqlconfig.GqlAuthProvider.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getType();
-  if (f !== 0.0) {
-    writer.writeEnum(
+  f = message.getAuthType();
+  if (f.length > 0) {
+    writer.writeString(
       1,
       f
     );
@@ -1062,14 +1061,14 @@ proto.gqlconfig.GqlAuthProvider.serializeBinaryToWriter = function(message, writ
       f
     );
   }
-  f = message.getClientid();
+  f = message.getClientId();
   if (f.length > 0) {
     writer.writeString(
       3,
       f
     );
   }
-  f = message.getClientsecret();
+  f = message.getClientSecret();
   if (f.length > 0) {
     writer.writeString(
       4,
@@ -1080,17 +1079,17 @@ proto.gqlconfig.GqlAuthProvider.serializeBinaryToWriter = function(message, writ
 
 
 /**
- * optional AuthenticationType type = 1;
- * @return {!proto.gqlconfig.AuthenticationType}
+ * optional string auth_type = 1;
+ * @return {string}
  */
-proto.gqlconfig.GqlAuthProvider.prototype.getType = function() {
-  return /** @type {!proto.gqlconfig.AuthenticationType} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+proto.gqlconfig.GqlAuthProvider.prototype.getAuthType = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
-/** @param {!proto.gqlconfig.AuthenticationType} value */
-proto.gqlconfig.GqlAuthProvider.prototype.setType = function(value) {
-  jspb.Message.setProto3EnumField(this, 1, value);
+/** @param {string} value */
+proto.gqlconfig.GqlAuthProvider.prototype.setAuthType = function(value) {
+  jspb.Message.setProto3StringField(this, 1, value);
 };
 
 
@@ -1110,40 +1109,33 @@ proto.gqlconfig.GqlAuthProvider.prototype.setAuthority = function(value) {
 
 
 /**
- * optional string clientId = 3;
+ * optional string client_id = 3;
  * @return {string}
  */
-proto.gqlconfig.GqlAuthProvider.prototype.getClientid = function() {
+proto.gqlconfig.GqlAuthProvider.prototype.getClientId = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
 
 /** @param {string} value */
-proto.gqlconfig.GqlAuthProvider.prototype.setClientid = function(value) {
+proto.gqlconfig.GqlAuthProvider.prototype.setClientId = function(value) {
   jspb.Message.setProto3StringField(this, 3, value);
 };
 
 
 /**
- * optional string clientSecret = 4;
+ * optional string client_secret = 4;
  * @return {string}
  */
-proto.gqlconfig.GqlAuthProvider.prototype.getClientsecret = function() {
+proto.gqlconfig.GqlAuthProvider.prototype.getClientSecret = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
 };
 
 
 /** @param {string} value */
-proto.gqlconfig.GqlAuthProvider.prototype.setClientsecret = function(value) {
+proto.gqlconfig.GqlAuthProvider.prototype.setClientSecret = function(value) {
   jspb.Message.setProto3StringField(this, 4, value);
 };
 
-
-/**
- * @enum {number}
- */
-proto.gqlconfig.AuthenticationType = {
-  CLIENT_CREDENTIALS: 0
-};
 
 goog.object.extend(exports, proto.gqlconfig);

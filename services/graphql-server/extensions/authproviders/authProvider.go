@@ -16,18 +16,26 @@ func newAuthProvider(apConfig *gqlconfig.GqlAuthProvider) AuthProvider {
 	return newClientCredentialsAuthProvider(apConfig)
 }
 
-var authProviders map[string]AuthProvider
+var authProviders map[string](map[string]AuthProvider)
 
 // Init initializes endpoint repository by
 func Init(apConfigs []*gqlconfig.GqlAuthProvider) {
-	authProviders = make(map[string]AuthProvider)
+	authProviders = make(map[string]map[string]AuthProvider)
 	for _, apConfig := range apConfigs {
-		authProviders[apConfig.Authority] = newAuthProvider(apConfig)
+		_, ok := authProviders[apConfig.AuthType]
+		if !ok {
+			authProviders[apConfig.AuthType] = make(map[string]AuthProvider)
+		}
+		authProviders[apConfig.AuthType][apConfig.Authority] = newAuthProvider(apConfig)
 	}
 }
 
 // Get gets Endpoint by host
-func Get(authority string) (AuthProvider, bool) {
-	ap, ok := authProviders[authority]
-	return ap, ok
+func Get(authType string, authority string) (AuthProvider, bool) {
+	apsByType, ok := authProviders[authType]
+	if ok {
+		ap, ok := apsByType[authority]
+		return ap, ok
+	}
+	return nil, ok
 }

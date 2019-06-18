@@ -3,7 +3,7 @@ kind: GqlAuthProvider
 metadata:
     name: user-service-auth-provider
 spec:
-  type: oauth2/client_credentials
+  authType: oauth2/client_credentials
   authority: "http://oidc-server-mock/connect/token"
   client_id: agogos_client_id
   client_secret:

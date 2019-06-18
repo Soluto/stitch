@@ -34,10 +34,10 @@ export class GqlConfigurationMessage extends jspb.Message {
     setEndpointsList(value: Array<GqlEndpoint>): void;
     addEndpoints(value?: GqlEndpoint, index?: number): GqlEndpoint;
 
-    clearAuthprovidersList(): void;
-    getAuthprovidersList(): Array<GqlAuthProvider>;
-    setAuthprovidersList(value: Array<GqlAuthProvider>): void;
-    addAuthproviders(value?: GqlAuthProvider, index?: number): GqlAuthProvider;
+    clearAuthProvidersList(): void;
+    getAuthProvidersList(): Array<GqlAuthProvider>;
+    setAuthProvidersList(value: Array<GqlAuthProvider>): void;
+    addAuthProviders(value?: GqlAuthProvider, index?: number): GqlAuthProvider;
 
 
     serializeBinary(): Uint8Array;
@@ -54,7 +54,7 @@ export namespace GqlConfigurationMessage {
     export type AsObject = {
         schema?: GqlSchema.AsObject,
         endpointsList: Array<GqlEndpoint.AsObject>,
-        authprovidersList: Array<GqlAuthProvider.AsObject>,
+        authProvidersList: Array<GqlAuthProvider.AsObject>,
     }
 }
 
@@ -108,8 +108,8 @@ export namespace GqlEndpoint {
 }
 
 export class GqlEndpointAuthentication extends jspb.Message { 
-    getType(): AuthenticationType;
-    setType(value: AuthenticationType): void;
+    getAuthType(): string;
+    setAuthType(value: string): void;
 
     getAuthority(): string;
     setAuthority(value: string): void;
@@ -130,24 +130,24 @@ export class GqlEndpointAuthentication extends jspb.Message {
 
 export namespace GqlEndpointAuthentication {
     export type AsObject = {
-        type: AuthenticationType,
+        authType: string,
         authority: string,
         scope: string,
     }
 }
 
 export class GqlAuthProvider extends jspb.Message { 
-    getType(): AuthenticationType;
-    setType(value: AuthenticationType): void;
+    getAuthType(): string;
+    setAuthType(value: string): void;
 
     getAuthority(): string;
     setAuthority(value: string): void;
 
-    getClientid(): string;
-    setClientid(value: string): void;
+    getClientId(): string;
+    setClientId(value: string): void;
 
-    getClientsecret(): string;
-    setClientsecret(value: string): void;
+    getClientSecret(): string;
+    setClientSecret(value: string): void;
 
 
     serializeBinary(): Uint8Array;
@@ -162,13 +162,9 @@ export class GqlAuthProvider extends jspb.Message {
 
 export namespace GqlAuthProvider {
     export type AsObject = {
-        type: AuthenticationType,
+        authType: string,
         authority: string,
-        clientid: string,
-        clientsecret: string,
+        clientId: string,
+        clientSecret: string,
     }
-}
-
-export enum AuthenticationType {
-    CLIENT_CREDENTIALS = 0,
 }

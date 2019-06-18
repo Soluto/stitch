@@ -3,9 +3,9 @@ k8s_yaml('./deployments/infra/namespace.yaml')
 
 # agogos crds
 k8s_yaml([
-    '../../remote-sources/kubernetes/src/GqlSchemaCRD.yaml',
-    '../../remote-sources/kubernetes/src/GqlEndpointCRD.yaml',
-    '../../remote-sources/kubernetes/src/GqlAuthProviderCRD.yaml',
+    '../../remote-sources/kubernetes/src/GqlSchemaCrd.yaml',
+    '../../remote-sources/kubernetes/src/GqlEndpointCrd.yaml',
+    '../../remote-sources/kubernetes/src/GqlAuthProviderCrd.yaml',
 ])
 
 # mocks

@@ -14,8 +14,8 @@ spec:
     singular: gqlendpoint
     kind: GqlEndpoint
     shortNames:
-    - gqleps
-    - gqlep
+    - gqlendps
+    - gqlendp
   additionalPrinterColumns:
     - name: Host
       type: string
@@ -34,7 +34,7 @@ spec:
               type: string
             auth:
               properties:
-                type:
+                authType:
                   type: string
                   enum:
                     - oauth2/client_credentials

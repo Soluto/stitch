@@ -11,7 +11,7 @@ message GqlConfigurationSubscribeParams {}
 message GqlConfigurationMessage {
     GqlSchema schema = 1;
     repeated GqlEndpoint endpoints = 2;
-    repeated GqlAuthProvider authProviders = 3;
+    repeated GqlAuthProvider auth_providers = 3;
 }
 
 message GqlSchema {
@@ -20,22 +20,19 @@ message GqlSchema {
 
 message GqlEndpoint {
     string host = 1;
-    GqlEndpointAuthentication auth = 3;
+    GqlEndpointAuthentication auth = 2;
 }
 
 message GqlEndpointAuthentication {
-    AuthenticationType type = 1;
+    string auth_type = 1;
     string authority = 2;
     string scope = 3;
 }
 
+// TODO: Use "oneof" keyword to declare several types of Auth Providers
 message GqlAuthProvider {
-    AuthenticationType type = 1;
+    string auth_type = 1;
     string authority = 2;
-    string clientId = 3;
-    string clientSecret = 4;
-}
-
-enum AuthenticationType {
-    client_credentials = 0;
+    string client_id = 3;
+    string client_secret = 4;
 }

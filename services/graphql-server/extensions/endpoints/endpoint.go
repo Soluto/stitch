@@ -30,7 +30,7 @@ func (ep *endpointStruct) ApplyEndpoint(req *http.Request) {
 	}
 
 	// TODO: consider more implicit approach
-	ap, ok := authproviders.Get(ep.auth.authority)
+	ap, ok := authproviders.Get(ep.auth.authType, ep.auth.authority)
 	if ok {
 		ap.AddAuthentication(req)
 	}
@@ -40,6 +40,7 @@ func newEndpoint(epConfig *gqlconfig.GqlEndpoint) Endpoint {
 	return &endpointStruct{
 		host: epConfig.Host,
 		auth: authStruct{
+			authType:  epConfig.Auth.AuthType,
 			authority: epConfig.Auth.Authority,
 			scope:     epConfig.Auth.Scope,
 		},

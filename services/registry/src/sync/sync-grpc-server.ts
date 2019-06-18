@@ -8,7 +8,6 @@ import {
     GqlConfigurationSubscribeParams,
     GqlEndpoint,
     GqlEndpointAuthentication,
-    AuthenticationType,
     GqlAuthProvider
 } from "../generated/gql_configuration_pb";
 import {
@@ -43,7 +42,7 @@ class GqlConfigurationSubscriptionServer implements IGqlConfigurationServer {
 
                     const gqlEndpointAuth = new GqlEndpointAuthentication();
                     // FIXME: get from ep
-                    gqlEndpointAuth.setType(AuthenticationType.CLIENT_CREDENTIALS);
+                    gqlEndpointAuth.setAuthType(ep.auth.authType);
                     gqlEndpointAuth.setAuthority(ep.auth.authority);
                     gqlEndpointAuth.setScope(ep.auth.scope);
                     gqlEndpoint.setAuth(gqlEndpointAuth);
@@ -54,9 +53,10 @@ class GqlConfigurationSubscriptionServer implements IGqlConfigurationServer {
                 // TODO: extract to function
                 const gqlAuthProviders: GqlAuthProvider[] = Object.values(configuration.authProviders).map(ap => {
                     const gqlAuthProvider = new GqlAuthProvider();
+                    gqlAuthProvider.setAuthType(ap.authType);
                     gqlAuthProvider.setAuthority(ap.authority);
-                    gqlAuthProvider.setClientid(ap.client_id);
-                    gqlAuthProvider.setClientsecret(ap.client_secret);
+                    gqlAuthProvider.setClientId(ap.client_id);
+                    gqlAuthProvider.setClientSecret(ap.client_secret);
 
                     return gqlAuthProvider;
                 });
@@ -65,7 +65,7 @@ class GqlConfigurationSubscriptionServer implements IGqlConfigurationServer {
                 const gqlConfiguration = new GqlConfigurationMessage();
                 gqlConfiguration.setSchema(gqlSchema);
                 gqlConfiguration.setEndpointsList(gqlEndpoints);
-                gqlConfiguration.setAuthprovidersList(gqlAuthProviders);
+                gqlConfiguration.setAuthProvidersList(gqlAuthProviders);
 
                 call.write(gqlConfiguration);
             },

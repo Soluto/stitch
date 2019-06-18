@@ -14,8 +14,8 @@ spec:
     singular: gqlauthprovider
     kind: GqlAuthProvider
     shortNames:
-    - gqlaps
-    - gqlap
+    - gqlauthpvds
+    - gqlauthpvd
   additionalPrinterColumns:
     - name: Auth Type
       type: string
@@ -30,7 +30,7 @@ spec:
       properties:
         spec:
           properties:
-            type:
+            authType:
               type: string
               enum:
                 - oauth2/client_credentials
