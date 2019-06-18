@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oidc-server-mock
+  namespace: agogos
+spec:
+  selector:
+    matchLabels:
+      app: oidc-server-mock
+  template:
+    metadata:
+      labels:
+        app: oidc-server-mock
+    spec:
+      containers:
+      - name: oidc-server-mock
+        image: soluto/oidc-server-mock
+        env:
+          - name: CLIENT_CREDENTIALS_CLIENT_ID
+            value: agogos_client_id
+          - name: CLIENT_CREDENTIALS_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: agogos-credentials
+                key: client_secret
+          - name: API_RESOURCE
+            value: user-service-scope
+      volumes:
+        - name: agogos-credentials
+          secret:
+            secretName: agogos-credentials
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: oidc-server-mock
+  namespace: agogos
+spec:
+  selector:
+    app: oidc-server-mock
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+---

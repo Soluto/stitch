@@ -5,16 +5,17 @@ import {
     delay,
     repeat,
     map,
-    scan,
     shareReplay,
     catchError,
     combineAll,
     startWith,
 } from "rxjs/operators";
 
-type GqlObjsByName = { [name: string]: string };
+import { GqlAgogosObjectConfig } from "./object-types";
+
+
+export type GqlObjsByName = { [name: string]: GqlAgogosObjectConfig };
 export type GqlObjByNameByKind = { [kind: string]: GqlObjsByName };
-type GqlObjsByNameByKindBySource = { [source: string]: GqlObjByNameByKind };
 
 const addSourceToName = (source: string, name: string): string => `${source}.${name}`;
 const renameKeys = (source: string, obj: GqlObjsByName): GqlObjsByName => Object.keys(obj).reduce((acc, key) => ({ ...acc, ...{ [addSourceToName(source, key)]: obj[key] } }), {});

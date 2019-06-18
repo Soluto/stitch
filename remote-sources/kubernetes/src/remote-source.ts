@@ -1,6 +1,8 @@
 import k8s = require("@kubernetes/client-node");
 import Source from "./source-type";
 import config from "./config";
+import enrich from "./enrichment";
+import { GqlAgogosObjectConfig } from "./object-types";
 
 export default (client: k8s.CustomObjectsApi): Source =>
     ({
@@ -25,8 +27,10 @@ const getGqlObjectsByKind = async (kind: string, client: k8s.CustomObjectsApi): 
         config.namespace,
         kind,
     );
-    return response.body.items.map(item => ({
+    const definitions = response.body.items.map(item => ({
         name: item.metadata.name,
         definition: item.spec,
-    })).reduce((acc, { name, definition }) => ({ ...acc, [name]: definition }), {})
+    }));
+    const enrichedDefinitions: { name: string, definition: GqlAgogosObjectConfig }[] = await Promise.all(definitions.map(async ({ name, definition }) => ({ name, definition: await enrich(kind, definition) })));
+    return enrichedDefinitions.reduce((acc, { name, definition }) => ({ ...acc, [name]: definition }), {})
 }

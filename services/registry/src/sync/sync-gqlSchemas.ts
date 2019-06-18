@@ -6,7 +6,7 @@ import {
 } from "rxjs/operators";
 import { print } from "graphql/language/printer";
 
-import gqlObjects$ from "./sync-service";
+import gqlObjects$, { GqlObjsByName } from "./sync-service";
 
 import gql from "graphql-tag";
 import { mergeDocuments } from "../graphql/schema-utils";
@@ -38,8 +38,8 @@ function mergeAllDocuments(docs: DocumentNode[]) {
     }
 }
 
-export const makeGqlDocumentFromGqlSources = (gqlSchemas: GqlSchemas) => {
-    const documentNodes = Object.entries(gqlSchemas).map(([schemaName, schema]) => parseGqlSource(schemaName, schema));
+export const makeGqlDocumentFromGqlSources = (gqlSchemas: GqlObjsByName) => {
+    const documentNodes = Object.entries(gqlSchemas).map(([schemaName, schema]) => parseGqlSource(schemaName, schema as string));
     return mergeAllDocuments(documentNodes);
 };
 

@@ -2,23 +2,31 @@ import * as grpc from "grpc";
 import {
     combineLatest
 } from "rxjs";
-import syncSchema$ from "./sync-gqlSchemas";
 import {
     GqlConfigurationMessage,
     GqlSchema,
-    GqlConfigurationSubscribeParams
+    GqlConfigurationSubscribeParams,
+    GqlEndpoint,
+    GqlEndpointAuthentication,
+    GqlAuthProvider
 } from "../generated/gql_configuration_pb";
 import {
     IGqlConfigurationServer,
     GqlConfigurationService
 } from "../generated/gql_configuration_grpc_pb";
 
+import syncSchema$ from "./sync-gqlSchemas";
+import syncEndpoint$ from "./sync-gqlEndpoints";
+import syncAuthProvider$ from "./sync-gqlAuthProviders";
+
 const PORT = process.env.GRPC_PORT || 4001;
 
 // TODO: make this more general
 const syncGqlConfiguration$ = combineLatest([
-    syncSchema$
-], (schema) => ({ schema }));
+    syncSchema$,
+    syncEndpoint$,
+    syncAuthProvider$,
+], (schema, endpoints, authProviders) => ({ schema, endpoints, authProviders }));
 
 class GqlConfigurationSubscriptionServer implements IGqlConfigurationServer {
     subscribe(call: grpc.ServerWriteableStream<GqlConfigurationSubscribeParams>) {
@@ -27,8 +35,37 @@ class GqlConfigurationSubscriptionServer implements IGqlConfigurationServer {
                 const gqlSchema = new GqlSchema();
                 gqlSchema.setGql(configuration.schema);
 
+                // TODO: extract to function
+                const gqlEndpoints: GqlEndpoint[] = Object.values(configuration.endpoints).map(ep => {
+                    const gqlEndpoint = new GqlEndpoint();
+                    gqlEndpoint.setHost(ep.host);
+
+                    const gqlEndpointAuth = new GqlEndpointAuthentication();
+                    // FIXME: get from ep
+                    gqlEndpointAuth.setAuthType(ep.auth.authType);
+                    gqlEndpointAuth.setAuthority(ep.auth.authority);
+                    gqlEndpointAuth.setScope(ep.auth.scope);
+                    gqlEndpoint.setAuth(gqlEndpointAuth);
+
+                    return gqlEndpoint;
+                });
+
+                // TODO: extract to function
+                const gqlAuthProviders: GqlAuthProvider[] = Object.values(configuration.authProviders).map(ap => {
+                    const gqlAuthProvider = new GqlAuthProvider();
+                    gqlAuthProvider.setAuthType(ap.authType);
+                    gqlAuthProvider.setAuthority(ap.authority);
+                    gqlAuthProvider.setClientId(ap.clientId);
+                    gqlAuthProvider.setClientSecret(ap.clientSecret);
+
+                    return gqlAuthProvider;
+                });
+
+
                 const gqlConfiguration = new GqlConfigurationMessage();
                 gqlConfiguration.setSchema(gqlSchema);
+                gqlConfiguration.setEndpointsList(gqlEndpoints);
+                gqlConfiguration.setAuthProvidersList(gqlAuthProviders);
 
                 call.write(gqlConfiguration);
             },

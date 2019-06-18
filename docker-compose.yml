@@ -26,3 +26,13 @@ services:
       - GRPC_PORT=81
     ports:
       - 4000:80
+
+  oidc-server-mock:
+    container_name: oidc-server-mock
+    image: soluto/oidc-server-mock
+    ports:
+      - "4011:80"
+    environment:
+      - CLIENT_CREDENTIALS_CLIENT_ID=client-credentials-mock-client
+      - CLIENT_CREDENTIALS_CLIENT_SECRET=client-credentials-mock-client-secret
+      - API_RESOURCE=some-app
