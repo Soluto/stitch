@@ -12,7 +12,6 @@ import gql from "graphql-tag";
 import { mergeDocuments } from "../graphql/schema-utils";
 import { DocumentNode } from "graphql";
 import { GqlSchemaConfig } from "./object-types";
-import { GqlSchema } from "../generated/gql_configuration_pb";
 
 function parseGqlSource(schemaName: string, schema: string) {
     try {

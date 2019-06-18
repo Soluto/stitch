@@ -1,4 +1,6 @@
+import { GqlAgogosObjectConfig } from "../../sync/object-types";
+
 export default interface Source {
-    getGqlObjects(): Promise<{ [kind: string]: { [name: string]: string } }>;
-    putGqlObject(name: string, schema: string): Promise<void>;
+    getGqlObjects(): Promise<{ [kind: string]: { [name: string]: GqlAgogosObjectConfig } }>;
+    putGqlObject(name: string, definition: GqlAgogosObjectConfig): Promise<void>;
 }
