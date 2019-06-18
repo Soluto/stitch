@@ -5,8 +5,8 @@ metadata:
 spec:
   authType: oauth2/client_credentials
   authority: "http://oidc-server-mock/connect/token"
-  client_id: agogos_client_id
-  client_secret:
+  clientId: agogos_client_id
+  clientSecret:
     valueFrom:
       secretKeyRef:
         secretName: agogos-credentials

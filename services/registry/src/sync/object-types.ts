@@ -17,8 +17,8 @@ export type GqlEndpointConfig = {
 export type GqlAuthProviderConfig = {
     type: string,
     authority: string,
-    client_id: string,
-    client_secret: string,
+    clientId: string,
+    clientSecret: string,
 };
 
 export type GqlAgogosObjectConfig = GqlSchemaConfig | GqlEndpointConfig | GqlAuthProviderConfig;

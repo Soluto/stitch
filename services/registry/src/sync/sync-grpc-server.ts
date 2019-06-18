@@ -55,8 +55,8 @@ class GqlConfigurationSubscriptionServer implements IGqlConfigurationServer {
                     const gqlAuthProvider = new GqlAuthProvider();
                     gqlAuthProvider.setAuthType(ap.authType);
                     gqlAuthProvider.setAuthority(ap.authority);
-                    gqlAuthProvider.setClientId(ap.client_id);
-                    gqlAuthProvider.setClientSecret(ap.client_secret);
+                    gqlAuthProvider.setClientId(ap.clientId);
+                    gqlAuthProvider.setClientSecret(ap.clientSecret);
 
                     return gqlAuthProvider;
                 });

@@ -36,9 +36,9 @@ spec:
                 - oauth2/client_credentials
             authority:
               type: string
-            client_id:
+            clientId:
               type: string
-            client_secret:
+            clientSecret:
               anyOf:
               - type: string
               - properties:
