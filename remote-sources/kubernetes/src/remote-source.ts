@@ -21,10 +21,9 @@ export default (client: k8s.CustomObjectsApi): Source =>
 
 
 const getGqlObjectsByKind = async (kind: string, client: k8s.CustomObjectsApi): Promise<{ [name: string]: string }> => {
-    const response = await client.listNamespacedCustomObject(
+    const response = await client.listClusterCustomObject(
         config.apiGroup,
         config.apiVersion,
-        config.namespace,
         kind,
     );
     const definitions = response.body.items.map(item => ({
