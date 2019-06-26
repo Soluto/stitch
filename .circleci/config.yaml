@@ -1,0 +1,32 @@
+version: 2.1
+
+jobs:
+  build_registry:
+    build:
+      machine: true
+
+    steps:
+      - checkout
+
+      - run:
+          name: Build agogos-registry image
+          command: docker build -t soluto/agogos-registry --build-arg target=PRODUCTION ./services/registry
+
+  build_graphql_server:
+    build:
+      machine: true
+
+    steps:
+      - checkout
+
+      - run:
+          name: Build agogos-graphql-server image
+          command: docker build -t soluto/agogos-graphql-server --build-arg target=PRODUCTION ./services/graphql-server
+
+workflows:
+  version: 2
+
+  build_all:
+    jobs:
+      - build_registry
+      - build_graphql_server
