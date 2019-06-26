@@ -33,7 +33,7 @@ class GqlConfigurationSubscriptionServer implements IGqlConfigurationServer {
         const subscription = syncGqlConfiguration$.subscribe(
             configuration => {
                 const gqlSchema = new GqlSchema();
-                gqlSchema.setGql(configuration.schema);
+                gqlSchema.setDefinition(configuration.schema);
 
                 // TODO: extract to function
                 const gqlEndpoints: GqlEndpoint[] = Object.values(configuration.endpoints).map(ep => {

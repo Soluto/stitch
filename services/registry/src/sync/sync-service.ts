@@ -11,10 +11,10 @@ import {
     startWith,
 } from "rxjs/operators";
 
-import { GqlAgogosObjectConfig } from "./object-types";
+import { AgogosObjectConfig } from "./object-types";
 
 
-export type GqlObjsByName = { [name: string]: GqlAgogosObjectConfig };
+export type GqlObjsByName = { [name: string]: AgogosObjectConfig };
 export type GqlObjByNameByKind = { [kind: string]: GqlObjsByName };
 
 const addSourceToName = (source: string, name: string): string => `${source}.${name}`;
@@ -30,7 +30,7 @@ const gqlObjects$: Observable<GqlObjByNameByKind> =
     from(Object.entries(sources))
         .pipe(
             map(([sourceName, source]) =>
-                defer((): Promise<GqlObjByNameByKind> => source.getGqlObjects())
+                defer((): Promise<GqlObjByNameByKind> => source.getAgogosObjects())
                     .pipe(
                         map(sourceData => renameSubKeys(sourceName, sourceData)),
                         emitAndWait(5000) as OperatorFunction<GqlObjByNameByKind, GqlObjByNameByKind>,

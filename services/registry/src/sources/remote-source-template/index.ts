@@ -14,7 +14,7 @@ app.use("/health", async (_: express.Request, res: express.Response) =>
 
 app.get("/", async (req: express.Request, res: express.Response) => {
     try {
-        const gqlObjects = await remoteSource.getGqlObjects();
+        const gqlObjects = await remoteSource.getAgogosObjects();
         res.send(gqlObjects);
         return;
     } catch (error) {
@@ -33,7 +33,7 @@ app
         const name = req.params.name;
         const definition = req.body;
         try {
-            await remoteSource.putGqlObject(name, kind, definition);
+            await remoteSource.putAgogosObject(name, kind, definition);
             res.sendStatus(200);
             return;
         } catch (error) {

@@ -1,11 +1,11 @@
 import authProviderEnricher from "./authProviderEnricher";
-import { GqlAgogosObjectConfig } from "../object-types";
+import { AgogosObjectConfig } from "../object-types";
 
-const enrichers: { [kind: string]: (obj: GqlAgogosObjectConfig) => Promise<GqlAgogosObjectConfig> } = {
+const enrichers: { [kind: string]: (obj: AgogosObjectConfig) => Promise<AgogosObjectConfig> } = {
     gqlauthproviders: authProviderEnricher,
 };
 
-export default async (kind: string, definition: GqlAgogosObjectConfig): Promise<GqlAgogosObjectConfig> => {
+export default async (kind: string, definition: AgogosObjectConfig): Promise<AgogosObjectConfig> => {
     if (enrichers.hasOwnProperty(kind)) {
         return enrichers[kind](definition);
     }
