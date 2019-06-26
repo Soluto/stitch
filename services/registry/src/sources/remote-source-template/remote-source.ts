@@ -1,12 +1,12 @@
 import Source from "..";
-import { GqlAgogosObjectConfig } from "../../sync/object-types";
+import { AgogosObjectConfig } from "../../sync/object-types";
 
 const remoteSource: Source = {
-    async getGqlObjects(): Promise<{ [kind: string]: { [name: string]: GqlAgogosObjectConfig } }> {
+    async getAgogosObjects(): Promise<{ [kind: string]: { [name: string]: AgogosObjectConfig } }> {
         throw "Not implemented";
     },
 
-    async putGqlObject(name: string, kind: string, definition: GqlAgogosObjectConfig): Promise<void> {
+    async putAgogosObject(name: string, kind: string, definition: AgogosObjectConfig): Promise<void> {
         throw "Not implemented";
     }
 };

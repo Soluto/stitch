@@ -30,4 +30,4 @@ export type GqlAuthProviderConfig = {
     },
 };
 
-export type GqlAgogosObjectConfig = GqlSchemaConfig | GqlEndpointConfig | GqlAuthProviderConfig;
+export type AgogosObjectConfig = GqlSchemaConfig | GqlEndpointConfig | GqlAuthProviderConfig;

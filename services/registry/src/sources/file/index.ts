@@ -4,7 +4,7 @@ import * as glob from "glob";
 import * as path from "path";
 
 import Source from "../../sources";
-import { GqlAgogosObjectConfig } from "../../sync/object-types";
+import { AgogosObjectConfig } from "../../sync/object-types";
 import extractDefinition, { getExtensionByKind } from "./extraction";
 
 const globAsync = util.promisify(glob);
@@ -13,18 +13,18 @@ const globAsync = util.promisify(glob);
 type NamedGqlObject = {
     name: string;
     kind: string;
-    definition: GqlAgogosObjectConfig;
+    definition: AgogosObjectConfig;
 };
 
 const createSource = (folder: string): Source => ({
-    async getGqlObjects(): Promise<{ [kind: string]: { [name: string]: GqlAgogosObjectConfig } }> {
+    async getAgogosObjects(): Promise<{ [kind: string]: { [name: string]: AgogosObjectConfig } }> {
         const dir = path.join(__dirname, folder);
         const gqlObjectKinds = fs.readdirSync(dir);
         const objectsByKind = await Promise.all(gqlObjectKinds.map(async kind => await getGqlObjectsByKind(dir, kind)))
         return objectsByKind.reduce((acc, p) => ({ ...acc, [p.kind]: p.objects }), {});
     },
 
-    async putGqlObject(name: string, kind: string, definition: GqlAgogosObjectConfig) {
+    async putAgogosObject(name: string, kind: string, definition: AgogosObjectConfig) {
         await fs.writeFileSync(`./${kind}/${name}.${getExtensionByKind(kind)}`, definition, { encoding: "utf8" });
     }
 });

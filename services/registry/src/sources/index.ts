@@ -1,18 +1,18 @@
 import fetch from "node-fetch";
-import { GqlAgogosObjectConfig } from "../sync/object-types";
+import { AgogosObjectConfig } from "../sync/object-types";
 
 export default interface Source {
-    getGqlObjects(): Promise<{ [kind: string]: { [name: string]: GqlAgogosObjectConfig } }>;
-    putGqlObject(name: string, kind: string, definition: GqlAgogosObjectConfig): Promise<void>;
+    getAgogosObjects(): Promise<{ [kind: string]: { [name: string]: AgogosObjectConfig } }>;
+    putAgogosObject(name: string, kind: string, definition: AgogosObjectConfig): Promise<void>;
 }
 
 export function remoteSource(remoteSourceHost: String): Source {
     return {
-        async getGqlObjects() {
+        async getAgogosObjects() {
             const res = await fetch(`${remoteSourceHost}`);
             return await res.json();
         },
-        async putGqlObject(name: string, kind: string, definition: GqlAgogosObjectConfig) {
+        async putAgogosObject(name: string, kind: string, definition: AgogosObjectConfig) {
             await fetch(`${remoteSourceHost}/${kind}/${name}`, {
                 method: "POST",
                 body: JSON.stringify(definition),

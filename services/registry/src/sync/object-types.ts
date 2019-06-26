@@ -23,4 +23,4 @@ export type GqlAuthProviderConfig = {
     clientSecret: string,
 };
 
-export type GqlAgogosObjectConfig = GqlSchemaConfig | GqlEndpointConfig | GqlAuthProviderConfig;
+export type AgogosObjectConfig = GqlSchemaConfig | GqlEndpointConfig | GqlAuthProviderConfig;
