@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: e2e
+  namespace: agogos
+  labels:
+    name: e2e
+    app: e2e
+spec:
+  containers:
+  - name: e2e
+    image: e2e

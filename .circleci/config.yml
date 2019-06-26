@@ -23,6 +23,21 @@ jobs:
           name: Build agogos-graphql-server image
           command: docker build -t soluto/agogos-graphql-server --build-arg target=PRODUCTION ./services/graphql-server
 
+  run_e2e_tests:
+    machine:
+      image: ubuntu-1604:201903-01
+
+    steps:
+      - checkout
+
+      - run:
+          name: Build e2e tests image
+          command: docker build -t soluto/agogos-e2e ./e2e
+
+      - run:
+          name: Run E2E tests
+          command: docker run -it soluto/agogos-e2e
+
 workflows:
   version: 2
 
