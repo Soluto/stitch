@@ -1,42 +1,44 @@
 import * as fs from "fs";
-import Source from "../../sources";
 import * as util from "util";
 import * as glob from "glob";
 import * as path from "path";
 
+import Source from "../../sources";
+import { AgogosObjectConfig } from "../../sync/object-types";
+import extractDefinition, { getExtensionByKind } from "./extraction";
+
 const globAsync = util.promisify(glob);
 
-const readFileAsync = util.promisify(fs.readFile);
 
 type NamedGqlObject = {
     name: string;
     kind: string;
-    definition: string;
+    definition: AgogosObjectConfig;
 };
 
 const createSource = (folder: string): Source => ({
-    async getGqlObjects(): Promise<{ [kind: string]: { [name: string]: string } }> {
+    async getAgogosObjects(): Promise<{ [kind: string]: { [name: string]: AgogosObjectConfig } }> {
         const dir = path.join(__dirname, folder);
         const gqlObjectKinds = fs.readdirSync(dir);
         const objectsByKind = await Promise.all(gqlObjectKinds.map(async kind => await getGqlObjectsByKind(dir, kind)))
         return objectsByKind.reduce((acc, p) => ({ ...acc, [p.kind]: p.objects }), {});
     },
 
-    async putGqlObject(name: string, kind: string, definition: string) {
-        await fs.writeFileSync(`./${kind}/${name}.gql`, definition, { encoding: "utf8" });
+    async putAgogosObject(name: string, kind: string, definition: AgogosObjectConfig) {
+        await fs.writeFileSync(`./${kind}/${name}.${getExtensionByKind(kind)}`, definition, { encoding: "utf8" });
     }
 });
 
 const getGqlObjectsByKind = async (folder: string, kind: string): Promise<{ kind: string, objects: { [name: string]: string } }> => {
-    const files = await globAsync(`${folder}/${kind}/**/*.gql`);
+    const files = await globAsync(`${folder}/${kind}/**/*.{gql,json}`);
     const getGqlObjectFromFiles: Promise<NamedGqlObject>[] = files.map(
         async (file: string) => {
             const fileNameMatch = file.match(/([^\/]+)(?=\.\w+$)/);
             if (!fileNameMatch) throw "error extracting filename";
 
             const [name] = fileNameMatch;
-            const fileBuffer = await readFileAsync(file, "utf8");
-            return { name, kind, definition: fileBuffer };
+            const definition = await extractDefinition(kind, file);
+            return { name, kind, definition };
         }
     );
 

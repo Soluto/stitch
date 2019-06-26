@@ -1,4 +1,6 @@
-export type GqlSchemaConfig = string;
+export type GqlSchemaConfig = {
+    definition: string
+};
 
 export type GqlEndpointConfig = {
     host: string,
@@ -21,4 +23,4 @@ export type GqlAuthProviderConfig = {
     clientSecret: string,
 };
 
-export type GqlAgogosObjectConfig = GqlSchemaConfig | GqlEndpointConfig | GqlAuthProviderConfig;
+export type AgogosObjectConfig = GqlSchemaConfig | GqlEndpointConfig | GqlAuthProviderConfig;

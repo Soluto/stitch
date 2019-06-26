@@ -2,13 +2,14 @@ apiVersion: agogos.app/v1
 kind: GqlSchema
 metadata:
   name: user-subscription-service
-spec: |
-  type SubscriptionPlan {
-    plan: String!
-    expirationDate: String
-  }
+spec:
+  definition: |
+    type SubscriptionPlan {
+      plan: String!
+      expirationDate: String
+    }
 
-  type User {
-    subscription: SubscriptionPlan
-      @http(url: "http://user-subscription-service.user-namespace/user-subscription/:id")
-  }
+    type User {
+      subscription: SubscriptionPlan
+        @http(url: "http://user-subscription-service.user-namespace/user-subscription/:id")
+    }

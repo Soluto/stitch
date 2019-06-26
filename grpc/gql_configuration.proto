@@ -15,7 +15,7 @@ message GqlConfigurationMessage {
 }
 
 message GqlSchema {
-    string gql = 1;
+    string definition = 1;
 }
 
 message GqlEndpoint {

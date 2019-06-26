@@ -74,7 +74,7 @@ func subscribeToGqlConfiguration(gqlConfigurations chan gqlConfigurationResult) 
 
 		astSchema, err := parseSdl(source{
 			name: "schema registry sdl",
-			sdl:  gqlConfigurationMessage.Schema.Gql,
+			sdl:  gqlConfigurationMessage.Schema.Definition,
 		})
 		if err != nil {
 			fmt.Println("error parsing SDL")
