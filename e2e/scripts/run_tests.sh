@@ -72,6 +72,16 @@ execute_tests() {
     kubectl apply -f ../examples/kubernetes/deployments/crds/schemas/user-subscription-service.gql.yaml
     kubectl apply -f ../examples/kubernetes/deployments/crds/endpoints/user-service.endpoint.yaml
     kubectl apply -f ../examples/kubernetes/deployments/crds/authProviders/user-service.authProvider.yaml
+
+    # running e2e
+    sleep $STARTUP_DELAY
+    kubectl apply -f ./e2e.k8s.yaml
+
+    kubectl wait --namespace agogos --for=condition=complete --timeout "$TEST_TIMEOUT"s job/e2e
+    kubectl logs -n agogos --selector=jobs-name=e2e
+    exitCode=$(kubectl get pods -n agogos --selector=job-name=e2e --output=jsonpath='{.items[*].status.containerStatuses[*].state.terminated.exitCode}')
+    reason=$(kubectl get pods -n agogos --selector=job-name=e2e --output=jsonpath='{.items[*].status.containerStatuses[*].state.terminated.Reason}')
+
     KUBECONFIG="$oldKUBECONFIG"
     export KUBECONFIG
 }
@@ -83,28 +93,26 @@ parse_options() {
     case $i in
         --kind-version=*)
         KIND_VERSION="${i#*=}"
-        if [[ -z "$KIND_VERSION" ]]
-        then
-            KIND_VERSION="0.3.0"
-        fi
         shift
         ;;
 
         --kubectl-version=*)
         KUBECTL_VERSION="${i#*=}"
-        if [[ -z "$KUBECTL_VERSION" ]]
-        then
-            KUBECTL_VERSION="1.14.3"
-        fi
         shift
         ;;
 
         --cluster-name=*)
         CLUSTER_NAME="${i#*=}"
-        if [[ -z "$CLUSTER_NAME" ]]
-        then
-            CLUSTER_NAME="e2e"
-        fi
+        shift
+        ;;
+
+        --startup-delay=*)
+        STARTUP_DELAY="${i#*=}"
+        shift
+        ;;
+
+        --test-time=*)
+        TEST_TIMEOUT="${i#*=}"
         shift
         ;;
 
@@ -114,6 +122,31 @@ parse_options() {
         ;;
     esac
     done
+
+    if [[ -z "$KIND_VERSION" ]]
+    then
+        KIND_VERSION="0.3.0"
+    fi
+
+    if [[ -z "$KUBECTL_VERSION" ]]
+    then
+        KUBECTL_VERSION="1.14.3"
+    fi
+
+    if [[ -z "$CLUSTER_NAME" ]]
+    then
+        CLUSTER_NAME="e2e"
+    fi
+
+    if [[ -z "$STARTUP_DELAY" ]]
+    then
+        STARTUP_DELAY=10
+    fi
+
+    if [[ -z "$TEST_TIMEOUT" ]]
+    then
+        TEST_TIMEOUT=120
+    fi
 }
 
 main() {
