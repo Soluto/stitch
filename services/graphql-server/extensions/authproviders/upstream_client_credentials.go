@@ -11,7 +11,7 @@ import (
 	gqlconfig "agogos/generated"
 )
 
-type clientCredentialsAuthProvider struct {
+type upstreamClientCredentials struct {
 	clientID     string
 	clientSecret string
 	scopes       []string
@@ -19,22 +19,22 @@ type clientCredentialsAuthProvider struct {
 }
 
 // AddAuthentication implements interface AuthProvider, adds Authorization header to HTTP request
-func (ap *clientCredentialsAuthProvider) AddAuthentication(req *http.Request) {
+func (ac *upstreamClientCredentials) AddAuthentication(req *http.Request) {
 	conf := &clientcredentials.Config{
-		ClientID:     ap.clientID,
-		ClientSecret: ap.clientSecret,
-		TokenURL:     ap.authority,
+		ClientID:     ac.clientID,
+		ClientSecret: ac.clientSecret,
+		TokenURL:     ac.authority,
 	}
 	tok, err := conf.Token(context.Background())
 	if err != nil {
-		fmt.Printf("Failed to retrieve token from %s:\n %v", ap.authority, err)
+		fmt.Printf("Failed to retrieve token from %s:\n %v", ac.authority, err)
 		return
 	}
 	tok.SetAuthHeader(req)
 }
 
-func newClientCredentialsAuthProvider(apConfig *gqlconfig.GqlAuthProvider) AuthProvider {
-	return &clientCredentialsAuthProvider{
+func newUpstreamClientCredentials(apConfig *gqlconfig.UpstreamAuthCredentials) UpstreamAuthentication {
+	return &upstreamClientCredentials{
 		clientID:     apConfig.ClientId,
 		clientSecret: apConfig.ClientSecret,
 		authority:    apConfig.Authority,

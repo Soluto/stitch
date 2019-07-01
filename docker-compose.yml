@@ -9,7 +9,7 @@ services:
     healthcheck:
       disable: true
     ports:
-      - 3000:8011
+      - 4000:8011
 
   agogos.registry:
     build:
@@ -25,7 +25,7 @@ services:
       - PORT=80
       - GRPC_PORT=81
     ports:
-      - 4000:80
+      - 4001:80
 
   oidc-server-mock:
     container_name: oidc-server-mock

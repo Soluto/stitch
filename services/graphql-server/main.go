@@ -16,7 +16,7 @@ func main() {
 		failures := 0
 		for {
 			start := time.Now()
-			subscribeToGqlConfiguration(gqlConfigurations)
+			subscribeToRegistry(gqlConfigurations)
 			elapsed := time.Since(start)
 			if elapsed < (10 * time.Second) {
 				failures++

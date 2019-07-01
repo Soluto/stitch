@@ -8,11 +8,11 @@ import (
 )
 
 // Endpoint - interface for endpoint extension. Allows to change @http directive url or to add headers to http request created in resolver
-type Endpoint interface {
-	ApplyEndpoint(req *http.Request)
+type Upstream interface {
+	ApplyUpstream(req *http.Request)
 }
 
-type endpointStruct struct {
+type upstreamStruct struct {
 	host    string
 	headers map[string]string
 	auth    authStruct
@@ -24,7 +24,7 @@ type authStruct struct {
 	scope     string
 }
 
-func (ep *endpointStruct) ApplyEndpoint(req *http.Request) {
+func (ep *upstreamStruct) ApplyUpstream(req *http.Request) {
 	for header, headerValue := range ep.headers {
 		req.Header.Set(header, headerValue)
 	}
@@ -36,8 +36,8 @@ func (ep *endpointStruct) ApplyEndpoint(req *http.Request) {
 	}
 }
 
-func newEndpoint(epConfig *gqlconfig.GqlEndpoint) Endpoint {
-	return &endpointStruct{
+func newUpstream(epConfig *gqlconfig.Upstream) Upstream {
+	return &upstreamStruct{
 		host: epConfig.Host,
 		auth: authStruct{
 			authType:  epConfig.Auth.AuthType,
@@ -47,18 +47,18 @@ func newEndpoint(epConfig *gqlconfig.GqlEndpoint) Endpoint {
 	}
 }
 
-var endpoints map[string]Endpoint
+var upstreams map[string]Upstream
 
 // Init initializes endpoint repository by
-func Init(epConfigs []*gqlconfig.GqlEndpoint) {
-	endpoints = make(map[string]Endpoint)
+func Init(epConfigs []*gqlconfig.Upstream) {
+	upstreams = make(map[string]Upstream)
 	for _, epConfig := range epConfigs {
-		endpoints[epConfig.Host] = newEndpoint(epConfig)
+		upstreams[epConfig.Host] = newUpstream(epConfig)
 	}
 }
 
 // Get gets Endpoint by host
-func Get(host string) (Endpoint, bool) {
-	ep, ok := endpoints[host]
+func Get(host string) (Upstream, bool) {
+	ep, ok := upstreams[host]
 	return ep, ok
 }
