@@ -6,7 +6,10 @@ before('waiting for graphql server', async function () {
     const { hostname, port, protocol } = new URL(process.env.GRAPHQL_SERVER_URL);
 
     const explicitPort = port || getImplicitPort(protocol);
+    console.log(`http-get://${hostname}:${explicitPort}`)
     await waitOn({
+        log: true,
+        verbose: true,
         resources: [
             `tcp:${hostname}:${explicitPort}`,
         ],

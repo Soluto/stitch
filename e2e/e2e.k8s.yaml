@@ -14,4 +14,7 @@ spec:
       - name: e2e
         image: e2e
         imagePullPolicy: Never
-  backoffLimit: 1
+        env:
+          - name: "GRAPHQL_SERVER_URL"
+            value: "http://gateway"
+  backoffLimit: 0

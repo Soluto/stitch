@@ -78,12 +78,15 @@ execute_tests() {
     kubectl apply -f ./e2e.k8s.yaml
 
     kubectl wait --namespace agogos --for=condition=complete --timeout "$TEST_TIMEOUT"s job/e2e
-    kubectl logs -n agogos --selector=jobs-name=e2e
+    kubectl logs -n agogos --selector=jobs-name=e2e -f
     exitCode=$(kubectl get pods -n agogos --selector=job-name=e2e --output=jsonpath='{.items[*].status.containerStatuses[*].state.terminated.exitCode}')
     reason=$(kubectl get pods -n agogos --selector=job-name=e2e --output=jsonpath='{.items[*].status.containerStatuses[*].state.terminated.Reason}')
 
+    echo "The tests finished with status code $exitCode and message: $reason"
+
     KUBECONFIG="$oldKUBECONFIG"
     export KUBECONFIG
+    exit $exitCode
 }
 
 parse_options() {
@@ -140,12 +143,12 @@ parse_options() {
 
     if [[ -z "$STARTUP_DELAY" ]]
     then
-        STARTUP_DELAY=10
+        STARTUP_DELAY=60
     fi
 
     if [[ -z "$TEST_TIMEOUT" ]]
     then
-        TEST_TIMEOUT=120
+        TEST_TIMEOUT=60
     fi
 }
 
