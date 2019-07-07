@@ -137,6 +137,6 @@ workflows:
       - run_e2e_tests:
           requires:
             - build_registry
-            - build_graphql_server
+            - build_graphql_gateway
             - build_gql_controller
             - build_e2e
