@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -o
+set -ox
 
 install_kind() {
     echo "Installing kind (v$KIND_VERSION)..."
@@ -30,9 +30,9 @@ delete_cluster() {
 }
 
 report_error_and_exit() {
-    echo "Error on line $1"
+    echo "Error on line $1 with error code $2"
     delete_cluster
-    exit 1
+    exit $2
 }
 
 build_images() {
@@ -174,7 +174,7 @@ parse_options() {
 
 main() {
     trap delete_cluster EXIT
-    trap report_error_and_exit ERR
+    trap 'report_error_and_exit $LINENO $?' ERR
     parse_options
 
     if [[ ! -z "$CI" ]]
