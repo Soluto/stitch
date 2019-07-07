@@ -12,6 +12,7 @@ install_kubectl() {
     echo "Installing kubectl (v$KUBECTL_VERSION)..."
     curl -sfSLO "https://storage.googleapis.com/kubernetes-release/release/v$KUBECTL_VERSION/bin/linux/amd64/kubectl"
     chmod +x kubectl
+    sudo mv kubectl /usr/local/bin/kubectl
 }
 
 create_cluster() {
