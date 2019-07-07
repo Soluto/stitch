@@ -99,7 +99,9 @@ workflows:
     jobs:
       - build_registry
       - build_graphql_server
+      - build_e2e
       - run_e2e_tests:
           requires:
             - build_registry
             - build_graphql_server
+            - build_e2e
