@@ -36,17 +36,17 @@ report_error_and_exit() {
 
 build_images() {
     echo "Building images..."
-    docker build -t graphql-gateway '../services/graphql-server'
-    docker build -t registry '../services/registry'
-    docker build -t gql-controller '../remote-sources/kubernetes'
+    docker build -t soluto/agogos-graphql-gateway '../services/graphql-server'
+    docker build -t soluto/agogos-registry '../services/registry'
+    docker build -t soluto/agogos-gql-controller '../remote-sources/kubernetes'
     docker build -t e2e '.'
 }
 
 load_images() {
     echo "Loading images to cluster..."
-    kind load docker-image --name "$CLUSTER_NAME" graphql-gateway
-    kind load docker-image --name "$CLUSTER_NAME" registry
-    kind load docker-image --name "$CLUSTER_NAME" gql-controller
+    kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-graphql-gateway
+    kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-registry
+    kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-gql-controller
     kind load docker-image --name "$CLUSTER_NAME" e2e
 }
 

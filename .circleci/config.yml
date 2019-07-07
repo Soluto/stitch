@@ -23,7 +23,7 @@ jobs:
             - agogos-registry-cache
           key: agogos-registry-cache-key{{ .Revision }}
 
-  build_graphql_server:
+  build_graphql_gateway:
     machine:
       image: ubuntu-1604:201903-01
 
@@ -31,19 +31,41 @@ jobs:
       - checkout
 
       - run:
-          name: Build agogos-graphql-server image
-          command: docker build -t soluto/agogos-graphql-server --build-arg target=PRODUCTION ./services/graphql-server
+          name: Build agogos-graphql-gateway image
+          command: docker build -t soluto/agogos-graphql-gateway --build-arg target=PRODUCTION ./services/graphql-server
 
       - run:
           name: Save image to fs
           command: |
-            mkdir -p agogos-graphql-server-cache
-            docker save -o agogos-graphql-server-cache/agogos-graphql-server.tar soluto/agogos-graphql-server
+            mkdir -p agogos-graphql-gateway-cache
+            docker save -o agogos-graphql-gateway-cache/agogos-graphql-gateway.tar soluto/agogos-graphql-gateway
 
       - save_cache:
           paths:
-            - agogos-graphql-server-cache
-          key: agogos-graphql-server-cache-key{{ .Revision }}
+            - agogos-graphql-gateway-cache
+          key: agogos-graphql-gateway-cache-key{{ .Revision }}
+
+  build_gql_controller:
+    machine:
+      image: ubuntu-1604:201903-01
+
+    steps:
+      - checkout
+
+      - run:
+          name: Build agogos-gql-controller image
+          command: docker build -t soluto/agogos-gql-controller --build-arg target=PRODUCTION ./remote-sources/kubernetes
+
+      - run:
+          name: Save image to fs
+          command: |
+            mkdir -p agogos-gql-controller-cache
+            docker save -o agogos-gql-controller-cache/agogos-gql-controller.tar soluto/agogos-gql-controller
+
+      - save_cache:
+          paths:
+            - agogos-gql-controller-cache
+          key: agogos-gql-controller-cache-key{{ .Revision }}
 
   build_e2e:
     machine:
@@ -54,13 +76,13 @@ jobs:
 
       - run:
           name: Build e2e tests image
-          command: docker build -t soluto/agogos-e2e ./e2e
+          command: docker build -t e2e ./e2e
 
       - run:
           name: Save image to fs
           command: |
             mkdir -p agogos-e2e-cache
-            docker save -o agogos-e2e-cache/agogos-e2e.tar soluto/agogos-e2e
+            docker save -o agogos-e2e-cache/agogos-e2e.tar e2e
 
       - save_cache:
           paths:
@@ -80,7 +102,11 @@ jobs:
 
       - restore_cache:
           keys:
-            - agogos-graphql-server-cache-key{{ .Revision }}
+            - agogos-graphql-gateway-cache-key{{ .Revision }}
+
+      - restore_cache:
+          keys:
+            - agogos-gql-controller-cache-key{{ .Revision }}
 
       - restore_cache:
           keys:
@@ -90,7 +116,8 @@ jobs:
           name: Load docker images from fs
           command: |
             docker load < agogos-registry-cache/agogos-registry.tar
-            docker load < agogos-graphql-server-cache/agogos-graphql-server.tar
+            docker load < agogos-graphql-gateway-cache/agogos-graphql-gateway.tar
+            docker load < agogos-gql-controller-cache/agogos-gql-controller.tar
             docker load < agogos-e2e-cache/agogos-e2e.tar
 
       - run:
@@ -105,9 +132,11 @@ workflows:
     jobs:
       - build_registry
       - build_graphql_server
+      - build_gql_controller
       - build_e2e
       - run_e2e_tests:
           requires:
             - build_registry
             - build_graphql_server
+            - build_gql_controller
             - build_e2e
