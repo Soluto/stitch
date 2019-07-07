@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -o
+set -ox
 
 install_kind() {
     echo "Installing kind (v$KIND_VERSION)..."
@@ -15,6 +15,7 @@ install_kubectl() {
 }
 
 create_cluster() {
+    echo "Creating cluster $CLUSTER_NAME..."
     kind create cluster --name "$CLUSTER_NAME"
 }
 
@@ -22,11 +23,13 @@ delete_cluster() {
     clustername=`kind get clusters | grep $CLUSTER_NAME`
     if [[ ! -z "$clustername" ]]
     then
+        echo "Deleting cluster $clustername..."
         kind delete cluster --name "$clustername"
     fi
 }
 
 build_images() {
+    echo "Building images..."
     docker build -t graphql-gateway '../services/graphql-server'
     docker build -t registry '../services/registry'
     docker build -t gql-controller '../remote-sources/kubernetes'
@@ -34,6 +37,7 @@ build_images() {
 }
 
 load_images() {
+    echo "Loading images to cluster..."
     kind load docker-image --name "$CLUSTER_NAME" graphql-gateway
     kind load docker-image --name "$CLUSTER_NAME" registry
     kind load docker-image --name "$CLUSTER_NAME" gql-controller
@@ -41,10 +45,12 @@ load_images() {
 }
 
 execute_tests() {
+    echo "Configuring kubectl..."
     local oldKUBECONFIG="$KUBECONFIG"
     KUBECONFIG="$(kind get kubeconfig-path --name=$CLUSTER_NAME)"
     export KUBECONFIG
 
+    echo "Creating kubernetes objects..."
     # namespace
     kubectl apply -f ../examples/kubernetes/deployments/infra/namespace.yaml
 
@@ -79,15 +85,17 @@ execute_tests() {
     kubectl apply -f ../examples/kubernetes/deployments/crds/authProviders/user-service.authProvider.yaml
 
     # running e2e
+    echo "Running e2e tests job..."
     sleep $STARTUP_DELAY
     kubectl apply -f ./e2e.k8s.yaml
 
+    echo "Checking e2e test job exit code..."
     kubectl wait --namespace agogos --for=condition=complete --timeout "$TEST_TIMEOUT"s job/e2e
     kubectl logs -n agogos --selector=jobs-name=e2e -f
     exitCode=$(kubectl get pods -n agogos --selector=job-name=e2e --output=jsonpath='{.items[*].status.containerStatuses[*].state.terminated.exitCode}')
     reason=$(kubectl get pods -n agogos --selector=job-name=e2e --output=jsonpath='{.items[*].status.containerStatuses[*].state.terminated.Reason}')
 
-    echo "The tests finished with status code $exitCode and message: $reason"
+    echo "The tests finished with exit code $exitCode and message: $reason"
 
     KUBECONFIG="$oldKUBECONFIG"
     export KUBECONFIG
