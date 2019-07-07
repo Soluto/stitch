@@ -2,7 +2,6 @@
 set -o
 
 install_kind() {
-    KIND_VERSION=$1
     echo "Installing kind (v$KIND_VERSION)..."
     curl -sfSLo kind "https://github.com/kubernetes-sigs/kind/releases/download/v$KIND_VERSION/kind-linux-amd64"
     chmod +x kind
@@ -10,15 +9,21 @@ install_kind() {
 }
 
 install_kubectl() {
-    KUBECTL_VERSION=$2
     echo "Installing kubectl (v$KUBECTL_VERSION)..."
     curl -sfSLO "https://storage.googleapis.com/kubernetes-release/release/v$KUBECTL_VERSION/bin/linux/amd64/kubectl"
     chmod +x kubectl
 }
 
 create_cluster() {
-    CLUSTER_NAME=$3
     kind create cluster --name "$CLUSTER_NAME"
+}
+
+delete_cluster() {
+    clustername=`kind get clusters | grep $CLUSTER_NAME`
+    if [[ ! -z "$clustername" ]]
+    then
+        kind delete cluster --name "$clustername"
+    fi
 }
 
 build_images() {
@@ -29,15 +34,15 @@ build_images() {
 }
 
 load_images() {
-    kind load docker-image graphql-gateway
-    kind load docker-image registry
-    kind load docker-image gql-controller
-    kind load docker-image e2e
+    kind load docker-image --name "$CLUSTER_NAME" graphql-gateway
+    kind load docker-image --name "$CLUSTER_NAME" registry
+    kind load docker-image --name "$CLUSTER_NAME" gql-controller
+    kind load docker-image --name "$CLUSTER_NAME" e2e
 }
 
 execute_tests() {
     local oldKUBECONFIG="$KUBECONFIG"
-    KUBECONFIG=$(kind get kubeconfig-path)
+    KUBECONFIG="$(kind get kubeconfig-path --name=$CLUSTER_NAME)"
     export KUBECONFIG
 
     # namespace
@@ -153,6 +158,7 @@ parse_options() {
 }
 
 main() {
+    trap delete_cluster EXIT
     parse_options
 
     if [[ ! -z "$CI" ]]
