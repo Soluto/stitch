@@ -12,6 +12,17 @@ jobs:
           name: Build agogos-registry image
           command: docker build -t soluto/agogos-registry --build-arg target=PRODUCTION ./services/registry
 
+      - run:
+          name: Save image to fs
+          command: |
+            mkdir -p agogos-registry-cache
+            docker save -o agogos-registry-cache/agogos-registry.tar soluto/agogos-registry
+
+      - save_cache:
+          paths:
+            - agogos-registry-cache
+          key: agogos-registry-cache-key{{ .Revision }}
+
   build_graphql_server:
     machine:
       image: ubuntu-1604:201903-01
@@ -23,7 +34,18 @@ jobs:
           name: Build agogos-graphql-server image
           command: docker build -t soluto/agogos-graphql-server --build-arg target=PRODUCTION ./services/graphql-server
 
-  run_e2e_tests:
+      - run:
+          name: Save image to fs
+          command: |
+            mkdir -p agogos-graphql-server-cache
+            docker save -o agogos-graphql-server-cache/agogos-graphql-server.tar soluto/agogos-graphql-server
+
+      - save_cache:
+          paths:
+            - agogos-graphql-server-cache
+          key: agogos-graphql-server-cache-key{{ .Revision }}
+
+  build_e2e:
     machine:
       image: ubuntu-1604:201903-01
 
@@ -33,6 +55,37 @@ jobs:
       - run:
           name: Build e2e tests image
           command: docker build -t soluto/agogos-e2e ./e2e
+
+      - run:
+          name: Save image to fs
+          command: |
+            mkdir -p agogos-e2e-cache
+            docker save -o agogos-e2e-cache/agogos-e2e.tar soluto/agogos-e2e
+
+      - save_cache:
+          paths:
+            - agogos-e2e-cache
+          key: agogos-e2e-cache-key{{ .Revision }}
+
+  run_e2e_tests:
+    machine:
+      image: ubuntu-1604:201903-01
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - agogos-registry-cache-key{{ .Revision }}
+            - agogos-graphql-server-cache-key{{ .Revision }}
+            - agogos-e2e-cache-key{{ .Revision }}
+
+      - run:
+          name: Load docker images from fs
+          command: |
+            docker load < agogos-registry-cache/agogos-registry.tar
+            docker load < agogos-graphql-server-cache/agogos-graphql-server.tar
+            docker load < agogos-e2e-cache/agogos-e2e.tar
 
       - run:
           name: Run E2E tests
