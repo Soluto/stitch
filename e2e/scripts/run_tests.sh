@@ -32,6 +32,7 @@ delete_cluster() {
 report_error_and_exit() {
     echo "Error on line $1"
     delete_cluster
+    exit 1
 }
 
 build_images() {
