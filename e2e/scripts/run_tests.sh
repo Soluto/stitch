@@ -31,7 +31,6 @@ delete_cluster() {
 
 report_error_and_exit() {
     echo "Error on line $1 with error code $2"
-    delete_cluster
     exit $2
 }
 
