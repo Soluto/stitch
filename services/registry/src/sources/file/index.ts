@@ -9,50 +9,66 @@ import extractDefinition, { getExtensionByKind } from "./extraction";
 
 const globAsync = util.promisify(glob);
 
-
 type NamedGqlObject = {
-    name: string;
-    kind: string;
-    definition: AgogosObjectConfig;
+  name: string;
+  kind: string;
+  definition: AgogosObjectConfig;
 };
 
-const createSource = (folder: string): Source => ({
-    async getAgogosObjects(): Promise<{ [kind: string]: { [name: string]: AgogosObjectConfig } }> {
-        const dir = path.join(__dirname, folder);
-        const gqlObjectKinds = fs.readdirSync(dir);
-        const objectsByKind = await Promise.all(gqlObjectKinds.map(async kind => await getGqlObjectsByKind(dir, kind)))
-        return objectsByKind.reduce((acc, p) => ({ ...acc, [p.kind]: p.objects }), {});
-    },
+const createSource = (dir: string): Source => ({
+  async getAgogosObjects(): Promise<{
+    [kind: string]: { [name: string]: AgogosObjectConfig };
+  }> {
+    const gqlObjectKinds = fs.readdirSync(dir);
+    const objectsByKind = await Promise.all(
+      gqlObjectKinds.map(async kind => await getGqlObjectsByKind(dir, kind))
+    );
+    return objectsByKind.reduce(
+      (acc, p) => ({ ...acc, [p.kind]: p.objects }),
+      {}
+    );
+  },
 
-    async putAgogosObject(name: string, kind: string, definition: AgogosObjectConfig) {
-        await fs.writeFileSync(`./${kind}/${name}.${getExtensionByKind(kind)}`, definition, { encoding: "utf8" });
-    }
+  async putAgogosObject(
+    name: string,
+    kind: string,
+    definition: AgogosObjectConfig
+  ) {
+    await fs.writeFileSync(
+      `./${kind}/${name}.${getExtensionByKind(kind)}`,
+      definition,
+      { encoding: "utf8" }
+    );
+  }
 });
 
-const getGqlObjectsByKind = async (folder: string, kind: string): Promise<{ kind: string, objects: { [name: string]: string } }> => {
-    const files = await globAsync(`${folder}/${kind}/**/*.{gql,json}`);
-    const getGqlObjectFromFiles: Promise<NamedGqlObject>[] = files.map(
-        async (file: string) => {
-            const fileNameMatch = file.match(/([^\/]+)(?=\.\w+$)/);
-            if (!fileNameMatch) throw "error extracting filename";
+const getGqlObjectsByKind = async (
+  folder: string,
+  kind: string
+): Promise<{ kind: string; objects: { [name: string]: string } }> => {
+  const files = await globAsync(`${folder}/${kind}/**/*.{gql,json}`);
+  const getGqlObjectFromFiles: Promise<NamedGqlObject>[] = files.map(
+    async (file: string) => {
+      const fileNameMatch = file.match(/([^\/]+)(?=\.\w+$)/);
+      if (!fileNameMatch) throw "error extracting filename";
 
-            const [name] = fileNameMatch;
-            const definition = await extractDefinition(kind, file);
-            return { name, kind, definition };
-        }
-    );
+      const [name] = fileNameMatch;
+      const definition = await extractDefinition(kind, file);
+      return { name, kind, definition };
+    }
+  );
 
-    const gqlByNames = await Promise.all(getGqlObjectFromFiles);
+  const gqlByNames = await Promise.all(getGqlObjectFromFiles);
 
-    const objects = gqlByNames.reduce(
-        (agg, { name, definition }) => ({
-            ...agg,
-            [name]: definition
-        }),
-        {}
-    );
+  const objects = gqlByNames.reduce(
+    (agg, { name, definition }) => ({
+      ...agg,
+      [name]: definition
+    }),
+    {}
+  );
 
-    return { kind, objects };
+  return { kind, objects };
 };
 
 export default createSource;
