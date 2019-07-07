@@ -36,7 +36,8 @@ jobs:
 
       - run:
           name: Run E2E tests
-          command: cd e2e && scripts/run_tests.sh
+          working_directory: e2e
+          command: scripts/run_tests.sh
 
 workflows:
   version: 2
