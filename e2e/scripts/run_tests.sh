@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ox
+set -o
 
 install_kind() {
     echo "Installing kind (v$KIND_VERSION)..."
@@ -27,6 +27,11 @@ delete_cluster() {
         echo "Deleting cluster $clustername..."
         kind delete cluster --name "$clustername"
     fi
+}
+
+report_error_and_exit() {
+    echo "Error on line $1"
+    delete_cluster
 }
 
 build_images() {
@@ -168,6 +173,7 @@ parse_options() {
 
 main() {
     trap delete_cluster EXIT
+    trap report_error_and_exit ERR
     parse_options
 
     if [[ ! -z "$CI" ]]
