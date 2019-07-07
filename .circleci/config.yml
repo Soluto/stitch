@@ -36,7 +36,7 @@ jobs:
 
       - run:
           name: Run E2E tests
-          command: docker run -it soluto/agogos-e2e
+          command: cd e2e && scripts/run_tests.sh
 
 workflows:
   version: 2
@@ -45,3 +45,7 @@ workflows:
     jobs:
       - build_registry
       - build_graphql_server
+      - run_e2e_tests:
+          requires:
+            - build_registry
+            - build_graphql_server
