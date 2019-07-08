@@ -44,9 +44,9 @@ k8s_yaml([
 # e2e tests
 k8s_yaml('./e2e.k8s.yaml')
 
-docker_build('graphql-gateway', '../services/graphql-server')
-docker_build('registry', '../services/registry')
-docker_build('gql-controller', '../remote-sources/kubernetes')
+docker_build('soluto/agogos-graphql-gateway', '../services/graphql-server')
+docker_build('soluto/agogos-registry', '../services/registry')
+docker_build('soluto/agogos-gql-controller', '../remote-sources/kubernetes')
 docker_build('e2e', '.')
 
 k8s_resource('e2e')

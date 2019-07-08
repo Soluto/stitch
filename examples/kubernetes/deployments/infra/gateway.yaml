@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: graphql-gateway
-        image: graphql-gateway
+        image: soluto/agogos-graphql-gateway
         env:
           - name: REGISTRY_URL
             value: 'registry:81'

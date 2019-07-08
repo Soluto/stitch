@@ -10,13 +10,13 @@ jobs:
 
       - run:
           name: Build agogos-registry image
-          command: docker build -t soluto/agogos-registry --build-arg target=PRODUCTION ./services/registry
+          command: docker build -t agogos-registry --build-arg target=PRODUCTION ./services/registry
 
       - run:
           name: Save image to fs
           command: |
             mkdir -p agogos-registry-cache
-            docker save -o agogos-registry-cache/agogos-registry.tar soluto/agogos-registry
+            docker save -o agogos-registry-cache/agogos-registry.tar agogos-registry
 
       - save_cache:
           paths:
@@ -32,13 +32,13 @@ jobs:
 
       - run:
           name: Build agogos-graphql-gateway image
-          command: docker build -t soluto/agogos-graphql-gateway --build-arg target=PRODUCTION ./services/graphql-server
+          command: docker build -t agogos-graphql-gateway --build-arg target=PRODUCTION ./services/graphql-server
 
       - run:
           name: Save image to fs
           command: |
             mkdir -p agogos-graphql-gateway-cache
-            docker save -o agogos-graphql-gateway-cache/agogos-graphql-gateway.tar soluto/agogos-graphql-gateway
+            docker save -o agogos-graphql-gateway-cache/agogos-graphql-gateway.tar agogos-graphql-gateway
 
       - save_cache:
           paths:
@@ -54,13 +54,13 @@ jobs:
 
       - run:
           name: Build agogos-gql-controller image
-          command: docker build -t soluto/agogos-gql-controller --build-arg target=PRODUCTION ./remote-sources/kubernetes
+          command: docker build -t agogos-gql-controller --build-arg target=PRODUCTION ./remote-sources/kubernetes
 
       - run:
           name: Save image to fs
           command: |
             mkdir -p agogos-gql-controller-cache
-            docker save -o agogos-gql-controller-cache/agogos-gql-controller.tar soluto/agogos-gql-controller
+            docker save -o agogos-gql-controller-cache/agogos-gql-controller.tar agogos-gql-controller
 
       - save_cache:
           paths:

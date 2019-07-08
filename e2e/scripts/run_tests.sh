@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -ox
+set -o
 
 install_kind() {
     echo "Installing kind (v$KIND_VERSION)..."
@@ -91,13 +91,14 @@ execute_tests() {
     kubectl apply -f ../examples/kubernetes/deployments/crds/authProviders/user-service.authProvider.yaml
 
     # running e2e
-    echo "Running e2e tests job..."
+    echo "Waiting for things to get ready...($STARTUP_DELAY seconds)"
     sleep $STARTUP_DELAY
+    echo "Running e2e tests job..."
     kubectl apply -f ./e2e.k8s.yaml
 
-    echo "Checking e2e test job exit code..."
-    kubectl wait --namespace agogos --for=condition=complete --timeout "$TEST_TIMEOUT"s job/e2e
-    kubectl logs -n agogos --selector=jobs-name=e2e -f
+    echo "Waiting for e2e test job to complete..."
+    kubectl -n agogos wait  --for=condition=complete --timeout "$TEST_TIMEOUT"s jobs/e2e
+    kubectl -n agogos logs  --selector=jobs-name=e2e -f
     exitCode=$(kubectl get pods -n agogos --selector=job-name=e2e --output=jsonpath='{.items[*].status.containerStatuses[*].state.terminated.exitCode}')
     reason=$(kubectl get pods -n agogos --selector=job-name=e2e --output=jsonpath='{.items[*].status.containerStatuses[*].state.terminated.Reason}')
 

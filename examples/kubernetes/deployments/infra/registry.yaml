@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: registry
-        image: registry
+        image: soluto/agogos-registry
         env:
           - name: PORT
             value: "80"
