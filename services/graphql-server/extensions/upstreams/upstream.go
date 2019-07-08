@@ -1,10 +1,9 @@
-package endpoints
+package upstreams
 
 import (
-	"net/http"
-
-	authproviders "agogos/extensions/authproviders"
+	upstreamAuthentications "agogos/extensions/upstreams/authentication"
 	gqlconfig "agogos/generated"
+	"net/http"
 )
 
 // Endpoint - interface for endpoint extension. Allows to change @http directive url or to add headers to http request created in resolver
@@ -30,7 +29,7 @@ func (ep *upstreamStruct) ApplyUpstream(req *http.Request) {
 	}
 
 	// TODO: consider more implicit approach
-	ap, ok := authproviders.Get(ep.auth.authType, ep.auth.authority)
+	ap, ok := upstreamAuthentications.Get(ep.auth.authType, ep.auth.authority)
 	if ok {
 		ap.AddAuthentication(req)
 	}

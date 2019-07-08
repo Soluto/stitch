@@ -43,7 +43,7 @@ export const makeGqlDocumentFromGqlSources = (gqlSchemas: GqlObjsByName) => {
 };
 
 const syncSchema$ = gqlObjects$.pipe(
-  map(x => x.gqlschemas),
+  map(x => x.schemas),
   filter(a => a && Object.keys(a).length > 0),
   map(schemaBySource => makeGqlDocumentFromGqlSources(schemaBySource)),
   map(print),

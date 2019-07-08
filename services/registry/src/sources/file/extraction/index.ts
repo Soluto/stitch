@@ -3,20 +3,20 @@ import * as util from "util";
 import * as mime from "mime-types";
 
 import { AgogosObjectConfig } from "../../../sync/object-types";
-import GqlSchemaExtractor from "./schemaExtractor";
+import SchemaExtractor from "./schemaExtractor";
 
 const readFileAsync = util.promisify(fs.readFile);
 
 const extractors: {
   [kind: string]: (mimeType: string, content: string) => AgogosObjectConfig;
 } = {
-  gqlschemas: GqlSchemaExtractor
+  schemas: SchemaExtractor
 };
 
 const defaultObjectMimeTypes = {
-  gqlschemas: "gql",
-  gqlendpoints: "application/json",
-  gqlauthproviders: "application/json"
+  schemas: "gql",
+  upstreams: "application/json",
+  upstreamsClientCredentials: "application/json"
 };
 
 export const getExtensionByKind = (kind: string): string =>

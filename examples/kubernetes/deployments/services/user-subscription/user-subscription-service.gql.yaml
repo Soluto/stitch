@@ -1,5 +1,5 @@
 apiVersion: agogos.app/v1
-kind: GqlSchema
+kind: Schema
 metadata:
   name: user-subscription-service
 spec:

@@ -15,8 +15,8 @@ import (
 
 	"google.golang.org/grpc"
 
-	authproviders "agogos/extensions/authproviders"
 	upstreams "agogos/extensions/upstreams"
+	upstreamsAuthentication "agogos/extensions/upstreams/authentication"
 )
 
 func getenv(key, fallback string) string {
@@ -71,7 +71,7 @@ func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err err
 		}
 
 		upstreams.Init(registryMessage.Upstreams)
-		authproviders.Init(registryMessage.UpstreamAuthCredentials)
+		upstreamsAuthentication.Init(registryMessage.UpstreamAuthCredentials)
 
 		astSchema, err := parseSdl(source{
 			name: "schema registry sdl",

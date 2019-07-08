@@ -258,8 +258,10 @@
     "@types/istanbul-lib-coverage" "^2.0.0"
     "@types/yargs" "^12.0.9"
 
-"@kubernetes/client-node@file:./temp/@kubernetes/client-node":
+"@kubernetes/client-node@0.10.1":
   version "0.10.1"
+  resolved "https://registry.yarnpkg.com/@kubernetes/client-node/-/client-node-0.10.1.tgz#ff6352a57a35d5e49dc04abc3ba60747264e9e0c"
+  integrity sha512-AOfrCPa5oqdk/7lzIVU+4yYPlphc8cGW+kbiJAS5+GTbUpo62f5jPbWSPv83jTjQwfhWucj3t+3VHxQGdNexsw==
   dependencies:
     "@types/js-yaml" "^3.11.2"
     "@types/node" "^10.12.0"
@@ -2709,9 +2711,10 @@ node-emoji@^1.4.1:
   dependencies:
     lodash.toarray "^4.4.0"
 
-node-fetch@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.3.0.tgz#1a1d940bbfb916a1d3e0219f037e89e71f8c5fa5"
+"node-fetch@^2 .6.0":
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
+  integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
 
 node-int64@^0.4.0:
   version "0.4.0"

@@ -1,5 +1,5 @@
 apiVersion: agogos.app/v1
-kind: GqlEndpoint
+kind: Upstream
 metadata:
   name: user-service-endpoint
 spec:

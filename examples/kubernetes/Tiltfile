@@ -1,48 +1,34 @@
+if k8s_context() == 'microk8s':
+    print("using microk8s registry")
+    default_registry('localhost:32000')
+
 # agogos namespace
 k8s_yaml('./deployments/infra/namespace.yaml')
 
 # agogos crds
-k8s_yaml([
-    '../../remote-sources/kubernetes/src/GqlSchemaCrd.yaml',
-    '../../remote-sources/kubernetes/src/GqlEndpointCrd.yaml',
-    '../../remote-sources/kubernetes/src/GqlAuthProviderCrd.yaml',
-])
+k8s_yaml(
+    listdir('../../remote-sources/kubernetes/src/crd')
+)
 
 # mocks
-k8s_yaml([
-    './deployments/mocks/oidc-server-mock.yaml',
-])
+k8s_yaml(
+    listdir('./deployments/mocks'),
+)
 
 # agogos deployments, roles & secrets
-k8s_yaml([
-    './deployments/infra/rbac.yaml',
-    './deployments/infra/gql-controller.yaml',
-    './deployments/infra/admission-tls-secret.yaml',
-    './deployments/infra/agogos-credentials.yaml',
-
-    './deployments/infra/registry.yaml',
-    './deployments/infra/gateway.yaml',
-
-    './deployments/infra/webhook.yaml',
-])
+k8s_yaml(
+    listdir('./deployments/infra'),
+)
 
 # user namespace & services
 k8s_yaml('./deployments/services/user-namespace.yaml')
-k8s_yaml([
-    './deployments/services/user-service.yaml',
-    './deployments/services/user-subscription-service.yaml',
-])
-
-# agogos objects
-k8s_yaml([
-    './deployments/crds/schemas/user-service.gql.yaml',
-    './deployments/crds/schemas/user-subscription-service.gql.yaml',
-    './deployments/crds/endpoints/user-service.endpoint.yaml',
-    './deployments/crds/authProviders/user-service.authProvider.yaml',
-])
+k8s_yaml(listdir('./deployments/services/user'))
+k8s_yaml(listdir('./deployments/services/user-subscription'))
 
 docker_build('graphql-gateway', '../../services/graphql-server')
 docker_build('registry', '../../services/registry')
 docker_build('gql-controller', '../../remote-sources/kubernetes')
 
 k8s_resource('gateway', port_forwards=['8011:8011'])
+k8s_resource('registry', port_forwards=['8012:80', '8013:81'])
+k8s_resource('gql-controller', port_forwards=['8014:80'])
