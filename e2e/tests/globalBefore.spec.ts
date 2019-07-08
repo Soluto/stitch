@@ -2,7 +2,7 @@ import waitOn = require('wait-on');
 import { URL } from 'url';
 
 before('waiting for graphql server', async function () {
-    this.timeout(10000);
+    this.timeout(60000);
     const { hostname, port, protocol } = new URL(process.env.GRAPHQL_SERVER_URL);
 
     const explicitPort = port || getImplicitPort(protocol);
