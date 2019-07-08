@@ -18,7 +18,7 @@ func newUpstreamAuthentication(apConfig *gqlconfig.UpstreamAuthCredentials) Upst
 
 var upstreamAuthentications map[string](map[string]UpstreamAuthentication)
 
-// Init initializes endpoint repository by
+// Init initialises upstream repository by config
 func Init(apConfigs []*gqlconfig.UpstreamAuthCredentials) {
 	upstreamAuthentications = make(map[string]map[string]UpstreamAuthentication)
 	for _, apConfig := range apConfigs {
