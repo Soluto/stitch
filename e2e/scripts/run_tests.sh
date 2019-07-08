@@ -91,8 +91,8 @@ execute_tests() {
     kubectl apply -f ../examples/kubernetes/deployments/crds/authProviders/user-service.authProvider.yaml
 
     # running e2e
-    echo "Waiting for things to get ready...($STARTUP_DELAY seconds)"
-    sleep $STARTUP_DELAY
+    echo "Waiting for things to get ready...($STARTUP_TIMEOUT seconds at most)"
+    kubectl -n agogos wait pod -l app=gateway --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
     echo "Running e2e tests job..."
     kubectl apply -f ./e2e.k8s.yaml
 
@@ -132,8 +132,8 @@ parse_options() {
         shift
         ;;
 
-        --startup-delay=*)
-        STARTUP_DELAY="${i#*=}"
+        --startup-timeout=*)
+        STARTUP_TIMEOUT="${i#*=}"
         shift
         ;;
 
@@ -164,9 +164,9 @@ parse_options() {
         CLUSTER_NAME="e2e"
     fi
 
-    if [[ -z "$STARTUP_DELAY" ]]
+    if [[ -z "$STARTUP_TIMEOUT" ]]
     then
-        STARTUP_DELAY=60
+        STARTUP_TIMEOUT=60
     fi
 
     if [[ -z "$TEST_TIMEOUT" ]]
