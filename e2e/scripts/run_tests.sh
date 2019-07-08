@@ -92,18 +92,37 @@ execute_tests() {
 
     # running e2e
     echo "Waiting for things to get ready...($STARTUP_DELAY seconds)"
-    sleep $STARTUP_DELAY
+    #sleep $STARTUP_DELAY
     echo "Running e2e tests job..."
     kubectl apply -f ./e2e.k8s.yaml
 
-    echo "Waiting for e2e test job to complete..."
-    kubectl -n agogos wait  --for=condition=complete --timeout "$TEST_TIMEOUT"s jobs/e2e
-    kubectl -n agogos logs  --selector=jobs-name=e2e -f
-    exitCode=$(kubectl get pods -n agogos --selector=job-name=e2e --output=jsonpath='{.items[*].status.containerStatuses[*].state.terminated.exitCode}')
-    reason=$(kubectl get pods -n agogos --selector=job-name=e2e --output=jsonpath='{.items[*].status.containerStatuses[*].state.terminated.Reason}')
+set -x
+    echo "Waiting for e2e test job to complete...($TEST_TIMEOUT seconds at most)"
+
+    kubectl -n agogos logs -l=job-name=e2e -f
+    sleep 2
+    kubectl -n agogos logs -l=job-name=e2e -f
+    sleep 2
+    kubectl -n agogos logs -l=job-name=e2e -f
+    sleep 2
+    kubectl -n agogos logs -l=job-name=e2e -f
+    sleep 2
+    kubectl -n agogos logs -l=job-name=e2e -f
+    sleep 2
+    kubectl -n agogos logs -l=job-name=e2e -f
+    sleep 2
+    kubectl -n agogos logs -l=job-name=e2e -f
+    sleep 2
+    kubectl -n agogos logs -l=job-name=e2e -f
+    sleep 2
+
+    kubectl -n agogos wait --for=condition=complete --timeout "$TEST_TIMEOUT"s jobs/e2e
+    exitCode=$(kubectl -n agogos get pods -l job-name=e2e -o jsonpath='{.items[*].status.containerStatuses[*].state.terminated.exitCode}')
+    reason=$(kubectl -n agogos get pods -l job-name=e2e -o jsonpath='{.items[*].status.containerStatuses[*].state.terminated.Reason}')
 
     echo "The tests finished with exit code $exitCode and message: $reason"
 
+set +x
     KUBECONFIG="$oldKUBECONFIG"
     export KUBECONFIG
     exit $exitCode
