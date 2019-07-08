@@ -23,6 +23,12 @@ spec:
           - name: REMOTESOURCE__KUBERNETES
             value: http://gql-controller
         imagePullPolicy: Never
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 3
 ---
 kind: Service
 apiVersion: v1

@@ -21,6 +21,12 @@ spec:
           - name: PORT
             value: "80"
         imagePullPolicy: Never
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 3
 ---
 kind: Service
 apiVersion: v1
