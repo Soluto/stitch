@@ -8,6 +8,6 @@ const syncUpstreamAuthCredentials$ = gqlObjects$.pipe(
   shareReplay(1)
 );
 
-// TODO: Add auth providers validation
+// TODO: Add UpstreamAuthCredentials validation
 
 export default syncUpstreamAuthCredentials$;
