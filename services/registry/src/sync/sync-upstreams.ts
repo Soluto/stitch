@@ -8,6 +8,6 @@ const syncUpstreams$ = gqlObjects$.pipe(
   shareReplay(1)
 );
 
-// TODO: add endpoint validation
+// TODO: add Upstream validation
 
 export default syncUpstreams$;
