@@ -6,7 +6,6 @@
         "test": "mocha --require ts-node/register ./**/*.spec.ts --exit"
     },
     "devDependencies": {
-        "@types/bluebird": "3.5.27",
         "@types/chai": "4.1.7",
         "@types/mocha": "5.2.7",
         "@types/node": "12.0.10",
@@ -16,7 +15,6 @@
         "typescript": "3.5.2"
     },
     "dependencies": {
-        "bluebird": "3.5.5",
         "chai": "4.2.0",
         "graphql-request": "1.8.2",
         "wait-on": "3.2.0"

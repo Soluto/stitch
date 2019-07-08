@@ -15,6 +15,9 @@ spec:
         image: e2e
         imagePullPolicy: Never
         env:
-          - name: "GRAPHQL_SERVER_URL"
+          - name: GRAPHQL_SERVER_URL
             value: "http://gateway"
+          - name: TIMEOUT
+            value: "60000"
+
   backoffLimit: 0
