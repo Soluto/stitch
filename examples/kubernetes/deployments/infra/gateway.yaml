@@ -31,13 +31,6 @@ spec:
             port: 8011
           initialDelaySeconds: 3
           periodSeconds: 3
-        # resources:
-        #   requests:
-        #     memory: "128Mi"
-        #     cpu: "10m"
-        #   limits:
-        #     memory: "256Mi"
-        #     cpu: "30m"
 ---
 kind: Service
 apiVersion: v1
