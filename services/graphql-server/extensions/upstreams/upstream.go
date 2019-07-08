@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-// Endpoint - interface for endpoint extension. Allows to change @http directive url or to add headers to http request created in resolver
+// Upstream - interface for upstream extension. Allows to change @http directive url or to add headers to http request created in resolver
 type Upstream interface {
 	ApplyUpstream(req *http.Request)
 }
