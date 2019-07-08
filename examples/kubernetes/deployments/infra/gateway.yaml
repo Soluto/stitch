@@ -19,6 +19,18 @@ spec:
           - name: REGISTRY_URL
             value: 'registry:81'
         imagePullPolicy: Never
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8011
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /graphql
+            port: 8011
+          initialDelaySeconds: 3
+          periodSeconds: 3
 ---
 kind: Service
 apiVersion: v1
