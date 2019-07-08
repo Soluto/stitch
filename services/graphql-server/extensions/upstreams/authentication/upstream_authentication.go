@@ -6,7 +6,7 @@ import (
 	gqlconfig "agogos/generated"
 )
 
-// AuthProvider interface for AuthProvider extension. Supplies auth details to HTTP request
+// UpstreamAuthentication interface for UpstreamAuthentication extension. Supplies auth details to HTTP request
 type UpstreamAuthentication interface {
 	AddAuthentication(req *http.Request)
 }
