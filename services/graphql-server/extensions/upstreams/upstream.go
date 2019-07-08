@@ -56,7 +56,7 @@ func Init(epConfigs []*gqlconfig.Upstream) {
 	}
 }
 
-// Get gets Endpoint by host
+// Get gets Upstream by host
 func Get(host string) (Upstream, bool) {
 	ep, ok := upstreams[host]
 	return ep, ok
