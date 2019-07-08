@@ -30,7 +30,7 @@ func Init(apConfigs []*gqlconfig.UpstreamAuthCredentials) {
 	}
 }
 
-// Get gets Endpoint by host
+// Get gets UpstreamAuthentication by authType and authority
 func Get(authType string, authority string) (UpstreamAuthentication, bool) {
 	apsByType, ok := upstreamAuthentications[authType]
 	if ok {
