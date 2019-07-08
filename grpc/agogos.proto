@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package gqlconfig;
+package agogos;
 
 service Registry {
     rpc Subscribe(SubscribeParams) returns (stream ConfigurationMessage) {}

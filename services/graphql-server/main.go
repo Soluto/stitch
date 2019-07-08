@@ -16,6 +16,7 @@ func main() {
 		failures := 0
 		for {
 			start := time.Now()
+			fmt.Println("Connecting to registry")
 			subscribeToRegistry(gqlConfigurations)
 			elapsed := time.Since(start)
 			if elapsed < (10 * time.Second) {

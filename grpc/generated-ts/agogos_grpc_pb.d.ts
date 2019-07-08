@@ -1,4 +1,4 @@
-// package: gqlconfig
+// package: agogos
 // file: agogos.proto
 
 /* tslint:disable */
@@ -11,7 +11,7 @@ interface IRegistryService extends grpc.ServiceDefinition<grpc.UntypedServiceImp
 }
 
 interface IRegistryService_ISubscribe extends grpc.MethodDefinition<agogos_pb.SubscribeParams, agogos_pb.ConfigurationMessage> {
-    path: string; // "/gqlconfig.Registry/Subscribe"
+    path: string; // "/agogos.Registry/Subscribe"
     requestStream: boolean; // false
     responseStream: boolean; // true
     requestSerialize: grpc.serialize<agogos_pb.SubscribeParams>;

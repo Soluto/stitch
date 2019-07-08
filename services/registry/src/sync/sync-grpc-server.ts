@@ -72,7 +72,11 @@ class GqlConfigurationSubscriptionServer implements IRegistryServer {
 
         call.write(configurationMessage);
       },
-      () => {},
+      e => {
+        console.log("====================================");
+        console.log(e);
+        console.log("====================================");
+      },
       () => call.end()
     );
 

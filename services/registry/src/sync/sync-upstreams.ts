@@ -3,8 +3,7 @@ import { map, shareReplay, distinctUntilChanged, filter } from "rxjs/operators";
 import * as R from "ramda";
 
 const syncUpstreams$ = gqlObjects$.pipe(
-  map(x => x.upstreams),
-  filter(a => a && Object.keys(a).length > 0),
+  map(x => x.upstreams || {}),
   distinctUntilChanged(R.equals),
   shareReplay(1)
 );

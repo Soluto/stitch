@@ -1,4 +1,4 @@
-// package: gqlconfig
+// package: agogos
 // file: agogos.proto
 
 /* tslint:disable */

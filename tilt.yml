@@ -8,7 +8,7 @@ services:
       test:
       - NONE
     ports:
-    - published: 8000
+    - published: 5000
       target: 8011
   agogos.registry:
     build:
@@ -32,8 +32,10 @@ services:
       - http://localhost/health
       timeout: 3s
     ports:
-    - published: 4000
+    - published: 5001
       target: 80
+    - published: 5002
+      target: 81
     - published: 4001
       target: 81
     - published: 58581
@@ -48,7 +50,7 @@ services:
       CLIENT_CREDENTIALS_CLIENT_SECRET: client-credentials-mock-client-secret
     image: soluto/oidc-server-mock
     ports:
-    - published: 4011
+    - published: 5011
       target: 80
 version: '3.7'
 
