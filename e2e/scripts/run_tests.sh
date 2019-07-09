@@ -94,9 +94,11 @@ prepare_environment() {
 execute_tests() {
 
     # running e2e
-    echo "Waiting for things to get ready...($STARTUP_TIMEOUT seconds at most)"
+    echo "Waiting for things to get ready...($STARTUP_TIMEOUT seconds at most for each service)"
     kubectl -n user-namespace wait pod -l app=user-subscription-service --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
     kubectl -n user-namespace wait pod -l app=user-service --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
+    kubectl -n agogos wait pod -l app=gql-controller --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
+    kubectl -n agogos wait pod -l app=registry --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
     kubectl -n agogos wait pod -l app=gateway --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
 
     echo "Running e2e tests job..."
