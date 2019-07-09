@@ -8,7 +8,7 @@ services:
       test:
       - NONE
     ports:
-    - published: 5000
+    - published: 8011
       target: 8011
   agogos.registry:
     build:
@@ -32,9 +32,9 @@ services:
       - http://localhost/health
       timeout: 3s
     ports:
-    - published: 5001
+    - published: 8012
       target: 80
-    - published: 5002
+    - published: 8013
       target: 81
     - published: 4001
       target: 81
