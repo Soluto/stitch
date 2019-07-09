@@ -50,7 +50,7 @@ load_images() {
     kind load docker-image --name "$CLUSTER_NAME" e2e
 }
 
-execute_tests() {
+prepare_environment() {
     echo "Configuring kubectl..."
     local oldKUBECONFIG="$KUBECONFIG"
     KUBECONFIG="$(kind get kubeconfig-path --name=$CLUSTER_NAME)"
@@ -89,10 +89,16 @@ execute_tests() {
     kubectl apply -f ../examples/kubernetes/deployments/crds/schemas/user-subscription-service.gql.yaml
     kubectl apply -f ../examples/kubernetes/deployments/crds/endpoints/user-service.endpoint.yaml
     kubectl apply -f ../examples/kubernetes/deployments/crds/authProviders/user-service.authProvider.yaml
+}
+
+execute_tests() {
 
     # running e2e
     echo "Waiting for things to get ready...($STARTUP_TIMEOUT seconds at most)"
+    kubectl -n user-namespace wait pod -l app=user-subscription-service --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
+    kubectl -n user-namespace wait pod -l app=user-service --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
     kubectl -n agogos wait pod -l app=gateway --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
+
     echo "Running e2e tests job..."
     kubectl apply -f ./e2e.k8s.yaml
 
@@ -190,6 +196,7 @@ main() {
 
     create_cluster
     load_images
+    prepare_environment
     execute_tests
 }
 

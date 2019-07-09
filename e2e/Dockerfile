@@ -4,5 +4,6 @@ RUN yarn
 COPY ./tests ./tests
 
 ENV GRAPHQL_SERVER_URL=http://gateway
+ENV TIMOUT=60000
 
 CMD yarn test
