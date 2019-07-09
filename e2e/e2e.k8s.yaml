@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: e2e
+  namespace: agogos
+  labels:
+    name: e2e
+    app: e2e
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: e2e
+        image: e2e
+        imagePullPolicy: Never
+        env:
+          - name: GRAPHQL_SERVER_URL
+            value: "http://gateway"
+          - name: TIMEOUT
+            value: "60000"
+
+  backoffLimit: 0

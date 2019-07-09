@@ -25,9 +25,9 @@ k8s_yaml('./deployments/services/user-namespace.yaml')
 k8s_yaml(listdir('./deployments/services/user'))
 k8s_yaml(listdir('./deployments/services/user-subscription'))
 
-docker_build('graphql-gateway', '../../services/graphql-server')
-docker_build('registry', '../../services/registry')
-docker_build('gql-controller', '../../remote-sources/kubernetes')
+docker_build('soluto/agogos-graphql-gateway', '../../services/graphql-server')
+docker_build('soluto/agogos-registry', '../../services/registry')
+docker_build('soluto/agogos-gql-controller', '../../remote-sources/kubernetes')
 
 k8s_resource('gateway', port_forwards=['8011:8011'])
 k8s_resource('registry', port_forwards=['8012:80', '8013:81'])
