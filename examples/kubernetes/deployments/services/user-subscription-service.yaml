@@ -24,6 +24,12 @@ spec:
           - --port
           - "80"
           - server.json
+        livenessProbe:
+          httpGet:
+            path: /user-subscription
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 30
       volumes:
         - name: data
           configMap:

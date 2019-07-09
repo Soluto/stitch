@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: gql-controller
-        image: gql-controller
+        image: soluto/agogos-gql-controller
         env:
           - name: REGISTRY_URL
             value: 'http://registry'

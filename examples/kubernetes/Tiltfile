@@ -41,8 +41,8 @@ k8s_yaml([
     './deployments/crds/authProviders/user-service.authProvider.yaml',
 ])
 
-docker_build('graphql-gateway', '../../services/graphql-server')
-docker_build('registry', '../../services/registry')
-docker_build('gql-controller', '../../remote-sources/kubernetes')
+docker_build('soluto/agogos-graphql-gateway', '../../services/graphql-server')
+docker_build('soluto/agogos-registry', '../../services/registry')
+docker_build('soluto/agogos-gql-controller', '../../remote-sources/kubernetes')
 
 k8s_resource('gateway', port_forwards=['8011:8011'])

@@ -1,0 +1,52 @@
+# agogos namespace
+k8s_yaml('../examples/kubernetes/deployments/infra/namespace.yaml')
+
+# agogos crds
+k8s_yaml([
+    '../remote-sources/kubernetes/src/GqlSchemaCrd.yaml',
+    '../remote-sources/kubernetes/src/GqlEndpointCrd.yaml',
+    '../remote-sources/kubernetes/src/GqlAuthProviderCrd.yaml',
+])
+
+# mocks
+k8s_yaml([
+    '../examples/kubernetes/deployments/mocks/oidc-server-mock.yaml',
+])
+
+# agogos deployments, roles & secrets
+k8s_yaml([
+    '../examples/kubernetes/deployments/infra/rbac.yaml',
+    '../examples/kubernetes/deployments/infra/gql-controller.yaml',
+    '../examples/kubernetes/deployments/infra/admission-tls-secret.yaml',
+    '../examples/kubernetes/deployments/infra/agogos-credentials.yaml',
+
+    '../examples/kubernetes/deployments/infra/registry.yaml',
+    '../examples/kubernetes/deployments/infra/gateway.yaml',
+
+    '../examples/kubernetes/deployments/infra/webhook.yaml',
+])
+
+# user namespace & services
+k8s_yaml('../examples/kubernetes/deployments/services/user-namespace.yaml')
+k8s_yaml([
+    '../examples/kubernetes/deployments/services/user-service.yaml',
+    '../examples/kubernetes/deployments/services/user-subscription-service.yaml',
+])
+
+# agogos objects
+k8s_yaml([
+    '../examples/kubernetes/deployments/crds/schemas/user-service.gql.yaml',
+    '../examples/kubernetes/deployments/crds/schemas/user-subscription-service.gql.yaml',
+    '../examples/kubernetes/deployments/crds/endpoints/user-service.endpoint.yaml',
+    '../examples/kubernetes/deployments/crds/authProviders/user-service.authProvider.yaml',
+])
+
+# e2e tests
+k8s_yaml('./e2e.k8s.yaml')
+
+docker_build('soluto/agogos-graphql-gateway', '../services/graphql-server')
+docker_build('soluto/agogos-registry', '../services/registry')
+docker_build('soluto/agogos-gql-controller', '../remote-sources/kubernetes')
+docker_build('e2e', '.')
+
+k8s_resource('e2e')
