@@ -49,9 +49,9 @@ commands:
 
       - run:
           name: Tag Docker image
+          # TODO: change
           command: |
-            echo Current tag is $CIRCLE_TAG, ok?
-            export IMAGE_TAG=`echo $CIRCLE_TAG | cut -d'v' -f 2`
+            export IMAGE_TAG=`echo v0.1.0 | cut -d'v' -f 2`
             docker tag soluto/<< parameters.imageName >> soluto/<< parameters.imageName >>:$IMAGE_TAG
 
       - deploy:
