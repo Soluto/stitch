@@ -44,10 +44,6 @@ commands:
             - << parameters.imageName >>-cache-key{{ .Revision }}
 
       - run:
-          name: Save version to env
-          command: export IMAGE_TAG=`echo $CIRCLE_TAG | cut -d'v' -f 2`
-
-      - run:
           name: Load Docker image
           command: docker load < << parameters.imageName >>-cache/<< parameters.imageName >>.tar
 
@@ -58,6 +54,7 @@ commands:
       - deploy:
           name: Push tagged Docker image
           command: |
+            export IMAGE_TAG=`echo $CIRCLE_TAG | cut -d'v' -f 2`
             docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
             docker push soluto/<< parameters.imageName >>:$IMAGE_TAG
 
@@ -186,6 +183,7 @@ jobs:
 
       - run:
           name: Tag local repo
+          # TODO: Set real version
           command: |
             export AGOGOS_VERSION=v0.1.0
             git tag $AGOGOS_VERSION
