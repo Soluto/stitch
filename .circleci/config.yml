@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  slack: circleci/slack@3.2.0
+
 commands:
   build_image:
     description: Builds image
@@ -66,6 +69,11 @@ commands:
           command: |
             docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
             docker push soluto/<< parameters.imageName >>:latest
+
+      - slack/status:
+          fail_only: true
+          only_for_branch: "push-docker-images"
+          failure_message: 🔴 @here A $CIRCLE_JOB job for << oarameters.imageName >> has failed!
 
 jobs:
   build_registry:
@@ -164,6 +172,10 @@ jobs:
           working_directory: e2e
           command: scripts/run_tests.sh
 
+      - slack/status:
+          fail_only: true
+          only_for_branch: "push-docker-images"
+
   tag_repo:
     machine:
       image: ubuntu-1604:201903-01
@@ -247,7 +259,7 @@ workflows:
           filters:
             branches:
               only:
-                - master
+                - push-docker-images
     jobs:
       - build_registry
       - build_graphql_gateway
