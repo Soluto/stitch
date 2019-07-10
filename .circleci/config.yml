@@ -21,14 +21,15 @@ commands:
 
       - run:
           name: Save image to fs
+          working_directory: /tmp
           command: |
-            mkdir -p << parameters.imageName >>-cache
-            docker save -o << parameters.imageName >>-cache/<< parameters.imageName >>.tar soluto/<< parameters.imageName >>
+            mkdir -p agogos
+            docker save -o agogos/<< parameters.imageName >>.tar soluto/<< parameters.imageName >>
 
-      - save_cache:
+      - persist_to_workspace:
+          root: /tmp/agogos
           paths:
-            - << parameters.imageName >>-cache
-          key: << parameters.imageName >>-cache-key{{ .Revision }}
+            - << parameters.imageName >>.tar
 
   push_image:
     description: Push image to Docker Hub
@@ -39,18 +40,17 @@ commands:
     steps:
       - checkout
 
-      - restore_cache:
-          keys:
-            - << parameters.imageName >>-cache-key{{ .Revision }}
+      - attach_workspace:
+          at: /tmp/agogos
 
       - run:
           name: Load Docker image
-          command: docker load < << parameters.imageName >>-cache/<< parameters.imageName >>.tar
+          command: docker load < /tmp/agogos/<< parameters.imageName >>.tar
 
       - run:
           name: Set tag to env
           # TODO: change
-          command: echo 'export IMAGE_TAG="0.1.0"' >> $BASH_ENV
+          command: echo 'export IMAGE_TAG=`cat /tmp/agogos/version`' >> $BASH_ENV
 
       - deploy:
           name: Tag and push versioned Docker image
@@ -138,29 +138,17 @@ jobs:
     steps:
       - checkout
 
-      - restore_cache:
-          keys:
-            - agogos-registry-cache-key{{ .Revision }}
-
-      - restore_cache:
-          keys:
-            - agogos-graphql-gateway-cache-key{{ .Revision }}
-
-      - restore_cache:
-          keys:
-            - agogos-gql-controller-cache-key{{ .Revision }}
-
-      - restore_cache:
-          keys:
-            - e2e-cache-key{{ .Revision }}
+      - attach_workspace:
+          at: /tmp/agogos
 
       - run:
           name: Load docker images from fs
+          working_directory: /tmp/agogos
           command: |
-            docker load < agogos-registry-cache/agogos-registry.tar
-            docker load < agogos-graphql-gateway-cache/agogos-graphql-gateway.tar
-            docker load < agogos-gql-controller-cache/agogos-gql-controller.tar
-            docker load < e2e-cache/e2e.tar
+            docker load < agogos-registry.tar
+            docker load < agogos-graphql-gateway.tar
+            docker load < agogos-gql-controller.tar
+            docker load < e2e.tar
 
       - run:
           name: Run E2E tests
@@ -189,6 +177,7 @@ jobs:
           command: |
             export AGOGOS_VERSION=v0.1.0
             git tag $AGOGOS_VERSION
+            echo $AGOGOS_VERSION > /tmp/agogos/version
 
       - add_ssh_keys:
           fingerprints:
@@ -197,6 +186,11 @@ jobs:
       - run:
           name: Push tags to upstream
           command: git push --set-upstream origin $CIRCLE_BRANCH --tags
+
+      - persist_to_workspace:
+          root: /tmp/agogos
+          paths:
+            - version
 
       - slack/status:
           fail_only: true
