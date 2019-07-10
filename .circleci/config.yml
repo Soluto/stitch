@@ -156,7 +156,7 @@ jobs:
             docker load < agogos-registry-cache/agogos-registry.tar
             docker load < agogos-graphql-gateway-cache/agogos-graphql-gateway.tar
             docker load < agogos-gql-controller-cache/agogos-gql-controller.tar
-            docker load < agogos-e2e-cache/agogos-e2e.tar
+            docker load < e2e-cache/e2e.tar
 
       - run:
           name: Run E2E tests
