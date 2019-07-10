@@ -101,8 +101,8 @@ jobs:
           workingDirectory: ./e2e
 
   push_registry:
-    docker:
-      - image: ubuntu-1604:201903-01
+    machine:
+      image: ubuntu-1604:201903-01
 
     steps:
       - push_image:
@@ -110,8 +110,8 @@ jobs:
           imageTag: "0.1.0"
 
   push_graphql_gateway:
-    docker:
-      - image: ubuntu-1604:201903-01
+    machine:
+      image: ubuntu-1604:201903-01
 
     steps:
       - push_image:
@@ -119,8 +119,8 @@ jobs:
           imageTag: "0.1.0"
 
   push_gql_controller:
-    docker:
-      - image: ubuntu-1604:201903-01
+    machine:
+      image: ubuntu-1604:201903-01
 
     steps:
       - push_image:
