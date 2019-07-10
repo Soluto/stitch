@@ -72,7 +72,6 @@ commands:
 
       - slack/status:
           fail_only: true
-          only_for_branch: "push-docker-images"
           failure_message: 🔴 @here A $CIRCLE_JOB job for << oarameters.imageName >> has failed!
 
 jobs:
@@ -174,7 +173,6 @@ jobs:
 
       - slack/status:
           fail_only: true
-          only_for_branch: "push-docker-images"
 
   tag_repo:
     machine:
@@ -232,24 +230,28 @@ workflows:
             - run_e2e_tests
           filters:
             branches:
+              # TODO: Change to master when it's ready
               only: push-docker-images
       - push_registry:
           requires:
             - tag_repo
           filters:
             branches:
+              # TODO: Change to master when it's ready
               only: push-docker-images
       - push_graphql_gateway:
           requires:
             - tag_repo
           filters:
             branches:
+              # TODO: Change to master when it's ready
               only: push-docker-images
       - push_gql_controller:
           requires:
             - tag_repo
           filters:
             branches:
+              # TODO: Change to master when it's ready
               only: push-docker-images
 
   nightly:
@@ -259,6 +261,7 @@ workflows:
           filters:
             branches:
               only:
+                # TODO: Change to master when it's ready
                 - push-docker-images
     jobs:
       - build_registry
