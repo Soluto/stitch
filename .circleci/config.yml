@@ -1,93 +1,131 @@
 version: 2.1
 
+commands:
+  build_image:
+    description: Builds image
+    parameters:
+      imageName:
+        type: string
+      workingDirectory:
+        type: string
+
+    steps:
+      - checkout
+      - run:
+          name: Build image
+          working_directory: << parameters.workingDirectory >>
+          command: docker build -t soluto/<< parameters.imageName >> --build-arg target=PRODUCTION .
+
+      - run:
+          name: Save image to fs
+          command: |
+            mkdir -p a<< parameters.imageName >>-cache
+            docker save -o << parameters.imageName >>-cache/<< parameters.imageName >>.tar soluto/<< parameters.imageName >>
+
+      - save_cache:
+          paths:
+            - << parameters.imageName >>-cache
+          key: << parameters.imageName >>-cache-key{{ .Revision }}
+
+  push_image:
+    description: Push image to Docker Hub
+    parameters:
+      imageName:
+        type: string
+      imageTag:
+        type: string
+    steps:
+      - checkout
+
+      - setup_remote_docker
+
+      - restore_cache:
+          keys:
+            - << parameters.imageName >>-cache-key{{ .Revision }}
+
+      - run:
+          name: Load Docker image
+          command: docker load < << parameters.imageName >>-cache/<< parameters.imageName >>.tar
+
+      - run:
+          name: Tag Docker image
+          command: docker tag soluto/<< parameters.imageName >> soluto/<< parameters.imageName >>:<< parameters.imageTag >>
+
+      - run:
+          name: Push tagged Docker image
+          command: |
+            docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
+            docker push soluto/<< parameters.imageName >>:<< parameters.imageTag >>
+
+      - run:
+          name: Push latest Docker image
+          command: |
+            docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
+            docker push soluto/<< parameters.imageName >>:latest
+
 jobs:
   build_registry:
     machine:
       image: ubuntu-1604:201903-01
 
     steps:
-      - checkout
-
-      - run:
-          name: Build agogos-registry image
-          command: docker build -t soluto/agogos-registry --build-arg target=PRODUCTION ./services/registry
-
-      - run:
-          name: Save image to fs
-          command: |
-            mkdir -p agogos-registry-cache
-            docker save -o agogos-registry-cache/agogos-registry.tar soluto/agogos-registry
-
-      - save_cache:
-          paths:
-            - agogos-registry-cache
-          key: agogos-registry-cache-key{{ .Revision }}
+      - build_image:
+          imageName: agogos-registry
+          workingDirectory: ./services/registry
 
   build_graphql_gateway:
     machine:
       image: ubuntu-1604:201903-01
 
     steps:
-      - checkout
-
-      - run:
-          name: Build agogos-graphql-gateway image
-          command: docker build -t soluto/agogos-graphql-gateway --build-arg target=PRODUCTION ./services/graphql-server
-
-      - run:
-          name: Save image to fs
-          command: |
-            mkdir -p agogos-graphql-gateway-cache
-            docker save -o agogos-graphql-gateway-cache/agogos-graphql-gateway.tar soluto/agogos-graphql-gateway
-
-      - save_cache:
-          paths:
-            - agogos-graphql-gateway-cache
-          key: agogos-graphql-gateway-cache-key{{ .Revision }}
+      - build_image:
+          imageName: agogos-graphql-gateway
+          workingDirectory: ./services/graphql-server
 
   build_gql_controller:
     machine:
       image: ubuntu-1604:201903-01
 
     steps:
-      - checkout
-
-      - run:
-          name: Build agogos-gql-controller image
-          command: docker build -t soluto/agogos-gql-controller --build-arg target=PRODUCTION ./remote-sources/kubernetes
-
-      - run:
-          name: Save image to fs
-          command: |
-            mkdir -p agogos-gql-controller-cache
-            docker save -o agogos-gql-controller-cache/agogos-gql-controller.tar soluto/agogos-gql-controller
-
-      - save_cache:
-          paths:
-            - agogos-gql-controller-cache
-          key: agogos-gql-controller-cache-key{{ .Revision }}
+      - build_image:
+          imageName: agogos-gql-controller
+          workingDirectory: ./remote-sources/kubernetes
 
   build_e2e:
     machine:
       image: ubuntu-1604:201903-01
 
     steps:
-      - checkout
+      - build_image:
+          imageName: e2e
+          workingDirectory: ./e2e
 
-      - run:
-          name: Build e2e tests image
-          command: docker build -t e2e ./e2e
+  push_registry:
+    docker:
+      - image: ubuntu-1604:201903-01
 
-      - run:
-          name: Save image to fs
-          command: |
-            mkdir -p agogos-e2e-cache
-            docker save -o agogos-e2e-cache/agogos-e2e.tar e2e
+    steps:
+      - push_image:
+          imageName: agogos-registry
+          imageVersion: "0.1.0"
 
-      - save_cache:
-          paths:
-            - agogos-e2e-cache
-          key: agogos-e2e-cache-key{{ .Revision }}
+  push_graphql_gateway:
+    docker:
+      - image: ubuntu-1604:201903-01
+
+    steps:
+      - push_image:
+          imageName: agogos-graphql-gateway
+          imageVersion: "0.1.0"
+
+  push_gql_controller:
+    docker:
+      - image: ubuntu-1604:201903-01
+
+    steps:
+      - push_image:
+          imageName: agogos-gql-controller
+          imageVersion: "0.1.0"
 
   run_e2e_tests:
     machine:
@@ -140,3 +178,21 @@ workflows:
             - build_graphql_gateway
             - build_gql_controller
             - build_e2e
+      - push_registry:
+          requires:
+            - run_e2e_tests
+          filters:
+            branches:
+              only: push-docker-images
+      - push_graphql_gateway:
+          requires:
+            - run_e2e_tests
+          filters:
+            branches:
+              only: push-docker-images
+      - push_gql_controller:
+          requires:
+            - run_e2e_tests
+          filters:
+            branches:
+              only: push-docker-images
