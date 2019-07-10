@@ -37,8 +37,6 @@ commands:
     steps:
       - checkout
 
-      - setup_remote_docker
-
       - restore_cache:
           keys:
             - << parameters.imageName >>-cache-key{{ .Revision }}
