@@ -175,7 +175,7 @@ jobs:
           name: Tag git repository
           # TODO: Set real version
           command: |
-            export AGOGOS_VERSION=v0.1.0
+            export AGOGOS_VERSION=v0.1.${CIRCLE_BUILD_NUM}
             git tag $AGOGOS_VERSION
             mkdir -p /tmp/agogos
             echo $AGOGOS_VERSION | cut -d'v' -f 2 > /tmp/agogos/version
