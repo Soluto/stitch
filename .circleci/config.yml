@@ -179,12 +179,16 @@ jobs:
       - checkout
 
       - run:
-          name: Get version
-          command: export AGOGOS_VERSION=v0.1.0
+          name: Config git user
+          command: |
+            git config user.email "agogos@soluto.com"
+            git config user.name "agogos-circle-ci"
 
       - run:
           name: Tag local repo
-          command: git tag $AGOGOS_VERSION
+          command: |
+            export AGOGOS_VERSION=v0.1.0
+            git tag $AGOGOS_VERSION
 
       - add_ssh_keys:
           fingerprints:
