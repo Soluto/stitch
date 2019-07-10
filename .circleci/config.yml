@@ -107,7 +107,7 @@ jobs:
     steps:
       - push_image:
           imageName: agogos-registry
-          imageVersion: "0.1.0"
+          imageTag: "0.1.0"
 
   push_graphql_gateway:
     docker:
@@ -116,7 +116,7 @@ jobs:
     steps:
       - push_image:
           imageName: agogos-graphql-gateway
-          imageVersion: "0.1.0"
+          imageTag: "0.1.0"
 
   push_gql_controller:
     docker:
@@ -125,7 +125,7 @@ jobs:
     steps:
       - push_image:
           imageName: agogos-gql-controller
-          imageVersion: "0.1.0"
+          imageTag: "0.1.0"
 
   run_e2e_tests:
     machine:
