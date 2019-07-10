@@ -188,7 +188,7 @@ jobs:
 
       - add_ssh_keys:
           fingerprints:
-            - "85:8a:3d:79:88:ac:cd:80:c5:86:be:93:ae:44:70:d9"
+            - "d0:74:e5:a8:92:4c:0a:68:b8:f7:6d:d8:6b:aa:f8:a7"
 
       - run:
           name: Push tags to upstream
