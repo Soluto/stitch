@@ -32,8 +32,7 @@ commands:
     parameters:
       imageName:
         type: string
-      imageTag:
-        type: string
+
     steps:
       - checkout
 
@@ -41,21 +40,28 @@ commands:
           keys:
             - << parameters.imageName >>-cache-key{{ .Revision }}
 
+      - attach_workspace:
+          at: /tmp/agogos-config
+
+      - run:
+          name: Save version to env
+          command: export IMAGE_TAG=`cat /tmp/agogos-config/version`
+
       - run:
           name: Load Docker image
           command: docker load < << parameters.imageName >>-cache/<< parameters.imageName >>.tar
 
       - run:
           name: Tag Docker image
-          command: docker tag soluto/<< parameters.imageName >> soluto/<< parameters.imageName >>:<< parameters.imageTag >>
+          command: docker tag soluto/<< parameters.imageName >> soluto/<< parameters.imageName >>:$IMAGE_TAG
 
-      - run:
+      - deploy:
           name: Push tagged Docker image
           command: |
             docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
-            docker push soluto/<< parameters.imageName >>:<< parameters.imageTag >>
+            docker push soluto/<< parameters.imageName >>:$IMAGE_TAG
 
-      - run:
+      - deploy:
           name: Push latest Docker image
           command: |
             docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
@@ -105,7 +111,6 @@ jobs:
     steps:
       - push_image:
           imageName: agogos-registry
-          imageTag: "0.1.0"
 
   push_graphql_gateway:
     machine:
@@ -114,7 +119,6 @@ jobs:
     steps:
       - push_image:
           imageName: agogos-graphql-gateway
-          imageTag: "0.1.0"
 
   push_gql_controller:
     machine:
@@ -123,7 +127,6 @@ jobs:
     steps:
       - push_image:
           imageName: agogos-gql-controller
-          imageTag: "0.1.0"
 
   run_e2e_tests:
     machine:
@@ -161,10 +164,41 @@ jobs:
           working_directory: e2e
           command: scripts/run_tests.sh
 
+  tag_repo:
+    machine:
+      image: ubuntu-1604:201903-01
+
+    steps:
+      - checkout
+
+      - run:
+          name: Get version
+          command: export AGOGOS_VERSION=0.1.0
+
+      - run:
+          name: Tag local repo
+          command: git tag v$AGOGOS_VERSION
+
+      - run:
+          name: Push tags to upstream
+          command: echo "TODO git push --set-upstream origin $CIRCLE_BRANCH --tags"
+
+      - run:
+          name: Create version file
+          command: |
+            mkdir -p agogos-config
+            echo $AGOGOS_VERSION > version
+
+      - persist_to_workspace:
+          root: agogos-config
+          paths:
+            - version
+
+
 workflows:
   version: 2
 
-  build_all:
+  build_test_push:
     jobs:
       - build_registry
       - build_graphql_gateway
@@ -176,21 +210,47 @@ workflows:
             - build_graphql_gateway
             - build_gql_controller
             - build_e2e
-      - push_registry:
+      - tag_repo:
           requires:
             - run_e2e_tests
+          filters:
+            branches:
+              only: push-docker-images
+      - push_registry:
+          requires:
+            - tag_repo
           filters:
             branches:
               only: push-docker-images
       - push_graphql_gateway:
           requires:
-            - run_e2e_tests
+            - tag_repo
           filters:
             branches:
               only: push-docker-images
       - push_gql_controller:
           requires:
-            - run_e2e_tests
+            - tag_repo
           filters:
             branches:
               only: push-docker-images
+
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 1 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - build_registry
+      - build_graphql_gateway
+      - build_gql_controller
+      - build_e2e
+      - run_e2e_tests:
+          requires:
+            - build_registry
+            - build_graphql_gateway
+            - build_gql_controller
+            - build_e2e
