@@ -19,7 +19,7 @@ commands:
       - run:
           name: Save image to fs
           command: |
-            mkdir -p a<< parameters.imageName >>-cache
+            mkdir -p << parameters.imageName >>-cache
             docker save -o << parameters.imageName >>-cache/<< parameters.imageName >>.tar soluto/<< parameters.imageName >>
 
       - save_cache:
