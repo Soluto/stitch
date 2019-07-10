@@ -72,7 +72,7 @@ commands:
 
       - slack/status:
           fail_only: true
-          failure_message: 🔴 @here A $CIRCLE_JOB job for << oarameters.imageName >> has failed!
+          failure_message: 🔴 @here A $CIRCLE_JOB job for << parameters.imageName >> has failed!
 
 jobs:
   build_registry:
