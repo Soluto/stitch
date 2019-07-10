@@ -1,1 +1,1 @@
-docker_compose('./docker-compose.yml')
+docker_compose('./tilt.yml')

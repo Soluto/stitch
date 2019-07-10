@@ -1,0 +1,56 @@
+services:
+  agogos.graphql-server:
+    build:
+      context: /home/local/SOLUTO/yshay/code/graphql-gateway/services/graphql-server
+    depends_on:
+    - agogos.registry
+    healthcheck:
+      test:
+      - NONE
+    ports:
+    - published: 8011
+      target: 8011
+  agogos.registry:
+    build:
+      args:
+        target: DEBUG
+      context: /home/local/SOLUTO/yshay/code/graphql-gateway/services/registry
+    command:
+    - yarn
+    - debug
+    environment:
+      GRPC_PORT: '81'
+      NODE_ENV: dev
+      PORT: '80'
+    healthcheck:
+      interval: 5s
+      retries: 10
+      test:
+      - CMD
+      - curl
+      - -f
+      - http://localhost/health
+      timeout: 3s
+    ports:
+    - published: 8012
+      target: 80
+    - published: 8013
+      target: 81
+    - published: 4001
+      target: 81
+    - published: 58581
+      target: 5858
+    volumes:
+    - /home/local/SOLUTO/yshay/code/graphql-gateway/services/registry/src:/service/src:rw
+  oidc-server-mock:
+    container_name: oidc-server-mock
+    environment:
+      API_RESOURCE: some-app
+      CLIENT_CREDENTIALS_CLIENT_ID: client-credentials-mock-client
+      CLIENT_CREDENTIALS_CLIENT_SECRET: client-credentials-mock-client-secret
+    image: soluto/oidc-server-mock
+    ports:
+    - published: 5011
+      target: 80
+version: '3.7'
+
