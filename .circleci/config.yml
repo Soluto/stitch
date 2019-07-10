@@ -49,7 +49,6 @@ commands:
 
       - run:
           name: Set tag to env
-          # TODO: change
           command: echo 'export IMAGE_TAG=`cat /tmp/agogos/version`' >> $BASH_ENV
 
       - deploy:
@@ -173,7 +172,6 @@ jobs:
 
       - run:
           name: Tag git repository
-          # TODO: Set real version
           command: |
             export AGOGOS_VERSION=v0.1.${CIRCLE_BUILD_NUM}
             git tag $AGOGOS_VERSION
@@ -217,39 +215,34 @@ workflows:
             - run_e2e_tests
           filters:
             branches:
-              # TODO: Change to master when it's ready
-              only: push-docker-images
+              only: master
       - push_registry:
           requires:
             - tag_repo
           filters:
             branches:
-              # TODO: Change to master when it's ready
-              only: push-docker-images
+              only: master
       - push_graphql_gateway:
           requires:
             - tag_repo
           filters:
             branches:
-              # TODO: Change to master when it's ready
-              only: push-docker-images
+              only: master
       - push_gql_controller:
           requires:
             - tag_repo
           filters:
             branches:
-              # TODO: Change to master when it's ready
-              only: push-docker-images
+              only: master
 
   nightly:
     triggers:
       - schedule:
-          cron: "0 1 * * *"
+          cron: "0 11 * * *"
           filters:
             branches:
               only:
-                # TODO: Change to master when it's ready
-                - push-docker-images
+                - master
     jobs:
       - build_registry
       - build_graphql_gateway
