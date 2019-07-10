@@ -50,7 +50,7 @@ commands:
       - run:
           name: Set tag to env
           # TODO: change
-          command: echo `export IMAGE_TAG="0.1.0"` >> $BASH_ENV
+          command: echo 'export IMAGE_TAG="0.1.0"' >> $BASH_ENV
 
       - deploy:
           name: Tag and push versioned Docker image
