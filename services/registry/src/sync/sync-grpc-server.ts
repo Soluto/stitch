@@ -1,5 +1,6 @@
 import * as grpc from "grpc";
 import { combineLatest } from "rxjs";
+import { startWith } from "rxjs/operators";
 import {
   ConfigurationMessage,
   Schema,
@@ -18,12 +19,12 @@ const PORT = process.env.GRPC_PORT || 4001;
 
 // TODO: make this more general
 const syncConfiguration$ = combineLatest(
-  [syncSchema$, syncUpstreams$, syncAuthProvider$],
-  (schema, upstreams, upstreamAuthCredentials) => ({
-    schema,
-    upstreams,
-    upstreamAuthCredentials
-  })
+    [
+        syncSchema$.pipe(startWith("")),
+        syncUpstreams$.pipe(startWith({})),
+        syncAuthProvider$.pipe(startWith({}))
+    ],
+    (schema, upstreams, upstreamAuthCredentials) => ({ schema, upstreams, upstreamAuthCredentials })
 );
 
 class GqlConfigurationSubscriptionServer implements IRegistryServer {
