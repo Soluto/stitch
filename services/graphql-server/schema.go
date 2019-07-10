@@ -5,17 +5,18 @@ import (
 	"github.com/vektah/gqlparser"
 	"github.com/vektah/gqlparser/ast"
 
+	agogos "agogos/generated"
+	"agogos/utils"
 	"context"
 	"fmt"
-	"google.golang.org/grpc"
-	"agogos/generated"
-	"agogos/utils"
 	"io"
 	"os"
 	"time"
 
-	endpoints "agogos/extensions/endpoints"
-	authproviders "agogos/extensions/authproviders"
+	"google.golang.org/grpc"
+
+	upstreams "agogos/extensions/upstreams"
+	upstreamsAuthentication "agogos/extensions/upstreams/authentication"
 )
 
 func getenv(key, fallback string) string {
@@ -35,7 +36,7 @@ type gqlConfigurationResult struct {
 	err    error
 }
 
-func subscribeToGqlConfiguration(gqlConfigurations chan gqlConfigurationResult) (err error) {
+func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err error) {
 	defer utils.Recovery(&err)
 
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
@@ -45,16 +46,16 @@ func subscribeToGqlConfiguration(gqlConfigurations chan gqlConfigurationResult) 
 	}
 	defer conn.Close()
 
-	gqlConfigurationClient := gqlconfig.NewGqlConfigurationClient(conn)
+	registryClient := agogos.NewRegistryClient(conn)
 
-	stream, err := subscribe(gqlConfigurationClient)
+	stream, err := subscribe(registryClient)
 	if err != nil {
 		fmt.Println("error subscribing to registry", err)
 		return err
 	}
 
 	for {
-		gqlConfigurationMessage, err := stream.Recv()
+		registryMessage, err := stream.Recv()
 
 		if err == io.EOF {
 			fmt.Println("got EOF")
@@ -69,12 +70,12 @@ func subscribeToGqlConfiguration(gqlConfigurations chan gqlConfigurationResult) 
 			return err
 		}
 
-		endpoints.Init(gqlConfigurationMessage.Endpoints)
-		authproviders.Init(gqlConfigurationMessage.AuthProviders)
+		upstreams.Init(registryMessage.Upstreams)
+		upstreamsAuthentication.Init(registryMessage.UpstreamAuthCredentials)
 
 		astSchema, err := parseSdl(source{
 			name: "schema registry sdl",
-			sdl:  gqlConfigurationMessage.Schema.Definition,
+			sdl:  registryMessage.Schema.Definition,
 		})
 		if err != nil {
 			fmt.Println("error parsing SDL")
@@ -103,9 +104,9 @@ func subscribeToGqlConfiguration(gqlConfigurations chan gqlConfigurationResult) 
 	return
 }
 
-func subscribe(client gqlconfig.GqlConfigurationClient) (stream gqlconfig.GqlConfiguration_SubscribeClient, err error) {
+func subscribe(client agogos.RegistryClient) (stream agogos.Registry_SubscribeClient, err error) {
 	for i := 0; i < 3; i++ {
-		stream, err = client.Subscribe(context.Background(), &gqlconfig.GqlConfigurationSubscribeParams{})
+		stream, err = client.Subscribe(context.Background(), &agogos.SubscribeParams{})
 		if err == nil {
 			break
 		}

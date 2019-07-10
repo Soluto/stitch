@@ -61,34 +61,18 @@ prepare_environment() {
     kubectl apply -f ../examples/kubernetes/deployments/infra/namespace.yaml
 
     # CRDs
-    kubectl apply -f ../remote-sources/kubernetes/src/GqlSchemaCrd.yaml
-    kubectl apply -f ../remote-sources/kubernetes/src/GqlEndpointCrd.yaml
-    kubectl apply -f ../remote-sources/kubernetes/src/GqlAuthProviderCrd.yaml
+    kubectl apply -f ../remote-sources/kubernetes/src/crd
 
     # mocks
-    kubectl apply -f ../examples/kubernetes/deployments/mocks/oidc-server-mock.yaml
+    kubectl apply -f ../examples/kubernetes/deployments/mocks
 
     # agogos deployments, roles & secrets
-    kubectl apply -f ../examples/kubernetes/deployments/infra/rbac.yaml
-    kubectl apply -f ../examples/kubernetes/deployments/infra/gql-controller.yaml
-    kubectl apply -f ../examples/kubernetes/deployments/infra/admission-tls-secret.yaml
-    kubectl apply -f ../examples/kubernetes/deployments/infra/agogos-credentials.yaml
-
-    kubectl apply -f ../examples/kubernetes/deployments/infra/registry.yaml
-    kubectl apply -f ../examples/kubernetes/deployments/infra/gateway.yaml
-
-    kubectl apply -f ../examples/kubernetes/deployments/infra/webhook.yaml
+    kubectl apply -f ../examples/kubernetes/deployments/infra
 
     # user namespace & services
     kubectl apply -f ../examples/kubernetes/deployments/services/user-namespace.yaml
-    kubectl apply -f ../examples/kubernetes/deployments/services/user-service.yaml
-    kubectl apply -f ../examples/kubernetes/deployments/services/user-subscription-service.yaml
-
-    # agogos objects
-    kubectl apply -f ../examples/kubernetes/deployments/crds/schemas/user-service.gql.yaml
-    kubectl apply -f ../examples/kubernetes/deployments/crds/schemas/user-subscription-service.gql.yaml
-    kubectl apply -f ../examples/kubernetes/deployments/crds/endpoints/user-service.endpoint.yaml
-    kubectl apply -f ../examples/kubernetes/deployments/crds/authProviders/user-service.authProvider.yaml
+    kubectl apply -f ../examples/kubernetes/deployments/services/user
+    kubectl apply -f ../examples/kubernetes/deployments/services/user-subscription
 }
 
 execute_tests() {

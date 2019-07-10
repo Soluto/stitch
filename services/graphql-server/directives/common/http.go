@@ -2,7 +2,7 @@ package common
 
 import (
 	"agogos/directives/middlewares"
-	"agogos/extensions/endpoints"
+	upstreams "agogos/extensions/upstreams"
 	"agogos/utils"
 	"bytes"
 	"encoding/json"
@@ -155,9 +155,9 @@ func createHTTPRequest(p httpParams, rp graphql.ResolveParams) (*http.Request, e
 	}
 
 	// TODO: Make endpoints not connected directly to specific directive
-	ep, ok := endpoints.Get(request.URL.Host)
+	ep, ok := upstreams.Get(request.URL.Host)
 	if ok {
-		ep.ApplyEndpoint(request)
+		ep.ApplyUpstream(request)
 	}
 
 	return request, nil

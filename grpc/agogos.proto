@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package agogos;
+
+service Registry {
+    rpc Subscribe(SubscribeParams) returns (stream ConfigurationMessage) {}
+}
+
+message SubscribeParams {}
+
+message ConfigurationMessage {
+    Schema schema = 1;
+    repeated Upstream upstreams = 2;
+    repeated UpstreamAuthCredentials upstream_auth_credentials = 3;
+}
+
+message Schema {
+    string definition = 1;
+}
+
+message Upstream {
+    string host = 1;
+    UpstreamAuthentication auth = 2;
+}
+
+message UpstreamAuthentication {
+    string auth_type = 1;
+    string authority = 2;
+    string scope = 3;
+}
+
+message UpstreamAuthCredentials {
+    string auth_type = 1;
+    string authority = 2;
+    string client_id = 3;
+    string client_secret = 4;
+}
