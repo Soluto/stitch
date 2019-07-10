@@ -179,6 +179,10 @@ jobs:
           name: Tag local repo
           command: git tag v$AGOGOS_VERSION
 
+      - add_ssh_keys:
+          fingerprints:
+            - "85:8a:3d:79:88:ac:cd:80:c5:86:be:93:ae:44:70:d9"
+
       - run:
           name: Push tags to upstream
           command: echo "TODO git push --set-upstream origin $CIRCLE_BRANCH --tags"
@@ -191,7 +195,7 @@ jobs:
             echo $AGOGOS_VERSION > agogos-config/version
 
       - persist_to_workspace:
-          root: agogos-config
+          root: /tmp/agogos-config
           paths:
             - version
 
