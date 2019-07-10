@@ -48,24 +48,22 @@ commands:
           command: docker load < << parameters.imageName >>-cache/<< parameters.imageName >>.tar
 
       - run:
-          name: Tag Docker image
+          name: Set tag to env
           # TODO: change
-          command: |
-            export IMAGE_TAG=`echo v0.1.0 | cut -d'v' -f 2`
-            docker tag soluto/<< parameters.imageName >> soluto/<< parameters.imageName >>:$IMAGE_TAG
+          command: echo `export IMAGE_TAG="0.1.0" >> $BASH_ENV
 
       - deploy:
-          name: Push tagged Docker image
+          name: Tag and push versioned Docker image
           command: |
-            echo Current tag is $CIRCLE_TAG, ok?
-            export IMAGE_TAG=`echo $CIRCLE_TAG | cut -d'v' -f 2`
             docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
-            docker push soluto/<< parameters.imageName >>:$IMAGE_TAG
+            docker tag soluto/<< parameters.imageName >> soluto/<< parameters.imageName >>:${IMAGE_TAG}
+            docker push soluto/<< parameters.imageName >>:${IMAGE_TAG}
 
       - deploy:
-          name: Push latest Docker image
+          name: Tag and push latest Docker image
           command: |
             docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
+            docker tag soluto/<< parameters.imageName >>:${IMAGE_TAG} soluto/<< parameters.imageName >>:lastest
             docker push soluto/<< parameters.imageName >>:latest
 
       - slack/status:
@@ -186,7 +184,7 @@ jobs:
             git config user.name "agogos-circle-ci"
 
       - run:
-          name: Tag local repo
+          name: Tag git repository
           # TODO: Set real version
           command: |
             export AGOGOS_VERSION=v0.1.0
