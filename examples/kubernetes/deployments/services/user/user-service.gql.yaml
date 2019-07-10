@@ -11,6 +11,7 @@ spec:
     }
 
     type Query {
+      
       user(id: ID!): User @http(url: "http://user-service.user-namespace/users/:id")
     }
 
