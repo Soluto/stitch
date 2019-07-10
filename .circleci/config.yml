@@ -177,7 +177,8 @@ jobs:
           command: |
             export AGOGOS_VERSION=v0.1.0
             git tag $AGOGOS_VERSION
-            echo $AGOGOS_VERSION > /tmp/agogos/version
+            mkdir -p /tmp/agogos
+            echo $AGOGOS_VERSION | cut -d'v' -f 2 > /tmp/agogos/version
 
       - add_ssh_keys:
           fingerprints:
