@@ -54,6 +54,7 @@ commands:
       - deploy:
           name: Push tagged Docker image
           command: |
+            echo Current tag is $CIRCLE_TAG, ok?
             export IMAGE_TAG=`echo $CIRCLE_TAG | cut -d'v' -f 2`
             docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
             docker push soluto/<< parameters.imageName >>:$IMAGE_TAG
