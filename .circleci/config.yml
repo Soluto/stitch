@@ -43,12 +43,9 @@ commands:
           keys:
             - << parameters.imageName >>-cache-key{{ .Revision }}
 
-      - attach_workspace:
-          at: /tmp/agogos-config
-
       - run:
           name: Save version to env
-          command: export IMAGE_TAG=`cat /tmp/agogos-config/version`
+          command: export IMAGE_TAG=`echo $CIRCLE_TAG | cut -d'v' -f 2`
 
       - run:
           name: Load Docker image
@@ -72,7 +69,7 @@ commands:
 
       - slack/status:
           fail_only: true
-          failure_message: 🔴 @here A $CIRCLE_JOB job for << parameters.imageName >> has failed!
+          failure_message: 🔴 Push image job for soluto/<< parameters.imageName >> has failed!
 
 jobs:
   build_registry:
@@ -183,11 +180,11 @@ jobs:
 
       - run:
           name: Get version
-          command: export AGOGOS_VERSION=0.1.0
+          command: export AGOGOS_VERSION=v0.1.0
 
       - run:
           name: Tag local repo
-          command: git tag v$AGOGOS_VERSION
+          command: git tag $AGOGOS_VERSION
 
       - add_ssh_keys:
           fingerprints:
@@ -195,20 +192,11 @@ jobs:
 
       - run:
           name: Push tags to upstream
-          command: echo "TODO git push --set-upstream origin $CIRCLE_BRANCH --tags"
+          command: git push --set-upstream origin $CIRCLE_BRANCH --tags
 
-      - run:
-          name: Create version file
-          working_directory: /tmp
-          command: |
-            mkdir -p agogos-config
-            echo $AGOGOS_VERSION > agogos-config/version
-
-      - persist_to_workspace:
-          root: /tmp/agogos-config
-          paths:
-            - version
-
+      - slack/status:
+          fail_only: true
+          failure_message: 🔴 Tagging repo job has failed! (Tag $AGOGOS_VERSION)
 
 workflows:
   version: 2
