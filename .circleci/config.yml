@@ -148,7 +148,7 @@ jobs:
 
       - restore_cache:
           keys:
-            - agogos-e2e-cache-key{{ .Revision }}
+            - e2e-cache-key{{ .Revision }}
 
       - run:
           name: Load docker images from fs
