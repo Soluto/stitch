@@ -8,7 +8,7 @@ import (
 
 // UpstreamAuthentication interface for UpstreamAuthentication extension. Supplies auth details to HTTP request
 type UpstreamAuthentication interface {
-	AddAuthentication(req *http.Request)
+	AddAuthentication(req *http.Request, scope string)
 }
 
 func newUpstreamAuthentication(apConfig *gqlconfig.UpstreamAuthCredentials) UpstreamAuthentication {

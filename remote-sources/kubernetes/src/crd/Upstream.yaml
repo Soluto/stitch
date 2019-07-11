@@ -35,6 +35,7 @@ spec:
                   type: string
                   enum:
                     - oauth2/client_credentials
+                    - activedirectory/client_credentials
                 authority:
                   type: string
                 scope:

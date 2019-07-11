@@ -31,7 +31,7 @@ func (ep *upstreamStruct) ApplyUpstream(req *http.Request) {
 	// TODO: consider more implicit approach
 	ap, ok := upstreamAuthentications.Get(ep.auth.authType, ep.auth.authority)
 	if ok {
-		ap.AddAuthentication(req)
+		ap.AddAuthentication(req, ep.auth.scope)
 	}
 }
 
