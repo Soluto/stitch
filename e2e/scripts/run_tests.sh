@@ -39,7 +39,7 @@ build_images() {
     docker build -t soluto/agogos-graphql-gateway '../services/graphql-server'
     docker build -t soluto/agogos-registry '../services/registry'
     docker build -t soluto/agogos-gql-controller '../remote-sources/kubernetes'
-    docker build -t e2e '.'
+    docker build -t soluto/e2e '.'
 }
 
 load_images() {
@@ -47,7 +47,7 @@ load_images() {
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-graphql-gateway
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-registry
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-gql-controller
-    kind load docker-image --name "$CLUSTER_NAME" e2e
+    kind load docker-image --name "$CLUSTER_NAME" soluto/e2e
 }
 
 prepare_environment() {
