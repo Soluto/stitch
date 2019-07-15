@@ -23,25 +23,25 @@ type authStruct struct {
 	scope     string
 }
 
-func (ep *upstreamStruct) ApplyUpstream(req *http.Request) {
-	for header, headerValue := range ep.headers {
+func (up *upstreamStruct) ApplyUpstream(req *http.Request) {
+	for header, headerValue := range up.headers {
 		req.Header.Set(header, headerValue)
 	}
 
 	// TODO: consider more implicit approach
-	ap, ok := upstreamAuthentications.Get(ep.auth.authType, ep.auth.authority)
+	upa, ok := upstreamAuthentications.Get(up.auth.authType, up.auth.authority)
 	if ok {
-		ap.AddAuthentication(req, ep.auth.scope)
+		upa.AddAuthentication(req, up.auth.scope)
 	}
 }
 
-func newUpstream(epConfig *gqlconfig.Upstream) Upstream {
+func newUpstream(upConfig *gqlconfig.Upstream) Upstream {
 	return &upstreamStruct{
-		host: epConfig.Host,
+		host: upConfig.Host,
 		auth: authStruct{
-			authType:  epConfig.Auth.AuthType,
-			authority: epConfig.Auth.Authority,
-			scope:     epConfig.Auth.Scope,
+			authType:  upConfig.Auth.AuthType,
+			authority: upConfig.Auth.Authority,
+			scope:     upConfig.Auth.Scope,
 		},
 	}
 }
@@ -49,10 +49,10 @@ func newUpstream(epConfig *gqlconfig.Upstream) Upstream {
 var upstreams map[string]Upstream
 
 // Init initializes endpoint repository by
-func Init(epConfigs []*gqlconfig.Upstream) {
+func Init(upConfigs []*gqlconfig.Upstream) {
 	upstreams = make(map[string]Upstream)
-	for _, epConfig := range epConfigs {
-		upstreams[epConfig.Host] = newUpstream(epConfig)
+	for _, upConfig := range upConfigs {
+		upstreams[upConfig.Host] = newUpstream(upConfig)
 	}
 }
 
