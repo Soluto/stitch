@@ -21,7 +21,7 @@ spec:
     - name: Auth Type
       type: string
       description: Auth Type
-      JSONPath: .spec.authType
+      JSONPath: .spec.auth.authType
   validation:
     openAPIV3Schema:
       properties:
