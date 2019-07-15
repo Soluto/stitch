@@ -1,5 +1,9 @@
 # agogos
 
+[![CircleCI](https://circleci.com/gh/Soluto/agogos.svg?style=svg)](https://circleci.com/gh/Soluto/agogos)
+
+## General
+
 It allows you to create a unified GraphQL API in a microservices architecture. Each microservice contributes to a single unified schema.
 
 agogos is composed of these components:
@@ -8,6 +12,7 @@ agogos is composed of these components:
 - **graphql-server** - A single GraphQL API executed with the unified schema
 
 ## Disclaimer
+
 This deployment is **NOT** intended for a production environment. It is still a reference implementation and we plan to add some production-ready features like authentication & authorization soon.
 
 ## Example
@@ -77,7 +82,7 @@ type User {
 }
 ```
 
-### A query to the unified GraphQL schema could be:
+### A query to the unified GraphQL schema could be as following
 
 ```js
 query {
