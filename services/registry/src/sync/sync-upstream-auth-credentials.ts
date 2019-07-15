@@ -3,7 +3,7 @@ import { map, shareReplay, distinctUntilChanged, filter } from "rxjs/operators";
 import * as R from "ramda";
 
 const syncUpstreamAuthCredentials$ = gqlObjects$.pipe(
-  map(x => x.upstreamAuthCredentials || {}),
+  map(x => x.upstreamclientcredentials || {}),
   distinctUntilChanged(R.equals),
   shareReplay(1)
 );
