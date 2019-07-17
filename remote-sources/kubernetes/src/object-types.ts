@@ -25,7 +25,7 @@ export type UpstreamClientCredentialsConfig = {
         | string
         | {
               valueFrom: {
-                  secretRef: {
+                  secretKeyRef: {
                       secretName: string;
                       key: string;
                   };

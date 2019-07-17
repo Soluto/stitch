@@ -15,7 +15,7 @@ export default async (
         return spec;
     }
 
-    const {secretName, key} = spec.clientSecret && spec.clientSecret.valueFrom && spec.clientSecret.valueFrom.secretRef;
+    const {secretName, key} = spec.clientSecret && spec.clientSecret.valueFrom && spec.clientSecret.valueFrom.secretKeyRef;
 
     if (key && secretName) {
         const secret = await client.readNamespacedSecret(secretName, resource.metadata.namespace);
