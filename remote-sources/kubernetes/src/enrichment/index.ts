@@ -1,18 +1,16 @@
-import upstreamAuthEnricher from "./upstreamAuthEnricher";
-import { AgogosObjectConfig } from "../object-types";
+import upstreamAuthEnricher from './upstreamAuthEnricher';
+import {AgogosObjectConfig, AgogosCustomResource} from '../object-types';
 
 const enrichers: {
-  [kind: string]: (obj: AgogosObjectConfig) => Promise<AgogosObjectConfig>;
+    [kind: string]: (obj: AgogosCustomResource) => Promise<AgogosObjectConfig>;
 } = {
-  upstreamClientCredentials: upstreamAuthEnricher
+    upstreamclientcredentials: upstreamAuthEnricher,
 };
 
-export default async (
-  kind: string,
-  definition: AgogosObjectConfig
-): Promise<AgogosObjectConfig> => {
-  if (enrichers.hasOwnProperty(kind)) {
-    return enrichers[kind](definition);
-  }
-  return definition;
+export default async (resource: AgogosCustomResource<AgogosObjectConfig>): Promise<AgogosObjectConfig> => {
+    const kind = resource.kind.toLowerCase();
+    if (enrichers.hasOwnProperty(kind)) {
+        return enrichers[kind](resource);
+    }
+    return resource.spec;
 };
