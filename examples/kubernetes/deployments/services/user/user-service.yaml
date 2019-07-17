@@ -19,17 +19,25 @@ spec:
         volumeMounts:
           - name: data
             mountPath: data
+            readOnly: true
         command:
           - json-server
           - --port
-          - "80"
+          - "8080"
           - server.json
         livenessProbe:
           httpGet:
             path: /users
-            port: 80
+            port: 8080
           initialDelaySeconds: 3
           periodSeconds: 30
+      - name: airbag
+        image: alex4soluto/airbag
+        volumeMounts:
+          - name: data
+            mountPath: /app/data/airbag-config.json
+            subPath: airbag-config.json
+            readOnly: true
       volumes:
         - name: data
           configMap:
@@ -57,5 +65,18 @@ data:
   server.json: |
         {
           "users": [{ "id": "1", "firstName": "john", "lastName": "doe" }]
+        }
+  airbag-config.json: |
+        {
+          "backend": "http://localhost:8080",
+          "JWTProviders": [
+              {
+                  "iss": "http://oidc-server-mock.oidc-namespace",
+                  "aud": "user-service-scope"
+              }
+            ],
+            "UnauthenticatedPaths": [
+                "/health"
+            ]
         }
 ---

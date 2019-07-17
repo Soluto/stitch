@@ -193,6 +193,7 @@ jobs:
 
       - slack/status:
           fail_only: true
+          only_for_branches: master
           failure_message: 🔴 Tagging repo job has failed! (Tag $AGOGOS_VERSION)
 
 workflows:

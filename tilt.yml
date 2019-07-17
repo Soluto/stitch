@@ -42,15 +42,5 @@ services:
       target: 5858
     volumes:
     - /home/local/SOLUTO/yshay/code/graphql-gateway/services/registry/src:/service/src:rw
-  oidc-server-mock:
-    container_name: oidc-server-mock
-    environment:
-      API_RESOURCE: some-app
-      CLIENT_CREDENTIALS_CLIENT_ID: client-credentials-mock-client
-      CLIENT_CREDENTIALS_CLIENT_SECRET: client-credentials-mock-client-secret
-    image: soluto/oidc-server-mock
-    ports:
-    - published: 5011
-      target: 80
 version: '3.7'
 

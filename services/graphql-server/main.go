@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
@@ -9,14 +10,14 @@ import (
 )
 
 func main() {
-	fmt.Println("starting...")
+	log.Println("starting...")
 
 	gqlConfigurations := make(chan gqlConfigurationResult)
 	go func() {
 		failures := 0
 		for {
 			start := time.Now()
-			fmt.Println("Connecting to registry")
+			log.Println("Connecting to registry")
 			subscribeToRegistry(gqlConfigurations)
 			elapsed := time.Since(start)
 			if elapsed < (10 * time.Second) {
@@ -36,14 +37,14 @@ func main() {
 	go func() {
 		for {
 			gqlConfiguration := <-gqlConfigurations
-			fmt.Println("Got new GQL configuration")
+			log.Println("Got new GQL configuration")
 
 			if gqlConfiguration.err != nil {
-				fmt.Println("error", gqlConfiguration.err)
+				log.Println("error", gqlConfiguration.err)
 				continue
 			}
 
-			fmt.Println("updating graphql server...")
+			log.Println("updating graphql server...")
 
 			graphqlHTTPHandler = handler.New(&handler.Config{
 				Schema:     gqlConfiguration.schema,

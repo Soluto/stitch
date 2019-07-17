@@ -1,9 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: oidc-namespace
+  labels:
+    name: oidc-namespace
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: oidc-server-mock
-  namespace: agogos
+  namespace: oidc-namespace
 spec:
   selector:
     matchLabels:
@@ -17,25 +23,52 @@ spec:
       - name: oidc-server-mock
         image: soluto/oidc-server-mock
         env:
-          - name: CLIENT_CREDENTIALS_CLIENT_ID
-            value: agogos_client_id
-          - name: CLIENT_CREDENTIALS_CLIENT_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: agogos-credentials
-                key: client_secret
-          - name: API_RESOURCE
-            value: user-service-scope
-      volumes:
-        - name: agogos-credentials
-          secret:
-            secretName: agogos-credentials
+          - name: API_RESOURCES_INLINE
+            value: |
+              [
+                "user-service-scope",
+                "agogos-scope"
+              ]
+          - name: CLIENTS_CONFIGURATION_INLINE
+            value: |
+              [
+                {
+                    "ClientId": "agogos_client_id",
+                    "ClientSecrets": [
+                      "very-strong-secret"
+                    ],
+                    "Description": "user-service configuration",
+                    "AllowedGrantTypes": [
+                        "client_credentials"
+                    ],
+                    "AllowedScopes": [
+                        "user-service-scope"
+                    ]
+                },
+                {
+                    "ClientId": "e2e-client-id",
+                    "ClientSecrets": [
+                      "e2e-strong-secret"
+                    ],
+                    "Description": "e2e configuration",
+                    "AllowedGrantTypes": [
+                        "client_credentials"
+                    ],
+                    "AllowedScopes": [
+                        "agogos-scope"
+                    ]
+                }
+              ]
+        livenessProbe:
+          httpGet:
+            path: /.well-known/openid-configuration
+            port: 80
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: oidc-server-mock
-  namespace: agogos
+  namespace: oidc-namespace
 spec:
   selector:
     app: oidc-server-mock

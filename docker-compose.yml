@@ -27,13 +27,3 @@ services:
     ports:
       - 8012:80
       - 8013:81
-
-  oidc-server-mock:
-    container_name: oidc-server-mock
-    image: soluto/oidc-server-mock
-    ports:
-      - "5011:80"
-    environment:
-      - CLIENT_CREDENTIALS_CLIENT_ID=client-credentials-mock-client
-      - CLIENT_CREDENTIALS_CLIENT_SECRET=client-credentials-mock-client-secret
-      - API_RESOURCE=some-app

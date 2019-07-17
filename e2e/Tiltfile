@@ -1,5 +1,7 @@
 # agogos namespace
-k8s_yaml('../examples/kubernetes/deployments/infra/namespace.yaml')
+k8s_yaml(
+    listdir('../examples/kubernetes/deployments/infra')
+)
 
 # agogos crds
 k8s_yaml(
@@ -27,6 +29,6 @@ k8s_yaml('./e2e.k8s.yaml')
 docker_build('soluto/agogos-graphql-gateway', '../services/graphql-server')
 docker_build('soluto/agogos-registry', '../services/registry')
 docker_build('soluto/agogos-gql-controller', '../remote-sources/kubernetes')
-docker_build('e2e', '.')
+docker_build('soluto/e2e', '.')
 
 k8s_resource('e2e')
