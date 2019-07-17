@@ -10,5 +10,5 @@ spec:
     value: agogos
   auth:
     authType: oauth2/client_credentials
-    authority: "http://oidc-server-mock/connect/token"
+    authority: "http://oidc-server-mock.oidc-namespace/connect/token"
     scope: user-service-scope
