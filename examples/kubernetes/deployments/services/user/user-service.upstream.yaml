@@ -2,6 +2,7 @@ apiVersion: agogos.app/v1
 kind: Upstream
 metadata:
   name: user-service-endpoint
+  namespace: user-namespace
 spec:
   host: "user-service.user-namespace"
   headers:
