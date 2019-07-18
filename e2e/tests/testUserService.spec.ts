@@ -31,7 +31,7 @@ describe('User service', () => {
 
     it('should return user data', async () => {
         const response = await client.request(`{
-                user(id: "1") {
+            user(id: "1") {
                 id
                 lastName
                 firstName
@@ -39,8 +39,8 @@ describe('User service', () => {
                     plan
                     expirationDate
                 }
-                }
-            }`);
+            }
+        }`);
         expect(response).to.exist;
         expect(response).to.deep.equal(expectedResponse);
     });

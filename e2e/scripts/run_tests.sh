@@ -65,6 +65,7 @@ prepare_environment() {
     kubectl apply -f ../remote-sources/kubernetes/src/crd
 
     # mocks
+    kubectl apply -f ../examples/kubernetes/deployments/mocks/oidc-namespace.yaml
     kubectl apply -f ../examples/kubernetes/deployments/mocks
 
     # agogos deployments, roles & secrets
