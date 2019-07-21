@@ -180,7 +180,7 @@ func doHTTP(request *http.Request, client httpClient) (interface{}, error) {
 		return nil, nil
 	}
 	if response.StatusCode >= 400 {
-		return nil, fmt.Errorf("Got HTTP %v from %v: %v", response.StatusCode, request.Host, string(buffer))
+		return nil, fmt.Errorf("HTTP Error. StatusCode=%v, Host=%v, ResponseBody=%v", response.StatusCode, request.Host, string(buffer))
 	}
 
 	var result interface{}
