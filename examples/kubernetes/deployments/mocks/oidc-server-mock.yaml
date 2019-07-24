@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: oidc-server-mock
-        image: soluto/oidc-server-mock
+        image: soluto/oidc-server-mock:0.1.0
         env:
           - name: API_RESOURCES_INLINE
             value: |
