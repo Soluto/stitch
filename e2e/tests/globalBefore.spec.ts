@@ -4,8 +4,24 @@ import { URL } from 'url';
 before('waiting for graphql server', async function () {
     const timeout = Number(process.env.TIMEOUT);
     this.timeout(timeout);
-    const { hostname, port, protocol } = new URL(process.env.GRAPHQL_SERVER_URL);
+    const { hostname: gtwHostName, port: gtwPort, protocol: gtwProtocol } = new URL(process.env.GRAPHQL_SERVER_URL);
+    await waitFor(gtwHostName, gtwPort, gtwProtocol, timeout);
 
+    const { hostname: tknHostname, port: tknPort, protocol: tknProtocol } = new URL(process.env.TOKEN_ENDPOINT);
+    await waitFor(tknHostname, tknPort, tknProtocol, timeout);
+});
+
+const getImplicitPort = protocol => {
+    switch (protocol) {
+        case 'http:':
+            return 80;
+        case 'https:':
+            return 443;
+        default:
+    }
+};
+
+const waitFor = async (hostname: string, port: string, protocol: string, timeout: number): Promise<void> => {
     const explicitPort = port || getImplicitPort(protocol);
     await waitOn({
         log: true,
@@ -18,14 +34,4 @@ before('waiting for graphql server', async function () {
         timeout,
         window: 1000,
     });
-});
-
-const getImplicitPort = protocol => {
-    switch (protocol) {
-        case 'http:':
-            return 80;
-        case 'https:':
-            return 443;
-        default:
-    }
 }

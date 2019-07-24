@@ -31,6 +31,17 @@ spec:
             port: 8011
           initialDelaySeconds: 3
           periodSeconds: 3
+      - name: airbag
+        image: alex4soluto/airbag
+        volumeMounts:
+          - name: gateway-configmap
+            mountPath: /app/data/airbag-config.json
+            subPath: airbag-config.json
+            readOnly: true
+      volumes:
+        - name: gateway-configmap
+          configMap:
+            name: gateway-configmap
 ---
 kind: Service
 apiVersion: v1
@@ -43,4 +54,25 @@ spec:
   ports:
     - name: http
       port: 80
-      targetPort: 8011
+      targetPort: 80
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-configmap
+  namespace: agogos
+data:
+  airbag-config.json: |
+        {
+          "backend": "http://localhost:8011",
+          "JWTProviders": [
+              {
+                  "iss": "http://oidc-server-mock.oidc-namespace",
+                  "aud": "agogos-scope"
+              }
+            ],
+            "UnauthenticatedPaths": [
+                "/health"
+            ]
+        }
+---

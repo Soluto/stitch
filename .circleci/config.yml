@@ -103,7 +103,7 @@ jobs:
 
     steps:
       - build_image:
-          imageName: e2e
+          imageName: agogos-e2e
           workingDirectory: ./e2e
 
   push_registry:
@@ -147,7 +147,7 @@ jobs:
             docker load < agogos-registry.tar
             docker load < agogos-graphql-gateway.tar
             docker load < agogos-gql-controller.tar
-            docker load < e2e.tar
+            docker load < agogos-e2e.tar
 
       - run:
           name: Run E2E tests
@@ -193,6 +193,7 @@ jobs:
 
       - slack/status:
           fail_only: true
+          only_for_branches: master
           failure_message: 🔴 Tagging repo job has failed! (Tag $AGOGOS_VERSION)
 
 workflows:

@@ -1,8 +1,16 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: e2e-namespace
+  labels:
+    name: e2e-namespace
+
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: e2e
-  namespace: agogos
+  namespace: e2e-namespace
   labels:
     name: e2e
     app: e2e
@@ -12,12 +20,20 @@ spec:
       restartPolicy: Never
       containers:
       - name: e2e
-        image: soluto/e2e
+        image: soluto/agogos-e2e
         imagePullPolicy: Never
         env:
           - name: GRAPHQL_SERVER_URL
-            value: "http://gateway"
+            value: "http://gateway.agogos"
           - name: TIMEOUT
             value: "60000"
+          - name: TOKEN_ENDPOINT
+            value: "http://oidc-server-mock.oidc-namespace/connect/token"
+          - name: CLIENT_ID
+            value: e2e-client-id
+          - name: CLIENT_SECRET
+            value: e2e-strong-secret
+          - name: AGOGOS_SCOPE
+            value: agogos-scope
 
   backoffLimit: 0

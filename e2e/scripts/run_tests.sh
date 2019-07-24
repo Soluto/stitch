@@ -16,6 +16,7 @@ install_kubectl() {
 }
 
 create_cluster() {
+    delete_cluster
     echo "Creating cluster $CLUSTER_NAME..."
     kind create cluster --name "$CLUSTER_NAME"
 }
@@ -39,7 +40,7 @@ build_images() {
     docker build -t soluto/agogos-graphql-gateway '../services/graphql-server'
     docker build -t soluto/agogos-registry '../services/registry'
     docker build -t soluto/agogos-gql-controller '../remote-sources/kubernetes'
-    docker build -t soluto/e2e '.'
+    docker build -t soluto/agogos-e2e '.'
 }
 
 load_images() {
@@ -47,7 +48,7 @@ load_images() {
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-graphql-gateway
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-registry
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-gql-controller
-    kind load docker-image --name "$CLUSTER_NAME" soluto/e2e
+    kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-e2e
 }
 
 prepare_environment() {
@@ -64,6 +65,7 @@ prepare_environment() {
     kubectl apply -f ../remote-sources/kubernetes/src/crd
 
     # mocks
+    kubectl apply -f ../examples/kubernetes/deployments/mocks/oidc-namespace.yaml
     kubectl apply -f ../examples/kubernetes/deployments/mocks
 
     # agogos deployments, roles & secrets
@@ -89,14 +91,14 @@ execute_tests() {
     echo "Running e2e tests job..."
     kubectl apply -f ./e2e.k8s.yaml
 
-    echo "Waiting for e2e test job to start...(30 seconds at most)"
-    kubectl -n agogos wait pod -l job-name=e2e --for condition=Ready --timeout 30s
+    echo "Waiting for e2e test job to start...($STARTUP_TIMEOUT seconds at most)"
+    kubectl -n e2e-namespace wait pod -l job-name=e2e --for condition=Ready --timeout "$STARTUP_TIMEOUT"s
     echo "E2E job is running..."
-    kubectl -n agogos logs -l job-name=e2e -f
+    kubectl -n e2e-namespace logs -l job-name=e2e -f
     echo "Waiting for e2e test job to complete...($TEST_TIMEOUT seconds at most)"
-    kubectl -n agogos wait --for condition=complete --timeout "$TEST_TIMEOUT"s jobs/e2e
-    exitCode=$(kubectl -n agogos get pods -l job-name=e2e -o jsonpath='{.items[*].status.containerStatuses[*].state.terminated.exitCode}')
-    reason=$(kubectl -n agogos get pods -l job-name=e2e -o jsonpath='{.items[*].status.containerStatuses[*].state.terminated.Reason}')
+    kubectl -n e2e-namespace wait --for condition=complete --timeout "$TEST_TIMEOUT"s jobs/e2e
+    exitCode=$(kubectl -n e2e-namespace get pods -l job-name=e2e -o jsonpath='{.items[*].status.containerStatuses[*].state.terminated.exitCode}')
+    reason=$(kubectl -n e2e-namespace get pods -l job-name=e2e -o jsonpath='{.items[*].status.containerStatuses[*].state.terminated.Reason}')
 
     echo "The tests finished with exit code $exitCode and message: $reason"
 
@@ -112,27 +114,22 @@ parse_options() {
     case $i in
         --kind-version=*)
         KIND_VERSION="${i#*=}"
-        shift
         ;;
 
         --kubectl-version=*)
         KUBECTL_VERSION="${i#*=}"
-        shift
         ;;
 
         --cluster-name=*)
         CLUSTER_NAME="${i#*=}"
-        shift
         ;;
 
         --startup-timeout=*)
         STARTUP_TIMEOUT="${i#*=}"
-        shift
         ;;
 
         --test-time=*)
         TEST_TIMEOUT="${i#*=}"
-        shift
         ;;
 
         *)
@@ -171,7 +168,7 @@ parse_options() {
 main() {
     trap delete_cluster EXIT
     trap 'report_error_and_exit $LINENO $?' ERR
-    parse_options
+    parse_options "$@"
 
     if [[ ! -z "$CI" ]]
     then
