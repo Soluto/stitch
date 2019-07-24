@@ -176,6 +176,13 @@ func doHTTP(request *http.Request, client httpClient) (interface{}, error) {
 		return nil, err
 	}
 
+	if response.StatusCode == 404 {
+		return nil, nil
+	}
+	if response.StatusCode >= 400 {
+		return nil, fmt.Errorf("HTTP Error. StatusCode=%v, Host=%v, ResponseBody=%v", response.StatusCode, request.Host, string(buffer))
+	}
+
 	var result interface{}
 
 	err = json.Unmarshal(buffer, &result)
