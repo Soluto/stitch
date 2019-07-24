@@ -40,7 +40,7 @@ build_images() {
     docker build -t soluto/agogos-graphql-gateway '../services/graphql-server'
     docker build -t soluto/agogos-registry '../services/registry'
     docker build -t soluto/agogos-gql-controller '../remote-sources/kubernetes'
-    docker build -t soluto/e2e '.'
+    docker build -t soluto/agogos-e2e '.'
 }
 
 load_images() {
@@ -48,7 +48,7 @@ load_images() {
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-graphql-gateway
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-registry
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-gql-controller
-    kind load docker-image --name "$CLUSTER_NAME" soluto/e2e
+    kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-e2e
 }
 
 prepare_environment() {
@@ -114,27 +114,22 @@ parse_options() {
     case $i in
         --kind-version=*)
         KIND_VERSION="${i#*=}"
-        shift
         ;;
 
         --kubectl-version=*)
         KUBECTL_VERSION="${i#*=}"
-        shift
         ;;
 
         --cluster-name=*)
         CLUSTER_NAME="${i#*=}"
-        shift
         ;;
 
         --startup-timeout=*)
         STARTUP_TIMEOUT="${i#*=}"
-        shift
         ;;
 
         --test-time=*)
         TEST_TIMEOUT="${i#*=}"
-        shift
         ;;
 
         *)
@@ -173,7 +168,7 @@ parse_options() {
 main() {
     trap delete_cluster EXIT
     trap 'report_error_and_exit $LINENO $?' ERR
-    parse_options
+    parse_options "$@"
 
     if [[ ! -z "$CI" ]]
     then

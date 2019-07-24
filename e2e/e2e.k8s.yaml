@@ -20,7 +20,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: e2e
-        image: soluto/e2e
+        image: soluto/agogos-e2e
         imagePullPolicy: Never
         env:
           - name: GRAPHQL_SERVER_URL
