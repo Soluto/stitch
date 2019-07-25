@@ -18,7 +18,7 @@ install_kubectl() {
 create_cluster() {
     delete_cluster
     echo "Creating cluster $CLUSTER_NAME..."
-    kind create cluster --name "$CLUSTER_NAME"
+    kind create cluster --name "$CLUSTER_NAME" --config ./kubernetes/kind.config.yaml
 }
 
 delete_cluster() {
@@ -90,7 +90,7 @@ execute_tests() {
     kubectl -n agogos wait pod -l app=gateway --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
 
     echo "Running e2e tests job..."
-    kubectl apply -f ./e2e.k8s.yaml
+    kubectl apply -f ./kubernetes/e2e.yaml
 
     echo "Waiting for e2e test job to start...($STARTUP_TIMEOUT seconds at most)"
     kubectl -n e2e-namespace wait pod -l job-name=e2e --for condition=Ready --timeout "$STARTUP_TIMEOUT"s
