@@ -60,6 +60,7 @@ prepare_environment() {
     echo "Creating kubernetes objects..."
     # namespace
     kubectl apply -f ../examples/kubernetes/deployments/infra/namespace.yaml
+    kubectl apply -f ../examples/kubernetes/deployments/infra/service-account.yaml
 
     # CRDs
     kubectl apply -f ../remote-sources/kubernetes/src/crd
@@ -166,7 +167,7 @@ parse_options() {
 }
 
 main() {
-    trap delete_cluster EXIT
+    #trap delete_cluster EXIT
     trap 'report_error_and_exit $LINENO $?' ERR
     parse_options "$@"
 

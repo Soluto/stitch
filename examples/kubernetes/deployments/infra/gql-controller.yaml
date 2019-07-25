@@ -12,6 +12,7 @@ spec:
       labels:
         app: gql-controller
     spec:
+      serviceAccountName: agogos-ca
       containers:
       - name: gql-controller
         image: soluto/agogos-gql-controller

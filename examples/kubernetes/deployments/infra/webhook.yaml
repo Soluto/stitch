@@ -3,17 +3,17 @@ kind: ValidatingWebhookConfiguration
 metadata:
   name: gql-controller
 webhooks:
-  - name: schema-validation-webhook.graph.platform
+  - name: schema-validation-webhook.agogos.platform
     rules:
       - apiGroups:
-          - "agogos"
+          - "agogos.app"
         apiVersions:
           - v1
         operations:
           - CREATE
           - UPDATE
         resources:
-          - gqlschemas
+          - schemas
         scope: "Namespaced"
     failurePolicy: Ignore
     clientConfig:
