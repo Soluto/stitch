@@ -1,19 +1,9 @@
 import * as express from "express";
 import * as bodyParser from "body-parser";
 
-import validateSchema from "../validators/schemaValidator";
+import { validateNewObject } from "../validation";
 
 const app = express();
-
-type ValidatorFunc = (source: string, name: string, definition: string) => Promise<void>
-
-type ValidatorDictionary = {
-    [kind: string]: ValidatorFunc;
-}
-
-const validators: ValidatorDictionary = {
-    "gqlschemas": validateSchema,
-};
 
 // TODO: Move each validation to separate file
 const validateSource = async (
@@ -22,17 +12,15 @@ const validateSource = async (
     name: string,
     definition: string,
     res: express.Response
-) => {
+): Promise<void> => {
     try {
         console.log(`got validation request - ${source}`, {
             name,
             kind,
         });
 
-        if (!validators.hasOwnProperty(kind)) {
-            throw new Error("Unknown GraphQL object kind");
-        }
-        validators[kind].call(source, name, definition);
+        await validateNewObject(name, kind, source, definition);
+
         res.sendStatus(200);
     } catch (error) {
         console.warn(`Failed to validate source - ${source}`, {

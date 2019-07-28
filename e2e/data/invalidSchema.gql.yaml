@@ -9,5 +9,3 @@ spec:
       id: ID!
       firstName: String
       lastName: String
-
-
