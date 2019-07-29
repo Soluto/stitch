@@ -2,6 +2,7 @@ import * as express from "express";
 import * as bodyParser from "body-parser";
 
 import { validateNewObject } from "../validation";
+import { AgogosObjectConfig } from "../sync/object-types";
 
 const app = express();
 
@@ -10,7 +11,7 @@ const validateSource = async (
     source: string,
     kind: string,
     name: string,
-    definition: string,
+    spec: AgogosObjectConfig,
     res: express.Response
 ): Promise<void> => {
     try {
@@ -19,7 +20,7 @@ const validateSource = async (
             kind,
         });
 
-        await validateNewObject(name, kind, source, definition);
+        await validateNewObject(name, kind, source, spec);
 
         res.sendStatus(200);
     } catch (error) {
@@ -33,11 +34,11 @@ const validateSource = async (
 };
 
 app
-    .use(bodyParser.text())
-    .post("/:sourceName/:kind/:name", (req, res) => {
+    .use(bodyParser.json())
+    .post("/:sourceName/:kind/:name", (req: express.Request, res: express.Response) => {
         const { sourceName, kind, name } = req.params;
-        const definition = req.body;
-        return validateSource(sourceName, kind, name, definition, res);
+        const spec: AgogosObjectConfig = req.body;
+        return validateSource(sourceName, kind, name, spec, res);
     });
 
 export default app;

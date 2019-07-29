@@ -3,7 +3,6 @@ import * as express from "express";
 import bodyParser = require("body-parser");
 import fetch from "node-fetch";
 import { SchemaConfig } from "./object-types";
-import { resolve } from "url";
 
 var options = {
     key: process.env.PLATFORM_SSL_KEY,
@@ -68,32 +67,36 @@ app.post("/validate", bodyParser.json(), async (req: express.Request, res: expre
         res.json(buildResponse(req, "Only HTTPS protocol supported", 401));
         return;
     }
-    const request: WebhookRequest = req.body as WebhookRequest;
-    if (!request) {
+    const requestBody: WebhookRequest = req.body;
+    if (!requestBody) {
         res.json(buildResponse(req, "Expected AdmissionReview request body.\n\t\tsee https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#webhook-request-and-response for more details", 400))
         return;
     }
-    const { request: { object: vldSubj } } = req.body;
+    const { request: { object: vldObj } } = requestBody;
 
-    if (vldSubj.kind !== "Schema" || !vldSubj.spec) {
+    // TODO: Check that the kind is in list
+    if (vldObj.kind !== "Schema" || !vldObj.spec) {
         res.json(buildResponse(req, "Accepting only Schema validation request with spec", 400));
         return;
     }
 
-    const schema = vldSubj.spec as SchemaConfig;
-    const source = `${vldSubj.metadata.namespace}.${vldSubj.metadata.name}`;
+    const schema = vldObj.spec as SchemaConfig;
+    const source = encodeURIComponent(`${vldObj.metadata.namespace}.${vldObj.metadata.name}`);
 
     try {
         console.log(`validating new schema: ${source}`);
         const result = await fetch(
-            `${options.graphqlRegistryUrl}/validate/${options.sourceName}/${source}`,
+            `${options.graphqlRegistryUrl}/validate/${options.sourceName}/${vldObj.kind.toLowerCase()}/${source}`,
             {
                 method: "POST",
-                body: schema
-            }
+                body: JSON.stringify(schema, null, 4),
+                headers: {
+                    'Content-Type': "application/json",
+                },
+            },
         );
         if (!result.ok) {
-            throw new Error(`${result.status}: ${result.statusText}`);
+            throw new Error(`Validation error: ${result.status}: ${result.statusText}`);
         }
         console.log(`${source} is valid`);
     } catch (e) {
