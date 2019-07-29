@@ -1,7 +1,7 @@
 apiVersion: agogos.app/v1
 kind: Upstream
 metadata:
-  name: user-service-upstream
+  name: duplicate-user-service-upstream
   namespace: user-namespace
 spec:
   host: "user-service.user-namespace"
@@ -11,4 +11,4 @@ spec:
   auth:
     authType: oauth2/client_credentials
     authority: "http://oidc-server-mock.oidc-namespace/connect/token"
-    scope: user-service-scope
+    scope: another-service-scope

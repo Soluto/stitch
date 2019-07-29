@@ -2,7 +2,7 @@ import https = require("https");
 import * as express from "express";
 import bodyParser = require("body-parser");
 import fetch from "node-fetch";
-import { SchemaConfig } from "./object-types";
+import { AgogosObjectConfig } from "./object-types";
 
 var options = {
     key: process.env.PLATFORM_SSL_KEY,
@@ -24,7 +24,7 @@ type WebhookRequest = {
                 name: string,
                 namespace: string,
             }
-            spec: any,
+            spec: AgogosObjectConfig,
         }
     }
 }
@@ -73,14 +73,7 @@ app.post("/validate", bodyParser.json(), async (req: express.Request, res: expre
         return;
     }
     const { request: { object: vldObj } } = requestBody;
-
-    // TODO: Check that the kind is in list
-    if (vldObj.kind !== "Schema" || !vldObj.spec) {
-        res.json(buildResponse(req, "Accepting only Schema validation request with spec", 400));
-        return;
-    }
-
-    const schema = vldObj.spec as SchemaConfig;
+    const schema: AgogosObjectConfig = vldObj.spec;
     const source = encodeURIComponent(`${vldObj.metadata.namespace}.${vldObj.metadata.name}`);
 
     try {

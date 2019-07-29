@@ -8,7 +8,7 @@ const validateSchema = async (
     source: string,
     name: string,
     spec: AgogosObjectConfig
-) => {
+): Promise<void> => {
     const schemas = await gqlObjects$
         .pipe(
             map(x => x.schemas),

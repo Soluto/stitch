@@ -48,7 +48,7 @@ func newUpstream(upConfig *gqlconfig.Upstream) Upstream {
 
 var upstreams map[string]Upstream
 
-// Init initializes endpoint repository by
+// Init initializes upstreams repository by
 func Init(upConfigs []*gqlconfig.Upstream) {
 	upstreams = make(map[string]Upstream)
 	for _, upConfig := range upConfigs {
