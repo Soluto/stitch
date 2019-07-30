@@ -15,7 +15,7 @@ const validateUpstreamClientCredentials = async (
         )
         .toPromise();
     const newUpstreamClientCredentials = { ...upstreamClientCredentials, [`${source}.${name}`]: spec };
-    const uccs = Object.values(newUpstreamClientCredentials).map((u: UpstreamAuthCredentialsConfig) => `${u.type}||${u.authority}||${u.clientId}`);
+    const uccs = Object.values(newUpstreamClientCredentials).map((u: UpstreamAuthCredentialsConfig) => `${u.authType}||${u.authority}||${u.clientId}`);
     if (uccs.length !== (new Set(uccs)).size) {
         throw new Error("Duplicate upstream client credentials found.");
     }

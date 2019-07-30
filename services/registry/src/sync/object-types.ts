@@ -9,14 +9,14 @@ export type UpstreamConfig = {
         value: string;
     }[];
     auth: {
-        type: string;
+        authType: string;
         authority: string;
         scope: string;
     };
 };
 
 export type UpstreamAuthCredentialsConfig = {
-    type: string;
+    authType: string;
     authority: string;
     clientId: string;
     clientSecret: string;

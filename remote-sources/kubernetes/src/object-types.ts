@@ -11,26 +11,26 @@ export type UpstreamConfig = {
         value: string;
     }[];
     auth: {
-        type: string;
+        authType: string;
         authority: string;
         scope: string;
     };
 };
 
 export type UpstreamClientCredentialsConfig = {
-    type: string;
+    authType: string;
     authority: string;
     clientId: string;
     clientSecret:
-        | string
-        | {
-              valueFrom: {
-                  secretKeyRef: {
-                      secretName: string;
-                      key: string;
-                  };
-              };
-          };
+    | string
+    | {
+        valueFrom: {
+            secretKeyRef: {
+                secretName: string;
+                key: string;
+            };
+        };
+    };
 };
 
 export type AgogosObjectConfig = SchemaConfig | UpstreamConfig | UpstreamClientCredentialsConfig;

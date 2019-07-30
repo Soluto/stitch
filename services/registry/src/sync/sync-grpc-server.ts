@@ -43,7 +43,7 @@ class GqlConfigurationSubscriptionServer implements IRegistryServer {
 
                     const upstreamAuth = new UpstreamAuthentication();
                     // FIXME: get from ep
-                    upstreamAuth.setAuthType(ep.auth.type);
+                    upstreamAuth.setAuthType(ep.auth.authType);
                     upstreamAuth.setAuthority(ep.auth.authority);
                     upstreamAuth.setScope(ep.auth.scope);
                     upstream.setAuth(upstreamAuth);
@@ -56,7 +56,7 @@ class GqlConfigurationSubscriptionServer implements IRegistryServer {
                     configuration.upstreamAuthCredentials
                 ).map(ap => {
                     const upstreamAuthCredentials = new UpstreamAuthCredentials();
-                    upstreamAuthCredentials.setAuthType(ap.type);
+                    upstreamAuthCredentials.setAuthType(ap.authType);
                     upstreamAuthCredentials.setAuthority(ap.authority);
                     upstreamAuthCredentials.setClientId(ap.clientId);
                     upstreamAuthCredentials.setClientSecret(ap.clientSecret);
