@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -oE
+set -o
 
 install_kind() {
     echo "Installing kind (v$KIND_VERSION)..."
@@ -17,6 +17,7 @@ install_kubectl() {
 
 create_cluster() {
     delete_cluster
+    set -E
     echo "Creating cluster $CLUSTER_NAME..."
     kind create cluster --name "$CLUSTER_NAME" --config ./kubernetes/kind.config.yaml
 }
@@ -73,7 +74,7 @@ prepare_environment() {
     kubectl apply -f ../examples/kubernetes/deployments/infra
     kubectl -n agogos wait pod -l app=registry --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
     kubectl -n agogos wait pod -l app=gql-controller --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
-    sleep 60
+    #sleep 60
 
     # user namespace & services
     kubectl apply -f ../examples/kubernetes/deployments/services/user-namespace.yaml
