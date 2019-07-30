@@ -167,7 +167,7 @@ parse_options() {
 }
 
 main() {
-    #trap delete_cluster EXIT
+    trap delete_cluster EXIT
     trap 'report_error_and_exit $LINENO $?' ERR
     parse_options "$@"
 
