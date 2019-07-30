@@ -20,5 +20,5 @@ export const validateNewObject = async (name: string, kind: string, source: stri
     if (!validators.hasOwnProperty(kind)) {
         throw new Error("Unknown GraphQL object kind");
     }
-    await validators[kind].call(null, source, name, spec);
+    await validators[kind](source, name, spec);
 };
