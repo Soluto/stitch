@@ -1,7 +1,7 @@
 import { map, shareReplay, distinctUntilChanged, filter } from "rxjs/operators";
 import { print } from "graphql/language/printer";
 
-import gqlObjects$, { GqlObjsByName } from "./sync-service";
+import gqlObjects$, { AggObjsByName } from "./sync-service";
 
 import gql from "graphql-tag";
 import { mergeDocuments } from "../graphql/schema-utils";
@@ -34,7 +34,7 @@ function mergeAllDocuments(docs: DocumentNode[]) {
     }
 }
 
-export const makeGqlDocumentFromGqlSources = (gqlSchemas: GqlObjsByName) => {
+export const makeGqlDocumentFromGqlSources = (gqlSchemas: AggObjsByName) => {
     const documentNodes = Object.entries(gqlSchemas).map(
         ([schemaName, schema]: [string, SchemaConfig]) =>
             parseGqlSource(schemaName, schema.definition)

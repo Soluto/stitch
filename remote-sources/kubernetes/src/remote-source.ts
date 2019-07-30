@@ -9,7 +9,7 @@ export default (client: k8s.CustomObjectsApi): Source => ({
         const crds = await Promise.all(
             config.customResourceDefinitions.map(async kind => ({
                 kind,
-                definition: await getGqlObjectsByKind(kind, client),
+                definition: await getAggObjectsByKind(kind, client),
             }))
         );
         return crds.reduce((acc, o) => ({ ...acc, [o.kind]: o.definition }), {});
@@ -20,7 +20,7 @@ export default (client: k8s.CustomObjectsApi): Source => ({
     },
 });
 
-const getGqlObjectsByKind = async (kind: string, client: k8s.CustomObjectsApi): Promise<{ [name: string]: string }> => {
+const getAggObjectsByKind = async (kind: string, client: k8s.CustomObjectsApi): Promise<{ [name: string]: string }> => {
     const response = await client.listClusterCustomObject(config.apiGroup, config.apiVersion, kind);
     const enrichedDefinitions: { name: string; definition: AgogosObjectConfig }[] = await Promise.all(
         response.body.items.map(async (resource: AgogosCustomResource<AgogosObjectConfig>) => ({
