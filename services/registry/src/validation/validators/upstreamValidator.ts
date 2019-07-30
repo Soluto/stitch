@@ -10,8 +10,7 @@ const validateUpstream = async (
 ): Promise<void> => {
     const upstreams = await gqlObjects$
         .pipe(
-            map(x => x.upstreams),
-            filter(a => a && Object.keys(a).length > 0),
+            map(x => x.upstreams || {}),
             take(1)
         )
         .toPromise();

@@ -29,7 +29,7 @@ describe("Objects validation", () => {
 
         const [group, version] = crd.apiVersion.split("/");
         const kubectlPromise = client.createNamespacedCustomObject(group, version, crd.metadata.namespace, "schemas", crd);
-        expect(kubectlPromise).to.eventually.be.rejected
+        await expect(kubectlPromise).to.eventually.be.rejected
             .and.then(e => {
                 expect(e).has.property("response");
                 const { response } = e;
@@ -48,7 +48,26 @@ describe("Objects validation", () => {
 
         const [group, version] = crd.apiVersion.split("/");
         const kubectlPromise = client.createNamespacedCustomObject(group, version, crd.metadata.namespace, "upstreams", crd);
-        expect(kubectlPromise).to.eventually.be.rejected
+        await expect(kubectlPromise).to.eventually.be.rejected
+            .and.then(e => {
+                expect(e).has.property("response");
+                const { response } = e;
+                expect(response).to.exist;
+                expect(response).to.have.property("body");
+                const { body: responseBody } = response;
+                expect(responseBody).to.exist;
+                expect(responseBody).to.have.property("code", 400);
+                expect(responseBody).to.have.property("status", "Failure");
+            });
+    });
+
+    it("should reject duplicate upstream-client-credentials addition", async () => {
+        const yaml = await fs.promises.readFile("./data/duplicateUpstreamClientCredentials.yaml", { encoding: "utf8" });
+        const crd: AgogosObject = k8s.loadYaml(yaml);
+
+        const [group, version] = crd.apiVersion.split("/");
+        const kubectlPromise = client.createNamespacedCustomObject(group, version, crd.metadata.namespace, "upstreamclientcredentials", crd);
+        await expect(kubectlPromise).to.eventually.be.rejected
             .and.then(e => {
                 expect(e).has.property("response");
                 const { response } = e;

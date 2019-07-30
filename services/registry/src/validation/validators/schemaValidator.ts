@@ -11,8 +11,7 @@ const validateSchema = async (
 ): Promise<void> => {
     const schemas = await gqlObjects$
         .pipe(
-            map(x => x.schemas),
-            filter(a => a && Object.keys(a).length > 0),
+            map(x => x.schemas || {}),
             take(1)
         )
         .toPromise();

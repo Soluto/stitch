@@ -73,16 +73,16 @@ app.post("/validate", bodyParser.json(), async (req: express.Request, res: expre
         return;
     }
     const { request: { object: vldObj } } = requestBody;
-    const schema: AgogosObjectConfig = vldObj.spec;
+    const spec: AgogosObjectConfig = vldObj.spec;
     const source = encodeURIComponent(`${vldObj.metadata.namespace}.${vldObj.metadata.name}`);
 
     try {
-        console.log(`validating new schema: ${source}`);
+        console.log(`validating new ${vldObj.kind}: ${source}`);
         const result = await fetch(
             `${options.graphqlRegistryUrl}/validate/${options.sourceName}/${vldObj.kind.toLowerCase()}/${source}`,
             {
                 method: "POST",
-                body: JSON.stringify(schema, null, 4),
+                body: JSON.stringify(spec, null, 4),
                 headers: {
                     'Content-Type': "application/json",
                 },
