@@ -154,7 +154,7 @@ func createHTTPRequest(p httpParams, rp graphql.ResolveParams) (*http.Request, e
 		request.Header.Set("Content-Type", "application/json")
 	}
 
-	// TODO: Make endpoints not connected directly to specific directive
+	// TODO: Make upstreams not connected directly to specific directive
 	ep, ok := upstreams.Get(request.URL.Host)
 	if ok {
 		ep.ApplyUpstream(request)

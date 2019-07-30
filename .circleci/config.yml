@@ -155,6 +155,7 @@ jobs:
           command: scripts/run_tests.sh
 
       - slack/status:
+          only_for_branches: "master"
           fail_only: true
 
   tag_repo:

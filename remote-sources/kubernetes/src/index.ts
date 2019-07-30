@@ -18,7 +18,7 @@ const kubeSource = createKubeSource(kubeClient);
 
 const app = express();
 
-app.use("/health", async (_: express.Request, res: express.Response) =>
+app.get("/health", async (_: express.Request, res: express.Response) =>
     res.send(true)
 );
 

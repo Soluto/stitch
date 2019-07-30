@@ -1,5 +1,4 @@
 import k8s = require('@kubernetes/client-node');
-import config from '../config';
 import { AgogosCustomResource, UpstreamClientCredentialsConfig } from '../object-types';
 
 const k8sConfig = new k8s.KubeConfig();

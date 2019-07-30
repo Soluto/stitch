@@ -12,6 +12,7 @@ spec:
       labels:
         app: registry
     spec:
+      serviceAccountName: agogos-ca
       containers:
       - name: registry
         image: soluto/agogos-registry

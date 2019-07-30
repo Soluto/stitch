@@ -17,8 +17,9 @@ install_kubectl() {
 
 create_cluster() {
     delete_cluster
+    set -E
     echo "Creating cluster $CLUSTER_NAME..."
-    kind create cluster --name "$CLUSTER_NAME"
+    kind create cluster --name "$CLUSTER_NAME" --config ./kubernetes/kind.config.yaml
 }
 
 delete_cluster() {
@@ -60,6 +61,7 @@ prepare_environment() {
     echo "Creating kubernetes objects..."
     # namespace
     kubectl apply -f ../examples/kubernetes/deployments/infra/namespace.yaml
+    kubectl apply -f ../examples/kubernetes/deployments/infra/service-account.yaml
 
     # CRDs
     kubectl apply -f ../remote-sources/kubernetes/src/crd
@@ -70,6 +72,8 @@ prepare_environment() {
 
     # agogos deployments, roles & secrets
     kubectl apply -f ../examples/kubernetes/deployments/infra
+    kubectl -n agogos wait pod -l app=registry --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
+    kubectl -n agogos wait pod -l app=gql-controller --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
 
     # user namespace & services
     kubectl apply -f ../examples/kubernetes/deployments/services/user-namespace.yaml
@@ -84,12 +88,10 @@ execute_tests() {
     kubectl -n user-namespace wait pod -l app=user-subscription-service --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
     kubectl -n user-namespace wait pod -l app=user-service --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
     kubectl -n oidc-namespace wait pod -l app=oidc-server-mock --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
-    kubectl -n agogos wait pod -l app=gql-controller --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
-    kubectl -n agogos wait pod -l app=registry --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
     kubectl -n agogos wait pod -l app=gateway --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
 
     echo "Running e2e tests job..."
-    kubectl apply -f ./e2e.k8s.yaml
+    kubectl apply -f ./kubernetes/e2e.yaml
 
     echo "Waiting for e2e test job to start...($STARTUP_TIMEOUT seconds at most)"
     kubectl -n e2e-namespace wait pod -l job-name=e2e --for condition=Ready --timeout "$STARTUP_TIMEOUT"s
@@ -141,7 +143,7 @@ parse_options() {
 
     if [[ -z "$KIND_VERSION" ]]
     then
-        KIND_VERSION="0.3.0"
+        KIND_VERSION="0.4.0"
     fi
 
     if [[ -z "$KUBECTL_VERSION" ]]

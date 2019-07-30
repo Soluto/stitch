@@ -19,7 +19,7 @@ metadata:
   name: gql-reader-gql-controller
 subjects:
 - kind: ServiceAccount
-  name: default
+  name: agogos-ca
   namespace:  agogos
 roleRef:
   kind: ClusterRole

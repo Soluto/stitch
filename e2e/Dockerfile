@@ -3,6 +3,7 @@ COPY package.json yarn.lock ./
 RUN yarn
 COPY ./utils ./utils
 COPY ./tests ./tests
+COPY ./data ./data
 
 ENV GRAPHQL_SERVER_URL=http://gateway
 ENV TIMOUT=60000

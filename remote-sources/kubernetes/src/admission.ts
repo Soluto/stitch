@@ -2,70 +2,104 @@ import https = require("https");
 import * as express from "express";
 import bodyParser = require("body-parser");
 import fetch from "node-fetch";
+import { AgogosObjectConfig } from "./object-types";
 
 var options = {
-  key: process.env.PLATFORM_SSL_KEY,
-  cert: process.env.PLATFORM_SSL_CERT,
-  graphqlRegistryUrl: process.env.REGISTRY_URL,
-  sourceName: process.env.GRAPHQL_SOURCE_NAME || "KUBERNETES"
+    key: process.env.PLATFORM_SSL_KEY,
+    cert: process.env.PLATFORM_SSL_CERT,
+    graphqlRegistryUrl: process.env.REGISTRY_URL,
+    sourceName: process.env.GRAPHQL_SOURCE_NAME || "KUBERNETES"
 };
 
 const app = express();
 
-const error = (res, reason) => {
-  console.error(reason);
-  return res.json({
-    response: {
-      allowed: false,
-      status: {
-        status: "Failure",
-        message: "Failed to apply GQL schema - " + reason,
-        reason,
-        code: 402
-      }
+type WebhookRequest = {
+    apiVersion: string,
+    kind: string,
+    request: {
+        uid: string,
+        object: {
+            kind: string,
+            metadata: {
+                name: string,
+                namespace: string,
+            }
+            spec: AgogosObjectConfig,
+        }
     }
-  });
+}
+
+type WebhookResponse = {
+    apiVersion: string,
+    kind: string,
+    response: {
+        uid: string,
+        allowed: boolean,
+        status: {
+            message: string,
+            code: number,
+        },
+    },
 };
 
-app.use("/validate", bodyParser.json(), async (req, res) => {
-  if (!req.body) return error(res, "No body");
-  const { kind, request } = req.body;
+const buildResponse = (req: express.Request, message: string, code: number = 200): WebhookResponse => {
+    const { apiVersion, kind, request: { uid } } = req.body;
+    return {
+        apiVersion,
+        kind,
+        response: {
+            uid,
+            allowed: code === 200,
+            status: {
+                code,
+                message,
+            },
+        },
+    };
+};
 
-  if (kind !== "AdmissionReview")
-    return error(res, "Accepting only AdmissionReview requests");
+app.get("/health", (_: express.Request, res: express.Response): void => {
+    res.json(true);
+});
 
-  if (request.object.kind !== "Schema" || !request.object.spec)
-    return error(res, "Accepting only Schema validation request with spec");
-
-  const gqlSchema = request.object.spec;
-  const source = `${request.object.metadata.namespace}.${
-    request.object.metadata.name
-  }`;
-
-  try {
-    console.log(`validating new schema: ${source}`);
-    const result = await fetch(
-      `${options.graphqlRegistryUrl}/validate/${options.sourceName}/${source}`,
-      {
-        method: "POST",
-        body: gqlSchema
-      }
-    );
-    if (!result.ok) {
-      throw new Error(`${result.status}: ${result.statusText}`);
+app.post("/validate", bodyParser.json(), async (req: express.Request, res: express.Response): Promise<void> => {
+    if (!req.secure) {
+        res.json(buildResponse(req, "Only HTTPS protocol supported", 401));
+        return;
     }
-    console.log(`${source} is valid`);
-  } catch (e) {
-    return error(res, e);
-  }
-
-  return res.json({
-    response: {
-      allowed: true
+    const requestBody: WebhookRequest = req.body;
+    if (!requestBody) {
+        res.json(buildResponse(req, "Expected AdmissionReview request body.\n\t\tsee https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#webhook-request-and-response for more details", 400))
+        return;
     }
-  });
+    const { request: { object: vldObj } } = requestBody;
+    const spec: AgogosObjectConfig = vldObj.spec;
+    const source = encodeURIComponent(`${vldObj.metadata.namespace}.${vldObj.metadata.name}`);
+
+    try {
+        console.log(`validating new ${vldObj.kind}: ${source}`);
+        const result = await fetch(
+            `${options.graphqlRegistryUrl}/validate/${options.sourceName}/${vldObj.kind.toLowerCase()}/${source}`,
+            {
+                method: "POST",
+                body: JSON.stringify(spec, null, 4),
+                headers: {
+                    'Content-Type': "application/json",
+                },
+            },
+        );
+        if (!result.ok) {
+            throw new Error(`Validation error: ${result.status}: ${result.statusText}`);
+        }
+        console.log(`${source} is valid`);
+    } catch (e) {
+        res.json(buildResponse(req, e.toString(), 400));
+        return;
+    }
+
+    res.json(buildResponse(req, ""));
 });
 
 export default {
-  start: () => https.createServer(options, app).listen(443)
+    start: () => https.createServer(options, app).listen(443, () => console.log("admission server started to listen on port 443")),
 };

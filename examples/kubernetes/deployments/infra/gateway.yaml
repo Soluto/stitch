@@ -12,6 +12,7 @@ spec:
       labels:
         app: gateway
     spec:
+      serviceAccountName: agogos-ca
       containers:
       - name: graphql-gateway
         image: soluto/agogos-graphql-gateway

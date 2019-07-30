@@ -14,37 +14,37 @@ import {
 
 import { AgogosObjectConfig } from "./object-types";
 
-export type GqlObjsByName = { [name: string]: AgogosObjectConfig };
-export type GqlObjByNameByKind = { [kind: string]: GqlObjsByName };
+export type AggObjsByName = { [name: string]: AgogosObjectConfig };
+export type AggObjByNameByKind = { [kind: string]: AggObjsByName };
 
 const addSourceToName = (source: string, name: string): string =>
     `${source}.${name}`;
-const renameKeys = (source: string, obj: GqlObjsByName): GqlObjsByName =>
+const renameKeys = (source: string, obj: AggObjsByName): AggObjsByName =>
     Object.keys(obj).reduce(
         (acc, key) => ({ ...acc, ...{ [addSourceToName(source, key)]: obj[key] } }),
         {}
     );
 const renameSubKeys = (
     source: string,
-    obj: GqlObjByNameByKind
-): GqlObjByNameByKind =>
+    obj: AggObjByNameByKind
+): AggObjByNameByKind =>
     Object.keys(obj).reduce(
         (acc, key) => ({ ...acc, [key]: renameKeys(source, obj[key]) }),
         {}
     );
 
 const safeMergeProperty = (
-    obj: GqlObjByNameByKind,
+    obj: AggObjByNameByKind,
     key: string,
-    value: GqlObjsByName
-): GqlObjByNameByKind =>
+    value: AggObjsByName
+): AggObjByNameByKind =>
     obj[key]
         ? { ...obj, [key]: { ...obj[key], ...value } }
         : { ...obj, [key]: value };
 const safeMergeObjects = (
-    o1: GqlObjByNameByKind,
-    o2: GqlObjByNameByKind
-): GqlObjByNameByKind =>
+    o1: AggObjByNameByKind,
+    o2: AggObjByNameByKind
+): AggObjByNameByKind =>
     Object.entries(o2).reduce(
         (acc, [key, value]) => safeMergeProperty(acc, key, value),
         o1
@@ -52,22 +52,22 @@ const safeMergeObjects = (
 
 const emitAndWait = (duration: number) => concat(empty().pipe(delay(duration)));
 
-const gqlObjects$: Observable<GqlObjByNameByKind> = from(
+const gqlObjects$: Observable<AggObjByNameByKind> = from(
     Object.entries(sources)
 ).pipe(
     map(([sourceName, source]) =>
-        defer((): Promise<GqlObjByNameByKind> => source.getAgogosObjects()).pipe(
+        defer((): Promise<AggObjByNameByKind> => source.getAgogosObjects()).pipe(
             map(sourceData => renameSubKeys(sourceName, sourceData)),
             emitAndWait(5000) as OperatorFunction<
-                GqlObjByNameByKind,
-                GqlObjByNameByKind
+                AggObjByNameByKind,
+                AggObjByNameByKind
             >,
             catchError(err => {
                 console.warn("Error getting schema from source", source, err);
                 return empty();
             }),
             repeat(),
-            startWith({} as GqlObjByNameByKind)
+            startWith({} as AggObjByNameByKind)
         )
     ),
     combineAll(),
