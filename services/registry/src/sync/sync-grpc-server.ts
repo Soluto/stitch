@@ -1,96 +1,108 @@
 import * as grpc from "grpc";
-import { combineLatest } from "rxjs";
+import { combineLatest, Observable, pipe } from "rxjs";
 import {
-  ConfigurationMessage,
-  Schema,
-  SubscribeParams,
-  Upstream,
-  UpstreamAuthentication,
-  UpstreamAuthCredentials
+    filter, concatMap, map,
+} from "rxjs/operators";
+import {
+    ConfigurationMessage,
+    Schema,
+    SubscribeParams,
+    Upstream,
+    UpstreamAuthentication,
+    UpstreamAuthCredentials
 } from "../generated/agogos_pb";
 import { IRegistryServer, RegistryService } from "../generated/agogos_grpc_pb";
 
 import syncSchema$ from "./sync-schemas";
 import syncUpstreams$ from "./sync-upstreams";
-import syncAuthProvider$ from "./sync-upstream-auth-credentials";
+import syncUpstreamAuthCredentials$ from "./sync-upstream-auth-credentials";
+import { validateConfiguration } from "../validation";
+import { AgogosConfiguration } from "./object-types";
 
 const PORT = process.env.GRPC_PORT || 4001;
 
 // TODO: make this more general
-const syncConfiguration$ = combineLatest(
-  [syncSchema$, syncUpstreams$, syncAuthProvider$],
-  (schema, upstreams, upstreamAuthCredentials) => ({
-    schema,
-    upstreams,
-    upstreamAuthCredentials
-  })
+const syncConfiguration$: Observable<AgogosConfiguration> = combineLatest(
+    [syncSchema$, syncUpstreams$, syncUpstreamAuthCredentials$],
+    (schema, upstreams, upstreamAuthCredentials) => ({
+        schema,
+        upstreams,
+        upstreamAuthCredentials
+    })
 );
 
 class GqlConfigurationSubscriptionServer implements IRegistryServer {
-  subscribe(call: grpc.ServerWriteableStream<SubscribeParams>) {
-    const subscription = syncConfiguration$.subscribe(
-      configuration => {
-        const gqlSchema = new Schema();
-        gqlSchema.setDefinition(configuration.schema);
+    subscribe(call: grpc.ServerWriteableStream<SubscribeParams>) {
+        const subscription = syncConfiguration$.pipe(
+            concatMap(
+                (cfg: AgogosConfiguration) => validateConfiguration(cfg),
+                (cfg, isValid) => ({ cfg, isValid }),
+            ),
+            filter(a => a.isValid),
+            map(x => x.cfg),
+        ).subscribe(
+            (configuration: AgogosConfiguration) => {
+                const gqlSchema = new Schema();
+                gqlSchema.setDefinition(configuration.schema);
 
-        // TODO: extract to function
-        const upstreams: Upstream[] = Object.values(
-          configuration.upstreams
-        ).map(ep => {
-          const upstream = new Upstream();
-          upstream.setHost(ep.host);
+                // TODO: extract to function
+                const upstreams: Upstream[] = Object.values(
+                    configuration.upstreams
+                ).map(ep => {
+                    const upstream = new Upstream();
+                    upstream.setHost(ep.host);
 
-          const upstreamAuth = new UpstreamAuthentication();
-          // FIXME: get from ep
-          upstreamAuth.setAuthType(ep.auth.authType);
-          upstreamAuth.setAuthority(ep.auth.authority);
-          upstreamAuth.setScope(ep.auth.scope);
-          upstream.setAuth(upstreamAuth);
+                    const upstreamAuth = new UpstreamAuthentication();
+                    // FIXME: get from ep
+                    upstreamAuth.setAuthType(ep.auth.type);
+                    upstreamAuth.setAuthority(ep.auth.authority);
+                    upstreamAuth.setScope(ep.auth.scope);
+                    upstream.setAuth(upstreamAuth);
 
-          return upstream;
-        });
+                    return upstream;
+                });
 
-        // TODO: extract to function
-        const upstreamsAuthCredentials: UpstreamAuthCredentials[] = Object.values(
-          configuration.upstreamAuthCredentials
-        ).map(ap => {
-          const upstreamAuthCredentials = new UpstreamAuthCredentials();
-          upstreamAuthCredentials.setAuthType(ap.authType);
-          upstreamAuthCredentials.setAuthority(ap.authority);
-          upstreamAuthCredentials.setClientId(ap.clientId);
-          upstreamAuthCredentials.setClientSecret(ap.clientSecret);
+                // TODO: extract to function
+                const upstreamsAuthCredentials: UpstreamAuthCredentials[] = Object.values(
+                    configuration.upstreamAuthCredentials
+                ).map(ap => {
+                    const upstreamAuthCredentials = new UpstreamAuthCredentials();
+                    upstreamAuthCredentials.setAuthType(ap.type);
+                    upstreamAuthCredentials.setAuthority(ap.authority);
+                    upstreamAuthCredentials.setClientId(ap.clientId);
+                    upstreamAuthCredentials.setClientSecret(ap.clientSecret);
 
-          return upstreamAuthCredentials;
-        });
+                    return upstreamAuthCredentials;
+                });
 
-        const configurationMessage = new ConfigurationMessage();
-        configurationMessage.setSchema(gqlSchema);
-        configurationMessage.setUpstreamsList(upstreams);
-        configurationMessage.setUpstreamAuthCredentialsList(
-          upstreamsAuthCredentials
+                const configurationMessage = new ConfigurationMessage();
+                configurationMessage.setSchema(gqlSchema);
+                configurationMessage.setUpstreamsList(upstreams);
+                configurationMessage.setUpstreamAuthCredentialsList(
+                    upstreamsAuthCredentials
+                );
+
+                call.write(configurationMessage);
+            },
+            e => {
+                console.log("====================================");
+                console.log(e);
+                console.log("====================================");
+            },
+            () => call.end()
         );
 
-        call.write(configurationMessage);
-      },
-      e => {
-        console.log("====================================");
-        console.log(e);
-        console.log("====================================");
-      },
-      () => call.end()
-    );
-
-    const endStream = () => subscription.unsubscribe();
-    call.on("close", endStream);
-    call.on("end", endStream);
-    call.on("error", endStream);
-  }
+        const endStream = () => subscription.unsubscribe();
+        call.on("close", endStream);
+        call.on("end", endStream);
+        call.on("error", endStream);
+    }
 }
 
 export function startGrpcServer() {
-  var server = new grpc.Server();
-  server.addService(RegistryService, new GqlConfigurationSubscriptionServer());
-  server.bind(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure());
-  server.start();
-  console.log(`🚀 GRPC Server ready at localhost:${PORT}`);
+    var server = new grpc.Server();
+    server.addService(RegistryService, new GqlConfigurationSubscriptionServer());
+    server.bind(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure());
+    server.start();
+    console.log(`🚀 GRPC Server ready at localhost:${PORT}`);
 }
