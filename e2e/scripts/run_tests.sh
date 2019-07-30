@@ -142,7 +142,7 @@ parse_options() {
 
     if [[ -z "$KIND_VERSION" ]]
     then
-        KIND_VERSION="0.3.0"
+        KIND_VERSION="0.4.0"
     fi
 
     if [[ -z "$KUBECTL_VERSION" ]]
