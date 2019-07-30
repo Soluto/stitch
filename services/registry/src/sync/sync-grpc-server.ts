@@ -1,8 +1,5 @@
 import * as grpc from "grpc";
-import { combineLatest, Observable, pipe } from "rxjs";
-import {
-    filter, concatMap, map,
-} from "rxjs/operators";
+import { combineLatest, Observable } from "rxjs";
 import {
     ConfigurationMessage,
     Schema,
@@ -16,7 +13,6 @@ import { IRegistryServer, RegistryService } from "../generated/agogos_grpc_pb";
 import syncSchema$ from "./sync-schemas";
 import syncUpstreams$ from "./sync-upstreams";
 import syncUpstreamAuthCredentials$ from "./sync-upstream-auth-credentials";
-import { validateConfiguration } from "../validation";
 import { AgogosConfiguration } from "./object-types";
 
 const PORT = process.env.GRPC_PORT || 4001;
@@ -33,14 +29,7 @@ const syncConfiguration$: Observable<AgogosConfiguration> = combineLatest(
 
 class GqlConfigurationSubscriptionServer implements IRegistryServer {
     subscribe(call: grpc.ServerWriteableStream<SubscribeParams>) {
-        const subscription = syncConfiguration$.pipe(
-            concatMap(
-                (cfg: AgogosConfiguration) => validateConfiguration(cfg),
-                (cfg, isValid) => ({ cfg, isValid }),
-            ),
-            filter(a => a.isValid),
-            map(x => x.cfg),
-        ).subscribe(
+        const subscription = syncConfiguration$.subscribe(
             (configuration: AgogosConfiguration) => {
                 const gqlSchema = new Schema();
                 gqlSchema.setDefinition(configuration.schema);

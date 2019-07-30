@@ -22,7 +22,3 @@ export const validateNewObject = async (name: string, kind: string, source: stri
     }
     await validators[kind].call(null, source, name, spec);
 };
-
-export const validateConfiguration = async (configuration: AgogosConfiguration): Promise<boolean> => {
-    return true;
-};
