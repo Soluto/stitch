@@ -1,34 +1,34 @@
-export type SchemaConfig = {
+export interface ISchemaConfig {
     definition: string;
-};
+}
 
-export type UpstreamConfig = {
+export interface IUpstreamConfig {
     host: string;
-    headers: {
+    headers: Array<{
         name: string;
         value: string;
-    }[];
+    }>;
     auth: {
         authType: string;
         authority: string;
         scope: string;
     };
-};
+}
 
-export type UpstreamAuthCredentialsConfig = {
+export interface IUpstreamAuthCredentialsConfig {
     authType: string;
     authority: string;
     clientId: string;
     clientSecret: string;
-};
+}
 
 export type AgogosObjectConfig =
-    | SchemaConfig
-    | UpstreamConfig
-    | UpstreamAuthCredentialsConfig;
+    | ISchemaConfig
+    | IUpstreamConfig
+    | IUpstreamAuthCredentialsConfig;
 
-export type AgogosConfiguration = {
+export interface IAgogosConfiguration {
     schema: string,
-    upstreams: { [name: string]: UpstreamConfig },
-    upstreamAuthCredentials: { [name: string]: UpstreamAuthCredentialsConfig },
-};
+    upstreams: { [name: string]: IUpstreamConfig },
+    upstreamAuthCredentials: { [name: string]: IUpstreamAuthCredentialsConfig },
+}

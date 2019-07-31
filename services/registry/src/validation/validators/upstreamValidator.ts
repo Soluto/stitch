@@ -1,7 +1,8 @@
-import { take, map, filter } from "rxjs/operators";
+// tslint:disable-next-line:no-submodule-imports
+import { map, take } from "rxjs/operators";
 
+import { AgogosObjectConfig, IUpstreamConfig } from "../../sync/object-types";
 import gqlObjects$ from "../../sync/sync-service";
-import { AgogosObjectConfig, UpstreamConfig } from "../../sync/object-types";
 
 const validateUpstream = async (
     source: string,
@@ -15,7 +16,7 @@ const validateUpstream = async (
         )
         .toPromise();
     const newUpstreams = { ...upstreams, [`${source}.${name}`]: spec };
-    const hosts = Object.values(newUpstreams).map((u: UpstreamConfig) => u.host);
+    const hosts = Object.values(newUpstreams).map((u: IUpstreamConfig) => u.host);
     if (hosts.length !== (new Set(hosts)).size) {
         throw new Error("Duplicate hosts found.");
     }

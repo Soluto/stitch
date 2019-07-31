@@ -1,23 +1,25 @@
-import { map, shareReplay, distinctUntilChanged, filter } from "rxjs/operators";
+// tslint:disable-next-line:no-submodule-imports
 import { print } from "graphql/language/printer";
+// tslint:disable-next-line:no-submodule-imports
+import { distinctUntilChanged, filter, map, shareReplay } from "rxjs/operators";
 
-import gqlObjects$, { AggObjsByName } from "./sync-service";
+import gqlObjects$, { IAggObjsByName } from "./sync-service";
 
+import { DocumentNode } from "graphql";
 import gql from "graphql-tag";
 import { mergeDocuments } from "../graphql/schema-utils";
-import { DocumentNode } from "graphql";
-import { SchemaConfig } from "./object-types";
+import { ISchemaConfig } from "./object-types";
 
 function parseGqlSource(schemaName: string, schema: string) {
     try {
         return gql(schema);
     } catch (e) {
         throw {
+            error: e,
             message: `Failed to load schema for source -  ${schemaName} - ${
                 e.message
                 }`,
             schema: { schemaName, schema },
-            error: e
         };
     }
 }
@@ -27,16 +29,16 @@ function mergeAllDocuments(docs: DocumentNode[]) {
         return mergeDocuments(docs);
     } catch (e) {
         throw {
+            error: e,
             message: `Failed to merge schemas - ${e.message}`,
             schemas: docs,
-            error: e
         };
     }
 }
 
-export const makeGqlDocumentFromGqlSources = (gqlSchemas: AggObjsByName) => {
+export const makeGqlDocumentFromGqlSources = (gqlSchemas: IAggObjsByName) => {
     const documentNodes = Object.entries(gqlSchemas).map(
-        ([schemaName, schema]: [string, SchemaConfig]) =>
+        ([schemaName, schema]: [string, ISchemaConfig]) =>
             parseGqlSource(schemaName, schema.definition)
     );
     return mergeAllDocuments(documentNodes);

@@ -1,20 +1,19 @@
-import createFileSource from "./sources/file";
-import { remoteSource } from "./sources";
-import Source from "./sources";
-import * as R from "ramda";
 import nconf = require("nconf");
+import * as R from "ramda";
+import ISource, { remoteSource } from "./sources";
+import createFileSource from "./sources/file";
 
-const remoteSources: { [source: string]: Source } = R.map(
-  url => remoteSource(url),
-  nconf.get("REMOTESOURCE") || {}
+const remoteSources: { [source: string]: ISource } = R.map(
+    url => remoteSource(url),
+    nconf.get("REMOTESOURCE") || {}
 );
 
 // TODO: check relative and absolute paths
 const BUILTIN_RESOURCES_FOLDER = "./builtin-resources";
 
-const sources: { [source: string]: Source } = {
-  builtin: createFileSource(BUILTIN_RESOURCES_FOLDER),
-  ...remoteSources
+const sources: { [source: string]: ISource } = {
+    builtin: createFileSource(BUILTIN_RESOURCES_FOLDER),
+    ...remoteSources
 };
 
 export default sources;

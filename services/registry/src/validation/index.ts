@@ -1,15 +1,15 @@
-import { AgogosConfiguration, AgogosObjectConfig } from "../sync/object-types";
+import { AgogosObjectConfig } from "../sync/object-types";
 import validateSchema from "./validators/schemaValidator";
-import validateUpstream from "./validators/upstreamValidator";
 import validateUpstreamClientCredentials from "./validators/upstreamClientCredentialsValidator";
+import validateUpstream from "./validators/upstreamValidator";
 
 type ValidatorFunc = (source: string, name: string, spec: AgogosObjectConfig) => Promise<void>
 
-type ValidatorDictionary = {
+interface IValidatorDictionary {
     [kind: string]: ValidatorFunc;
 }
 
-const validators: ValidatorDictionary = {
+const validators: IValidatorDictionary = {
     schema: validateSchema,
     upstream: validateUpstream,
     upstreamclientcredentials: validateUpstreamClientCredentials,
