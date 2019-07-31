@@ -1,19 +1,19 @@
-import https = require("https");
-import * as express from "express";
 import bodyParser = require("body-parser");
+import * as express from "express";
+import https = require("https");
 import fetch from "node-fetch";
 import { AgogosObjectConfig } from "./object-types";
 
-var options = {
-    key: process.env.PLATFORM_SSL_KEY,
+const options = {
     cert: process.env.PLATFORM_SSL_CERT,
     graphqlRegistryUrl: process.env.REGISTRY_URL,
+    key: process.env.PLATFORM_SSL_KEY,
     sourceName: process.env.GRAPHQL_SOURCE_NAME || "KUBERNETES"
 };
 
 const app = express();
 
-type WebhookRequest = {
+interface IWebhookRequest {
     apiVersion: string,
     kind: string,
     request: {
@@ -29,7 +29,7 @@ type WebhookRequest = {
     }
 }
 
-type WebhookResponse = {
+interface IWebhookResponse {
     apiVersion: string,
     kind: string,
     response: {
@@ -40,20 +40,20 @@ type WebhookResponse = {
             code: number,
         },
     },
-};
+}
 
-const buildResponse = (req: express.Request, message: string, code: number = 200): WebhookResponse => {
+const buildResponse = (req: express.Request, message: string, code: number = 200): IWebhookResponse => {
     const { apiVersion, kind, request: { uid } } = req.body;
     return {
         apiVersion,
         kind,
         response: {
-            uid,
             allowed: code === 200,
             status: {
                 code,
                 message,
             },
+            uid,
         },
     };
 };
@@ -67,7 +67,7 @@ app.post("/validate", bodyParser.json(), async (req: express.Request, res: expre
         res.json(buildResponse(req, "Only HTTPS protocol supported", 401));
         return;
     }
-    const requestBody: WebhookRequest = req.body;
+    const requestBody: IWebhookRequest = req.body;
     if (!requestBody) {
         res.json(buildResponse(req, "Expected AdmissionReview request body.\n\t\tsee https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#webhook-request-and-response for more details", 400))
         return;
@@ -81,11 +81,11 @@ app.post("/validate", bodyParser.json(), async (req: express.Request, res: expre
         const result = await fetch(
             `${options.graphqlRegistryUrl}/validate/${options.sourceName}/${vldObj.kind.toLowerCase()}/${source}`,
             {
-                method: "POST",
                 body: JSON.stringify(spec, null, 4),
                 headers: {
                     'Content-Type': "application/json",
                 },
+                method: "POST",
             },
         );
         if (!result.ok) {

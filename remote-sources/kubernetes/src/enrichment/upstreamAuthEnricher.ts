@@ -1,5 +1,5 @@
 import k8s = require('@kubernetes/client-node');
-import { AgogosCustomResource, UpstreamClientCredentialsConfig } from '../object-types';
+import { AgogosCustomResource, IUpstreamClientCredentialsConfig } from '../object-types';
 
 const k8sConfig = new k8s.KubeConfig();
 k8sConfig.loadFromCluster();
@@ -7,8 +7,8 @@ k8sConfig.loadFromCluster();
 const client = k8sConfig.makeApiClient(k8s.CoreV1Api);
 
 export default async (
-    resource: AgogosCustomResource<UpstreamClientCredentialsConfig>
-): Promise<UpstreamClientCredentialsConfig> => {
+    resource: AgogosCustomResource<IUpstreamClientCredentialsConfig>
+): Promise<IUpstreamClientCredentialsConfig> => {
     const { spec } = resource;
     if (typeof spec.clientSecret === 'string') {
         return spec;
