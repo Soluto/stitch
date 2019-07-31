@@ -3,6 +3,7 @@ import * as k8s from "@kubernetes/client-node";
 import createKubeSource from "./remote-source";
 import "array-flat-polyfill";
 import admission from "./admission";
+import logger, { loggingMiddleware } from "./logger";
 
 const PORT = process.env.PORT || 3000; // Replace this
 
@@ -18,8 +19,14 @@ const kubeSource = createKubeSource(kubeClient);
 
 const app = express();
 
+app.use(loggingMiddleware);
+
 app.get("/health", async (_: express.Request, res: express.Response) =>
-    res.send(true)
+    res.send(true),
+);
+
+app.get("/metrics", (_: express.Request, res: express.Response) =>
+    res.send(true),
 );
 
 app.get("/", async (_: express.Request, res: express.Response) => {
@@ -28,7 +35,7 @@ app.get("/", async (_: express.Request, res: express.Response) => {
         res.send(gqlObjects);
         return;
     } catch (error) {
-        console.warn(`Failed to get objects from source kubernetes`, {
+        logger.warn(`Failed to get objects from source kubernetes`, {
             error
         });
         res.sendStatus(500);
@@ -37,7 +44,7 @@ app.get("/", async (_: express.Request, res: express.Response) => {
 });
 
 app.listen({ port: PORT }, () =>
-    console.log(`K8S gql controller ready at http://localhost:${PORT}`)
+    logger.info(`K8S gql controller ready at http://localhost:${PORT}`)
 );
 
 admission.start();

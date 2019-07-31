@@ -1,4 +1,5 @@
 import nconf = require("nconf");
+import logger, { loggingMiddleware } from "./logger";
 nconf.env("__");
 
 import * as express from "express";
@@ -10,14 +11,20 @@ const PORT = process.env.PORT || 4000;
 
 const app = express();
 
-app.use("/health", async (_: express.Request, res: express.Response) =>
-  res.send(true)
+app.use(loggingMiddleware);
+
+app.get("/health", (_: express.Request, res: express.Response) =>
+    res.send(true),
 );
-app.use("/schema", gqlSchemaRoute);
-app.use("/validate", validateRoute);
+app.get("/metrics", (_: express.Request, res: express.Response) =>
+    res.send(true),
+);
+
+app.get("/schema", gqlSchemaRoute);
+app.post("/validate", validateRoute);
 
 app.listen({ port: PORT }, () =>
-  console.log(`🚀 HTTP Server ready at http://localhost:${PORT}`)
+    logger.info(`🚀 HTTP Server ready at http://localhost:${PORT}`),
 );
 
 startGrpcServer();

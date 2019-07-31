@@ -15,6 +15,7 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "express-pino-logger": "^4.0.0",
     "glob": "^7.1.3",
     "google-protobuf": "^3.7.0",
     "graphql": "^14.1.1",
@@ -23,6 +24,8 @@
     "mime-types": "^2.1.24",
     "nconf": "^0.10.0",
     "node-fetch": "^2.3.0",
+    "pino": "^5.13.1",
+    "pino-pretty": "^3.2.0",
     "ramda": "^0.26.1",
     "rxjs": "^6.4.0"
   },
@@ -34,7 +37,9 @@
     "@types/jest": "^24.0.11",
     "@types/mime-types": "^2.1.0",
     "@types/nconf": "^0.10.0",
+    "@types/node": "^12.6.8",
     "@types/node-fetch": "^2.1.6",
+    "@types/pino": "^5.8.8",
     "@types/protobufjs": "^6.0.0",
     "@types/ramda": "^0.25.50",
     "jest": "^24.3.1",
