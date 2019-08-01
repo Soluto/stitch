@@ -6,16 +6,16 @@ export default interface Source {
     putAgogosObject(name: string, kind: string, definition: AgogosObjectConfig): Promise<void>;
 }
 
-export function remoteSource(remoteSourceHost: String): Source {
+export function remoteSource(remoteSourceHost: string): Source {
     return {
         async getAgogosObjects() {
             const res = await fetch(`${remoteSourceHost}`);
-            return await res.json();
+            return res.json();
         },
         async putAgogosObject(name: string, kind: string, definition: AgogosObjectConfig) {
             await fetch(`${remoteSourceHost}/${kind}/${name}`, {
-                method: "POST",
                 body: JSON.stringify(definition),
+                method: "POST",
             });
         }
     };

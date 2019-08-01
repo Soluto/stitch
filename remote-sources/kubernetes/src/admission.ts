@@ -1,13 +1,13 @@
-import https = require("https");
-import * as express from "express";
 import bodyParser = require("body-parser");
+import * as express from "express";
+import https = require("https");
 import fetch from "node-fetch";
 import { AgogosObjectConfig } from "./object-types";
 
-var options = {
-    key: process.env.PLATFORM_SSL_KEY,
+const options = {
     cert: process.env.PLATFORM_SSL_CERT,
     graphqlRegistryUrl: process.env.REGISTRY_URL,
+    key: process.env.PLATFORM_SSL_KEY,
     sourceName: process.env.GRAPHQL_SOURCE_NAME || "KUBERNETES"
 };
 
@@ -40,7 +40,7 @@ type WebhookResponse = {
             code: number,
         },
     },
-};
+}
 
 const buildResponse = (req: express.Request, message: string, code: number = 200): WebhookResponse => {
     const { apiVersion, kind, request: { uid } } = req.body;
@@ -48,12 +48,12 @@ const buildResponse = (req: express.Request, message: string, code: number = 200
         apiVersion,
         kind,
         response: {
-            uid,
             allowed: code === 200,
             status: {
                 code,
                 message,
             },
+            uid,
         },
     };
 };
@@ -81,11 +81,11 @@ app.post("/validate", bodyParser.json(), async (req: express.Request, res: expre
         const result = await fetch(
             `${options.graphqlRegistryUrl}/validate/${options.sourceName}/${vldObj.kind.toLowerCase()}/${source}`,
             {
-                method: "POST",
                 body: JSON.stringify(spec, null, 4),
                 headers: {
                     'Content-Type': "application/json",
                 },
+                method: "POST",
             },
         );
         if (!result.ok) {

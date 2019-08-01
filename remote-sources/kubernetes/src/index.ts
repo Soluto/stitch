@@ -1,9 +1,9 @@
-import * as express from "express";
 import * as k8s from "@kubernetes/client-node";
-import createKubeSource from "./remote-source";
 import "array-flat-polyfill";
+import * as express from "express";
 import admission from "./admission";
 import logger, { loggingMiddleware } from "./logger";
+import createKubeSource from "./remote-source";
 
 const PORT = process.env.PORT || 3000; // Replace this
 

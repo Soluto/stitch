@@ -1,7 +1,8 @@
-import { take, map, filter } from "rxjs/operators";
+// tslint:disable-next-line:no-submodule-imports
+import { map, take } from "rxjs/operators";
 
-import gqlObjects$ from "../../sync/sync-service";
 import { AgogosObjectConfig, UpstreamConfig } from "../../sync/object-types";
+import gqlObjects$ from "../../sync/sync-service";
 
 const validateUpstream = async (
     source: string,

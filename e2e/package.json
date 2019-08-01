@@ -3,18 +3,22 @@
     "version": "1.0.0",
     "license": "MIT",
     "scripts": {
-        "test": "mocha --require ts-node/register ./**/*.spec.ts --exit"
+        "test": "mocha --require ts-node/register ./**/*.spec.ts --exit",
+        "tslint-check": "tslint-config-prettier-check ./tslint.json"
     },
     "devDependencies": {
         "@types/axios": "0.14.0",
         "@types/chai": "4.1.7",
         "@types/chai-as-promised": "7.1.0",
         "@types/mocha": "5.2.7",
-        "@types/node": "12.0.10",
+        "@types/node": "12.6.8",
         "@types/wait-on": "3.2.0",
-        "mocha": "6.1.4",
+        "mocha": "6.2.0",
         "ts-node": "8.3.0",
-        "typescript": "3.5.2"
+        "tslint": "5.18.0",
+        "tslint-config-prettier": "1.18.0",
+        "tslint-eslint-rules": "5.4.0",
+        "typescript": "3.5.3"
     },
     "dependencies": {
         "@kubernetes/client-node": "0.10.2",
@@ -23,6 +27,6 @@
         "chai-as-promised": "7.1.1",
         "graphql-request": "1.8.2",
         "querystring": "0.2.0",
-        "wait-on": "3.2.0"
+        "wait-on": "3.3.0"
     }
 }

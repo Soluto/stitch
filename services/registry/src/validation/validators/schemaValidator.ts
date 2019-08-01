@@ -1,8 +1,9 @@
-import { take, map, filter } from "rxjs/operators";
+// tslint:disable-next-line:no-submodule-imports
+import { filter, map, take } from "rxjs/operators";
 
-import gqlObjects$ from "../../sync/sync-service";
-import { makeGqlDocumentFromGqlSources } from "../../sync/sync-schemas";
 import { AgogosObjectConfig } from "../../sync/object-types";
+import { makeGqlDocumentFromGqlSources } from "../../sync/sync-schemas";
+import gqlObjects$ from "../../sync/sync-service";
 
 const validateSchema = async (
     source: string,

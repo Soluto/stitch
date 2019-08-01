@@ -1,5 +1,5 @@
+import { AgogosCustomResource, AgogosObjectConfig } from '../object-types';
 import upstreamAuthEnricher from './upstreamAuthEnricher';
-import { AgogosObjectConfig, AgogosCustomResource } from '../object-types';
 
 const enrichers: {
     [kind: string]: (obj: AgogosCustomResource) => Promise<AgogosObjectConfig>;
