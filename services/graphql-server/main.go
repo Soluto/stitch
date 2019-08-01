@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"time"
 
+	"agogos/metrics"
+
 	"github.com/graphql-go/handler"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -55,13 +56,16 @@ func main() {
 		}
 	}()
 
-	mainHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	graphqlHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if graphqlHTTPHandler != nil {
 			graphqlHTTPHandler.ServeHTTP(w, r)
 		} else {
 			http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
 		}
 	})
+	metricsHandler := metrics.Init()
+
+	mainHandler := metrics.InstrumentHandler(graphqlHandler)
 
 	healthHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
@@ -70,6 +74,6 @@ func main() {
 
 	http.Handle("/graphql", mainHandler)
 	http.Handle("/health", healthHandler)
-	http.Handle("/metrics", promhttp.Handler())
+	http.Handle("/metrics", metricsHandler)
 	http.ListenAndServe(":8011", nil)
 }
