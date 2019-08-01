@@ -1,9 +1,9 @@
-import * as express from "express";
 import * as bodyParser from "body-parser";
-import sources, { defaultSource } from "../sources-config";
-import syncSchema$ from "../sync/sync-service";
+import * as express from "express";
 import { take } from "rxjs/operators";
+import sources, { defaultSource } from "../sources-config";
 import { AgogosObjectConfig } from "../sync/object-types";
+import syncSchema$ from "../sync/sync-service";
 
 const app = express();
 

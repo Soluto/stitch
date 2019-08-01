@@ -1,11 +1,18 @@
 {
     "defaultSeverity": "error",
     "extends": [
-        "tslint:latest",
+        "tslint:recommended",
         "tslint-eslint-rules",
         "tslint-config-prettier"
     ],
-    "jsRules": {},
-    "rules": {},
-    "rulesDirectory": []
+    "linterOptions": {
+        "exclude": [
+            "node_modules/**/*.ts"
+        ]
+    },
+    "rules": {
+        "interface-name": [true, "never-prefix"],
+        "interface-over-type-literal": false,
+        "object-literal-sort-keys": false
+    }
 }

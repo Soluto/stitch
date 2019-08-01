@@ -41,7 +41,6 @@ describe('User service', () => {
                 }
             }
         }`);
-        // tslint:disable-next-line:no-unused-expression
         expect(response).to.exist;
         expect(response).to.deep.equal(expectedResponse);
     });

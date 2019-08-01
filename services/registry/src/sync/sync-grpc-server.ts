@@ -10,7 +10,7 @@ import {
     UpstreamAuthentication
 } from "../generated/agogos_pb";
 
-import { IAgogosConfiguration } from "./object-types";
+import { AgogosConfiguration } from "./object-types";
 import syncSchema$ from "./sync-schemas";
 import syncUpstreamAuthCredentials$ from "./sync-upstream-auth-credentials";
 import syncUpstreams$ from "./sync-upstreams";
@@ -18,7 +18,7 @@ import syncUpstreams$ from "./sync-upstreams";
 const PORT = process.env.GRPC_PORT || 4001;
 
 // TODO: make this more general
-const syncConfiguration$: Observable<IAgogosConfiguration> = combineLatest(
+const syncConfiguration$: Observable<AgogosConfiguration> = combineLatest(
     [syncSchema$, syncUpstreams$, syncUpstreamAuthCredentials$],
     (schema, upstreams, upstreamAuthCredentials) => ({
         schema,
@@ -30,7 +30,7 @@ const syncConfiguration$: Observable<IAgogosConfiguration> = combineLatest(
 class GqlConfigurationSubscriptionServer implements IRegistryServer {
     public subscribe(call: grpc.ServerWriteableStream<SubscribeParams>) {
         const subscription = syncConfiguration$.subscribe(
-            (configuration: IAgogosConfiguration) => {
+            (configuration: AgogosConfiguration) => {
                 const gqlSchema = new Schema();
                 gqlSchema.setDefinition(configuration.schema);
 

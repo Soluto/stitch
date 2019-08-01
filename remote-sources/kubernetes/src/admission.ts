@@ -13,7 +13,7 @@ const options = {
 
 const app = express();
 
-interface IWebhookRequest {
+type WebhookRequest = {
     apiVersion: string,
     kind: string,
     request: {
@@ -29,7 +29,7 @@ interface IWebhookRequest {
     }
 }
 
-interface IWebhookResponse {
+type WebhookResponse = {
     apiVersion: string,
     kind: string,
     response: {
@@ -42,7 +42,7 @@ interface IWebhookResponse {
     },
 }
 
-const buildResponse = (req: express.Request, message: string, code: number = 200): IWebhookResponse => {
+const buildResponse = (req: express.Request, message: string, code: number = 200): WebhookResponse => {
     const { apiVersion, kind, request: { uid } } = req.body;
     return {
         apiVersion,
@@ -67,7 +67,7 @@ app.post("/validate", bodyParser.json(), async (req: express.Request, res: expre
         res.json(buildResponse(req, "Only HTTPS protocol supported", 401));
         return;
     }
-    const requestBody: IWebhookRequest = req.body;
+    const requestBody: WebhookRequest = req.body;
     if (!requestBody) {
         res.json(buildResponse(req, "Expected AdmissionReview request body.\n\t\tsee https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/#webhook-request-and-response for more details", 400))
         return;

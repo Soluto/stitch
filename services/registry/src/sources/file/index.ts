@@ -8,7 +8,7 @@ import extractDefinition, { getExtensionByKind } from "./extraction";
 
 const globAsync = util.promisify(glob);
 
-interface INamedAggObject {
+type NamedAggObject = {
     name: string;
     kind: string;
     definition: AgogosObjectConfig;
@@ -46,7 +46,7 @@ const getAggObjectsByKind = async (
     kind: string
 ): Promise<{ kind: string; objects: { [name: string]: string } }> => {
     const files = await globAsync(`${folder}/${kind}/**/*.{gql,json}`);
-    const getAggObjectFromFiles: Array<Promise<INamedAggObject>> = files.map(
+    const getAggObjectFromFiles: Array<Promise<NamedAggObject>> = files.map(
         async (file: string) => {
             const fileNameMatch = file.match(/([^\/]+)(?=\.\w+$)/);
             if (!fileNameMatch) { throw new Error("error extracting filename"); }

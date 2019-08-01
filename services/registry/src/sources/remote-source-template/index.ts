@@ -1,5 +1,5 @@
-import * as express from "express";
 import * as bodyParser from "body-parser";
+import * as express from "express";
 
 const PORT = 0; // Replace this
 const REMOTE_SOURCE_NAME = "REMOTE SOURCE NAME"; // Replace this

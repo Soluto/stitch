@@ -5,11 +5,11 @@ import validateUpstream from "./validators/upstreamValidator";
 
 type ValidatorFunc = (source: string, name: string, spec: AgogosObjectConfig) => Promise<void>
 
-interface IValidatorDictionary {
+type ValidatorDictionary = {
     [kind: string]: ValidatorFunc;
 }
 
-const validators: IValidatorDictionary = {
+const validators: ValidatorDictionary = {
     schema: validateSchema,
     upstream: validateUpstream,
     upstreamclientcredentials: validateUpstreamClientCredentials,

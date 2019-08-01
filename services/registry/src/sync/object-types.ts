@@ -1,8 +1,8 @@
-export interface ISchemaConfig {
+export type SchemaConfig = {
     definition: string;
 }
 
-export interface IUpstreamConfig {
+export type UpstreamConfig = {
     host: string;
     headers: Array<{
         name: string;
@@ -15,7 +15,7 @@ export interface IUpstreamConfig {
     };
 }
 
-export interface IUpstreamAuthCredentialsConfig {
+export type UpstreamAuthCredentialsConfig = {
     authType: string;
     authority: string;
     clientId: string;
@@ -23,12 +23,12 @@ export interface IUpstreamAuthCredentialsConfig {
 }
 
 export type AgogosObjectConfig =
-    | ISchemaConfig
-    | IUpstreamConfig
-    | IUpstreamAuthCredentialsConfig;
+    | SchemaConfig
+    | UpstreamConfig
+    | UpstreamAuthCredentialsConfig;
 
-export interface IAgogosConfiguration {
+export type AgogosConfiguration = {
     schema: string,
-    upstreams: { [name: string]: IUpstreamConfig },
-    upstreamAuthCredentials: { [name: string]: IUpstreamAuthCredentialsConfig },
+    upstreams: { [name: string]: UpstreamConfig },
+    upstreamAuthCredentials: { [name: string]: UpstreamAuthCredentialsConfig },
 }

@@ -1,10 +1,10 @@
 import k8s = require('@kubernetes/client-node');
 
-export interface ISchemaConfig {
+export type SchemaConfig = {
     definition: string;
 }
 
-export interface IUpstreamConfig {
+export type UpstreamConfig = {
     host: string;
     headers: Array<{
         name: string;
@@ -17,7 +17,7 @@ export interface IUpstreamConfig {
     };
 }
 
-export interface IUpstreamClientCredentialsConfig {
+export type UpstreamClientCredentialsConfig = {
     authType: string;
     authority: string;
     clientId: string;
@@ -33,7 +33,7 @@ export interface IUpstreamClientCredentialsConfig {
     };
 }
 
-export type AgogosObjectConfig = ISchemaConfig | IUpstreamConfig | IUpstreamClientCredentialsConfig;
+export type AgogosObjectConfig = SchemaConfig | UpstreamConfig | UpstreamClientCredentialsConfig;
 
 export type AgogosCustomResource<T extends AgogosObjectConfig = AgogosObjectConfig> = k8s.KubernetesObject & {
     spec: T;

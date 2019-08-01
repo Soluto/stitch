@@ -3,12 +3,12 @@ import { print } from "graphql/language/printer";
 // tslint:disable-next-line:no-submodule-imports
 import { distinctUntilChanged, filter, map, shareReplay } from "rxjs/operators";
 
-import gqlObjects$, { IAggObjsByName } from "./sync-service";
+import gqlObjects$, { AggObjsByName } from "./sync-service";
 
 import { DocumentNode } from "graphql";
 import gql from "graphql-tag";
 import { mergeDocuments } from "../graphql/schema-utils";
-import { ISchemaConfig } from "./object-types";
+import { SchemaConfig } from "./object-types";
 
 function parseGqlSource(schemaName: string, schema: string) {
     try {
@@ -36,9 +36,9 @@ function mergeAllDocuments(docs: DocumentNode[]) {
     }
 }
 
-export const makeGqlDocumentFromGqlSources = (gqlSchemas: IAggObjsByName) => {
+export const makeGqlDocumentFromGqlSources = (gqlSchemas: AggObjsByName) => {
     const documentNodes = Object.entries(gqlSchemas).map(
-        ([schemaName, schema]: [string, ISchemaConfig]) =>
+        ([schemaName, schema]: [string, SchemaConfig]) =>
             parseGqlSource(schemaName, schema.definition)
     );
     return mergeAllDocuments(documentNodes);

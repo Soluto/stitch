@@ -1,7 +1,7 @@
 // tslint:disable-next-line:no-submodule-imports
 import { map, take } from "rxjs/operators";
 
-import { AgogosObjectConfig, IUpstreamAuthCredentialsConfig } from "../../sync/object-types";
+import { AgogosObjectConfig, UpstreamAuthCredentialsConfig } from "../../sync/object-types";
 import gqlObjects$ from "../../sync/sync-service";
 
 const validateUpstreamClientCredentials = async (
@@ -16,7 +16,7 @@ const validateUpstreamClientCredentials = async (
         )
         .toPromise();
     const newUpstreamClientCredentials = { ...upstreamClientCredentials, [`${source}.${name}`]: spec };
-    const uccs = Object.values(newUpstreamClientCredentials).map((u: IUpstreamAuthCredentialsConfig) => `${u.authType}||${u.authority}||${u.clientId}`);
+    const uccs = Object.values(newUpstreamClientCredentials).map((u: UpstreamAuthCredentialsConfig) => `${u.authType}||${u.authority}||${u.clientId}`);
     if (uccs.length !== (new Set(uccs)).size) {
         throw new Error("Duplicate upstream client credentials found.");
     }
