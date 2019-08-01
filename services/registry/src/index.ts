@@ -20,8 +20,8 @@ app.get("/metrics", (_: express.Request, res: express.Response) =>
     res.send(true),
 );
 
-app.get("/schema", gqlSchemaRoute);
-app.post("/validate", validateRoute);
+app.use("/schema", gqlSchemaRoute);
+app.use("/validate", validateRoute);
 
 app.listen({ port: PORT }, () =>
     logger.info(`🚀 HTTP Server ready at http://localhost:${PORT}`),

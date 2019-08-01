@@ -1,6 +1,7 @@
 import * as bodyParser from "body-parser";
 import * as express from "express";
 
+import logger from "../logger";
 import { AgogosObjectConfig } from "../sync/object-types";
 import { validateNewObject } from "../validation";
 
@@ -15,7 +16,7 @@ const validateSource = async (
     res: express.Response
 ): Promise<void> => {
     try {
-        console.log(`got validation request - ${source}`, {
+        logger.info(`got validation request - ${source}`, {
             name,
             kind,
         });
@@ -24,7 +25,7 @@ const validateSource = async (
 
         res.sendStatus(200);
     } catch (error) {
-        console.warn(`Failed to validate source - ${source}`, {
+        logger.warn(`Failed to validate source - ${source}`, {
             name,
             kind,
             error,

@@ -1,4 +1,5 @@
 import k8s = require('@kubernetes/client-node');
+import logger from '../logger';
 import { AgogosCustomResource, UpstreamClientCredentialsConfig } from '../object-types';
 
 const k8sConfig = new k8s.KubeConfig();
@@ -25,7 +26,7 @@ export default async (
         return enrichedSpec;
     }
 
-    console.warn(
+    logger.warn(
         `Failed enriching UpstreamClientCredentials: ${resource.metadata.namespace}/${
         resource.metadata.name
         }. Something is weird in it.`

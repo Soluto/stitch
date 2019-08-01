@@ -12,6 +12,7 @@ import {
 } from "rxjs/operators";
 import sources from "../sources-config";
 
+import logger from "../logger";
 import { AgogosObjectConfig } from "./object-types";
 
 export type AggObjsByName = { [name: string]: AgogosObjectConfig }
@@ -63,7 +64,7 @@ const gqlObjects$: Observable<AggObjByNameByKind> = from(
                 AggObjByNameByKind
             >,
             catchError(err => {
-                console.warn("Error getting schema from source", source, err);
+                logger.warn("Error getting schema from source", source, err);
                 return empty();
             }),
             repeat(),

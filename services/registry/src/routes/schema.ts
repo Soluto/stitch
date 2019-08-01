@@ -1,6 +1,7 @@
 import * as bodyParser from "body-parser";
 import * as express from "express";
 import { take } from "rxjs/operators";
+import logger from "../logger";
 import sources, { defaultSource } from "../sources-config";
 import { AgogosObjectConfig } from "../sync/object-types";
 import syncSchema$ from "../sync/sync-service";
@@ -12,7 +13,7 @@ const getFromSource = async (source: string, res: express.Response) => {
         const gqlObjects = await sources[source].getAgogosObjects();
         res.send(gqlObjects);
     } catch (error) {
-        console.warn(`Failed to get from source - ${source}`, {
+        logger.warn(`Failed to get from source - ${source}`, {
             error
         });
         res.sendStatus(500);
@@ -30,7 +31,7 @@ const postSource = async (
         await sources[source].putAgogosObject(name, kind, definition);
         res.sendStatus(200);
     } catch (error) {
-        console.warn(`Failed to register schema to source - ${source}`, {
+        logger.warn(`Failed to register schema to source - ${source}`, {
             name,
             kind,
             error

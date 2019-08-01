@@ -4,6 +4,7 @@ import * as express from "express";
 const PORT = 0; // Replace this
 const REMOTE_SOURCE_NAME = "REMOTE SOURCE NAME"; // Replace this
 
+import logger from "../../logger";
 import remoteSource from "./remote-source";
 
 const app = express();
@@ -18,7 +19,7 @@ app.get("/", async (req: express.Request, res: express.Response) => {
         res.send(gqlObjects);
         return;
     } catch (error) {
-        console.warn(`Failed to get from source - ${REMOTE_SOURCE_NAME}`, {
+        logger.warn(`Failed to get from source - ${REMOTE_SOURCE_NAME}`, {
             error
         });
         res.sendStatus(500);
@@ -37,7 +38,7 @@ app
             res.sendStatus(200);
             return;
         } catch (error) {
-            console.warn(
+            logger.warn(
                 `Failed to register schema to source - ${REMOTE_SOURCE_NAME}`,
                 {
                     name,
@@ -51,7 +52,7 @@ app
     });
 
 app.listen({ port: PORT }, () =>
-    console.log(
+    logger.info(
         `Remote source '${REMOTE_SOURCE_NAME}' ready at http://localhost:${PORT}`
     )
 );

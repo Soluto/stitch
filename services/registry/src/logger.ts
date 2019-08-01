@@ -1,5 +1,5 @@
-import * as pino from "pino";
 import * as pinoExpress from "express-pino-logger";
+import * as pino from "pino";
 import * as  printer from "pino-http-print";
 
 

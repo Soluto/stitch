@@ -3,6 +3,7 @@ import * as express from "express";
 import https = require("https");
 import fetch from "node-fetch";
 import { AgogosObjectConfig } from "./object-types";
+import logger from "./logger";
 
 const options = {
     cert: process.env.PLATFORM_SSL_CERT,
@@ -77,7 +78,7 @@ app.post("/validate", bodyParser.json(), async (req: express.Request, res: expre
     const source = encodeURIComponent(`${vldObj.metadata.namespace}.${vldObj.metadata.name}`);
 
     try {
-        console.log(`validating new ${vldObj.kind}: ${source}`);
+        logger.info(`validating new ${vldObj.kind}: ${source}`);
         const result = await fetch(
             `${options.graphqlRegistryUrl}/validate/${options.sourceName}/${vldObj.kind.toLowerCase()}/${source}`,
             {
@@ -91,8 +92,9 @@ app.post("/validate", bodyParser.json(), async (req: express.Request, res: expre
         if (!result.ok) {
             throw new Error(`Validation error: ${result.status}: ${result.statusText}`);
         }
-        console.log(`${source} is valid`);
+        logger.info(`${source} is valid`);
     } catch (e) {
+        logger.error(e, "Error while validating new object");
         res.json(buildResponse(req, e.toString(), 400));
         return;
     }
@@ -101,5 +103,5 @@ app.post("/validate", bodyParser.json(), async (req: express.Request, res: expre
 });
 
 export default {
-    start: () => https.createServer(options, app).listen(443, () => console.log("admission server started to listen on port 443")),
+    start: () => https.createServer(options, app).listen(443, () => logger.info("admission server started to listen on port 443")),
 };

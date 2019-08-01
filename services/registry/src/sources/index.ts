@@ -1,4 +1,5 @@
 import fetch from "node-fetch";
+import logger from "../logger";
 import { AgogosObjectConfig } from "../sync/object-types";
 
 export default interface Source {
@@ -9,8 +10,10 @@ export default interface Source {
 export function remoteSource(remoteSourceHost: string): Source {
     return {
         async getAgogosObjects() {
-            const res = await fetch(`${remoteSourceHost}`);
-            return res.json();
+            const response = await fetch(`${remoteSourceHost}`);
+            const aggObjects = await response.json();
+            logger.debug(`Resources fetched from ${remoteSourceHost}:`, aggObjects);
+            return aggObjects;
         },
         async putAgogosObject(name: string, kind: string, definition: AgogosObjectConfig) {
             await fetch(`${remoteSourceHost}/${kind}/${name}`, {
