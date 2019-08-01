@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/graphql-go/handler"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -69,5 +70,6 @@ func main() {
 
 	http.Handle("/graphql", mainHandler)
 	http.Handle("/health", healthHandler)
+	http.Handle("/metrics", promhttp.Handler())
 	http.ListenAndServe(":8011", nil)
 }

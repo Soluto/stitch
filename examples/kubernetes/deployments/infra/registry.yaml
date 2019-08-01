@@ -23,13 +23,15 @@ spec:
             value: "81"
           - name: REMOTESOURCE__KUBERNETES
             value: http://gql-controller
+          - name: NODE_ENV
+            value: development
         imagePullPolicy: Never
         livenessProbe:
           httpGet:
             path: /health
             port: 80
-          initialDelaySeconds: 3
-          periodSeconds: 3
+          initialDelaySeconds: 5
+          periodSeconds: 10
 ---
 kind: Service
 apiVersion: v1
