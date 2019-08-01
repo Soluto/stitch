@@ -1,19 +1,19 @@
 import * as grpc from "grpc";
 import { combineLatest, Observable } from "rxjs";
+import { IRegistryServer, RegistryService } from "../generated/agogos_grpc_pb";
 import {
     ConfigurationMessage,
     Schema,
     SubscribeParams,
     Upstream,
-    UpstreamAuthentication,
-    UpstreamAuthCredentials
+    UpstreamAuthCredentials,
+    UpstreamAuthentication
 } from "../generated/agogos_pb";
-import { IRegistryServer, RegistryService } from "../generated/agogos_grpc_pb";
 
-import syncSchema$ from "./sync-schemas";
-import syncUpstreams$ from "./sync-upstreams";
-import syncUpstreamAuthCredentials$ from "./sync-upstream-auth-credentials";
 import { AgogosConfiguration } from "./object-types";
+import syncSchema$ from "./sync-schemas";
+import syncUpstreamAuthCredentials$ from "./sync-upstream-auth-credentials";
+import syncUpstreams$ from "./sync-upstreams";
 
 const PORT = process.env.GRPC_PORT || 4001;
 
@@ -22,13 +22,13 @@ const syncConfiguration$: Observable<AgogosConfiguration> = combineLatest(
     [syncSchema$, syncUpstreams$, syncUpstreamAuthCredentials$],
     (schema, upstreams, upstreamAuthCredentials) => ({
         schema,
+        upstreamAuthCredentials,
         upstreams,
-        upstreamAuthCredentials
     })
 );
 
 class GqlConfigurationSubscriptionServer implements IRegistryServer {
-    subscribe(call: grpc.ServerWriteableStream<SubscribeParams>) {
+    public subscribe(call: grpc.ServerWriteableStream<SubscribeParams>) {
         const subscription = syncConfiguration$.subscribe(
             (configuration: AgogosConfiguration) => {
                 const gqlSchema = new Schema();
@@ -89,7 +89,7 @@ class GqlConfigurationSubscriptionServer implements IRegistryServer {
 }
 
 export function startGrpcServer() {
-    var server = new grpc.Server();
+    const server = new grpc.Server();
     server.addService(RegistryService, new GqlConfigurationSubscriptionServer());
     server.bind(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure());
     server.start();

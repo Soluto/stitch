@@ -1,8 +1,8 @@
-import * as express from "express";
 import * as bodyParser from "body-parser";
+import * as express from "express";
 
-import { validateNewObject } from "../validation";
 import { AgogosObjectConfig } from "../sync/object-types";
+import { validateNewObject } from "../validation";
 
 const app = express();
 

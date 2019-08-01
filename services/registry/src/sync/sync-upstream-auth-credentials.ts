@@ -1,8 +1,9 @@
-import gqlObjects$ from "./sync-service";
-import { map, shareReplay, distinctUntilChanged, filter } from "rxjs/operators";
 import * as R from "ramda";
 import { Observable } from "rxjs";
+// tslint:disable-next-line:no-submodule-imports
+import { distinctUntilChanged, map, shareReplay } from "rxjs/operators";
 import { UpstreamAuthCredentialsConfig } from "./object-types";
+import gqlObjects$ from "./sync-service";
 
 const syncUpstreamAuthCredentials$ = gqlObjects$.pipe(
     map(x => x.upstreamclientcredentials || {}),

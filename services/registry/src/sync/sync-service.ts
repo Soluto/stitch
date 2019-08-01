@@ -1,21 +1,21 @@
-import sources from "../sources-config";
-import { defer, from, empty, Observable, OperatorFunction } from "rxjs";
+import { defer, empty, from, Observable, OperatorFunction } from "rxjs";
 import {
-    concat,
-    delay,
-    repeat,
-    map,
-    shareReplay,
     catchError,
     combineAll,
-    tap,
-    startWith
+    concat,
+    delay,
+    map,
+    repeat,
+    shareReplay,
+    startWith,
+    // tslint:disable-next-line:no-submodule-imports
 } from "rxjs/operators";
+import sources from "../sources-config";
 
 import { AgogosObjectConfig } from "./object-types";
 
-export type AggObjsByName = { [name: string]: AgogosObjectConfig };
-export type AggObjByNameByKind = { [kind: string]: AggObjsByName };
+export type AggObjsByName = { [name: string]: AgogosObjectConfig }
+export type AggObjByNameByKind = { [kind: string]: AggObjsByName }
 
 const addSourceToName = (source: string, name: string): string =>
     `${source}.${name}`;
@@ -67,6 +67,7 @@ const gqlObjects$: Observable<AggObjByNameByKind> = from(
                 return empty();
             }),
             repeat(),
+            // tslint:disable-next-line:no-object-literal-type-assertion
             startWith({} as AggObjByNameByKind)
         )
     ),

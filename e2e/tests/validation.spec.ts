@@ -1,7 +1,7 @@
-import * as fs from "fs";
 import k8s = require('@kubernetes/client-node');
 import { expect, use } from "chai";
 import * as chaiAsPromised from "chai-as-promised";
+import * as fs from "fs";
 use(chaiAsPromised);
 
 type AgogosObject = {
@@ -12,7 +12,7 @@ type AgogosObject = {
     },
     kind: string,
     spec: object,
-};
+}
 
 describe("Objects validation", () => {
     const k8sConfig = new k8s.KubeConfig();
@@ -33,9 +33,11 @@ describe("Objects validation", () => {
             .and.then(e => {
                 expect(e).has.property("response");
                 const { response } = e;
+
                 expect(response).to.exist;
                 expect(response).to.have.property("body");
                 const { body: responseBody } = response;
+
                 expect(responseBody).to.exist;
                 expect(responseBody).to.have.property("code", 400);
                 expect(responseBody).to.have.property("status", "Failure");
