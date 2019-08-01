@@ -25,6 +25,7 @@
     "nconf": "^0.10.0",
     "node-fetch": "^2.3.0",
     "pino": "^5.13.1",
+    "pino-http-print": "^1.0.1",
     "pino-pretty": "^3.2.0",
     "ramda": "^0.26.1",
     "rxjs": "^6.4.0"

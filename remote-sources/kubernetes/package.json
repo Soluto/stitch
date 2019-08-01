@@ -17,6 +17,7 @@
         "express-pino-logger": "^4.0.0",
         "node-fetch": "^2.6.0",
         "pino": "^5.13.1",
+        "pino-http-print": "^1.0.1",
         "pino-pretty": "^3.2.0"
     },
     "devDependencies": {
