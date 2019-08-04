@@ -1,7 +1,7 @@
-import { URL } from 'url';
-import waitOn = require('wait-on');
+import { URL } from "url";
+import waitOn = require("wait-on");
 
-before('waiting for graphql server', async function () {
+before("waiting for graphql server", async function () {
     const timeout = Number(process.env.TIMEOUT);
     this.timeout(timeout);
     const { hostname: gtwHostName, port: gtwPort, protocol: gtwProtocol } = new URL(process.env.GRAPHQL_SERVER_URL);
@@ -13,9 +13,9 @@ before('waiting for graphql server', async function () {
 
 const getImplicitPort = protocol => {
     switch (protocol) {
-        case 'http:':
+        case "http:":
             return 80;
-        case 'https:':
+        case "https:":
             return 443;
         default:
     }

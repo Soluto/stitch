@@ -1,18 +1,18 @@
-import { expect } from 'chai';
-import { GraphQLClient } from 'graphql-request';
-import { getToken } from '../utils/token-utils';
+import { expect } from "chai";
+import { GraphQLClient } from "graphql-request";
+import { getToken } from "../utils/token-utils";
 
 
-describe('User service', () => {
+describe("Simple tests", () => {
 
     const expectedResponse = {
         user: {
-            firstName: 'john',
-            id: '1',
-            lastName: 'doe',
+            firstName: "john",
+            id: "1",
+            lastName: "doe",
             subscription: {
-                expirationDate: '2019-01-01T00:00:00Z',
-                plan: 'trial'
+                expirationDate: "2019-01-01T00:00:00Z",
+                plan: "trial"
             }
         }
     };
@@ -29,7 +29,7 @@ describe('User service', () => {
         client = new GraphQLClient(`${process.env.GRAPHQL_SERVER_URL}/graphql`, options);
     });
 
-    it('should return user data', async () => {
+    it("should return user data", async () => {
         const response = await client.request(`{
             user(id: "1") {
                 id
