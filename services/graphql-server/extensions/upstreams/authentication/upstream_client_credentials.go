@@ -1,9 +1,10 @@
 package authentication
 
 import (
-	"log"
 	"net/http"
 	"net/url"
+
+	log "github.com/sirupsen/logrus"
 
 	"golang.org/x/net/context"
 
