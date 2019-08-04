@@ -8,12 +8,12 @@ import (
 	agogos "agogos/generated"
 	"agogos/utils"
 	"context"
-	"fmt"
 	"io"
 	"os"
 	"time"
 
 	"google.golang.org/grpc"
+	log "github.com/sirupsen/logrus"
 
 	upstreams "agogos/extensions/upstreams"
 	upstreamsAuthentication "agogos/extensions/upstreams/authentication"
@@ -41,7 +41,7 @@ func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err err
 
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
-		fmt.Println("error initiating GRPC channel")
+		log.Error("error initiating GRPC channel")
 		return err
 	}
 	defer conn.Close()
@@ -50,7 +50,7 @@ func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err err
 
 	stream, err := subscribe(registryClient)
 	if err != nil {
-		fmt.Println("error subscribing to registry", err)
+		log.Error("error subscribing to registry", err)
 		return err
 	}
 
@@ -58,11 +58,11 @@ func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err err
 		registryMessage, err := stream.Recv()
 
 		if err == io.EOF {
-			fmt.Println("got EOF")
+			log.Warn("got EOF")
 			break
 		}
 		if err != nil {
-			fmt.Println("error receiving message")
+			log.Error("error receiving message")
 			gqlConfigurations <- gqlConfigurationResult{
 				schema: nil,
 				err:    err,
@@ -78,7 +78,7 @@ func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err err
 			sdl:  registryMessage.Schema.Definition,
 		})
 		if err != nil {
-			fmt.Println("error parsing SDL")
+			log.Error("error parsing SDL")
 			gqlConfigurations <- gqlConfigurationResult{
 				schema: nil,
 				err:    err,
@@ -88,7 +88,7 @@ func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err err
 
 		schema, err := ConvertSchema(astSchema)
 		if err != nil {
-			fmt.Println("error converting schema")
+			log.Error("error converting schema")
 			gqlConfigurations <- gqlConfigurationResult{
 				schema: nil,
 				err:    err,

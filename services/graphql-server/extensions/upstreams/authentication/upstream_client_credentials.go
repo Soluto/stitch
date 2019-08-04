@@ -39,7 +39,7 @@ func (ac *upstreamClientCredentials) AddAuthentication(req *http.Request, scope 
 
 	tok, err := conf.Token(context.Background())
 	if err != nil {
-		log.Printf("Failed to retrieve token from %s:\n %v", ac.authority, err)
+		log.Error("Failed to retrieve token from %s:\n %v", ac.authority, err)
 		return
 	}
 	tok.SetAuthHeader(req)

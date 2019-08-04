@@ -19,14 +19,14 @@ func main() {
 		},
 	})
 
-	log.Println("starting...")
+	log.Info("starting...")
 
 	gqlConfigurations := make(chan gqlConfigurationResult)
 	go func() {
 		failures := 0
 		for {
 			start := time.Now()
-			log.Println("Connecting to registry")
+			log.Info("Connecting to registry")
 			subscribeToRegistry(gqlConfigurations)
 			elapsed := time.Since(start)
 			if elapsed < (10 * time.Second) {
@@ -46,14 +46,14 @@ func main() {
 	go func() {
 		for {
 			gqlConfiguration := <-gqlConfigurations
-			log.Println("Got new GQL configuration")
+			log.Info("Got new GQL configuration")
 
 			if gqlConfiguration.err != nil {
-				log.Println("error", gqlConfiguration.err)
+				log.Error("error", gqlConfiguration.err)
 				continue
 			}
 
-			log.Println("updating graphql server...")
+			log.Info("updating graphql server...")
 
 			graphqlHTTPHandler = handler.New(&handler.Config{
 				Schema:     gqlConfiguration.schema,
