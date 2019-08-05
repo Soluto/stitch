@@ -74,6 +74,8 @@ prepare_environment() {
     kubectl apply -f ../examples/kubernetes/deployments/infra
     kubectl -n agogos wait pod -l app=registry --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
     kubectl -n agogos wait pod -l app=gql-controller --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
+    # TODO: Improve readiness probe
+    sleep 10
 
     # user namespace & services
     kubectl apply -f ../examples/kubernetes/deployments/services/user-namespace.yaml
@@ -177,7 +179,9 @@ main() {
         install_kind
         install_kubectl
     else
+        set -E
         build_images
+        set +E
     fi
 
     create_cluster

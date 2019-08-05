@@ -1,6 +1,7 @@
 package authentication
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -39,7 +40,7 @@ func (ac *upstreamClientCredentials) AddAuthentication(req *http.Request, scope 
 
 	tok, err := conf.Token(context.Background())
 	if err != nil {
-		log.Error("Failed to retrieve token from %s:\n %v", ac.authority, err)
+		log.WithField("error", err).Error(fmt.Sprintf("Failed to retrieve token for %s", ac.authority))
 		return
 	}
 	tok.SetAuthHeader(req)

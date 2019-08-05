@@ -14,8 +14,7 @@ import (
 var log = middlewares.DirectiveDefinition{
 	MiddlewareFactory: func(f *ast.FieldDefinition, d *ast.Directive) middlewares.Middleware {
 		return middlewares.RequestTransform(func(g graphql.ResolveParams) graphql.ResolveParams {
-			logrus.Info("got new request with params")
-			logrus.Info("%+v\n", g)
+			logrus.WithField("params", g).Info("Got new request")
 			nc := context.WithValue(g.Context, "override", "abc")
 
 			ng := graphql.ResolveParams{

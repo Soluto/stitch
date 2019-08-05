@@ -5,10 +5,10 @@ import * as  printer from "pino-http-print";
 
 const logger = process.env.NODE_ENV === "production" ?
     pino({
-        level: "warn",
+        level: (process.env.LOG_LEVEL || "WARN").toLowerCase(),
     }) :
     pino({
-        level: "debug",
+        level: (process.env.LOG_LEVEL || "DEBUG").toLowerCase(),
         prettyPrint: {
             colorize: true,
             translateTime: "HH:MM:ss",

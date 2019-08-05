@@ -2,6 +2,17 @@ import { expect } from "chai";
 import gqlRawFetch from "../utils/raw-graphql-request";
 import { getToken } from "../utils/token-utils";
 
+type GraphqlResponseBody = {
+    data: any,
+    errors: Array<{
+        message: string,
+        locations: Array<{
+            line: number,
+            column: number,
+        }>,
+    }>,
+};
+
 describe("Response statuses tests", () => {
     let token;
 
@@ -35,12 +46,13 @@ describe("Response statuses tests", () => {
         expect(response.status).to.equal(401);
     });
 
-    it("should return 400 for invalid request", async () => {
+    it("should return 200 and errors array in result for invalid request", async () => {
         const response = await gqlRawFetch(host, badQqlRequest, token);
-
-        console.log(`===== ${await response.text()}`);
-
         expect(response).to.exist;
-        // expect(response.status).to.equal(400);
+        expect(response.status).to.equal(200);
+        const body: GraphqlResponseBody = await response.json()
+        expect(body.errors).to.exist;
+        expect(body.errors.length).gt(0);
+        expect(body.errors[0].message).contains("Bad Request");
     });
 });

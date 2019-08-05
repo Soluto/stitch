@@ -2,6 +2,8 @@ package utils
 
 import (
 	"errors"
+
+	"github.com/sirupsen/logrus"
 )
 
 // Recovery - General error recovery returns error
@@ -12,6 +14,8 @@ func Recovery(err *error) {
 			*err = errors.New(x)
 		case error:
 			*err = x
+		case *logrus.Entry:
+			*err = errors.New(x.Message)
 		default:
 			*err = errors.New("Unknown panic")
 		}

@@ -11,23 +11,21 @@ import (
 )
 
 func main() {
-	log.SetFormatter(&log.JSONFormatter{
-		FieldMap: log.FieldMap{
-			log.FieldKeyTime:  "time",
-			log.FieldKeyLevel: "severity",
-			log.FieldKeyMsg:   "message",
-		},
-	})
+	err := InitLogger()
+	if err != nil {
+		log.Panic("Failed to init logger")
+	}
 
-	log.Info("starting...")
+	log.Info("Graphql Server is starting...")
 
 	gqlConfigurations := make(chan gqlConfigurationResult)
 	go func() {
 		failures := 0
 		for {
 			start := time.Now()
-			log.Info("Connecting to registry")
-			subscribeToRegistry(gqlConfigurations)
+			log.Info("Connecting to registry...")
+			err := subscribeToRegistry(gqlConfigurations)
+			log.WithField("error", err).Warn("Connection attempt failed...")
 			elapsed := time.Since(start)
 			if elapsed < (10 * time.Second) {
 				failures++
@@ -35,7 +33,8 @@ func main() {
 				failures = 0
 			}
 			if failures == 5 {
-				panic("Failed to connect to grpc channel")
+
+				log.Panic("Failed to connect to gRPC channel")
 			}
 			time.Sleep(5 * time.Second)
 		}
@@ -46,14 +45,14 @@ func main() {
 	go func() {
 		for {
 			gqlConfiguration := <-gqlConfigurations
-			log.Info("Got new GQL configuration")
+			log.Info("Got new configuration from registry")
 
 			if gqlConfiguration.err != nil {
-				log.Error("error", gqlConfiguration.err)
+				log.WithField("error", gqlConfiguration.err).Error("Error getting configuration from registry")
 				continue
 			}
 
-			log.Info("updating graphql server...")
+			log.Info("Updating graphql server...")
 
 			graphqlHTTPHandler = handler.New(&handler.Config{
 				Schema:     gqlConfiguration.schema,

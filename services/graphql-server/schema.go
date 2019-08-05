@@ -41,7 +41,7 @@ func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err err
 
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
-		log.Error("error initiating GRPC channel")
+		log.WithField("error", err).Warn("Error initiating GRPC channel")
 		return err
 	}
 	defer conn.Close()
@@ -50,7 +50,7 @@ func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err err
 
 	stream, err := subscribe(registryClient)
 	if err != nil {
-		log.Error("error subscribing to registry", err)
+		log.WithField("error", err).Warn("Error subscribing to registry", err)
 		return err
 	}
 
@@ -62,7 +62,7 @@ func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err err
 			break
 		}
 		if err != nil {
-			log.Error("error receiving message")
+			log.WithField("error", err).Warn("Error receiving message")
 			gqlConfigurations <- gqlConfigurationResult{
 				schema: nil,
 				err:    err,
@@ -78,7 +78,7 @@ func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err err
 			sdl:  registryMessage.Schema.Definition,
 		})
 		if err != nil {
-			log.Error("error parsing SDL")
+			log.WithField("error", err).Warn("Error parsing SDL")
 			gqlConfigurations <- gqlConfigurationResult{
 				schema: nil,
 				err:    err,
@@ -88,7 +88,7 @@ func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err err
 
 		schema, err := ConvertSchema(astSchema)
 		if err != nil {
-			log.Error("error converting schema")
+			log.WithField("error", err).Warn("Error converting schema")
 			gqlConfigurations <- gqlConfigurationResult{
 				schema: nil,
 				err:    err,
@@ -101,7 +101,7 @@ func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err err
 			err:    nil,
 		}
 	}
-	return
+	return nil
 }
 
 func subscribe(client agogos.RegistryClient) (stream agogos.Registry_SubscribeClient, err error) {

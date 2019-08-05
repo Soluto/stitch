@@ -16,6 +16,7 @@ import (
 
 	"github.com/graphql-go/graphql"
 	"github.com/vektah/gqlparser/ast"
+	"github.com/sirupsen/logrus"
 )
 
 type httpParams struct {
@@ -63,7 +64,7 @@ func parseHTTPParams(d *ast.Directive) httpParams {
 	params.templateURL, ok = arguments["url"].(string)
 
 	if !ok {
-		panic("url argument missing from http directive")
+		logrus.Panic("url argument missing from http directive")
 	}
 
 	params.method, ok = arguments["method"].(string)
