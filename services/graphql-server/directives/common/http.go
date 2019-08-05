@@ -44,7 +44,7 @@ var httpMiddleware = middlewares.DirectiveDefinition{
 	MiddlewareFactory: func(f *ast.FieldDefinition, d *ast.Directive) middlewares.Middleware {
 		params := parseHTTPParams(d)
 		client := createHTTPClient(params.timeout)
-		return middlewares.Leaf(func(rp graphql.ResolveParams) (interface{}, error) {
+		return middlewares.ConcurrentLeaf(func(rp graphql.ResolveParams) (interface{}, error) {
 			request, err := createHTTPRequest(params, rp)
 			if err != nil {
 				return nil, err
