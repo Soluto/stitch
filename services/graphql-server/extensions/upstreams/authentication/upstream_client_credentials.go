@@ -25,7 +25,7 @@ func (ucc *upstreamClientCredentials) AddAuthentication(req *http.Request, scope
 	tok, err := tokenSource.Token()
 
 	if err != nil {
-		log.WithField("error", err).Error(fmt.Sprintf("Failed to retrieve token from %s", ac.authority))
+		log.WithField("error", err).Error(fmt.Sprintf("Failed to retrieve token from %s", ucc.authority))
 		return
 	}
 
