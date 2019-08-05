@@ -13,9 +13,7 @@ const getFromSource = async (source: string, res: express.Response) => {
         const gqlObjects = await sources[source].getAgogosObjects();
         res.send(gqlObjects);
     } catch (error) {
-        logger.warn(`Failed to get from source - ${source}`, {
-            error
-        });
+        logger.warn({ error }, `Failed to get from source - ${source}`);
         res.sendStatus(500);
     }
 };
@@ -31,11 +29,11 @@ const postSource = async (
         await sources[source].putAgogosObject(name, kind, definition);
         res.sendStatus(200);
     } catch (error) {
-        logger.warn(`Failed to register schema to source - ${source}`, {
+        logger.warn({
             name,
             kind,
             error
-        });
+        }, `Failed to register schema to source - ${source}`);
         res.sendStatus(500);
     }
 };

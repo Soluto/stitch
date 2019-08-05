@@ -35,9 +35,7 @@ app.get("/", async (_: express.Request, res: express.Response) => {
         res.send(gqlObjects);
         return;
     } catch (error) {
-        logger.warn(`Failed to get objects from source kubernetes`, {
-            error
-        });
+        logger.warn({ error }, `Failed to get objects from source kubernetes`);
         res.sendStatus(500);
         return;
     }

@@ -63,8 +63,8 @@ const gqlObjects$: Observable<AggObjByNameByKind> = from(
                 AggObjByNameByKind,
                 AggObjByNameByKind
             >,
-            catchError(err => {
-                logger.warn("Error getting schema from source", source, err);
+            catchError(error => {
+                logger.warn({ source, error }, "Error getting schema from source");
                 return empty();
             }),
             repeat(),

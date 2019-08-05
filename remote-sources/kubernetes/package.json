@@ -12,8 +12,8 @@
     "dependencies": {
         "@kubernetes/client-node": "0.10.2",
         "array-flat-polyfill": "^1.0.1",
-        "body-parser": "^1.18.3",
-        "express": "^4.16.4",
+        "body-parser": "^1.19.0",
+        "express": "^4.17.1",
         "express-pino-logger": "^4.0.0",
         "node-fetch": "^2.6.0",
         "pino": "^5.13.1",
@@ -22,10 +22,10 @@
     },
     "devDependencies": {
         "@types/express": "^4.17.0",
-        "@types/node": "^10.14.13",
+        "@types/node": "^12.6.9",
         "@types/node-fetch": "^2.5.0",
         "@types/pino": "^5.8.8",
-        "jest": "^24.7.1",
+        "jest": "^24.8.0",
         "ts-jest": "^24.0.2",
         "tslint": "5.18.0",
         "tslint-config-prettier": "1.18.0",

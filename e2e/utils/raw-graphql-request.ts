@@ -1,4 +1,4 @@
-import fetch from 'cross-fetch';
+import fetch from "cross-fetch";
 
 export default (host: string, query: string, token?: string) => {
     const method = "POST";
@@ -12,13 +12,10 @@ export default (host: string, query: string, token?: string) => {
     });
 };
 
-const getHeaders = (token: string): { [name: string]: string } => {
-    const baseHeaders = {
-        'Content-Type': "application/json",
-    };
-    const headers = token ? {
-        ...baseHeaders,
-        Authorization: `Bearer ${token}`,
-    } : baseHeaders;
-    return headers;
+type Headers = { [name: string]: string };
+
+const getHeaders = (token: string): Headers => {
+    const headers: Headers = { "Content-Type": "application/json" };
+    if (token) { headers.Authorization = `Bearer ${token}`; }
+    return headers
 };

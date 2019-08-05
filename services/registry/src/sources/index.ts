@@ -12,7 +12,7 @@ export function remoteSource(remoteSourceHost: string): Source {
         async getAgogosObjects() {
             const response = await fetch(`${remoteSourceHost}`);
             const aggObjects = await response.json();
-            logger.debug(`Resources fetched from ${remoteSourceHost}:`, aggObjects);
+            logger.debug(aggObjects, `Resources fetched from ${remoteSourceHost}:`);
             return aggObjects;
         },
         async putAgogosObject(name: string, kind: string, definition: AgogosObjectConfig) {

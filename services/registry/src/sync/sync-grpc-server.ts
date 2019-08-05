@@ -74,8 +74,8 @@ class GqlConfigurationSubscriptionServer implements IRegistryServer {
 
                 call.write(configurationMessage);
             },
-            e => {
-                logger.error(e, "Failed to send configuration to graphql-gateway");
+            error => {
+                logger.error({ error }, "Failed to send configuration to graphql-gateway");
             },
             () => call.end()
         );

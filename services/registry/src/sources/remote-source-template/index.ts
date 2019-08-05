@@ -19,9 +19,7 @@ app.get("/", async (req: express.Request, res: express.Response) => {
         res.send(gqlObjects);
         return;
     } catch (error) {
-        logger.warn(`Failed to get from source - ${REMOTE_SOURCE_NAME}`, {
-            error
-        });
+        logger.warn({ error }, `Failed to get from source - ${REMOTE_SOURCE_NAME}`);
         res.sendStatus(500);
         return;
     }
@@ -38,14 +36,11 @@ app
             res.sendStatus(200);
             return;
         } catch (error) {
-            logger.warn(
-                `Failed to register schema to source - ${REMOTE_SOURCE_NAME}`,
-                {
-                    name,
-                    kind,
-                    error
-                }
-            );
+            logger.warn({
+                name,
+                kind,
+                error
+            }, `Failed to register schema to source - ${REMOTE_SOURCE_NAME}`);
             res.sendStatus(500);
             return;
         }
