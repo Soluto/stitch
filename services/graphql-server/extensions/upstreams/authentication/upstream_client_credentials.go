@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	gqlconfig "agogos/generated"
+
+	"golang.org/x/oauth2"
 )
 
 type upstreamClientCredentials struct {
@@ -12,15 +14,16 @@ type upstreamClientCredentials struct {
 	clientID     string
 	clientSecret string
 	authority    string
+	tokenSources map[string]oauth2.TokenSource
 }
 
 // AddAuthentication implements interface AuthProvider, adds Authorization header to HTTP request
-func (ac *upstreamClientCredentials) AddAuthentication(req *http.Request, scope string) {
-	tokenSource := ac.getOrCreateTokenSource(scope)
+func (ucc *upstreamClientCredentials) AddAuthentication(req *http.Request, scope string) {
+	tokenSource := ucc.getOrCreateTokenSource(scope)
 	tok, err := tokenSource.Token()
 
 	if err != nil {
-		log.Printf("Failed to retrieve token from %s:\n %v", ac.authority, err)
+		log.Printf("Failed to retrieve token from %s:\n %v", ucc.authority, err)
 		return
 	}
 
@@ -33,5 +36,6 @@ func newUpstreamClientCredentials(apConfig *gqlconfig.UpstreamAuthCredentials) U
 		clientID:     apConfig.ClientId,
 		clientSecret: apConfig.ClientSecret,
 		authority:    apConfig.Authority,
+		tokenSources: make(map[string]oauth2.TokenSource)
 	}
 }

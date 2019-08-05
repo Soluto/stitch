@@ -1,7 +1,6 @@
 package authentication
 
 import (
-	"fmt"
 	"net/url"
 
 	"golang.org/x/net/context"
@@ -9,21 +8,13 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 )
 
-var tokenSources = make(map[string]oauth2.TokenSource)
-
-func hashConfig(ucc *upstreamClientCredentials, scope string) string {
-	return fmt.Sprintf("%s:%s:%s:%s:%s", ucc.authType, ucc.authority, ucc.clientID, ucc.clientSecret, scope)
-}
-
 func (ucc *upstreamClientCredentials) getOrCreateTokenSource(scope string) oauth2.TokenSource {
-	id := hashConfig(ucc, scope)
-
-	if tokenSource, ok := tokenSources[id]; ok {
+	if tokenSource, ok := ucc.tokenSources[scope]; ok {
 		return tokenSource
 	}
 
 	tokenSource := createTokenSource(ucc, scope)
-	tokenSources[id] = tokenSource
+	ucc.tokenSources[scope] = tokenSource
 	return tokenSource
 }
 
