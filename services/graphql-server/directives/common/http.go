@@ -147,6 +147,8 @@ func createHTTPRequest(p httpParams, rp graphql.ResolveParams) (*http.Request, e
 		return nil, err
 	}
 
+	request = request.WithContext(rp.Context)
+
 	for _, h := range p.headers {
 		request.Header.Set(h.name, replace(h.value, args, input, source))
 	}
