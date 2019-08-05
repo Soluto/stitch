@@ -36,6 +36,6 @@ func newUpstreamClientCredentials(apConfig *gqlconfig.UpstreamAuthCredentials) U
 		clientID:     apConfig.ClientId,
 		clientSecret: apConfig.ClientSecret,
 		authority:    apConfig.Authority,
-		tokenSources: make(map[string]oauth2.TokenSource)
+		tokenSources: make(map[string]oauth2.TokenSource),
 	}
 }
