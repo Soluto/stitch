@@ -3,15 +3,12 @@ package authentication
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 
 	log "github.com/sirupsen/logrus"
 
-	"golang.org/x/net/context"
-
-	"golang.org/x/oauth2/clientcredentials"
-
 	gqlconfig "agogos/generated"
+
+	"golang.org/x/oauth2"
 )
 
 type upstreamClientCredentials struct {
@@ -19,30 +16,19 @@ type upstreamClientCredentials struct {
 	clientID     string
 	clientSecret string
 	authority    string
+	tokenSources map[string]oauth2.TokenSource
 }
 
 // AddAuthentication implements interface AuthProvider, adds Authorization header to HTTP request
-func (ac *upstreamClientCredentials) AddAuthentication(req *http.Request, scope string) {
-	conf := &clientcredentials.Config{
-		ClientID:     ac.clientID,
-		ClientSecret: ac.clientSecret,
-		TokenURL:     ac.authority,
-	}
+func (ucc *upstreamClientCredentials) AddAuthentication(req *http.Request, scope string) {
+	tokenSource := ucc.getOrCreateTokenSource(scope)
+	tok, err := tokenSource.Token()
 
-	switch ac.authType {
-	case "oauth2/client_credentials":
-		conf.Scopes = []string{scope}
-	case "activedirectory/client_credentials":
-		conf.EndpointParams = url.Values{
-			"resource": []string{scope},
-		}
-	}
-
-	tok, err := conf.Token(context.Background())
 	if err != nil {
-		log.WithField("error", err).Error(fmt.Sprintf("Failed to retrieve token for %s", ac.authority))
+		log.WithField("error", err).Error(fmt.Sprintf("Failed to retrieve token from %s", ac.authority))
 		return
 	}
+
 	tok.SetAuthHeader(req)
 }
 
@@ -52,5 +38,6 @@ func newUpstreamClientCredentials(apConfig *gqlconfig.UpstreamAuthCredentials) U
 		clientID:     apConfig.ClientId,
 		clientSecret: apConfig.ClientSecret,
 		authority:    apConfig.Authority,
+		tokenSources: make(map[string]oauth2.TokenSource),
 	}
 }
