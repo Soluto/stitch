@@ -1,16 +1,18 @@
 package common
 
 import (
+	"agogos/utils"
+	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"testing"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/graphql-go/graphql"
 	"github.com/vektah/gqlparser"
 	"github.com/vektah/gqlparser/ast"
-	"agogos/utils"
-	"io/ioutil"
-	"net/http"
-	"testing"
 )
 
 func TestParseHTTPParams(t *testing.T) {
@@ -135,6 +137,7 @@ func TestParseHTTPParams(t *testing.T) {
 }
 
 func TestCreateHTTPRequest(t *testing.T) {
+	testContext := context.TODO()
 	tests := []struct {
 		name            string
 		rp              graphql.ResolveParams
@@ -145,7 +148,9 @@ func TestCreateHTTPRequest(t *testing.T) {
 	}{
 		{
 			"GET basic",
-			graphql.ResolveParams{},
+			graphql.ResolveParams{
+				Context: testContext,
+			},
 			httpParams{
 				templateURL: "http://some",
 			},
@@ -155,7 +160,9 @@ func TestCreateHTTPRequest(t *testing.T) {
 		},
 		{
 			"GET with header",
-			graphql.ResolveParams{},
+			graphql.ResolveParams{
+				Context: testContext,
+			},
 			httpParams{
 				templateURL: "http://some",
 				headers: []nameValue{
@@ -171,10 +178,10 @@ func TestCreateHTTPRequest(t *testing.T) {
 		{
 			"GET with header from placeholder",
 			graphql.ResolveParams{
-
 				Args: map[string]interface{}{
 					"someArg": "some-arg-value",
 				},
+				Context: testContext,
 			},
 			httpParams{
 				templateURL: "http://some",
@@ -194,6 +201,7 @@ func TestCreateHTTPRequest(t *testing.T) {
 				Args: map[string]interface{}{
 					"id": "100",
 				},
+				Context: testContext,
 			},
 			httpParams{
 				templateURL: "http://some/:id",
@@ -208,6 +216,7 @@ func TestCreateHTTPRequest(t *testing.T) {
 				Source: map[string]interface{}{
 					"id": "100",
 				},
+				Context: testContext,
 			},
 			httpParams{
 				templateURL: "http://some/:id",
@@ -222,6 +231,7 @@ func TestCreateHTTPRequest(t *testing.T) {
 				Args: map[string]interface{}{
 					"id": "100",
 				},
+				Context: testContext,
 			},
 			httpParams{
 				templateURL: "http://some?a=:id",
@@ -237,6 +247,7 @@ func TestCreateHTTPRequest(t *testing.T) {
 					"id":        "100",
 					"firstName": "dude",
 				},
+				Context: testContext,
 			},
 			httpParams{
 				templateURL: "http://some/:id?name=:firstName",
@@ -251,6 +262,7 @@ func TestCreateHTTPRequest(t *testing.T) {
 				Args: map[string]interface{}{
 					"id": "100",
 				},
+				Context: testContext,
 			},
 			httpParams{
 				templateURL: "http://some",
@@ -271,6 +283,7 @@ func TestCreateHTTPRequest(t *testing.T) {
 					"id":     "100",
 					"entity": "user",
 				},
+				Context: testContext,
 			},
 			httpParams{
 				templateURL: "http://some/:entity",
@@ -292,6 +305,7 @@ func TestCreateHTTPRequest(t *testing.T) {
 					"entity":    "user",
 					"firstName": "dude",
 				},
+				Context: testContext,
 			},
 			httpParams{
 				templateURL: "http://some/:entity?name=:firstName",
@@ -313,6 +327,7 @@ func TestCreateHTTPRequest(t *testing.T) {
 						"data": "asdasd",
 					},
 				},
+				Context: testContext,
 			},
 			httpParams{
 				templateURL: "http://some",
@@ -333,6 +348,7 @@ func TestCreateHTTPRequest(t *testing.T) {
 				Source: map[string]interface{}{
 					"someSourceParam": "some-value",
 				},
+				Context: testContext,
 			},
 			httpParams{
 				templateURL: "http://some",
@@ -361,6 +377,7 @@ func TestCreateHTTPRequest(t *testing.T) {
 						"some-arg": "some-arg-value",
 					},
 				},
+				Context: testContext,
 			},
 			httpParams{
 				templateURL: "http://some",
@@ -400,6 +417,8 @@ func TestCreateHTTPRequest(t *testing.T) {
 			assertEqual(t, test.expectedURL, fmt.Sprint(request.URL), "url incorrect")
 
 			assertEqual(t, headers, request.Header, "headers incorrect")
+
+			assertEqual(t, request.Context(), testContext, "bad context propagation")
 
 			if test.expectedBody == nil {
 				assert(t, request.GetBody == nil, "body should be nil")
