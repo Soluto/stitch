@@ -1,4 +1,4 @@
-import k8s = require('@kubernetes/client-node');
+import k8s = require("@kubernetes/client-node");
 import { expect, use } from "chai";
 import * as chaiAsPromised from "chai-as-promised";
 import * as fs from "fs";
@@ -12,9 +12,9 @@ type AgogosObject = {
     },
     kind: string,
     spec: object,
-}
+};
 
-describe("Objects validation", () => {
+describe("Validating webhook tests", () => {
     const k8sConfig = new k8s.KubeConfig();
     let client: k8s.CustomObjectsApi;
 

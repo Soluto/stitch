@@ -1,8 +1,10 @@
 package authentication
 
 import (
-	"log"
+	"fmt"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 
 	gqlconfig "agogos/generated"
 
@@ -23,7 +25,7 @@ func (ucc *upstreamClientCredentials) AddAuthentication(req *http.Request, scope
 	tok, err := tokenSource.Token()
 
 	if err != nil {
-		log.Printf("Failed to retrieve token from %s:\n %v", ucc.authority, err)
+		log.WithField("error", err).Error(fmt.Sprintf("Failed to retrieve token from %s", ucc.authority))
 		return
 	}
 

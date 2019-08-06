@@ -19,6 +19,8 @@ spec:
         env:
           - name: REGISTRY_URL
             value: 'registry:81'
+          - name: LOG_LEVEL
+            value: DEBUG
         imagePullPolicy: Never
         livenessProbe:
           httpGet:
@@ -73,7 +75,8 @@ data:
               }
             ],
             "UnauthenticatedPaths": [
-                "/health"
+                "/health",
+                "/metrics"
             ]
         }
 ---

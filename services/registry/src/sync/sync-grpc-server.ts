@@ -14,6 +14,7 @@ import { AgogosConfiguration } from "./object-types";
 import syncSchema$ from "./sync-schemas";
 import syncUpstreamAuthCredentials$ from "./sync-upstream-auth-credentials";
 import syncUpstreams$ from "./sync-upstreams";
+import logger from "../logger";
 
 const PORT = process.env.GRPC_PORT || 4001;
 
@@ -73,10 +74,8 @@ class GqlConfigurationSubscriptionServer implements IRegistryServer {
 
                 call.write(configurationMessage);
             },
-            e => {
-                console.log("====================================");
-                console.log(e);
-                console.log("====================================");
+            error => {
+                logger.error({ error }, "Failed to send configuration to graphql-gateway");
             },
             () => call.end()
         );
@@ -93,5 +92,5 @@ export function startGrpcServer() {
     server.addService(RegistryService, new GqlConfigurationSubscriptionServer());
     server.bind(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure());
     server.start();
-    console.log(`🚀 GRPC Server ready at localhost:${PORT}`);
+    logger.info(`🚀 GRPC Server ready at localhost:${PORT}`);
 }

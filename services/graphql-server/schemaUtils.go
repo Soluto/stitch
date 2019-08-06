@@ -8,6 +8,8 @@ import (
 	"agogos/directives/middlewares"
 	"agogos/utils"
 	"reflect"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type schemaContext struct {
@@ -64,13 +66,14 @@ func convertNamedType(t *ast.Type, c schemaContext) graphql.Type {
 			return convertSchemaUnion(definition, c)
 		}
 		if definition.Kind == ast.Scalar {
-			panic("Custom scalar handling not implemented")
+			log.Panic("Custom scalar handling not implemented")
 		}
 		if definition.Kind == ast.Enum {
 			return convertSchemaEnum(definition, c)
 		}
 
-		panic("Unreachable code")
+		log.Panic("Unreachable code")
+		return nil
 	}
 }
 
@@ -239,7 +242,7 @@ func convertSchemaInterface(d *ast.Definition, c schemaContext) *graphql.Interfa
 
 			schemaField, err := convertSchemaField(field, c)
 			if err != nil {
-				panic(err)
+				log.Panic(err)
 			}
 
 			fields[field.Name] = schemaField
@@ -274,7 +277,7 @@ func convertSchemaObject(d *ast.Definition, c schemaContext) *graphql.Object {
 
 			schemaField, err := convertSchemaField(field, c)
 			if err != nil {
-				panic(err)
+				log.Panic(err)
 			}
 
 			fields[field.Name] = schemaField

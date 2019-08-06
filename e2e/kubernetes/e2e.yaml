@@ -46,6 +46,10 @@ spec:
         env:
           - name: GRAPHQL_SERVER_URL
             value: "http://gateway.agogos"
+          - name: REGISTRY_URL
+            value: "http://registry.agogos"
+          - name: GQL_CONTROLLER_URL
+            value: "http://gql-controller.agogos"
           - name: TIMEOUT
             value: "60000"
           - name: TOKEN_ENDPOINT

@@ -1,4 +1,10 @@
 FROM golang:1.12.5-stretch as base
+
+# Enable the go modules feature
+ENV GO111MODULE=on
+# Set the GOPROXY environment variable
+ENV GOPROXY=https://goproxy.io
+
 RUN mkdir /src
 WORKDIR /src
 

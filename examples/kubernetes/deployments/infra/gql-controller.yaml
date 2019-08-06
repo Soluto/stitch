@@ -17,6 +17,8 @@ spec:
       - name: gql-controller
         image: soluto/agogos-gql-controller
         env:
+          - name: NODE_ENV
+            value: development
           - name: REGISTRY_URL
             value: 'http://registry'
           - name: PORT
@@ -36,15 +38,15 @@ spec:
           httpGet:
             path: /health
             port: 80
-          initialDelaySeconds: 3
-          periodSeconds: 3
+          initialDelaySeconds: 5
+          periodSeconds: 10
         readinessProbe:
           httpGet:
             path: /health
             port: 443
             scheme: HTTPS
-          initialDelaySeconds: 3
-          periodSeconds: 3
+          initialDelaySeconds: 5
+          periodSeconds: 10
 ---
 kind: Service
 apiVersion: v1
