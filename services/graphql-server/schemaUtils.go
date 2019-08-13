@@ -117,7 +117,7 @@ func createResolver(f *ast.FieldDefinition) middlewares.Resolver {
 
 func fieldIdentityResolver(rp graphql.ResolveParams) (interface{}, error) {
 	fieldName := rp.Info.FieldName
-	return utils.IdentityResolver(fieldName, rp)
+	return utils.IdentityResolver(fieldName, rp.Source)
 }
 
 func convertSchemaField(f *ast.FieldDefinition, c schemaContext) (*graphql.Field, error) {
