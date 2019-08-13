@@ -20,4 +20,6 @@ directive @http(
   timeout: Int
   headers: [HttpNameValue!]
 ) on FIELD_DEFINITION
+
+directive @select(path: [String!]!) on FIELD_DEFINITION
 directive @alias(from: String!) on FIELD_DEFINITION
