@@ -2,6 +2,7 @@ package common
 
 import (
 	"agogos/directives/middlewares"
+	"agogos/utils"
 	"fmt"
 
 	"github.com/graphql-go/graphql"
@@ -39,17 +40,15 @@ var selectMiddleware = middlewares.DirectiveDefinition{
 			logrus.Panic("'path' argument not a string array in @select directive")
 		}
 
-		return middlewares.ResultTransform(func(rp graphql.ResolveParams, result interface{}) interface{} {
+		return middlewares.ResultTransform(func(rp graphql.ResolveParams, original interface{}) interface{} {
+			result := original
+
 			for _, segment := range path {
-				asMap, ok := result.(map[string]interface{})
+				result, err = utils.IdentityResolver(segment, result)
 
-				if !ok {
-					return nil
-				}
+				if err != nil {
+					logrus.WithField("path", path).WithField("source", original).Infof("Failed extracting value in @select directive")
 
-				result, ok = asMap[segment]
-
-				if !ok {
 					return nil
 				}
 			}

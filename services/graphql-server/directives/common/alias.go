@@ -2,6 +2,7 @@ package common
 
 import (
 	"agogos/directives/middlewares"
+	"agogos/utils"
 
 	"github.com/graphql-go/graphql"
 	"github.com/sirupsen/logrus"
@@ -18,19 +19,7 @@ var aliasMiddleware = middlewares.DirectiveDefinition{
 		}
 
 		return middlewares.Leaf(func(rp graphql.ResolveParams) (interface{}, error) {
-			asMap, ok := rp.Source.(map[string]interface{})
-
-			if !ok {
-				return nil, nil
-			}
-
-			result, ok := asMap[originalFieldName]
-
-			if !ok {
-				return nil, nil
-			}
-
-			return result, nil
+			return utils.IdentityResolver(originalFieldName, rp.Source)
 		})
 	},
 }

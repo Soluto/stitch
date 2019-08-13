@@ -1,13 +1,13 @@
 package main
 
 import (
-	"fmt"
-	graphql "github.com/graphql-go/graphql"
-	"github.com/vektah/gqlparser/ast"
 	"agogos/directives/common"
 	"agogos/directives/middlewares"
 	"agogos/utils"
-	"reflect"
+	"fmt"
+
+	graphql "github.com/graphql-go/graphql"
+	"github.com/vektah/gqlparser/ast"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -98,7 +98,7 @@ func convertFieldArgs(a ast.ArgumentDefinitionList, c schemaContext) (graphql.Fi
 }
 
 func createResolver(f *ast.FieldDefinition) middlewares.Resolver {
-	resolver := createIdentityResolver(f.Name)
+	resolver := fieldIdentityResolver
 
 	for _, d := range f.Directives {
 		middlewareDefinition, ok := common.MiddlewareDefinitions[d.Name]
@@ -115,24 +115,9 @@ func createResolver(f *ast.FieldDefinition) middlewares.Resolver {
 	return resolver
 }
 
-func createIdentityResolver(fieldName string) middlewares.Resolver {
-	return func(p graphql.ResolveParams) (res interface{}, err error) {
-		defer utils.Recovery(&err)
-
-		switch p.Source.(type) {
-
-		case map[string]interface{}:
-			m := p.Source.(map[string]interface{})
-			res = m[fieldName]
-
-		default:
-			value := reflect.ValueOf(p.Source)
-			f := reflect.Indirect(value).FieldByName(fieldName)
-			res = f.Interface()
-		}
-
-		return
-	}
+func fieldIdentityResolver(rp graphql.ResolveParams) (interface{}, error) {
+	fieldName := rp.Info.FieldName
+	return utils.IdentityResolver(fieldName, rp)
 }
 
 func convertSchemaField(f *ast.FieldDefinition, c schemaContext) (*graphql.Field, error) {
