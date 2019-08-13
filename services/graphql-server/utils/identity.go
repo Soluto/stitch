@@ -14,7 +14,12 @@ func IdentityResolver(fieldName string, source interface{}) (res interface{}, er
 	default:
 		value := reflect.ValueOf(source)
 		f := reflect.Indirect(value).FieldByName(fieldName)
-		res = f.Interface()
+
+		if f.Kind() == reflect.Invalid {
+			res = nil
+		} else {
+			res = f.Interface()
+		}
 	}
 
 	return
