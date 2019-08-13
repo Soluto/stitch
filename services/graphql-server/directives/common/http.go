@@ -221,7 +221,7 @@ func getURL(templateURL string, queryParams []nameValue, args dictionary, input 
 
 	for _, nv := range queryParams {
 		if p := args[nv.value]; p != nil && p != "" {
-			mappedQueryParams.Add(nv.name, nv.value)
+			mappedQueryParams.Add(nv.name, fmt.Sprintf("%s", p))
 		}
 	}
 
