@@ -1,6 +1,8 @@
 package common
 
 import (
+	"agogos/extensions/upstreams"
+	"agogos/server"
 	"agogos/utils"
 	"context"
 	"encoding/json"
@@ -138,6 +140,7 @@ func TestParseHTTPParams(t *testing.T) {
 
 func TestCreateHTTPRequest(t *testing.T) {
 	testContext := context.TODO()
+	emptyServerContext := server.CreateServerContext(make(map[string]upstreams.Upstream))
 	tests := []struct {
 		name            string
 		rp              graphql.ResolveParams
@@ -411,7 +414,7 @@ func TestCreateHTTPRequest(t *testing.T) {
 			}
 
 			// Act
-			request, err := createHTTPRequest(test.hp, test.rp)
+			request, err := createHTTPRequest(emptyServerContext, test.hp, test.rp)
 
 			// Assert
 			if err != nil {

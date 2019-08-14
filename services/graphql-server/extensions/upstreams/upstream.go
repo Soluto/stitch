@@ -1,7 +1,7 @@
 package upstreams
 
 import (
-	upstreamAuthentications "agogos/extensions/upstreams/authentication"
+	"agogos/extensions/upstreams/authentication"
 	agogos "agogos/generated"
 	"net/http"
 )
@@ -12,9 +12,10 @@ type Upstream interface {
 }
 
 type upstreamStruct struct {
-	host    string
-	headers map[string]string
-	auth    authStruct
+	host         string
+	headers      map[string]string
+	auth         authStruct
+	upstreamAuth authentication.UpstreamAuthentication
 }
 
 type authStruct struct {
@@ -28,14 +29,12 @@ func (up *upstreamStruct) ApplyUpstream(req *http.Request) {
 		req.Header.Set(header, headerValue)
 	}
 
-	// TODO: consider more implicit approach
-	upa, ok := upstreamAuthentications.Get(up.auth.authType, up.auth.authority)
-	if ok {
-		upa.AddAuthentication(req, up.auth.scope)
+	if up.upstreamAuth != nil {
+		up.upstreamAuth.AddAuthentication(req, up.auth.scope)
 	}
 }
 
-func From(upConfig *agogos.Upstream) Upstream {
+func CreateFromConfig(upConfig *agogos.Upstream, upsAuth authentication.UpstreamAuthentication) Upstream {
 	return &upstreamStruct{
 		host: upConfig.Host,
 		auth: authStruct{
@@ -43,21 +42,6 @@ func From(upConfig *agogos.Upstream) Upstream {
 			authority: upConfig.Auth.Authority,
 			scope:     upConfig.Auth.Scope,
 		},
+		upstreamAuth: upsAuth,
 	}
-}
-
-var upstreams map[string]Upstream
-
-// Init initializes upstreams repository by
-func Init(upConfigs []*agogos.Upstream) {
-	upstreams = make(map[string]Upstream)
-	for _, upConfig := range upConfigs {
-		upstreams[upConfig.Host] = From(upConfig)
-	}
-}
-
-// Get gets Upstream by host
-func Get(host string) (Upstream, bool) {
-	ep, ok := upstreams[host]
-	return ep, ok
 }
