@@ -6,14 +6,16 @@ import (
 	"github.com/vektah/gqlparser/ast"
 
 	agogos "agogos/generated"
+	"agogos/server"
+	"agogos/server/schema"
 	"agogos/utils"
 	"context"
 	"io"
 	"os"
 	"time"
 
-	"google.golang.org/grpc"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 
 	upstreams "agogos/extensions/upstreams"
 	upstreamsAuthentication "agogos/extensions/upstreams/authentication"
@@ -86,7 +88,11 @@ func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err err
 			return err
 		}
 
-		schema, err := ConvertSchema(astSchema)
+		upstreamsMap := createUpstreams(registryMessage.Upstreams)
+		upstreamsAuthMap := createUpstreamAuths(registryMessage.UpstreamAuthCredentials)
+		serverContext := server.CreateServerContext(upstreamsMap, upstreamsAuthMap)
+
+		convertedSchema, err := schema.ConvertSchema(serverContext, astSchema)
 		if err != nil {
 			log.WithField("error", err).Warn("Error converting schema")
 			gqlConfigurations <- gqlConfigurationResult{
@@ -97,7 +103,7 @@ func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err err
 		}
 
 		gqlConfigurations <- gqlConfigurationResult{
-			schema: schema,
+			schema: convertedSchema,
 			err:    nil,
 		}
 	}
@@ -133,4 +139,29 @@ func parseSdl(s source) (*ast.Schema, error) {
 	}
 
 	return schema, nil
+}
+
+func createUpstreams(upsConfig []*agogos.Upstream) map[string]upstreams.Upstream {
+	ups := make(map[string]upstreams.Upstream, len(upsConfig))
+
+	for _, upConfig := range upsConfig {
+		ups[upConfig.Host] = upstreams.From(upConfig)
+	}
+
+	return ups
+}
+
+func createUpstreamAuths(upsAuthConfigs []*agogos.UpstreamAuthCredentials) map[string]map[string]upstreamsAuthentication.UpstreamAuthentication {
+	upAuths := make(map[string]map[string]upstreamsAuthentication.UpstreamAuthentication)
+
+	for _, upAuthConfig := range upsAuthConfigs {
+		_, ok := upAuths[upAuthConfig.AuthType]
+		if !ok {
+			upAuths[upAuthConfig.AuthType] = make(map[string]upstreamsAuthentication.UpstreamAuthentication)
+		}
+
+		upAuths[upAuthConfig.AuthType][upAuthConfig.Authority] = upstreamsAuthentication.From(upAuthConfig)
+	}
+
+	return upAuths
 }

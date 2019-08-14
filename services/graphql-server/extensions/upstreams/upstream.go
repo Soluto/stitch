@@ -2,7 +2,7 @@ package upstreams
 
 import (
 	upstreamAuthentications "agogos/extensions/upstreams/authentication"
-	gqlconfig "agogos/generated"
+	agogos "agogos/generated"
 	"net/http"
 )
 
@@ -35,7 +35,7 @@ func (up *upstreamStruct) ApplyUpstream(req *http.Request) {
 	}
 }
 
-func newUpstream(upConfig *gqlconfig.Upstream) Upstream {
+func From(upConfig *agogos.Upstream) Upstream {
 	return &upstreamStruct{
 		host: upConfig.Host,
 		auth: authStruct{
@@ -49,10 +49,10 @@ func newUpstream(upConfig *gqlconfig.Upstream) Upstream {
 var upstreams map[string]Upstream
 
 // Init initializes upstreams repository by
-func Init(upConfigs []*gqlconfig.Upstream) {
+func Init(upConfigs []*agogos.Upstream) {
 	upstreams = make(map[string]Upstream)
 	for _, upConfig := range upConfigs {
-		upstreams[upConfig.Host] = newUpstream(upConfig)
+		upstreams[upConfig.Host] = From(upConfig)
 	}
 }
 
