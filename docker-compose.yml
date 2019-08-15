@@ -8,6 +8,7 @@ services:
         ports:
             - '8011:8011'
         environment:
+            LOG_LEVEL: DEBUG
             REGISTRY_URL: registry:81
 
     registry:
@@ -21,8 +22,10 @@ services:
             - '8080:80'
             - '8081:81'
         environment:
+            LOG_LEVEL: DEBUG
             PORT: 80
             GRPC_PORT: 81
+
             REMOTESOURCE__FILESYSTEM: http://resources:3000
 
     resources:
