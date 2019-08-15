@@ -1,8 +1,22 @@
 version: '3.7'
 
 services:
+    gateway:
+        build: services/graphql-server
+        depends_on:
+            - registry
+        ports:
+            - '8011:8011'
+        environment:
+            REGISTRY_URL: registry:81
+
     registry:
-        build: services/registry
+        build:
+            args:
+                target: DEBUG
+            context: services/registry
+        depends_on:
+            - resources
         ports:
             - '8080:80'
             - '8081:81'
@@ -10,13 +24,6 @@ services:
             PORT: 80
             GRPC_PORT: 81
             REMOTESOURCE__FILESYSTEM: http://resources:3000
-
-    gateway:
-        build: services/graphql-server
-        ports:
-            - '8011:8011'
-        environment:
-            REGISTRY_URL: registry:81
 
     resources:
         build: remote-sources/filesystem
