@@ -137,15 +137,22 @@ func parseSdl(s source) (*ast.Schema, error) {
 }
 
 func createUpstreams(upsConfigs []*agogos.Upstream, upsAuthConfigs []*agogos.UpstreamAuthCredentials) map[string]upstreams.Upstream {
+	upsAuths := make(map[string]map[string]upstreamsAuthentication.UpstreamAuthentication)
+	for _, upsAuthConfig := range upsAuthConfigs {
+		if _, ok := upsAuths[upsAuthConfig.AuthType]; !ok {
+			upsAuths[upsAuthConfig.AuthType] = make(map[string]upstreamsAuthentication.UpstreamAuthentication)
+		}
+
+		upsAuths[upsAuthConfig.AuthType][upsAuthConfig.Authority] = upstreamsAuthentication.CreateFromConfig(upsAuthConfig)
+	}
+
 	ups := make(map[string]upstreams.Upstream, len(upsConfigs))
 
 	for _, upConfig := range upsConfigs {
 		var matchedUpsAuth upstreamsAuthentication.UpstreamAuthentication
-
-		for _, upsAuthConfig := range upsAuthConfigs {
-			if upsAuthConfig.AuthType == upConfig.Auth.AuthType && upsAuthConfig.Authority == upConfig.Auth.Authority {
-				matchedUpsAuth = upstreamsAuthentication.CreateFromConfig(upsAuthConfig)
-				break
+		if m, ok := upsAuths[upConfig.Auth.AuthType]; ok {
+			if upsAuth, ok := m[upConfig.Auth.Authority]; ok {
+				matchedUpsAuth = upsAuth
 			}
 		}
 
