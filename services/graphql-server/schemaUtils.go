@@ -99,7 +99,7 @@ func convertFieldArgs(a ast.ArgumentDefinitionList, c schemaContext) (graphql.Fi
 	return args, nil
 }
 
-func createResolver(f *ast.FieldDefinition) middlewares.Resolver {
+func createResolver(f *ast.FieldDefinition, c schemaContext) middlewares.Resolver {
 	resolver := fieldIdentityResolver
 
 	for _, d := range f.Directives {

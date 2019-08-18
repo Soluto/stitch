@@ -2,6 +2,7 @@ package common
 
 import (
 	"agogos/directives/middlewares"
+	"agogos/server"
 	"agogos/utils"
 	"fmt"
 
@@ -26,7 +27,7 @@ func toStringSlice(slice []interface{}) ([]string, error) {
 }
 
 var selectMiddleware = middlewares.DirectiveDefinition{
-	MiddlewareFactory: func(f *ast.FieldDefinition, d *ast.Directive) middlewares.Middleware {
+	MiddlewareFactory: func(s server.ServerContext, f *ast.FieldDefinition, d *ast.Directive) middlewares.Middleware {
 		args := d.ArgumentMap(make(map[string]interface{}))
 		pathRaw, ok := args["path"].([]interface{})
 
