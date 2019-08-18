@@ -22,4 +22,3 @@ directive @http(
 ) on FIELD_DEFINITION
 
 directive @select(path: [String!]!) on FIELD_DEFINITION
-directive @from(field: String!) on FIELD_DEFINITION
