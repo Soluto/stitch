@@ -37,7 +37,7 @@ var selectMiddleware = middlewares.DirectiveDefinition{
 		path, err := toStringSlice(pathRaw)
 
 		if err != nil {
-			logrus.Panic("'path' argument not a string array in @select directive")
+			logrus.WithError(err).Panic("'path' argument not a string array in @select directive")
 		}
 
 		return middlewares.ResultTransform(func(rp graphql.ResolveParams, original interface{}) interface{} {
@@ -47,7 +47,7 @@ var selectMiddleware = middlewares.DirectiveDefinition{
 				result, err = utils.IdentityResolver(segment, result)
 
 				if err != nil {
-					logrus.WithField("path", path).WithField("source", original).Infof("Failed extracting value in @select directive")
+					logrus.WithField("path", path).WithField("source", original).WithError(err).Infof("Failed extracting value in @select directive")
 
 					return nil
 				}
