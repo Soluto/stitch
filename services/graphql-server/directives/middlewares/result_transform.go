@@ -6,13 +6,26 @@ import (
 
 type ResultTransform func(graphql.ResolveParams, interface{}) interface{}
 
-func (rt ResultTransform) Wrap(prior Resolver) Resolver {
-	return func(g graphql.ResolveParams) (interface{}, error) {
-		value, err := prior(g)
+func (rt ResultTransform) Wrap(resolve Resolver) Resolver {
+	return func(rp graphql.ResolveParams) (interface{}, error) {
+		value, err := resolve(rp)
 		if err != nil {
 			return nil, err
 		}
-		newValue := rt(g, value)
-		return newValue, nil
+
+		// Support concurrent resolvers
+		if valueFunc, ok := value.(func() (interface{}, error)); ok {
+			return func() (interface{}, error) {
+				newValue, err := valueFunc()
+
+				if err != nil {
+					return nil, err
+				}
+
+				return rt(rp, newValue), nil
+			}, nil
+		}
+
+		return rt(rp, value), nil
 	}
 }

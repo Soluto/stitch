@@ -10,13 +10,13 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"regexp"
-	"strings"
 	"time"
 
 	"github.com/graphql-go/graphql"
-	"github.com/vektah/gqlparser/ast"
 	"github.com/sirupsen/logrus"
+	"github.com/vektah/gqlparser/ast"
 )
 
 type httpParams struct {
@@ -130,10 +130,12 @@ func createHTTPClient(timeout int) http.Client {
 func createHTTPRequest(p httpParams, rp graphql.ResolveParams) (*http.Request, error) {
 	args, input, source := getArgs(rp)
 
-	URL := getURL(p.templateURL, p.queryParams, args, input, source)
+	URL, err := getURL(p.templateURL, p.queryParams, args, input, source)
+	if err != nil {
+		return nil, err
+	}
 
 	var reader io.Reader
-	var err error
 
 	if p.method != "GET" && p.contentType == "json" {
 		reader, err = getReader(p.bodyParams, args, input, source)
@@ -142,7 +144,7 @@ func createHTTPRequest(p httpParams, rp graphql.ResolveParams) (*http.Request, e
 		}
 	}
 
-	request, err := http.NewRequest(p.method, URL, reader)
+	request, err := http.NewRequest(p.method, *URL, reader)
 	if err != nil {
 		return nil, err
 	}
@@ -209,28 +211,23 @@ func getArgs(g graphql.ResolveParams) (args dictionary, input dictionary, source
 	return
 }
 
-func getURL(templateURL string, queryParams []nameValue, args dictionary, input dictionary, source dictionary) string {
-	path := replace(templateURL, args, input, source)
+func getURL(templateURL string, queryParams []nameValue, args dictionary, input dictionary, source dictionary) (*string, error) {
+	mappedURL, err := url.Parse(replace(templateURL, args, input, source))
+	if err != nil {
+		return nil, err
+	}
 
-	mappedQueryParams := make([]string, 0, len(queryParams))
+	mappedQueryParams := mappedURL.Query()
 
 	for _, nv := range queryParams {
 		if p := args[nv.value]; p != nil && p != "" {
-			mappedQueryParams = append(mappedQueryParams, fmt.Sprintf("%s=%s", nv.name, p))
+			mappedQueryParams.Add(nv.name, fmt.Sprintf("%s", p))
 		}
 	}
 
-	if len(mappedQueryParams) == 0 {
-		return path
-	}
-
-	query := strings.Join(mappedQueryParams, "&")
-
-	if strings.Contains(path, "?") {
-		return fmt.Sprintf("%s&%s", path, query)
-	}
-
-	return fmt.Sprintf("%s?%s", path, query)
+	mappedURL.RawQuery = mappedQueryParams.Encode()
+	finalURL := mappedURL.String()
+	return &finalURL, nil
 }
 
 func getReader(bodyParams []nameValue, args dictionary, input dictionary, source dictionary) (io.Reader, error) {

@@ -10,6 +10,7 @@ require (
 	github.com/prometheus/client_golang v1.0.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/objx v0.2.0 // indirect
+	github.com/stretchr/testify v1.3.0
 	github.com/vektah/gqlparser v1.1.1
 	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45

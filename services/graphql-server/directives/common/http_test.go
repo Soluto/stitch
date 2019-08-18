@@ -260,7 +260,8 @@ func TestCreateHTTPRequest(t *testing.T) {
 			"Get with queryParams",
 			graphql.ResolveParams{
 				Args: map[string]interface{}{
-					"id": "100",
+					"id":   "100",
+					"text": "and escape!",
 				},
 				Context: testContext,
 			},
@@ -270,9 +271,12 @@ func TestCreateHTTPRequest(t *testing.T) {
 					nameValue{
 						name: "a", value: "id",
 					},
+					nameValue{
+						name: "txt", value: "text",
+					},
 				},
 			},
-			"http://some?a=100",
+			"http://some?a=100&txt=and+escape%21",
 			nil,
 			[]nameValue{},
 		},
@@ -315,7 +319,7 @@ func TestCreateHTTPRequest(t *testing.T) {
 					},
 				},
 			},
-			"http://some/user?name=dude&a=100",
+			"http://some/user?a=100&name=dude",
 			nil,
 			[]nameValue{},
 		},
