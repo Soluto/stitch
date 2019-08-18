@@ -34,6 +34,7 @@ func main() {
 			err := <-errCh
 			log.WithError(err).Println("Registry connection/subscription failure")
 			errors++
+			metrics.RegistryConnectionErrors.Inc()
 
 			if graphqlHTTPHandler == nil && errors > 30 {
 				log.WithError(err).Fatalln("Couldn't connect to registry")
@@ -50,6 +51,7 @@ func main() {
 
 			if schemaResult.Error != nil {
 				log.WithError(schemaResult.Error).Error("Error processing new schema")
+				metrics.SchemaErrors.Inc()
 				continue
 			}
 

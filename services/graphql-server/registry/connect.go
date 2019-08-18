@@ -52,6 +52,9 @@ func Connect(ctx context.Context) (chan *agogos.ConfigurationMessage, chan error
 	errCh := make(chan error)
 
 	go func() {
+		defer close(configCh)
+		defer close(errCh)
+
 		for {
 			var err error
 			clientCtx, cancel := context.WithCancel(ctx)
