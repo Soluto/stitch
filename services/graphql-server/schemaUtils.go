@@ -14,13 +14,13 @@ import (
 )
 
 type schemaContext struct {
-	serverContext server.ServerContext
-	schema        *ast.Schema
-	objects       map[string]*graphql.Object
-	interfaces    map[string]*graphql.Interface
-	unions        map[string]*graphql.Union
-	enums         map[string]*graphql.Enum
-	inputs        map[string]*graphql.InputObject
+	server.ServerContext
+	schema     *ast.Schema
+	objects    map[string]*graphql.Object
+	interfaces map[string]*graphql.Interface
+	unions     map[string]*graphql.Union
+	enums      map[string]*graphql.Enum
+	inputs     map[string]*graphql.InputObject
 }
 
 var errMissingResolver = fmt.Errorf("missing resolver")
@@ -109,7 +109,7 @@ func createResolver(f *ast.FieldDefinition, c schemaContext) middlewares.Resolve
 			continue
 		}
 
-		middleware := middlewareDefinition.CreateMiddleware(c.serverContext, f, d)
+		middleware := middlewareDefinition.CreateMiddleware(c, f, d)
 
 		resolver = middleware.Wrap(resolver)
 	}
