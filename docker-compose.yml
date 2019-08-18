@@ -1,29 +1,39 @@
-version: "3.7"
+version: '3.7'
 
 services:
-  agogos.graphql-server:
-    build:
-      context: ./services/graphql-server
-    depends_on:
-      - agogos.registry
-    healthcheck:
-      disable: true
-    ports:
-      - 8011:8011
+    gateway:
+        build: services/graphql-server
+        depends_on:
+            - registry
+        ports:
+            - '8011:8011'
+        environment:
+            LOG_LEVEL: DEBUG
+            REGISTRY_URL: registry:81
 
-  agogos.registry:
-    build:
-      context: ./services/registry
-      args:
-        target: PRODUCTION
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/health"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-    environment:
-      - PORT=80
-      - GRPC_PORT=81
-    ports:
-      - 8012:80
-      - 8013:81
+    registry:
+        build:
+            args:
+                target: DEBUG
+            context: services/registry
+        depends_on:
+            - resources
+        ports:
+            - '8080:80'
+            - '8081:81'
+        environment:
+            LOG_LEVEL: DEBUG
+            PORT: 80
+            GRPC_PORT: 81
+
+            REMOTESOURCE__FILESYSTEM: http://resources:3000
+
+    resources:
+        build: remote-sources/filesystem
+        ports:
+            - '3000:3000'
+        environment:
+            PORT: 3000
+            SOURCE_FOLDER: /resources
+        volumes:
+            - ./remote-sources/filesystem/resources:/resources

@@ -5,7 +5,7 @@ FROM base as dependencies
 ARG target
 COPY package.json yarn.lock jest.config.js builtin-resources ./
 RUN yarn --production true
-RUN if [ $target = "DEBUG" ]; then yarn --pure-lockfile --production false; fi
+RUN if [ "$target" = "DEBUG" ]; then yarn --pure-lockfile --production false; fi
 
 FROM dependencies as build
 RUN yarn --production false
@@ -14,7 +14,7 @@ RUN yarn build
 
 FROM build as tests
 ARG target
-RUN if [ $target == "PRODUCTION" ]; then yarn test; fi
+RUN if [ "$target" == "PRODUCTION" ]; then yarn test; fi
 
 FROM base as release
 RUN apk add --no-cache curl

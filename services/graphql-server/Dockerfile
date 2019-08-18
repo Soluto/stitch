@@ -1,4 +1,4 @@
-FROM golang:1.12.5-stretch as base
+FROM golang:1.12.7-stretch as base
 
 # Enable the go modules feature
 ENV GO111MODULE=on
