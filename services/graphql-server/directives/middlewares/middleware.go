@@ -1,6 +1,8 @@
 package middlewares
 
 import (
+	"agogos/server"
+
 	"github.com/graphql-go/graphql"
 	"github.com/vektah/gqlparser/ast"
 )
@@ -11,16 +13,16 @@ type Middleware interface {
 	Wrap(next Resolver) Resolver
 }
 
-type MiddlewareFactory = func(*ast.FieldDefinition, *ast.Directive) Middleware
+type MiddlewareFactory = func(server.ServerContext, *ast.FieldDefinition, *ast.Directive) Middleware
 
 type MiddlewareDefinition interface {
-	CreateMiddleware(*ast.FieldDefinition, *ast.Directive) Middleware
+	CreateMiddleware(server.ServerContext, *ast.FieldDefinition, *ast.Directive) Middleware
 }
 
 type DirectiveDefinition struct {
 	MiddlewareFactory MiddlewareFactory
 }
 
-func (dd DirectiveDefinition) CreateMiddleware(f *ast.FieldDefinition, d *ast.Directive) Middleware {
-	return dd.MiddlewareFactory(f, d)
+func (dd DirectiveDefinition) CreateMiddleware(s server.ServerContext, f *ast.FieldDefinition, d *ast.Directive) Middleware {
+	return dd.MiddlewareFactory(s, f, d)
 }

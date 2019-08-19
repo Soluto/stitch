@@ -6,14 +6,15 @@ import (
 	"github.com/vektah/gqlparser/ast"
 
 	agogos "agogos/generated"
+	"agogos/server"
 	"agogos/utils"
 	"context"
 	"io"
 	"os"
 	"time"
 
-	"google.golang.org/grpc"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 
 	upstreams "agogos/extensions/upstreams"
 	upstreamsAuthentication "agogos/extensions/upstreams/authentication"
@@ -70,9 +71,6 @@ func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err err
 			return err
 		}
 
-		upstreams.Init(registryMessage.Upstreams)
-		upstreamsAuthentication.Init(registryMessage.UpstreamAuthCredentials)
-
 		astSchema, err := parseSdl(source{
 			name: "schema registry sdl",
 			sdl:  registryMessage.Schema.Definition,
@@ -86,7 +84,10 @@ func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err err
 			return err
 		}
 
-		schema, err := ConvertSchema(astSchema)
+		upstreamsMap := createUpstreams(registryMessage.Upstreams, registryMessage.UpstreamAuthCredentials)
+		serverContext := server.CreateServerContext(upstreamsMap)
+
+		convertedSchema, err := ConvertSchema(serverContext, astSchema)
 		if err != nil {
 			log.WithField("error", err).Warn("Error converting schema")
 			gqlConfigurations <- gqlConfigurationResult{
@@ -97,7 +98,7 @@ func subscribeToRegistry(gqlConfigurations chan gqlConfigurationResult) (err err
 		}
 
 		gqlConfigurations <- gqlConfigurationResult{
-			schema: schema,
+			schema: convertedSchema,
 			err:    nil,
 		}
 	}
@@ -133,4 +134,30 @@ func parseSdl(s source) (*ast.Schema, error) {
 	}
 
 	return schema, nil
+}
+
+func createUpstreams(upsConfigs []*agogos.Upstream, upsAuthConfigs []*agogos.UpstreamAuthCredentials) map[string]upstreams.Upstream {
+	upsAuths := make(map[string]map[string]upstreamsAuthentication.UpstreamAuthentication)
+	for _, upsAuthConfig := range upsAuthConfigs {
+		if _, ok := upsAuths[upsAuthConfig.AuthType]; !ok {
+			upsAuths[upsAuthConfig.AuthType] = make(map[string]upstreamsAuthentication.UpstreamAuthentication)
+		}
+
+		upsAuths[upsAuthConfig.AuthType][upsAuthConfig.Authority] = upstreamsAuthentication.CreateFromConfig(upsAuthConfig)
+	}
+
+	ups := make(map[string]upstreams.Upstream, len(upsConfigs))
+
+	for _, upConfig := range upsConfigs {
+		var matchedUpsAuth upstreamsAuthentication.UpstreamAuthentication
+		if m, ok := upsAuths[upConfig.Auth.AuthType]; ok {
+			if upsAuth, ok := m[upConfig.Auth.Authority]; ok {
+				matchedUpsAuth = upsAuth
+			}
+		}
+
+		ups[upConfig.Host] = upstreams.CreateFromConfig(upConfig, matchedUpsAuth)
+	}
+
+	return ups
 }

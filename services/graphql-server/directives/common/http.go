@@ -2,7 +2,7 @@ package common
 
 import (
 	"agogos/directives/middlewares"
-	upstreams "agogos/extensions/upstreams"
+	"agogos/server"
 	"agogos/utils"
 	"bytes"
 	"encoding/json"
@@ -41,11 +41,11 @@ type httpClient interface {
 }
 
 var httpMiddleware = middlewares.DirectiveDefinition{
-	MiddlewareFactory: func(f *ast.FieldDefinition, d *ast.Directive) middlewares.Middleware {
+	MiddlewareFactory: func(s server.ServerContext, f *ast.FieldDefinition, d *ast.Directive) middlewares.Middleware {
 		params := parseHTTPParams(d)
 		client := createHTTPClient(params.timeout)
 		return middlewares.ConcurrentLeaf(func(rp graphql.ResolveParams) (interface{}, error) {
-			request, err := createHTTPRequest(params, rp)
+			request, err := createHTTPRequest(s, params, rp)
 			if err != nil {
 				return nil, err
 			}
@@ -127,7 +127,7 @@ func createHTTPClient(timeout int) http.Client {
 	}
 }
 
-func createHTTPRequest(p httpParams, rp graphql.ResolveParams) (*http.Request, error) {
+func createHTTPRequest(s server.ServerContext, p httpParams, rp graphql.ResolveParams) (*http.Request, error) {
 	args, input, source := getArgs(rp)
 
 	URL, err := getURL(p.templateURL, p.queryParams, args, input, source)
@@ -159,8 +159,7 @@ func createHTTPRequest(p httpParams, rp graphql.ResolveParams) (*http.Request, e
 		request.Header.Set("Content-Type", "application/json")
 	}
 
-	// TODO: Make upstreams not connected directly to specific directive
-	ep, ok := upstreams.Get(request.URL.Host)
+	ep, ok := s.Upstream(request.URL.Host)
 	if ok {
 		ep.ApplyUpstream(request)
 	}

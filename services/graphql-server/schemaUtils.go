@@ -3,6 +3,7 @@ package main
 import (
 	"agogos/directives/common"
 	"agogos/directives/middlewares"
+	"agogos/server"
 	"agogos/utils"
 	"fmt"
 
@@ -13,6 +14,7 @@ import (
 )
 
 type schemaContext struct {
+	server.ServerContext
 	schema     *ast.Schema
 	objects    map[string]*graphql.Object
 	interfaces map[string]*graphql.Interface
@@ -97,7 +99,7 @@ func convertFieldArgs(a ast.ArgumentDefinitionList, c schemaContext) (graphql.Fi
 	return args, nil
 }
 
-func createResolver(f *ast.FieldDefinition) middlewares.Resolver {
+func createResolver(f *ast.FieldDefinition, c schemaContext) middlewares.Resolver {
 	resolver := fieldIdentityResolver
 
 	for _, d := range f.Directives {
@@ -107,7 +109,7 @@ func createResolver(f *ast.FieldDefinition) middlewares.Resolver {
 			continue
 		}
 
-		middleware := middlewareDefinition.CreateMiddleware(f, d)
+		middleware := middlewareDefinition.CreateMiddleware(c, f, d)
 
 		resolver = middleware.Wrap(resolver)
 	}
@@ -130,7 +132,7 @@ func convertSchemaField(f *ast.FieldDefinition, c schemaContext) (*graphql.Field
 	return &graphql.Field{
 		Description: f.Description,
 		Type:        convertType(f.Type, c),
-		Resolve:     createResolver(f),
+		Resolve:     createResolver(f, c),
 		Args:        args,
 	}, nil
 }
@@ -278,10 +280,11 @@ func convertSchemaObject(d *ast.Definition, c schemaContext) *graphql.Object {
 }
 
 // ConvertSchema converts schema definition to a graphql schema
-func ConvertSchema(astSchema *ast.Schema) (schemaPtr *graphql.Schema, err error) {
+func ConvertSchema(serverContext server.ServerContext, astSchema *ast.Schema) (schemaPtr *graphql.Schema, err error) {
 	defer utils.Recovery(&err)
 
 	schemaCtx := schemaContext{
+		serverContext,
 		astSchema,
 		make(map[string]*graphql.Object),
 		make(map[string]*graphql.Interface),
