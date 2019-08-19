@@ -15,7 +15,7 @@ import sources from "../sources-config";
 import logger from "../logger";
 import { AgogosObjectConfig } from "./object-types";
 
-export type AggObjsByName<Obj extends AgogosObjectConfig = AgogosObjectConfig> = { [name: string]: AgogosObjectConfig }
+export type AggObjsByName<ObjectConfig extends AgogosObjectConfig = AgogosObjectConfig> = { [name: string]: ObjectConfig }
 export type AggObjByNameByKind = { [kind: string]: AggObjsByName }
 
 const addSourceToName = (source: string, name: string): string =>

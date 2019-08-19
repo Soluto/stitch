@@ -42,7 +42,7 @@ export const makeGqlDocumentFromGqlSources = (gqlSchemas: AggObjsByName) => {
     return mergeAllDocuments(documentNodes);
 };
 
-const validateSchemasAsBool = (schemas: AggObjsByName<SchemaConfig>) => {
+const areSchemasValid = (schemas: AggObjsByName<SchemaConfig>) => {
     try {
         validateSchemas(schemas);
         return true;
@@ -55,7 +55,7 @@ const validateSchemasAsBool = (schemas: AggObjsByName<SchemaConfig>) => {
 const syncSchema$ = gqlObjects$.pipe(
     map(x => x.schemas),
     filter(a => a && Object.keys(a).length > 0),
-    filter(schemaBySource => validateSchemasAsBool(schemaBySource)),
+    filter(schemaBySource => areSchemasValid(schemaBySource)),
     map(schemaBySource => makeGqlDocumentFromGqlSources(schemaBySource)),
     map(print),
     distinctUntilChanged(),
