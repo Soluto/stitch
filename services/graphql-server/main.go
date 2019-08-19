@@ -63,6 +63,8 @@ func main() {
 				Playground: true,
 				GraphiQL:   false,
 			})
+
+			log.Info("New schema applied to gateway!")
 		}
 	}()
 
