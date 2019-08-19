@@ -1,20 +1,15 @@
 {
     "defaultSeverity": "error",
-    "extends": [
-        "tslint:recommended",
-        "tslint-eslint-rules",
-        "tslint-config-prettier"
-    ],
+    "extends": ["tslint:recommended", "tslint-eslint-rules", "tslint-config-prettier"],
     "linterOptions": {
-        "exclude": [
-            "node_modules/**/*.ts",
-            "src/generated/**/*.*"
-        ]
+        "exclude": ["node_modules/**/*.ts", "src/generated/**/*.*"]
     },
     "rules": {
         "interface-name": [true, "never-prefix"],
         "interface-over-type-literal": false,
         "object-literal-sort-keys": false,
-        "quotemark": [true, "double"]
+        "quotemark": false,
+        "no-submodule-imports": [true, "rxjs"],
+        "ordered-imports": false
     }
 }

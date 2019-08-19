@@ -1,5 +1,5 @@
 import gql from "graphql-tag";
-import { print } from "graphql/language/printer";
+import { print } from "graphql";
 import { mergeDocuments } from "./schema-utils";
 
 describe("mergeDocuments", () => {

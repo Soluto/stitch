@@ -19,7 +19,7 @@
         "glob": "^7.1.4",
         "google-protobuf": "^3.9.0",
         "graphql": "^14.4.2",
-        "graphql-tag": "^2.10.1",
+        "graphql-tools": "^4.0.5",
         "grpc": "^1.22.2",
         "mime-types": "^2.1.24",
         "nconf": "^0.10.0",
@@ -43,12 +43,13 @@
         "@types/pino": "^5.8.8",
         "@types/protobufjs": "^6.0.0",
         "@types/ramda": "^0.26.18",
+        "graphql-tag": "^2.10.1",
         "jest": "^24.8.0",
         "ts-jest": "^24.0.2",
+        "ts-node-dev": "^1.0.0-pre.40",
         "tslint": "^5.18.0",
         "tslint-config-prettier": "1.18.0",
         "tslint-eslint-rules": "5.4.0",
-        "ts-node-dev": "^1.0.0-pre.40",
         "typescript": "^3.5.3"
     }
 }

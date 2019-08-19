@@ -1,11 +1,17 @@
-// tslint:disable-next-line:no-submodule-imports
 import { filter, map, take } from "rxjs/operators";
-
-import { AgogosObjectConfig } from "../../sync/object-types";
+import {makeExecutableSchema} from "graphql-tools";
+import { AgogosObjectConfig, SchemaConfig } from "../../sync/object-types";
 import { makeGqlDocumentFromGqlSources } from "../../sync/sync-schemas";
-import gqlObjects$ from "../../sync/sync-service";
+import gqlObjects$, { AggObjsByName } from "../../sync/sync-service";
 
-const validateSchema = async (
+export const validateSchemas = (schemas: AggObjsByName<SchemaConfig>) => {
+    const stitchedSchema = makeGqlDocumentFromGqlSources(schemas);
+    makeExecutableSchema({
+        typeDefs: stitchedSchema,
+    });
+};
+
+export const validateSchemaWithLatest = async (
     source: string,
     name: string,
     spec: AgogosObjectConfig
@@ -17,7 +23,5 @@ const validateSchema = async (
         )
         .toPromise();
     const newSchemas = { ...schemas, [`${source}.${name}`]: spec };
-    makeGqlDocumentFromGqlSources(newSchemas);
+    validateSchemas(newSchemas);
 };
-
-export default validateSchema;

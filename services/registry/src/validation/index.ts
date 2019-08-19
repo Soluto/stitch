@@ -1,5 +1,5 @@
 import { AgogosObjectConfig } from "../sync/object-types";
-import validateSchema from "./validators/schemaValidator";
+import {validateSchemaWithLatest} from "./validators/schemaValidator";
 import validateUpstreamClientCredentials from "./validators/upstreamClientCredentialsValidator";
 import validateUpstream from "./validators/upstreamValidator";
 
@@ -10,7 +10,7 @@ type ValidatorDictionary = {
 }
 
 const validators: ValidatorDictionary = {
-    schema: validateSchema,
+    schema: validateSchemaWithLatest,
     upstream: validateUpstream,
     upstreamclientcredentials: validateUpstreamClientCredentials,
 };
