@@ -1,21 +1,12 @@
 import { defer, empty, from, Observable, OperatorFunction } from "rxjs";
-import {
-    catchError,
-    combineAll,
-    concat,
-    delay,
-    map,
-    repeat,
-    shareReplay,
-    startWith,
-    // tslint:disable-next-line:no-submodule-imports
-} from "rxjs/operators";
+import { catchError, combineAll, concat, delay, map, repeat, shareReplay, startWith, filter } from 'rxjs/operators';
 import sources from "../sources-config";
 
 import logger from "../logger";
 import { AgogosObjectConfig } from "./object-types";
+import { areObjectsValid } from "../validation";
 
-export type AggObjsByName<ObjectConfig extends AgogosObjectConfig = AgogosObjectConfig> = { [name: string]: ObjectConfig }
+export type AggObjsByName = { [name: string]: AgogosObjectConfig }
 export type AggObjByNameByKind = { [kind: string]: AggObjsByName }
 
 const addSourceToName = (source: string, name: string): string =>
@@ -74,7 +65,8 @@ const gqlObjects$: Observable<AggObjByNameByKind> = from(
     ),
     combineAll(),
     map(x => x.reduce((acc, next) => safeMergeObjects(acc, next)), {}),
-    shareReplay(1)
+    shareReplay(1),
+    filter(areObjectsValid),
 );
 
 export default gqlObjects$;

@@ -4,7 +4,7 @@ import { AgogosObjectConfig, SchemaConfig } from "../../sync/object-types";
 import { makeGqlDocumentFromGqlSources } from "../../sync/sync-schemas";
 import gqlObjects$, { AggObjsByName } from "../../sync/sync-service";
 
-export const validateSchemas = (schemas: AggObjsByName<SchemaConfig>) => {
+export const validateSchemas = (schemas: AggObjsByName) => {
     const stitchedSchema = makeGqlDocumentFromGqlSources(schemas);
     makeExecutableSchema({
         typeDefs: stitchedSchema,
