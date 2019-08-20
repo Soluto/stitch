@@ -30,7 +30,7 @@ export const areObjectsValid = (objects: AggObjByNameByKind): boolean => {
         validateSchemas(objects.schemas);
         return true;
     } catch (error) {
-        logger.error({error}, 'Resources validation failed');
+        logger.error(error, 'Resources validation failed');
         return false;
     }
 };
