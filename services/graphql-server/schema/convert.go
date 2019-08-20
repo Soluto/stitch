@@ -1,4 +1,4 @@
-package main
+package schema
 
 import (
 	"agogos/directives/common"
@@ -280,7 +280,7 @@ func convertSchemaObject(d *ast.Definition, c schemaContext) *graphql.Object {
 }
 
 // ConvertSchema converts schema definition to a graphql schema
-func ConvertSchema(serverContext server.ServerContext, astSchema *ast.Schema) (schemaPtr *graphql.Schema, err error) {
+func convertSchema(serverContext server.ServerContext, astSchema *ast.Schema) (schemaPtr *graphql.Schema, err error) {
 	defer utils.Recovery(&err)
 
 	schemaCtx := schemaContext{

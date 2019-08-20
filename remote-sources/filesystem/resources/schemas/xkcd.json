@@ -1,0 +1,3 @@
+{
+    "definition": "type XKCDComic {\n    num: Int\n    link: String\n\n    day: String\n    month: String\n    year: String\n\n    title: String\n    safe_title: String\n    alt: String\n    img: String\n\n    transcript: String\n    news: String\n}\n\ntype XKCDQuery {\n    latest: XKCDComic @http(url: \"http://xkcd.com/info.0.json\")\n    comic(num: Int!): XKCDComic @http(url: \"http://xkcd.com/:num/info.0.json\")\n}\n\ntype Query {\n    xkcd: XKCDQuery @stub(value: \"\")\n}"
+}

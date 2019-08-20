@@ -1,8 +1,10 @@
 package main
 
 import (
+	"agogos/registry"
+	"agogos/schema"
+	"context"
 	"net/http"
-	"time"
 
 	"agogos/metrics"
 
@@ -13,73 +15,74 @@ import (
 func main() {
 	err := InitLogger()
 	if err != nil {
-		log.Panic("Failed to init logger")
+		log.WithError(err).Fatalln("Failed to init logger")
 	}
 
 	log.Info("Graphql Server is starting...")
 
-	gqlConfigurations := make(chan gqlConfigurationResult)
-	go func() {
-		failures := 0
-		for {
-			start := time.Now()
-			log.Info("Connecting to registry...")
-			err := subscribeToRegistry(gqlConfigurations)
-			log.WithField("error", err).Warn("Connection attempt failed...")
-			elapsed := time.Since(start)
-			if elapsed < (10 * time.Second) {
-				failures++
-			} else {
-				failures = 0
-			}
-			if failures == 5 {
-
-				log.Panic("Failed to connect to gRPC channel")
-			}
-			time.Sleep(5 * time.Second)
-		}
-	}()
+	configCh, errCh := registry.Connect(context.Background())
+	if err != nil {
+		log.WithError(err).Fatalln("Failed to connect to registry")
+	}
 
 	var graphqlHTTPHandler http.Handler
 
+	// Handle registry connection errors
+	go func() {
+		errors := 0
+		for {
+			err := <-errCh
+			log.WithError(err).Println("Registry connection/subscription failure")
+			errors++
+			metrics.RegistryConnectionErrors.Inc()
+
+			if graphqlHTTPHandler == nil && errors > 30 {
+				log.WithError(err).Fatalln("Couldn't connect to registry")
+			}
+		}
+	}()
+
+	schemaCh := schema.Process(configCh)
+
+	// Handle new schemas
 	go func() {
 		for {
-			gqlConfiguration := <-gqlConfigurations
-			log.Info("Got new configuration from registry")
+			schemaResult := <-schemaCh
 
-			if gqlConfiguration.err != nil {
-				log.WithField("error", gqlConfiguration.err).Error("Error getting configuration from registry")
+			if schemaResult.Error != nil {
+				log.WithError(schemaResult.Error).Error("Error processing new schema")
+				metrics.SchemaErrors.Inc()
 				continue
 			}
 
 			log.Info("Updating graphql server...")
 
 			graphqlHTTPHandler = handler.New(&handler.Config{
-				Schema:     gqlConfiguration.schema,
+				Schema:     schemaResult.Schema,
 				Pretty:     true,
 				Playground: true,
 				GraphiQL:   false,
 			})
+
+			log.Info("New schema applied to gateway!")
 		}
 	}()
 
-	graphqlHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	graphqlHandler := metrics.InstrumentHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if graphqlHTTPHandler != nil {
 			graphqlHTTPHandler.ServeHTTP(w, r)
 		} else {
 			http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
 		}
-	})
+	}))
 	metricsHandler := metrics.Init()
-
-	mainHandler := metrics.InstrumentHandler(graphqlHandler)
 
 	healthHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Write([]byte("true"))
 	})
 
-	http.Handle("/graphql", mainHandler)
+	http.Handle("/graphql", graphqlHandler)
 	http.Handle("/health", healthHandler)
 	http.Handle("/metrics", metricsHandler)
 	http.ListenAndServe(":8011", nil)
