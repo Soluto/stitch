@@ -36,6 +36,7 @@ spec:
                   enum:
                     - oauth2/client_credentials
                     - activedirectory/client_credentials
+                    - forward_auth_header
                 authority:
                   type: string
                 scope:

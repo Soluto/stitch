@@ -3,6 +3,7 @@ package main
 import (
 	"agogos/registry"
 	"agogos/schema"
+	"agogos/server/runtime"
 	"context"
 	"net/http"
 
@@ -70,6 +71,7 @@ func main() {
 
 	graphqlHandler := metrics.InstrumentHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if graphqlHTTPHandler != nil {
+			r = runtime.BindRequestContext(r)
 			graphqlHTTPHandler.ServeHTTP(w, r)
 		} else {
 			http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)

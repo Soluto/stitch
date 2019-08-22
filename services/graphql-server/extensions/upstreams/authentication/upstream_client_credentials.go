@@ -1,6 +1,7 @@
 package authentication
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -20,7 +21,7 @@ type upstreamClientCredentials struct {
 }
 
 // AddAuthentication implements interface AuthProvider, adds Authorization header to HTTP request
-func (ucc *upstreamClientCredentials) AddAuthentication(req *http.Request, scope string) {
+func (ucc *upstreamClientCredentials) AddAuthentication(ctx context.Context, req *http.Request, scope string) {
 	tokenSource := ucc.getOrCreateTokenSource(scope)
 	tok, err := tokenSource.Token()
 
