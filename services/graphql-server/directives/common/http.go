@@ -219,7 +219,18 @@ func getURL(templateURL string, queryParams []nameValue, args dictionary, input 
 	mappedQueryParams := mappedURL.Query()
 
 	for _, nv := range queryParams {
-		if p := args[nv.value]; p != nil && p != "" {
+		switch p := args[nv.value].(type) {
+		case []interface{}:
+			for _, val := range p {
+				mappedQueryParams.Add(nv.name, fmt.Sprintf("%s", val))
+			}
+		case nil:
+			continue
+		default:
+			if p == "" {
+				continue
+			}
+
 			mappedQueryParams.Add(nv.name, fmt.Sprintf("%s", p))
 		}
 	}
