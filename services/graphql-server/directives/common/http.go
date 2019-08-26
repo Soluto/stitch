@@ -222,7 +222,7 @@ func getURL(templateURL string, queryParams []nameValue, args dictionary, input 
 		switch p := args[nv.value].(type) {
 		case []interface{}:
 			for _, val := range p {
-				mappedQueryParams.Add(nv.name, fmt.Sprintf("%s", val))
+				mappedQueryParams.Add(nv.name, fmt.Sprintf("%v", val))
 			}
 		case nil:
 			continue
@@ -231,7 +231,7 @@ func getURL(templateURL string, queryParams []nameValue, args dictionary, input 
 				continue
 			}
 
-			mappedQueryParams.Add(nv.name, fmt.Sprintf("%s", p))
+			mappedQueryParams.Add(nv.name, fmt.Sprintf("%v", p))
 		}
 	}
 
