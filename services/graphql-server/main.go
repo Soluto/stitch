@@ -85,5 +85,5 @@ func main() {
 	http.Handle("/graphql", graphqlHandler)
 	http.Handle("/health", healthHandler)
 	http.Handle("/metrics", metricsHandler)
-	http.ListenAndServe(":8011", nil)
+	log.Fatalln(http.ListenAndServe(":8011", nil))
 }
