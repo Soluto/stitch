@@ -7,9 +7,10 @@ require (
 	github.com/graphql-go/handler v0.2.3
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
+	github.com/machinebox/graphql v0.2.2
+	github.com/matryer/is v1.2.0 // indirect
 	github.com/prometheus/client_golang v1.0.0
 	github.com/sirupsen/logrus v1.4.2
-	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/stretchr/testify v1.3.0
 	github.com/vektah/gqlparser v1.1.1
 	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80

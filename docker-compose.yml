@@ -37,3 +37,8 @@ services:
             SOURCE_FOLDER: /resources
         volumes:
             - ./remote-sources/filesystem/resources:/resources
+
+    user-books-service:
+        build: e2e/mocks/graphql-server-mock
+        ports:
+            - '8101:4000'

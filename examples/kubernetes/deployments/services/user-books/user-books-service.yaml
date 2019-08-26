@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-books-service
+  namespace: user-namespace
+spec:
+  selector:
+    matchLabels:
+      app: user-books-service
+  template:
+    metadata:
+      labels:
+        app: user-books-service
+    spec:
+      containers:
+      - name: user-books-service
+        image: soluto/agogos-graphql-server-mock
+        imagePullPolicy: Never
+        command:
+          - yarn
+          - start
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 4000
+          initialDelaySeconds: 3
+          periodSeconds: 30
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: user-books-service
+  namespace: user-namespace
+spec:
+  selector:
+    app: user-books-service
+  ports:
+    - name: http
+      port: 80
+      targetPort: 4000
+---

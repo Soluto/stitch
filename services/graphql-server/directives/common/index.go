@@ -9,4 +9,5 @@ var MiddlewareDefinitions = map[string]middlewares.MiddlewareDefinition{
 	"stub":            stub,
 	"http":            httpMiddleware,
 	"select":          selectMiddleware,
+	"gql":             gqlMiddleware,
 }

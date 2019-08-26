@@ -41,14 +41,21 @@ build_images() {
     docker build -t soluto/agogos-graphql-gateway '../services/graphql-server'
     docker build -t soluto/agogos-registry '../services/registry'
     docker build -t soluto/agogos-gql-controller '../remote-sources/kubernetes'
+    docker build -t soluto/agogos-graphql-server-mock './mocks/graphql-server-mock'
     docker build -t soluto/agogos-e2e '.'
 }
 
 load_images() {
     echo "Loading images to cluster..."
+    # Core images
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-graphql-gateway
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-registry
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-gql-controller
+
+    # Mocks
+    kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-graphql-server-mock
+
+    # Tests
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-e2e
 }
 
@@ -81,6 +88,7 @@ prepare_environment() {
     kubectl apply -f ../examples/kubernetes/deployments/services/user-namespace.yaml
     kubectl apply -f ../examples/kubernetes/deployments/services/user
     kubectl apply -f ../examples/kubernetes/deployments/services/user-subscription
+    kubectl apply -f ../examples/kubernetes/deployments/services/user-books
 }
 
 execute_tests() {
@@ -89,6 +97,7 @@ execute_tests() {
     echo "Waiting for things to get ready...($STARTUP_TIMEOUT seconds at most for each service)"
     kubectl -n user-namespace wait pod -l app=user-subscription-service --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
     kubectl -n user-namespace wait pod -l app=user-service --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
+    kubectl -n user-namespace wait pod -l app=user-books-service --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
     kubectl -n oidc-namespace wait pod -l app=oidc-server-mock --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
     kubectl -n agogos wait pod -l app=gateway --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
 
