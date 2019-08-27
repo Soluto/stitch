@@ -1,13 +1,13 @@
 # Stage 1: dependencies
 FROM node:10-alpine as dependencies
 WORKDIR /app
-COPY package.json ./
+COPY package.json yarn.lock ./
 RUN yarn --production
 
 # Stage 2: build
 FROM node:10-alpine as build
 WORKDIR /app
-COPY package.json ./
+COPY package.json yarn.lock ./
 RUN yarn
 COPY src ./src
 COPY data ./data

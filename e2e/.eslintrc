@@ -23,7 +23,7 @@
         "@typescript-eslint/semi": ["error"]
     },
     "overrides": [{
-        "files": ["test/**"],
+        "files": ["tests/**"],
         "rules": {
             "no-unused-expressions": "off"
         }

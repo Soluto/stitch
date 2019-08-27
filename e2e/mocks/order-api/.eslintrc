@@ -21,11 +21,5 @@
         "array-bracket-spacing": "off",
         "semi": "off",
         "@typescript-eslint/semi": ["error"]
-    },
-    "overrides": [{
-        "files": ["test/**"],
-        "rules": {
-            "no-unused-expressions": "off"
-        }
-    }]
+    }
 }
