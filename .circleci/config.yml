@@ -234,6 +234,8 @@ workflows:
             - build_graphql_gateway
             - build_gql_controller
             - build_e2e
+            - build_customer_api
+            - build_order_api
       - tag_repo:
           requires:
             - run_e2e_tests
@@ -280,3 +282,5 @@ workflows:
             - build_graphql_gateway
             - build_gql_controller
             - build_e2e
+            - build_customer_api
+            - build_order_api
