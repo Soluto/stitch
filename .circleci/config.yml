@@ -70,6 +70,24 @@ commands:
           failure_message: 🔴 Push image job for soluto/<< parameters.imageName >> has failed!
 
 jobs:
+  build_customer_api:
+    machine:
+      image: ubuntu-1604:201903-01
+
+    steps:
+      - build_image:
+          imageName: agogos-e2e-customer-api
+          workingDirectory: ./e2e/mocks/customer-api
+
+  build_order_api:
+    machine:
+      image: ubuntu-1604:201903-01
+
+    steps:
+      - build_image:
+          imageName: agogos-e2e-order-api
+          workingDirectory: ./e2e/mocks/order-api
+
   build_registry:
     machine:
       image: ubuntu-1604:201903-01
@@ -147,6 +165,8 @@ jobs:
             docker load < agogos-registry.tar
             docker load < agogos-graphql-gateway.tar
             docker load < agogos-gql-controller.tar
+            docker load < agogos-e2e-customer-api.tar
+            docker load < agogos-e2e-order-api.tar
             docker load < agogos-e2e.tar
 
       - run:
@@ -202,6 +222,8 @@ workflows:
 
   build_test_push:
     jobs:
+      - build_customer_api
+      - build_order_api
       - build_registry
       - build_graphql_gateway
       - build_gql_controller
@@ -246,6 +268,8 @@ workflows:
               only:
                 - master
     jobs:
+      - build_customer_api
+      - build_order_api
       - build_registry
       - build_graphql_gateway
       - build_gql_controller

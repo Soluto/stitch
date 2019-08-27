@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "license": "MIT",
     "scripts": {
-        "test": "mocha --require ts-node/register ./**/*.spec.ts --exit",
+        "test": "mocha --require ./tsnodeRegister.js ./**/*.spec.ts --exit",
         "tslint-check": "tslint-config-prettier-check ./tslint.json"
     },
     "devDependencies": {
@@ -15,9 +15,14 @@
         "@types/wait-on": "3.2.0",
         "mocha": "6.2.0",
         "ts-node": "8.3.0",
-        "tslint": "5.18.0",
-        "tslint-config-prettier": "1.18.0",
-        "tslint-eslint-rules": "5.4.0",
+        "@typescript-eslint/eslint-plugin": "2.0.0",
+        "@typescript-eslint/parser": "2.0.0",
+        "eslint": "6.2.2",
+        "eslint-config-standard": "14.0.1",
+        "eslint-plugin-import": "2.18.2",
+        "eslint-plugin-node": "9.1.0",
+        "eslint-plugin-promise": "4.2.1",
+        "eslint-plugin-standard": "4.0.1",
         "typescript": "3.5.3"
     },
     "dependencies": {
