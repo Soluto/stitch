@@ -4,19 +4,6 @@ import { getToken } from "../utils/token-utils";
 
 
 describe("Simple tests", () => {
-
-    const expectedResponse = {
-        user: {
-            firstName: "john",
-            id: "1",
-            lastName: "doe",
-            subscription: {
-                expirationDate: "2019-01-01T00:00:00Z",
-                plan: "trial"
-            }
-        }
-    };
-
     let client: GraphQLClient;
 
     before(async () => {
@@ -31,17 +18,9 @@ describe("Simple tests", () => {
 
     it("should return user data", async () => {
         const response = await client.request(`{
-            user(id: "1") {
-                id
-                lastName
-                firstName
-                subscription {
-                    plan
-                    expirationDate
-                }
-            }
+            hello
         }`);
         expect(response).to.exist;
-        expect(response).to.deep.equal(expectedResponse);
+        expect(response).to.deep.equal({ hello: "world" });
     });
 });

@@ -1,0 +1,29 @@
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: gql-controller
+webhooks:
+  - name: schema-validation-webhook.agogos.platform
+    rules:
+      - apiGroups:
+          - agogos.app
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - schemas
+          - upstreams
+          - upstreamclientcredentials
+        scope: "Namespaced"
+    failurePolicy: Fail
+    clientConfig:
+      service:
+        namespace: "agogos"
+        name: "gql-controller"
+        path: "/validate"
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURHekNDQWdPZ0F3SUJBZ0lKQU9pUDZ1V2JDdjhzTUEwR0NTcUdTSWIzRFFFQkJRVUFNQ1F4SWpBZ0JnTlYKQkFNTUdXZHhiQzFqYjI1MGNtOXNiR1Z5TG1GbmIyZHZjeTV6ZG1Nd0hoY05NVGt3T0RJNE1EVXdNVFV3V2hjTgpNamt3T0RJMU1EVXdNVFV3V2pBa01TSXdJQVlEVlFRRERCbG5jV3d0WTI5dWRISnZiR3hsY2k1aFoyOW5iM011CmMzWmpNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQW91L3BpUzVib2lZY2xzdFoKMEFPY2lmR3JLOEdGbUovUHdMTzE3QTVzWnhUanlubEMvTnBTOWFBVmY0b0FRbXVaYVR0SjF3N1NWa0EwYTNpSQpaMmVuaG5BS1NpSCtmY2N2YXRLQ3VaeG01OG81Mnc0S2hidkRIZkV5VVVsMkxJN2ZwRWV0bGgvQXY5MXJhUjlTCm11aXdjYVh4eVRISUZOK0UwemZNakFLa0tleWJSUXJVWnhiejBQZ2hhMmxhc3RWZGtjekE2T09OTUlBOXB0alAKS0I2UTN5c0dteExST2VVV0FONVRuajEwQWlHRHdReFh4RVpGYUNwUmFaeTBGK0ZYVlVSM2t2Mk5uS0ptbGk3VQpMM1F5ejNrUXBtYks3OFpaWGlDK3A5MG1tVGNjYXo5bXYxZjFWclpKUUVvQ3g1TjFsWjlZN0kyMW5venpET3ZCCmd2OTcxd0lEQVFBQm8xQXdUakFkQmdOVkhRNEVGZ1FVRTN3NWdJK25Wd2R6andDQXAyUnZrTk9SdHRvd0h3WUQKVlIwakJCZ3dGb0FVRTN3NWdJK25Wd2R6andDQXAyUnZrTk9SdHRvd0RBWURWUjBUQkFVd0F3RUIvekFOQmdrcQpoa2lHOXcwQkFRVUZBQU9DQVFFQWdmc1c1UUlYWlNCMnpUNkFEV1RNTG9aemFGOVJXTTBVbE9iOGhhRzE4MjZnCnl1VEhFZjJQTnVwT1VkaWcyVTN2a1dqTFlaR1BWbngyS1REK2dwQ2c4K0FsTG9WckJWbW1McDVsYlhML2UyeWoKNDM5bGVZL2hJZmc3cDFPVG9pTUZWZi94eENydEtlb0RtT2lPV3Z1UjY5TmI2Qk9UcHp0aldrSXZ5MmkxN2E1dQpmNngrSnZVa0dydmdpeFNqcHZMQ2t1a0ZXVCtNWFZrZCtEeGpNUmRsK1JHT1E2VGhkYlNNV3JvWVArSFNmVWJvCllodUh2ekljdVlmYmpZU3lTbnRhcjZ4WStPM3JrbmgyUHF2WTUwWFBtbEdUcUIrM1l2TUF4VnVvRjhjNlljU2QKYWJEUUk3aklFbVFHNU4xTmI1czcvMnJCVzNETXBoNWw1R2J5WEU4bFhBPT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    admissionReviewVersions:
+      - v1beta1
+    timeoutSeconds: 3

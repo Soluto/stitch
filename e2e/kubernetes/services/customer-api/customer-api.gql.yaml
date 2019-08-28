@@ -1,0 +1,16 @@
+apiVersion: agogos.app/v1
+kind: Schema
+metadata:
+  name: customer-api
+  namespace: user-namespace
+spec:
+  definition: |
+    type Customer {
+      id: ID!
+      firstName: String
+      lastName: String
+    }
+
+    type Query {
+      customer(id: ID!): Customer @http(url: "http://customer-api.user-namespace/customer/:id")
+    }

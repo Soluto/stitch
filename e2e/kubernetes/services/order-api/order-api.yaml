@@ -2,33 +2,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-service
+  name: order-api
   namespace: user-namespace
 spec:
   selector:
     matchLabels:
-      app: user-service
+      app: order-api
   template:
     metadata:
       labels:
-        app: user-service
+        app: order-api
     spec:
       containers:
-      - name: user-service
-        image: clue/json-server
-        volumeMounts:
-          - name: data
-            mountPath: data
-            readOnly: true
-        command:
-          - json-server
-          - --port
-          - "8080"
-          - server.json
+      - name: order-api
+        image: soluto/agogos-e2e-order-api
+        imagePullPolicy: Never
         livenessProbe:
           httpGet:
-            path: /users
-            port: 8080
+            path: /health
+            port: 3000
           initialDelaySeconds: 3
           periodSeconds: 30
       - name: airbag
@@ -41,16 +33,16 @@ spec:
       volumes:
         - name: data
           configMap:
-            name: user-service
+            name: order-api
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: user-service
+  name: order-api
   namespace: user-namespace
 spec:
   selector:
-    app: user-service
+    app: order-api
   ports:
     - name: http
       port: 80
@@ -59,20 +51,16 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: user-service
+  name: order-api
   namespace: user-namespace
 data:
-  server.json: |
-        {
-          "users": [{ "id": "1", "firstName": "john", "lastName": "doe" }]
-        }
   airbag-config.json: |
         {
-          "backend": "http://localhost:8080",
+          "backend": "http://localhost:3000",
           "JWTProviders": [
               {
                   "iss": "http://oidc-server-mock.oidc-namespace",
-                  "aud": "user-service-scope"
+                  "aud": "order-api-scope"
               }
             ],
             "UnauthenticatedPaths": [
