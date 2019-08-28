@@ -35,7 +35,7 @@ func (up *upstreamStruct) ApplyUpstream(ctx context.Context, req *http.Request) 
 	}
 }
 
-func CreateFromConfig(upConfig *agogos.Upstream, upsAuth authentication.UpstreamAuthentication) Upstream {
+func CreateUpstream(upConfig *agogos.Upstream, upsAuth authentication.UpstreamAuthentication) Upstream {
 	return &upstreamStruct{
 		host: upConfig.Host,
 		auth: authStruct{

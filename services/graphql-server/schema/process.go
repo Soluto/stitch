@@ -48,12 +48,12 @@ func transformToSchema(config *agogos.ConfigurationMessage) (*graphql.Schema, er
 }
 
 func createUpstreams(upsConfigs []*agogos.Upstream, upsAuthConfigs []*agogos.UpstreamAuthCredentials) map[string]upstreams.Upstream {
-	authMap := authentication.CreateFromConfig(upsAuthConfigs)
+	authMap := authentication.CreateUpstreamAuths(upsAuthConfigs)
 	ups := make(map[string]upstreams.Upstream, len(upsConfigs))
 
 	for _, upConfig := range upsConfigs {
 		auth := authMap.Get(upConfig.Auth.AuthType, upConfig.Auth.Authority)
-		ups[upConfig.Host] = upstreams.CreateFromConfig(upConfig, auth)
+		ups[upConfig.Host] = upstreams.CreateUpstream(upConfig, auth)
 	}
 
 	return ups
