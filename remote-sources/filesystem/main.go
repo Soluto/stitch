@@ -37,7 +37,7 @@ func readFolder(dirName string) (map[string]interface{}, error) {
 		defer content.Close()
 
 		decoder := json.NewDecoder(content)
-		var jsonContent map[string]string
+		var jsonContent map[string]interface{}
 		decoder.Decode(&jsonContent)
 		contents[file.Name()] = jsonContent
 	}
@@ -47,7 +47,6 @@ func readFolder(dirName string) (map[string]interface{}, error) {
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Handling request...")
 		schemas, err := readFolder("schemas")
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

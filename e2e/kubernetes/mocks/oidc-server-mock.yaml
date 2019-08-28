@@ -19,7 +19,8 @@ spec:
           - name: API_RESOURCES_INLINE
             value: |
               [
-                "user-service-scope",
+                "customer-api-scope",
+                "order-api-scope",
                 "agogos-scope"
               ]
           - name: CLIENTS_CONFIGURATION_INLINE
@@ -30,12 +31,13 @@ spec:
                     "ClientSecrets": [
                       "very-strong-secret"
                     ],
-                    "Description": "user-service configuration",
+                    "Description": "customer-api configuration",
                     "AllowedGrantTypes": [
                         "client_credentials"
                     ],
                     "AllowedScopes": [
-                        "user-service-scope"
+                        "customer-api-scope",
+                        "order-api-scope"
                     ]
                 },
                 {

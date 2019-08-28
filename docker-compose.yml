@@ -22,7 +22,7 @@ services:
             - '8080:80'
             - '8081:81'
         environment:
-            LOG_LEVEL: DEBUG
+            LOG_LEVEL: INFO
             PORT: 80
             GRPC_PORT: 81
 

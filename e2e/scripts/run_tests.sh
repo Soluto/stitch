@@ -38,24 +38,34 @@ report_error_and_exit() {
 
 build_images() {
     echo "Building images..."
+    # Mock services images
+    docker build -t soluto/agogos-e2e-customer-api './mocks/customer-api'
+    docker build -t soluto/agogos-e2e-order-api './mocks/order-api'
+    docker build -t soluto/agogos-e2e-hotel-api './mocks/hotel-api'
+
+
+    # Core services images
     docker build -t soluto/agogos-graphql-gateway '../services/graphql-server'
     docker build -t soluto/agogos-registry '../services/registry'
     docker build -t soluto/agogos-gql-controller '../remote-sources/kubernetes'
-    docker build -t soluto/agogos-graphql-server-mock './mocks/graphql-server-mock'
+
+    # E2E image
     docker build -t soluto/agogos-e2e '.'
 }
 
 load_images() {
     echo "Loading images to cluster..."
-    # Core images
+    # Mock services images
+    kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-e2e-customer-api
+    kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-e2e-order-api
+    kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-e2e-hotel-api
+
+    # Core services images
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-graphql-gateway
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-registry
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-gql-controller
 
-    # Mocks
-    kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-graphql-server-mock
-
-    # Tests
+    # E2E image
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-e2e
 }
 
@@ -67,38 +77,41 @@ prepare_environment() {
 
     echo "Creating kubernetes objects..."
     # namespace
-    kubectl apply -f ../examples/kubernetes/deployments/infra/namespace.yaml
-    kubectl apply -f ../examples/kubernetes/deployments/infra/service-account.yaml
+    kubectl apply -f ./kubernetes/infra/namespace.yaml
+    kubectl apply -f ./kubernetes/infra/service-account.yaml
 
     # CRDs
     kubectl apply -f ../remote-sources/kubernetes/src/crd
 
     # mocks
-    kubectl apply -f ../examples/kubernetes/deployments/mocks/oidc-namespace.yaml
-    kubectl apply -f ../examples/kubernetes/deployments/mocks
+    kubectl apply -f ./kubernetes/mocks/oidc-namespace.yaml
+    kubectl apply -f ./kubernetes/mocks
 
     # agogos deployments, roles & secrets
-    kubectl apply -f ../examples/kubernetes/deployments/infra
+    kubectl apply -f ./kubernetes/infra
     kubectl -n agogos wait pod -l app=registry --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
     kubectl -n agogos wait pod -l app=gql-controller --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
     # TODO: Improve readiness probe
     sleep 10
 
     # user namespace & services
-    kubectl apply -f ../examples/kubernetes/deployments/services/user-namespace.yaml
-    kubectl apply -f ../examples/kubernetes/deployments/services/user
-    kubectl apply -f ../examples/kubernetes/deployments/services/user-subscription
-    kubectl apply -f ../examples/kubernetes/deployments/services/user-books
+    kubectl apply -f ./kubernetes/services/user-namespace.yaml
+    kubectl apply -f ./kubernetes/services/customer-api
+    kubectl apply -f ./kubernetes/services/order-api
+    kubectl apply -f ./kubernetes/services/hotel-api
 }
 
 execute_tests() {
 
     # running e2e
     echo "Waiting for things to get ready...($STARTUP_TIMEOUT seconds at most for each service)"
-    kubectl -n user-namespace wait pod -l app=user-subscription-service --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
-    kubectl -n user-namespace wait pod -l app=user-service --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
-    kubectl -n user-namespace wait pod -l app=user-books-service --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
+    kubectl -n user-namespace wait pod -l app=customer-api --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
+    kubectl -n user-namespace wait pod -l app=order-api --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
+    kubectl -n user-namespace wait pod -l app=hotel-api --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
+
+
     kubectl -n oidc-namespace wait pod -l app=oidc-server-mock --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
+
     kubectl -n agogos wait pod -l app=gateway --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
 
     echo "Running e2e tests job..."

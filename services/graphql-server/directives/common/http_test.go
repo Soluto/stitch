@@ -403,6 +403,30 @@ func TestCreateHTTPRequest(t *testing.T) {
 				nameValue{"Content-Type", "application/json"},
 			},
 		},
+		{
+			"Non string query params",
+			graphql.ResolveParams{
+				Args: map[string]interface{}{
+					"int":   100,
+					"arr":   []interface{}{"a", 3},
+					"bool":  true,
+					"float": 123.2,
+				},
+				Context: testContext,
+			},
+			httpParams{
+				templateURL: "http://some/",
+				queryParams: []nameValue{
+					nameValue{"int", "int"},
+					nameValue{"arr", "arr"},
+					nameValue{"bool", "bool"},
+					nameValue{"float", "float"},
+				},
+			},
+			"http://some/?arr=a&arr=3&bool=true&float=123.2&int=100",
+			nil,
+			[]nameValue{},
+		},
 	}
 
 	for _, test := range tests {

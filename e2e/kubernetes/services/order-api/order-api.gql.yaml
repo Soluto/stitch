@@ -1,0 +1,22 @@
+apiVersion: agogos.app/v1
+kind: Schema
+metadata:
+  name: order-api
+  namespace: user-namespace
+spec:
+  definition: |
+    type Order {
+      id: ID!
+      startDate: String!
+      endDate: String!
+      adults: Int!
+      children: Int
+      city: String!
+      country: String!
+      hotel: String!
+    }
+
+    type Customer {
+      orders: [Order]
+        @http(url: "http://order-api.user-namespace/customerOrders/:id")
+    }
