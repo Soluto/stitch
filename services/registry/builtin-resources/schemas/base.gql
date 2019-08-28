@@ -22,3 +22,5 @@ directive @http(
 ) on FIELD_DEFINITION
 
 directive @select(path: [String!]!) on FIELD_DEFINITION
+
+scalar JSON
