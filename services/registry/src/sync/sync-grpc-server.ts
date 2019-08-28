@@ -45,8 +45,14 @@ class GqlConfigurationSubscriptionServer implements IRegistryServer {
                     const upstreamAuth = new UpstreamAuthentication();
                     // FIXME: get from ep
                     upstreamAuth.setAuthType(ep.auth.authType);
-                    upstreamAuth.setAuthority(ep.auth.authority);
-                    upstreamAuth.setScope(ep.auth.scope);
+                    if (ep.auth.authority) {
+                        upstreamAuth.setAuthority(ep.auth.authority);
+                    }
+
+                    if (ep.auth.scope) {
+                        upstreamAuth.setScope(ep.auth.scope);
+                    }
+                    
                     upstream.setAuth(upstreamAuth);
 
                     return upstream;
