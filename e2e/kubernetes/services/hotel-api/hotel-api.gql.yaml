@@ -1,0 +1,21 @@
+apiVersion: agogos.app/v1
+kind: Schema
+metadata:
+  name: hotel-api
+  namespace: user-namespace
+spec:
+  definition: |
+    type Hotel {
+      id: String!
+      name: String!
+      address: String!
+      city: String!
+      country: String!
+      stars: Int
+      services: [String]
+    }
+
+    type Query {
+      hotel(id: ID!): Hotel @gql(url: "http://hotel-api.user-namespace", queryName: "hotels"),
+      hotels: [Hotel] @gql(url: "http://hotel-api.user-namespace", queryName: "hotel", args: ["id"])
+    }

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 )
 
@@ -36,9 +37,16 @@ func readFolder(dirName string) (map[string]interface{}, error) {
 
 		defer content.Close()
 
-		decoder := json.NewDecoder(content)
 		var jsonContent map[string]interface{}
-		decoder.Decode(&jsonContent)
+		switch filepath.Ext(file.Name()) {
+		case ".json":
+			decoder := json.NewDecoder(content)
+			decoder.Decode(&jsonContent)
+		case ".gql":
+			definition, _ := ioutil.ReadAll(content)
+			jsonContent = make(map[string]interface{})
+			jsonContent["definition"] = string(definition)
+		}
 		contents[file.Name()] = jsonContent
 	}
 

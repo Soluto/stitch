@@ -1,22 +1,21 @@
-{
-    "1": [{
-        "id": "1234",
-        "startDate": "2019-01-11",
-        "endDate": "2019-01-19",
-        "adults": 2,
-        "children": 0,
-        "city": "London",
-        "country": "Great Britain",
-        "hotel": "Hotel ibis London Blackfriars"
-    }, {
-        "id": "1234",
-        "startDate": "2019-06-21",
-        "endDate": "2019-06-28",
-        "adults": 2,
-        "children": 1,
-        "city": "Paris",
-        "country": "France",
-        "hotel": "Hotel ibis Paris Avenue de la République"
-    }],
-    "2": []
-}
+  [{
+      "id": "1234",
+      "customerId": "1",
+      "hotelId": "hotel_ibis_london_blackfriars",
+      "startDate": "2019-01-11",
+      "endDate": "2019-01-19",
+      "adults": 2,
+      "children": 0,
+      "city": "London",
+      "country": "UK"
+  }, {
+      "id": "1234",
+      "customerId": "2",
+      "hotelId": "hotel_ibis_paris_avenue_de_la_republique",
+      "startDate": "2019-06-21",
+      "endDate": "2019-06-28",
+      "adults": 2,
+      "children": 1,
+      "city": "Paris",
+      "country": "France"
+  }]

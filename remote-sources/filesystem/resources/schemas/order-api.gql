@@ -1,0 +1,23 @@
+type Order {
+    id: ID!
+    customer: Customer
+    @http(url: "http://customer-api/customer/:customerId")
+    hotel: Hotel
+    @gql(url: "http://hotel-api", queryName: "hotel", args: ["id"])
+    startDate: String!
+    endDate: String!
+    adults: Int!
+    children: Int
+    city: String!
+    country: String!
+}
+
+type Customer {
+    orders: [Order]
+    @http(url: "http://order-api/customerOrders/:customerId")
+}
+
+type Hotel {
+    orders: [Order]
+    @http(url: "http://order-api/hotelOrders/:hotelId")
+}

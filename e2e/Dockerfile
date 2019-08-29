@@ -7,6 +7,7 @@ COPY ./tests ./tests
 
 # Data for tests
 COPY ./data ./data
+COPY ./mocks ./mocks
 
 # More data for tests
 COPY ./mocks/customer-api/data ./mocks/customer-api/data

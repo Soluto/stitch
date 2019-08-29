@@ -7,16 +7,24 @@ spec:
   definition: |
     type Order {
       id: ID!
+      customer: Customer
+        @http(url: "http://customer-api.user-namespace/customer/:customerId")
+      hotel: Hotel
+        @gql(url: "http://hotel-api.user-namespace", queryName: "hotel", args: ["id"])
       startDate: String!
       endDate: String!
       adults: Int!
       children: Int
       city: String!
       country: String!
-      hotel: String!
     }
 
     type Customer {
       orders: [Order]
-        @http(url: "http://order-api.user-namespace/customerOrders/:id")
+        @http(url: "http://order-api.user-namespace/customerOrders/:customerId")
+    }
+
+    type Hotel {
+      orders: [Order]
+        @http(url: "http://order-api.user-namespace/hotelOrders/:hotelId")
     }

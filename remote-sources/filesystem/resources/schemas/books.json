@@ -1,3 +1,0 @@
-{
-    "definition": "type Book {\n title: String!\n author: String!\n }\n type User {\n books: [Book]\n @gql(url: \"http://user-books-service:4000\",\n queryName: \"books\",\n arguments: \"ID\"\n )\n favoriteBook: Book\n @gql(url: \"http://user-books-service:4000\",\nqueryName: \"favoriteBook\",\n arguments: \"ID\"\n )\n }"
-}

@@ -13,51 +13,53 @@ spec:
         app: oidc-server-mock
     spec:
       containers:
-      - name: oidc-server-mock
-        image: soluto/oidc-server-mock:0.1.0
-        env:
-          - name: API_RESOURCES_INLINE
-            value: |
-              [
-                "customer-api-scope",
-                "order-api-scope",
-                "agogos-scope"
-              ]
-          - name: CLIENTS_CONFIGURATION_INLINE
-            value: |
-              [
-                {
-                    "ClientId": "agogos_client_id",
-                    "ClientSecrets": [
-                      "very-strong-secret"
-                    ],
-                    "Description": "customer-api configuration",
-                    "AllowedGrantTypes": [
-                        "client_credentials"
-                    ],
-                    "AllowedScopes": [
-                        "customer-api-scope",
-                        "order-api-scope"
-                    ]
-                },
-                {
-                    "ClientId": "e2e-client-id",
-                    "ClientSecrets": [
-                      "e2e-strong-secret"
-                    ],
-                    "Description": "e2e configuration",
-                    "AllowedGrantTypes": [
-                        "client_credentials"
-                    ],
-                    "AllowedScopes": [
-                        "agogos-scope"
-                    ]
-                }
-              ]
-        livenessProbe:
-          httpGet:
-            path: /.well-known/openid-configuration
-            port: 80
+        - name: oidc-server-mock
+          image: soluto/oidc-server-mock:0.1.0
+          env:
+            - name: API_RESOURCES_INLINE
+              value: |
+                [
+                  "customer-api-scope",
+                  "hotel-api-scope",
+                  "order-api-scope",
+                  "agogos-scope"
+                ]
+            - name: CLIENTS_CONFIGURATION_INLINE
+              value: |
+                [
+                  {
+                      "ClientId": "agogos_client_id",
+                      "ClientSecrets": [
+                        "very-strong-secret"
+                      ],
+                      "Description": "customer-api configuration",
+                      "AllowedGrantTypes": [
+                          "client_credentials"
+                      ],
+                      "AllowedScopes": [
+                          "customer-api-scope",
+                          "hotel-api-scope",
+                          "order-api-scope"
+                      ]
+                  },
+                  {
+                      "ClientId": "e2e-client-id",
+                      "ClientSecrets": [
+                        "e2e-strong-secret"
+                      ],
+                      "Description": "e2e configuration",
+                      "AllowedGrantTypes": [
+                          "client_credentials"
+                      ],
+                      "AllowedScopes": [
+                          "agogos-scope"
+                      ]
+                  }
+                ]
+          livenessProbe:
+            httpGet:
+              path: /.well-known/openid-configuration
+              port: 80
 ---
 kind: Service
 apiVersion: v1
@@ -72,3 +74,4 @@ spec:
       port: 80
       targetPort: 80
 ---
+

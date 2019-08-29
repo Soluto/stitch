@@ -1,0 +1,14 @@
+type Hotel {
+    id: String!
+    name: String!
+    address: String!
+    city: String!
+    country: String!
+    stars: Int
+    services: [String]
+}
+
+type Query {
+    hotel(id: ID!): Hotel @gql(url: "http://hotel-api", queryName: "hotels"),
+    hotels: [Hotel] @gql(url: "http://hotel-api", queryName: "hotel", args: ["id"])
+}

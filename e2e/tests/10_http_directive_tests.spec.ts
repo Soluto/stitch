@@ -3,8 +3,6 @@ import { GraphQLClient } from "graphql-request";
 import { getToken } from "../utils/token-utils";
 
 import * as customers from "../mocks/customer-api/data/customers.json";
-import * as customerOrders from "../mocks/order-api/data/orders.json";
-
 
 describe("@http directive tests", () => {
     let client: GraphQLClient;
@@ -14,7 +12,6 @@ describe("@http directive tests", () => {
         customer: {
             id: customerId,
             ...customers[customerId],
-            orders: customerOrders[customerId],
         }
     };
 
@@ -28,22 +25,12 @@ describe("@http directive tests", () => {
         client = new GraphQLClient(`${process.env.GRAPHQL_SERVER_URL}/graphql`, options);
     });
 
-    it("should return user data", async () => {
+    it("should return customer data", async () => {
         const response = await client.request(`{
             customer(id: "1") {
                 id
                 lastName
                 firstName
-                orders {
-                    id
-                    startDate
-                    endDate
-                    country
-                    city
-                    hotel
-                    adults
-                    children
-                }
             }
         }`);
         expect(response).to.exist;
