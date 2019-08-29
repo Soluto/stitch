@@ -66,14 +66,24 @@ func TestList(t *testing.T) {
 func TestObject(t *testing.T) {
 	val1 := ast.NewIntValue(nil)
 	val1.Value = "123"
+	name1 := ast.NewName(nil)
+	name1.Value = "inty"
+	field1 := ast.NewObjectField(nil)
+	field1.Name = name1
+	field1.Value = val1
 
-	val2 := ast.NewIntValue(nil)
-	val2.Value = "1337"
+	val2 := ast.NewBooleanValue(nil)
+	val2.Value = false
+	name2 := ast.NewName(nil)
+	name2.Value = "booly"
+	field2 := ast.NewObjectField(nil)
+	field2.Name = name2
+	field2.Value = val2
 
-	list := ast.NewListValue(nil)
-	list.Values = []ast.Value{val1, val2}
+	obj := ast.NewObjectValue(nil)
+	obj.Fields = []*ast.ObjectField{field1, field2}
 
-	res := parseLiteral(t, list)
+	res := parseLiteral(t, obj)
 
-	assert.Equal(t, []interface{}{123, 1337}, res)
+	assert.Equal(t, map[string]interface{}{"inty": 123, "booly": false}, res)
 }
