@@ -34,6 +34,13 @@ func TestStructMissingValue(t *testing.T) {
 	assert.Nil(t, result)
 }
 
+func TestNilStruct(t *testing.T) {
+	result, err := IdentityResolver("Nope", nil)
+
+	assert.Nil(t, err)
+	assert.Nil(t, result)
+}
+
 type Person struct {
 	Name string
 }

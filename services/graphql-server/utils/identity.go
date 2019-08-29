@@ -6,6 +6,8 @@ func IdentityResolver(fieldName string, source interface{}) (res interface{}, er
 	defer Recovery(&err)
 
 	switch source.(type) {
+	case nil:
+		res = nil
 
 	case map[string]interface{}:
 		m := source.(map[string]interface{})
