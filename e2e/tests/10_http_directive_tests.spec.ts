@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { GraphQLClient } from "graphql-request";
 import { getToken } from "../utils/token-utils";
 
-import * as customers from "../mocks/customer-api/data/customers.json";
+import customers from "../mocks/customer-api/data/customers.json";
 
 describe("@http directive tests", () => {
     let client: GraphQLClient;

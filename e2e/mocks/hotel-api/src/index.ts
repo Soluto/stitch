@@ -40,8 +40,14 @@ const resolvers = {
     },
 };
 
-const server = new ApolloServer({ typeDefs, resolvers });
+(async () => {
+    const server = new ApolloServer({ typeDefs, resolvers });
 
-const app = fastify();
+    const app = fastify();
 
-app.register(server.createHandler()).listen(port, "0.0.0.0", () => console.log(`Server is listening to port: ${port}`));
+    app.get("/health", (req, res) => { res.status(200).send(true); });
+
+    app.register(server.createHandler())
+    await app.ready();
+    await app.listen(port, "0.0.0.0", () => console.log(`Server is listening to port: ${port}`));
+})();

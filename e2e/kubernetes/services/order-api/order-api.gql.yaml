@@ -10,7 +10,7 @@ spec:
       customer: Customer
         @http(url: "http://customer-api.user-namespace/customer/:customerId")
       hotel: Hotel
-        @gql(url: "http://hotel-api.user-namespace", queryName: "hotel", args: ["id"])
+        @gql(url: "http://hotel-api.user-namespace/graphql", queryName: "hotel", args: ["id"])
       startDate: String!
       endDate: String!
       adults: Int!

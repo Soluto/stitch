@@ -8,7 +8,7 @@ import (
 
 // Upstream - interface for upstream extension. Allows to change @http directive url or to add headers to http request created in resolver
 type Upstream interface {
-	ApplyUpstream(req *http.Request)
+	ApplyUpstream(header *http.Header)
 }
 
 type upstreamStruct struct {
@@ -24,16 +24,17 @@ type authStruct struct {
 	scope     string
 }
 
-func (up *upstreamStruct) ApplyUpstream(req *http.Request) {
-	for header, headerValue := range up.headers {
-		req.Header.Set(header, headerValue)
+func (up *upstreamStruct) ApplyUpstream(header *http.Header) {
+	for hKey, hValue := range up.headers {
+		header.Set(hKey, hValue)
 	}
 
 	if up.upstreamAuth != nil {
-		up.upstreamAuth.AddAuthentication(req, up.auth.scope)
+		up.upstreamAuth.AddAuthentication(header, up.auth.scope)
 	}
 }
 
+// CreateFromConfig - creates upstream object from config
 func CreateFromConfig(upConfig *agogos.Upstream, upsAuth authentication.UpstreamAuthentication) Upstream {
 	return &upstreamStruct{
 		host: upConfig.Host,

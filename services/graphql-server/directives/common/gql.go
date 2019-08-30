@@ -4,6 +4,7 @@ import (
 	"agogos/directives/middlewares"
 	"agogos/server"
 	"context"
+	"net/url"
 
 	"agogos/utils"
 
@@ -61,6 +62,16 @@ func createGqlClient(url string) *gqlclient.Client {
 func createGqlRequest(s server.ServerContext, gqlParams gqlParams, rp graphql.ResolveParams) (*gqlclient.Request, error) {
 	query := utils.ResolveParamsToSDLQuery(gqlParams.queryName, rp)
 	request := gqlclient.NewRequest(query)
+
+	url, err := url.Parse(gqlParams.url)
+	if err != nil {
+		logrus.WithError(err).Panic("Invalid url")
+	}
+
+	upstream, ok := s.Upstream(url.Host)
+	if ok {
+		upstream.ApplyUpstream(&request.Header)
+	}
 	return request, nil
 }
 

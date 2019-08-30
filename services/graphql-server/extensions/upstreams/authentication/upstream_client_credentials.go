@@ -20,7 +20,7 @@ type upstreamClientCredentials struct {
 }
 
 // AddAuthentication implements interface AuthProvider, adds Authorization header to HTTP request
-func (ucc *upstreamClientCredentials) AddAuthentication(req *http.Request, scope string) {
+func (ucc *upstreamClientCredentials) AddAuthentication(header *http.Header, scope string) {
 	tokenSource := ucc.getOrCreateTokenSource(scope)
 	tok, err := tokenSource.Token()
 
@@ -28,8 +28,7 @@ func (ucc *upstreamClientCredentials) AddAuthentication(req *http.Request, scope
 		log.WithField("error", err).Error(fmt.Sprintf("Failed to retrieve token from %s", ucc.authority))
 		return
 	}
-
-	tok.SetAuthHeader(req)
+	header.Set("Authorization", tok.Type()+" "+tok.AccessToken)
 }
 
 func newUpstreamClientCredentials(apConfig *gqlconfig.UpstreamAuthCredentials) UpstreamAuthentication {

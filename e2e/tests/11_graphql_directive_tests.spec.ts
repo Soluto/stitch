@@ -3,8 +3,8 @@ import { GraphQLClient } from "graphql-request";
 import { getToken } from "../utils/token-utils";
 
 // import * as customers from "../mocks/customer-api/data/customers.json";
-import * as orders from "../mocks/order-api/data/orders.json";
-import * as hotels from "../mocks/hotel-api/data/hotels.json";
+import orders from "../mocks/order-api/data/orders.json";
+import hotels from "../mocks/hotel-api/data/hotels.json";
 
 
 describe("Graphql Directive tests", () => {

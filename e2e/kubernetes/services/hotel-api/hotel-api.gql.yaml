@@ -16,6 +16,6 @@ spec:
     }
 
     type Query {
-      hotel(id: ID!): Hotel @gql(url: "http://hotel-api.user-namespace", queryName: "hotels"),
-      hotels: [Hotel] @gql(url: "http://hotel-api.user-namespace", queryName: "hotel", args: ["id"])
+      hotel(id: ID!): Hotel @gql(url: "http://hotel-api.user-namespace/graphql", queryName: "hotel", args: ["id"]),
+      hotels: [Hotel] @gql(url: "http://hotel-api.user-namespace/graphql", queryName: "hotels")
     }
