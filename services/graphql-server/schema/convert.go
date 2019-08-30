@@ -3,6 +3,7 @@ package schema
 import (
 	"agogos/directives/common"
 	"agogos/directives/middlewares"
+	"agogos/scalars"
 	"agogos/server"
 	"agogos/utils"
 	"fmt"
@@ -52,6 +53,8 @@ func convertNamedType(t *ast.Type, c schemaContext) graphql.Type {
 		return graphql.Boolean
 	case "Date":
 		return graphql.DateTime
+	case "JSON":
+		return scalars.JSON
 	default:
 		definition := c.schema.Types[name]
 

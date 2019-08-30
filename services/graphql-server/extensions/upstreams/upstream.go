@@ -3,12 +3,13 @@ package upstreams
 import (
 	"agogos/extensions/upstreams/authentication"
 	agogos "agogos/generated"
+	"context"
 	"net/http"
 )
 
 // Upstream - interface for upstream extension. Allows to change @http directive url or to add headers to http request created in resolver
 type Upstream interface {
-	ApplyUpstream(header *http.Header)
+	ApplyUpstream(ctx context.Context, header *http.Header)
 }
 
 type upstreamStruct struct {
@@ -24,18 +25,17 @@ type authStruct struct {
 	scope     string
 }
 
-func (up *upstreamStruct) ApplyUpstream(header *http.Header) {
+func (up *upstreamStruct) ApplyUpstream(ctx context.Context, header *http.Header) {
 	for hKey, hValue := range up.headers {
 		header.Set(hKey, hValue)
 	}
 
 	if up.upstreamAuth != nil {
-		up.upstreamAuth.AddAuthentication(header, up.auth.scope)
+		up.upstreamAuth.AddAuthentication(ctx, header, up.auth.scope)
 	}
 }
 
-// CreateFromConfig - creates upstream object from config
-func CreateFromConfig(upConfig *agogos.Upstream, upsAuth authentication.UpstreamAuthentication) Upstream {
+func CreateUpstream(upConfig *agogos.Upstream, upsAuth authentication.UpstreamAuthentication) Upstream {
 	return &upstreamStruct{
 		host: upConfig.Host,
 		auth: authStruct{
