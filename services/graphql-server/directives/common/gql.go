@@ -70,7 +70,7 @@ func createGqlRequest(s server.ServerContext, gqlParams gqlParams, rp graphql.Re
 
 	upstream, ok := s.Upstream(url.Host)
 	if ok {
-		upstream.ApplyUpstream(&request.Header)
+		upstream.ApplyUpstream(rp.Context, &request.Header)
 	}
 	return request, nil
 }
