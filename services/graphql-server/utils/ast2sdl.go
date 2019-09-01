@@ -9,12 +9,15 @@ import (
 )
 
 // ResolveParamsToSDLQuery - generates SDL query from graphql.ResolveParams object
-func ResolveParamsToSDLQuery(queryName string, rp graphql.ResolveParams) string {
+func ResolveParamsToSDLQuery(queryName string, rp graphql.ResolveParams, args string) string {
 	builder := strings.Builder{}
 
 	builder.WriteString("query {\n")
 	builder.WriteString(queryName)
 	builder.WriteString(" ")
+
+	buildCustomArgumentsClause(&builder, rp, args)
+
 	for _, field := range rp.Info.FieldASTs {
 		resolveParamsToQueryInner(&builder, field)
 	}
@@ -33,15 +36,15 @@ func resolveParamsToQueryInner(builder *strings.Builder, field *ast.Field) {
 
 	builder.WriteString("{\n")
 	for _, selection := range field.SelectionSet.Selections {
+		// TODO: filter out fields with own resolvers
 		if subField, ok := selection.(*ast.Field); ok {
+
 			if subField.Alias != nil {
 				builder.WriteString(subField.Alias.Value)
 				builder.WriteString(": ")
 			}
 
 			builder.WriteString(subField.Name.Value)
-
-			buildArgumentsClause(builder, subField)
 			resolveParamsToQueryInner(builder, subField)
 		}
 	}
@@ -66,4 +69,15 @@ func buildArgumentsClause(builder *strings.Builder, field *ast.Field) {
 
 		builder.WriteString(")")
 	}
+}
+
+func buildCustomArgumentsClause(builder *strings.Builder, rp graphql.ResolveParams, args string) {
+	if args == "" {
+		return
+	}
+
+	builder.WriteString("(")
+	values := ReplaceWithParameters(rp, args)
+	builder.WriteString(values)
+	builder.WriteString(")")
 }

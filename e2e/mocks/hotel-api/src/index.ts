@@ -1,6 +1,7 @@
 import fastify from "fastify";
 import { ApolloServer, gql } from "apollo-server-fastify";
 import hotels from "../data/hotels.json";
+import reviews from "../data/reviews.json";
 
 const port = Number(process.env.PORT) || 3000;
 
@@ -14,6 +15,13 @@ type Hotel = {
     services: Array<string>,
 };
 
+type Review = {
+    id: string,
+    hotelId: string,
+    author: string,
+    text: string,
+};
+
 const typeDefs = gql`
   type Hotel {
     id: String!
@@ -23,6 +31,14 @@ const typeDefs = gql`
     country: String!
     stars: Int
     services: [String]
+    reviews(limit: Int): [Review!]
+  }
+
+  type Review {
+      id: String!
+      hotel: Hotel!
+      author: String!
+      text: String!
   }
 
   type Query {
@@ -38,6 +54,9 @@ const resolvers = {
         hotel: (_, { id }): Hotel => hotels.find(h => h.id === id),
         hotels: (): Array<Hotel> => hotels,
     },
+    Hotel: {
+        reviews: ({ id }, { limit }): Array<Review> => reviews.filter(r => r.hotelId === id).slice(0, limit),
+    }
 };
 
 (async () => {

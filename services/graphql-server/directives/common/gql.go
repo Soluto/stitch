@@ -17,6 +17,7 @@ import (
 type gqlParams struct {
 	url       string
 	queryName string
+	args      string
 }
 
 var gqlMiddleware = middlewares.DirectiveDefinition{
@@ -51,6 +52,8 @@ func parseGqlParams(d *ast.Directive) gqlParams {
 		logrus.Panic("queryName argument is missing from gql directive")
 	}
 
+	params.args = arguments["arguments"].(string)
+
 	return params
 }
 
@@ -60,9 +63,8 @@ func createGqlClient(url string) *gqlclient.Client {
 }
 
 func createGqlRequest(s server.ServerContext, gqlParams gqlParams, rp graphql.ResolveParams) (*gqlclient.Request, error) {
-	query := utils.ResolveParamsToSDLQuery(gqlParams.queryName, rp)
+	query := utils.ResolveParamsToSDLQuery(gqlParams.queryName, rp, gqlParams.args)
 	request := gqlclient.NewRequest(query)
-
 	url, err := url.Parse(gqlParams.url)
 	if err != nil {
 		logrus.WithError(err).Panic("Invalid url")

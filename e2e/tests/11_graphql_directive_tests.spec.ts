@@ -2,9 +2,10 @@ import { expect } from "chai";
 import { GraphQLClient } from "graphql-request";
 import { getToken } from "../utils/token-utils";
 
-// import * as customers from "../mocks/customer-api/data/customers.json";
+import customers from "../mocks/customer-api/data/customers.json";
 import orders from "../mocks/order-api/data/orders.json";
 import hotels from "../mocks/hotel-api/data/hotels.json";
+import reviews from "../mocks/hotel-api/data/reviews.json";
 
 
 describe("Graphql Directive tests", () => {
@@ -37,7 +38,7 @@ describe("Graphql Directive tests", () => {
 
     it("should return hotel by id", async () => {
         const hotelId = "hotel_ibis_london_blackfriars";
-        const expectedResponse = hotels.find(h => h.id === hotelId).name;
+        const expectedResponse = { hotel: hotels.find(h => h.id === hotelId).name };
 
         const response = await client.request(`{
             hotel(id: ${hotelId}) {
@@ -48,22 +49,60 @@ describe("Graphql Directive tests", () => {
         expect(response).to.deep.equal(expectedResponse);
     });
 
-    it("should return hotel by id with orders", async () => {
+    it("should return hotel by id with alias", async () => {
         const hotelId = "hotel_ibis_london_blackfriars";
+        const hotelAlias = "hotelAlias";
+        const expectedResponse = { hotelAlias: hotels.find(h => h.id === hotelId).name };
+
+        const response = await client.request(`{
+            ${hotelAlias}: hotel(id: ${hotelId}) {
+                name
+            }
+        }`);
+        expect(response).to.exist;
+        expect(response).to.deep.equal(expectedResponse);
+    });
+
+    it("should return hotel by id with orders", async () => {
+        const customerId = "1";
+        const reviewsLimit = 2;
+
+        const { firstName, lastName } = customers[customerId];
         const expectedResponse = {
-            name: hotels.find(h => h.id === hotelId).name,
-            orders: orders.filter(o => o.hotelId === hotelId).map(o => ({ startDate: o.startDate, endDate: o.endDate })),
+            customer: {
+                firstName,
+                lastName,
+                orders: orders.filter(o => o.customerId === customerId).map(o => ({
+                    startDate: o.startDate,
+                    endDate: o.endDate,
+                    hotel: {
+                        name: hotels.find(h => h.id === o.hotelId).name,
+                        reviews: reviews.filter(r => r.hotelId === o.hotelId).map(r => ({
+                            author: r.author,
+                            text: r.text,
+                        })),
+                    },
+                })),
+            },
         };
 
         const response = await client.request(`{
-            hotel(id: ${hotelId}) {
-                name
-                orders {
-                    startDate
-                    endDate
+            customer(id: "${customerId}") {
+              firstName
+              lastName
+              orders {
+                startDate
+                endDate
+                hotel {
+                    name
+                    reviews(limit: ${reviewsLimit}) {
+                        author
+                        text
+                    }
                 }
+              }
             }
-        }`);
+          }`);
         expect(response).to.exist;
         expect(response).to.deep.equal(expectedResponse);
     });

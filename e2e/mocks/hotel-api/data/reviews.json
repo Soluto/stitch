@@ -1,0 +1,19 @@
+[{
+        "id": "1",
+        "hotelId": "hotel_ibis_london_blackfriars",
+        "author": "Carol Reese",
+        "text": "Very beautiful place"
+    },
+    {
+        "id": "2",
+        "hotelId": "hotel_ibis_london_blackfriars",
+        "author": "Melody Wall",
+        "text": "Nice hotel"
+    },
+    {
+        "id": "3",
+        "hotelId": "hotel_ibis_london_blackfriars",
+        "author": "Cole Terrell",
+        "text": "Noisy place"
+    }
+]

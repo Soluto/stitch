@@ -24,7 +24,7 @@ directive @select(path: [String!]!) on FIELD_DEFINITION
 directive @gql(
     url: String!
     queryName: String!
-    arguments: String
+    arguments: String = ""
 ) on FIELD_DEFINITION
 
 scalar JSON

@@ -1,11 +1,19 @@
 type Hotel {
-    id: String!
-    name: String!
-    address: String!
-    city: String!
-    country: String!
-    stars: Int
-    services: [String]
+  id: String!
+  name: String!
+  address: String!
+  city: String!
+  country: String!
+  stars: Int
+  services: [String]
+  reviews(limit: Int): [Review!]
+}
+
+type Review {
+  id: String!
+  hotel: Hotel!
+  author: String!
+  text: String!
 }
 
 type Query {
