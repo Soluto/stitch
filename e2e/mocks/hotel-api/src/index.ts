@@ -35,7 +35,7 @@ const typeDefs = gql`
 // schema.  We'll retrieve books from the "books" array above.
 const resolvers = {
     Query: {
-        hotel: (id: string): Hotel => hotels.find(h => h.id === id),
+        hotel: (_, { id }): Hotel => hotels.find(h => h.id === id),
         hotels: (): Array<Hotel> => hotels,
     },
 };

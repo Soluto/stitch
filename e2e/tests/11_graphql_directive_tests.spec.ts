@@ -24,7 +24,7 @@ describe("Graphql Directive tests", () => {
     });
 
     it("should return hotels data", async () => {
-        const expectedResponse = Object.values(hotels).map(h => h.name);
+        const expectedResponse = { hotels: hotels.map(h => h.name) };
 
         const response = await client.request(`{
             hotels {
@@ -37,7 +37,7 @@ describe("Graphql Directive tests", () => {
 
     it("should return hotel by id", async () => {
         const hotelId = "hotel_ibis_london_blackfriars";
-        const expectedResponse = hotels[hotelId].name;
+        const expectedResponse = hotels.find(h => h.id === hotelId).name;
 
         const response = await client.request(`{
             hotel(id: ${hotelId}) {
@@ -51,7 +51,7 @@ describe("Graphql Directive tests", () => {
     it("should return hotel by id with orders", async () => {
         const hotelId = "hotel_ibis_london_blackfriars";
         const expectedResponse = {
-            name: hotels[hotelId].name,
+            name: hotels.find(h => h.id === hotelId).name,
             orders: orders.filter(o => o.hotelId === hotelId).map(o => ({ startDate: o.startDate, endDate: o.endDate })),
         };
 
