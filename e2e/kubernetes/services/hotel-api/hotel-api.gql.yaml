@@ -13,9 +13,17 @@ spec:
       country: String!
       stars: Int
       services: [String]
+      reviews(limit: Int): [Review!]
+    }
+
+    type Review {
+      id: String!
+      hotel: Hotel!
+      author: String!
+      text: String!
     }
 
     type Query {
-      hotel(id: ID!): Hotel @gql(url: "http://hotel-api.user-namespace/graphql", queryName: "hotel", args: ["id"]),
+      hotel(id: ID!): Hotel @gql(url: "http://hotel-api.user-namespace/graphql", queryName: "hotel"),
       hotels: [Hotel] @gql(url: "http://hotel-api.user-namespace/graphql", queryName: "hotels")
     }
