@@ -175,6 +175,7 @@ jobs:
             docker load < agogos-graphql-gateway.tar
             docker load < agogos-gql-controller.tar
             docker load < agogos-e2e-customer-api.tar
+            docker load < agogos-e2e-hotel-api.tar
             docker load < agogos-e2e-order-api.tar
             docker load < agogos-e2e.tar
 
