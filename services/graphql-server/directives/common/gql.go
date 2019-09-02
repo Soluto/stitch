@@ -34,7 +34,7 @@ var gqlMiddleware = middlewares.DirectiveDefinition{
 				return nil, err
 			}
 
-			return sendRequest(s, request, client, params)
+			return sendRequest(request, client, rp, params)
 		})
 	},
 }
@@ -86,9 +86,9 @@ func createGqlRequest(s server.ServerContext, gqlParams gqlParams, rp graphql.Re
 	return request, nil
 }
 
-func sendRequest(ctx server.ServerContext, request *gqlclient.Request, client *gqlclient.Client, gqlParams gqlParams) (interface{}, error) {
+func sendRequest(request *gqlclient.Request, client *gqlclient.Client, rp graphql.ResolveParams, gqlParams gqlParams) (interface{}, error) {
 	var respData interface{}
-	if err := client.Run(ctx, request, &respData); err != nil {
+	if err := client.Run(rp.Context, request, &respData); err != nil {
 		logrus.WithError(err).Error("error while graphql request")
 		return nil, err
 	}
