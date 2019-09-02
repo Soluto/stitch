@@ -25,7 +25,7 @@ describe("Graphql Directive tests", () => {
     });
 
     it("should return hotels data", async () => {
-        const expectedResponse = { hotels: hotels.map(h => h.name) };
+        const expectedResponse = { hotels: hotels.map(h => ({ name: h.name })) };
 
         const response = await client.request(`{
             hotels {
@@ -41,7 +41,7 @@ describe("Graphql Directive tests", () => {
         const expectedResponse = { hotel: hotels.find(h => h.id === hotelId).name };
 
         const response = await client.request(`{
-            hotel(id: ${hotelId}) {
+            hotel(id: "${hotelId}") {
                 name
             }
         }`);
@@ -55,7 +55,7 @@ describe("Graphql Directive tests", () => {
         const expectedResponse = { hotelAlias: hotels.find(h => h.id === hotelId).name };
 
         const response = await client.request(`{
-            ${hotelAlias}: hotel(id: ${hotelId}) {
+            ${hotelAlias}: hotel(id: "${hotelId}") {
                 name
             }
         }`);
