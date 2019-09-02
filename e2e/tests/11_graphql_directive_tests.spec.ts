@@ -77,7 +77,7 @@ describe("Graphql Directive tests", () => {
                     endDate: o.endDate,
                     hotel: {
                         name: hotels.find(h => h.id === o.hotelId).name,
-                        reviews: reviews.filter(r => r.hotelId === o.hotelId).map(r => ({
+                        reviews: reviews.filter(r => r.hotelId === o.hotelId).slice(0, reviewsLimit).map(r => ({
                             author: r.author,
                             text: r.text,
                         })),
