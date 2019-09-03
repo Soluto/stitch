@@ -38,7 +38,7 @@ describe("Graphql Directive tests", () => {
 
     it("should return hotel by id", async () => {
         const hotelId = "hotel_ibis_london_blackfriars";
-        const expectedResponse = { hotel: hotels.find(h => h.id === hotelId).name };
+        const expectedResponse = { hotel: { name: hotels.find(h => h.id === hotelId).name } };
 
         const response = await client.request(`{
             hotel(id: "${hotelId}") {
