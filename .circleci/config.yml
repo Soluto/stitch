@@ -150,6 +150,7 @@ jobs:
       - build_image:
           imageName: agogos-standalone
           workingDirectory: ./standalone
+
   build_e2e:
     machine:
       image: ubuntu-1604:201903-01
@@ -190,12 +191,14 @@ jobs:
     steps:
       - push_image:
           imageName: agogos-source-kubernetes-fs
+
   push_agogos_standalone:
     machine:
       image: 'ubuntu-1604:201903-01'
     steps:
       - push_image:
           imageName: agogos-standalone
+          
   run_e2e_tests:
     machine:
       image: ubuntu-1604:201903-01
@@ -319,12 +322,6 @@ workflows:
           filters:
             branches:
               only: master
-      - push_kubernetes_fs_source:
-          requires:
-            - tag_repo
-          # filters:
-          #   branches:
-          #     only: master
       - push_agogos_standalone:
           requires:
             - tag_repo
