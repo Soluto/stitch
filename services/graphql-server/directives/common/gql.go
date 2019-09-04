@@ -3,6 +3,7 @@ package common
 import (
 	"agogos/directives/middlewares"
 	"agogos/server"
+	"errors"
 	"net/url"
 	"reflect"
 
@@ -17,7 +18,6 @@ import (
 
 type gqlParams struct {
 	url       *url.URL
-	urlStr    string
 	upstream  upstreams.Upstream
 	queryName string
 	args      string
@@ -26,7 +26,7 @@ type gqlParams struct {
 var gqlMiddleware = middlewares.DirectiveDefinition{
 	MiddlewareFactory: func(s server.ServerContext, f *ast.FieldDefinition, d *ast.Directive) middlewares.Middleware {
 		params := parseGqlParams(d, s)
-		client := createGqlClient(params.urlStr)
+		client := createGqlClient(params.url.String())
 
 		return middlewares.ConcurrentLeaf(func(rp graphql.ResolveParams) (interface{}, error) {
 			request, err := createGqlRequest(s, params, rp)
@@ -46,12 +46,13 @@ func parseGqlParams(d *ast.Directive, s server.ServerContext) gqlParams {
 
 	arguments := d.ArgumentMap(make(map[string]interface{}))
 
-	params.urlStr, ok = arguments["url"].(string)
+	var urlStr string
+	urlStr, ok = arguments["url"].(string)
 	if !ok {
 		logrus.Panic("url argument is missing from gql directive")
 	}
 
-	params.url, err = url.Parse(params.urlStr)
+	params.url, err = url.Parse(urlStr)
 	if err != nil {
 		logrus.Panic("url argument in gql directive is invalid")
 	}
@@ -94,7 +95,8 @@ func sendRequest(request *gqlclient.Request, client *gqlclient.Client, rp graphq
 	}
 	responseBody, ok := respData.(map[string]interface{})
 	if !ok {
-		logrus.WithField("response_body_type", reflect.TypeOf(respData)).Panic("Gql query call returned response with invalid body type")
+		logrus.WithField("response_body_type", reflect.TypeOf(respData)).Error("Gql query call returned response with invalid body type")
+		return nil, errors.New("Gql query call returned response with invalid body type")
 	}
 	result := responseBody[gqlParams.queryName]
 	return result, nil
