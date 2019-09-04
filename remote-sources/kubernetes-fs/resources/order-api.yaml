@@ -7,9 +7,9 @@ spec:
         type Order {
             id: ID!
             customer: Customer!
-                @http(url: "http://localhost:8101/customer/:customerId")
+                @http(url: "http://customer-api/customer/:customerId")
             hotel: Hotel!
-                @gql(url: "http://localhost:8102/graphql", queryName: "hotel", arguments: "id:\"{source.hotelId}\"")
+                @gql(url: "http://hotel-api/graphql", queryName: "hotel", arguments: "id:\"{source.hotelId}\"")
             startDate: String!
             endDate: String!
             adults: Int!
@@ -19,9 +19,9 @@ spec:
         }
 
         type Customer {
-            orders: [Order!] @http(url: "http://localhost:8103/customerOrders/:id")
+            orders: [Order!] @http(url: "http://order-api/customerOrders/:id")
         }
 
         type Hotel {
-            orders: [Order!] @http(url: "http://localhost:8103/hotelOrders/:id")
+            orders: [Order!] @http(url: "http://order-api/hotelOrders/:id")
         }

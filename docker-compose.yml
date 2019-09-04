@@ -6,11 +6,11 @@ services:
         depends_on:
             - registry
         ports:
-            - '8000:8000'
+            - '8000:80'
         environment:
-            PORT: 8000
+            PORT: 80
             LOG_LEVEL: DEBUG
-            REGISTRY_URL: registry:8002
+            REGISTRY_URL: registry
 
     registry:
         build:
@@ -22,15 +22,15 @@ services:
             - k8s-fs-resources
         environment:
             LOG_LEVEL: INFO
-            PORT: 8001
-            GRPC_PORT: 8002
+            PORT: 80
+            GRPC_PORT: 81
 
-            REMOTESOURCE__KUBERNETES_FS: http://k8s-fs-resources:8003
+            REMOTESOURCE__KUBERNETES_FS: http://k8s-fs-resources
 
     k8s-fs-resources:
         build: remote-sources/kubernetes-fs
         environment:
-            PORT: 8003
+            PORT: 80
             RESOURCE_FOLDER: /resources
         volumes:
             - ./remote-sources/kubernetes-fs/resources:/resources
@@ -40,16 +40,16 @@ services:
         container_name: customer-api
         build: e2e/mocks/customer-api
         environment:
-            PORT: 3000
+            PORT: 80
 
     hotel-api:
         container_name: hotel-api
         build: e2e/mocks/hotel-api
         environment:
-            PORT: 3000
+            PORT: 80
 
     order-api:
         container_name: order-api
         build: e2e/mocks/order-api
         environment:
-            PORT: 3000
+            PORT: 80

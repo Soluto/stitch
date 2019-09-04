@@ -11,5 +11,5 @@ spec:
         }
 
         type Query {
-            customer(id: ID!): Customer @http(url: "http://localhost:8101/customer/:id")
+            customer(id: ID!): Customer @http(url: "http://customer-api/customer/:id")
         }

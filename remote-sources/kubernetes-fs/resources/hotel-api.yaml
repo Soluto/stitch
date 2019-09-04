@@ -23,6 +23,6 @@ spec:
         }
 
         type Query {
-            hotel(id: ID!): Hotel @gql(url: "http://localhost:8102/graphql", queryName: "hotel"),
-            hotels: [Hotel] @gql(url: "http://localhost:8102/graphql", queryName: "hotels")
+            hotel(id: ID!): Hotel @gql(url: "http://hotel-api/graphql", queryName: "hotel"),
+            hotels: [Hotel] @gql(url: "http://hotel-api/graphql", queryName: "hotels")
         }
