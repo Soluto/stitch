@@ -1,3 +1,0 @@
-{
-    "definition": "type Query {\n    echo(input: JSON): JSON @http(url: \"https://postman-echo.com/post\", method: \"POST\", contentType: \"json\") @select(path: [\"json\"])\n}\n"
-}

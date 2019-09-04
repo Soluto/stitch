@@ -1,0 +1,9 @@
+apiVersion: agogos.app/v1
+kind: Schema
+metadata:
+    name: echo
+spec:
+    definition: |
+        type Query {
+            echo(input: JSON): JSON @http(url: "https://postman-echo.com/post", method: "POST", contentType: "json") @select(path: ["json"])
+        }

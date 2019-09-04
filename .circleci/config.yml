@@ -124,6 +124,15 @@ jobs:
           imageName: agogos-gql-controller
           workingDirectory: ./remote-sources/kubernetes
 
+  build_kubernetes_fs_source:
+    machine:
+      image: ubuntu-1604:201903-01
+
+    steps:
+      - build_image:
+          imageName: agogos-source-kubernetes-fs
+          workingDirectory: ./remote-sources/kubernetes-fs
+
   build_e2e:
     machine:
       image: ubuntu-1604:201903-01
@@ -156,6 +165,14 @@ jobs:
     steps:
       - push_image:
           imageName: agogos-gql-controller
+
+  push_kubernetes_fs_source:
+    machine:
+      image: ubuntu-1604:201903-01
+
+    steps:
+      - push_image:
+          imageName: agogos-source-kubernetes-fs
 
   run_e2e_tests:
     machine:
@@ -238,12 +255,14 @@ workflows:
       - build_registry
       - build_graphql_gateway
       - build_gql_controller
+      - build_kubernetes_fs_source
       - build_e2e
       - run_e2e_tests:
           requires:
             - build_registry
             - build_graphql_gateway
             - build_gql_controller
+            - build_kubernetes_fs_source
             - build_e2e
             - build_customer_api
             - build_hotel_api
@@ -272,6 +291,12 @@ workflows:
           filters:
             branches:
               only: master
+      - push_kubernetes_fs_source:
+          requires:
+            - tag_repo
+          filters:
+            branches:
+              only: master
 
   nightly:
     triggers:
@@ -288,12 +313,14 @@ workflows:
       - build_registry
       - build_graphql_gateway
       - build_gql_controller
+      - build_kubernetes_fs_source
       - build_e2e
       - run_e2e_tests:
           requires:
             - build_registry
             - build_graphql_gateway
             - build_gql_controller
+            - build_kubernetes_fs_source
             - build_e2e
             - build_customer_api
             - build_hotel_api

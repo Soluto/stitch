@@ -1,0 +1,28 @@
+apiVersion: agogos.app/v1
+kind: Schema
+metadata:
+    name: hotel-api
+spec:
+    definition: |
+        type Hotel {
+          id: String!
+          name: String!
+          address: String!
+          city: String!
+          country: String!
+          stars: Int
+          services: [String]
+          reviews(limit: Int): [Review!]
+        }
+
+        type Review {
+          id: String!
+          hotel: Hotel!
+          author: String!
+          text: String!
+        }
+
+        type Query {
+            hotel(id: ID!): Hotel @gql(url: "http://localhost:8102/graphql", queryName: "hotel"),
+            hotels: [Hotel] @gql(url: "http://localhost:8102/graphql", queryName: "hotels")
+        }
