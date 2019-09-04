@@ -41,6 +41,8 @@ build_images() {
     # Mock services images
     docker build -t soluto/agogos-e2e-customer-api './mocks/customer-api'
     docker build -t soluto/agogos-e2e-order-api './mocks/order-api'
+    docker build -t soluto/agogos-e2e-hotel-api './mocks/hotel-api'
+
 
     # Core services images
     docker build -t soluto/agogos-graphql-gateway '../services/graphql-server'
@@ -56,6 +58,7 @@ load_images() {
     # Mock services images
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-e2e-customer-api
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-e2e-order-api
+    kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-e2e-hotel-api
 
     # Core services images
     kind load docker-image --name "$CLUSTER_NAME" soluto/agogos-graphql-gateway
@@ -95,6 +98,7 @@ prepare_environment() {
     kubectl apply -f ./kubernetes/services/user-namespace.yaml
     kubectl apply -f ./kubernetes/services/customer-api
     kubectl apply -f ./kubernetes/services/order-api
+    kubectl apply -f ./kubernetes/services/hotel-api
 }
 
 execute_tests() {
@@ -103,7 +107,11 @@ execute_tests() {
     echo "Waiting for things to get ready...($STARTUP_TIMEOUT seconds at most for each service)"
     kubectl -n user-namespace wait pod -l app=customer-api --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
     kubectl -n user-namespace wait pod -l app=order-api --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
+    kubectl -n user-namespace wait pod -l app=hotel-api --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
+
+
     kubectl -n oidc-namespace wait pod -l app=oidc-server-mock --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
+
     kubectl -n agogos wait pod -l app=gateway --for condition=Ready --timeout="$STARTUP_TIMEOUT"s
 
     echo "Running e2e tests job..."

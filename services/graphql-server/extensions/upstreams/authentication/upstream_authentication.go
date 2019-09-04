@@ -9,7 +9,7 @@ import (
 
 // UpstreamAuthentication interface for UpstreamAuthentication extension. Supplies auth details to HTTP request
 type UpstreamAuthentication interface {
-	AddAuthentication(ctx context.Context, req *http.Request, scope string)
+	AddAuthentication(ctx context.Context, header *http.Header, scope string)
 }
 
 type AuthMap map[string]map[string]UpstreamAuthentication

@@ -2,6 +2,11 @@ FROM node:10-alpine as base
 WORKDIR /service
 
 FROM base as dependencies
+
+RUN apk add --no-cache --virtual .build-deps make gcc g++ python \
+    && npm install --production --silent \
+    && apk del .build-deps
+
 ARG target
 COPY package.json yarn.lock jest.config.js builtin-resources ./
 RUN yarn --production true

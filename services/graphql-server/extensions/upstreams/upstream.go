@@ -9,7 +9,7 @@ import (
 
 // Upstream - interface for upstream extension. Allows to change @http directive url or to add headers to http request created in resolver
 type Upstream interface {
-	ApplyUpstream(ctx context.Context, req *http.Request)
+	ApplyUpstream(ctx context.Context, header *http.Header)
 }
 
 type upstreamStruct struct {
@@ -25,13 +25,13 @@ type authStruct struct {
 	scope     string
 }
 
-func (up *upstreamStruct) ApplyUpstream(ctx context.Context, req *http.Request) {
-	for header, headerValue := range up.headers {
-		req.Header.Set(header, headerValue)
+func (up *upstreamStruct) ApplyUpstream(ctx context.Context, header *http.Header) {
+	for hKey, hValue := range up.headers {
+		header.Set(hKey, hValue)
 	}
 
 	if up.upstreamAuth != nil {
-		up.upstreamAuth.AddAuthentication(ctx, req, up.auth.scope)
+		up.upstreamAuth.AddAuthentication(ctx, header, up.auth.scope)
 	}
 }
 

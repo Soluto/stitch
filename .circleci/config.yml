@@ -79,6 +79,15 @@ jobs:
           imageName: agogos-e2e-customer-api
           workingDirectory: ./e2e/mocks/customer-api
 
+  build_hotel_api:
+    machine:
+      image: ubuntu-1604:201903-01
+
+    steps:
+      - build_image:
+          imageName: agogos-e2e-hotel-api
+          workingDirectory: ./e2e/mocks/hotel-api
+
   build_order_api:
     machine:
       image: ubuntu-1604:201903-01
@@ -166,6 +175,7 @@ jobs:
             docker load < agogos-graphql-gateway.tar
             docker load < agogos-gql-controller.tar
             docker load < agogos-e2e-customer-api.tar
+            docker load < agogos-e2e-hotel-api.tar
             docker load < agogos-e2e-order-api.tar
             docker load < agogos-e2e.tar
 
@@ -223,6 +233,7 @@ workflows:
   build_test_push:
     jobs:
       - build_customer_api
+      - build_hotel_api
       - build_order_api
       - build_registry
       - build_graphql_gateway
@@ -235,6 +246,7 @@ workflows:
             - build_gql_controller
             - build_e2e
             - build_customer_api
+            - build_hotel_api
             - build_order_api
       - tag_repo:
           requires:
@@ -271,6 +283,7 @@ workflows:
                 - master
     jobs:
       - build_customer_api
+      - build_hotel_api
       - build_order_api
       - build_registry
       - build_graphql_gateway
@@ -283,4 +296,5 @@ workflows:
             - build_gql_controller
             - build_e2e
             - build_customer_api
+            - build_hotel_api
             - build_order_api

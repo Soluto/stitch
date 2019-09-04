@@ -1,7 +1,7 @@
 import k8s = require("@kubernetes/client-node");
 import { expect, use } from "chai";
-import * as chaiAsPromised from "chai-as-promised";
-import * as fs from "fs";
+import chaiAsPromised from "chai-as-promised";
+import fs from "fs";
 use(chaiAsPromised);
 
 type AgogosObject = {

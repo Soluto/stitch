@@ -159,9 +159,9 @@ func createHTTPRequest(s server.ServerContext, p httpParams, rp graphql.ResolveP
 		request.Header.Set("Content-Type", "application/json")
 	}
 
-	ep, ok := s.Upstream(request.URL.Host)
+	upstream, ok := s.Upstream(request.URL.Host)
 	if ok {
-		ep.ApplyUpstream(rp.Context, request)
+		upstream.ApplyUpstream(rp.Context, &request.Header)
 	}
 
 	return request, nil

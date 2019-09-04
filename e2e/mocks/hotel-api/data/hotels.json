@@ -1,0 +1,33 @@
+[{
+        "id": "hotel_ibis_london_blackfriars",
+        "name": "Hotel ibis London Blackfriars",
+        "address": "49 Blackfriars Rd, South Bank",
+        "city": "London",
+        "country": "UK",
+        "stars": 3,
+        "services": [
+            "Online check-in",
+            "Accessibility for people with reduced mobility",
+            "WIFI/Internet Access",
+            "Air conditioned",
+            "Laundry",
+            "Currency exchange",
+            "Laundry"
+        ]
+    },
+    {
+        "id": "hotel_paris_avenue_de_la_republique",
+        "name": "Hotel ibis Paris Avenue de la République",
+        "address": "14 Rue Rampon",
+        "city": "Paris",
+        "country": "France",
+        "stars": 3,
+        "services": [
+            "Online check-in",
+            "WIFI/Internet Access",
+            "Air conditioned",
+            "Public indoor parking (Nearby)",
+            "Accessible bathroom"
+        ]
+    }
+]

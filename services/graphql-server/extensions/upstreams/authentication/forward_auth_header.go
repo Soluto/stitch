@@ -12,7 +12,7 @@ type forwardHeaderAuth struct{}
 
 var authHeaderForwarder = forwardHeaderAuth{}
 
-func (ucc forwardHeaderAuth) AddAuthentication(ctx context.Context, req *http.Request, scope string) {
+func (ucc forwardHeaderAuth) AddAuthentication(ctx context.Context, header *http.Header, scope string) {
 	originalRequest := runtime.GetRequest(ctx)
 	if originalRequest == nil {
 		logrus.Panic("Could not find request in context, this should never happen")
@@ -26,7 +26,7 @@ func (ucc forwardHeaderAuth) AddAuthentication(ctx context.Context, req *http.Re
 		return
 	}
 
-	req.Header.Set("Authorization", authHeader)
+	header.Set("Authorization", authHeader)
 }
 
 func newForwardAuthHeader() UpstreamAuthentication {
