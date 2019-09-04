@@ -14,9 +14,10 @@ services:
 
     registry:
         build:
+            context: services/registry
             args:
                 target: DEBUG
-                context: services/registry
+
         depends_on:
             - k8s-fs-resources
         environment:
