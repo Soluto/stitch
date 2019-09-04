@@ -298,9 +298,9 @@ workflows:
           requires:
             - run_e2e_tests
             - build_agogos_standalone
-          filters:
-            branches:
-              only: master
+          # filters:
+          #   branches:
+          #     only: master
       - push_registry:
           requires:
             - tag_repo
@@ -322,15 +322,15 @@ workflows:
       - push_kubernetes_fs_source:
           requires:
             - tag_repo
-          filters:
-            branches:
-              only: master
+          # filters:
+          #   branches:
+          #     only: master
       - push_agogos_standalone:
           requires:
             - tag_repo
-          filters:
-            branches:
-              only: master
+          # filters:
+          #   branches:
+          #     only: master
   nightly:
     triggers:
       - schedule:
