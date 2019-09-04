@@ -4,13 +4,19 @@ import (
 	"agogos/registry"
 	"agogos/schema"
 	"agogos/server/runtime"
+	"agogos/utils"
 	"context"
+	"fmt"
 	"net/http"
 
 	"agogos/metrics"
 
 	"github.com/graphql-go/handler"
 	log "github.com/sirupsen/logrus"
+)
+
+var (
+	port = utils.GetenvWithFallback("PORT", "8011")
 )
 
 func main() {
@@ -87,5 +93,5 @@ func main() {
 	http.Handle("/graphql", graphqlHandler)
 	http.Handle("/health", healthHandler)
 	http.Handle("/metrics", metricsHandler)
-	log.Fatalln(http.ListenAndServe(":8011", nil))
+	log.Fatalln(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
 }
