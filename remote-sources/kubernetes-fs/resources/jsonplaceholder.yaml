@@ -1,0 +1,76 @@
+apiVersion: agogos.app/v1
+kind: Schema
+metadata:
+    name: jsonplaceholder
+spec:
+    definition: |
+        type Query {
+            user(id: String): User @http(url: "https://jsonplaceholder.typicode.com/users/:id")
+        }
+
+        type User {
+            id: ID!
+            name: String!
+            username: String!
+            email: String
+            address: Address
+            phone: String
+            website: String
+            company: Company
+
+            todos: [Todo] @http(url: "https://jsonplaceholder.typicode.com/todos?userId=:id")
+            albums: [Album] @http(url: "https://jsonplaceholder.typicode.com/albums?userId=:id")
+            posts: [Post] @http(url: "https://jsonplaceholder.typicode.com/posts?userId=:id")
+        }
+
+        type Address {
+            street: String!
+            suite: String
+            city: String!
+            zipcode: String
+            geo: Geo
+        }
+
+        type Geo {
+            lat: String!
+            lng: String!
+        }
+
+        type Company {
+            name: String!
+            catchPhrase: String
+            bs: String
+        }
+
+        type Todo {
+            id: ID!
+            title: String!
+            completed: Boolean!
+        }
+
+        type Album {
+            id: ID!
+            title: String!
+            photos: [Photo] @http(url: "https://jsonplaceholder.typicode.com/photos?albumId=:id")
+        }
+
+        type Photo {
+            id: ID!
+            title: String!
+            url: String!
+            thumbnailUrl: String!
+        }
+
+        type Post {
+            id: ID!
+            title: String!
+            body: String!
+            comments: [Comment] @http(url: "https://jsonplaceholder.typicode.com/comments?postId=:id")
+        }
+
+        type Comment {
+            id: ID!
+            name: String!
+            email: String!
+            body: String!
+        }

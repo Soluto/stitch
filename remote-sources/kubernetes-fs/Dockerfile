@@ -4,6 +4,7 @@ WORKDIR /src
 COPY . /src/
 
 FROM base as build
+RUN go mod download
 RUN go build -o source .
 
 FROM gcr.io/distroless/base

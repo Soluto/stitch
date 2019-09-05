@@ -1,0 +1,31 @@
+apiVersion: agogos.app/v1
+kind: Schema
+metadata:
+    name: xkcd
+spec:
+    definition: |
+        type XKCDComic {
+            num: Int
+            link: String
+
+            day: String
+            month: String
+            year: String
+
+            title: String
+            safe_title: String
+            alt: String
+            img: String
+
+            transcript: String
+            news: String
+        }
+
+        type XKCDQuery {
+            latest: XKCDComic @http(url: "http://xkcd.com/info.0.json")
+            comic(num: Int!): XKCDComic @http(url: "http://xkcd.com/:num/info.0.json")
+        }
+
+        type Query {
+            xkcd: XKCDQuery @stub(value: "")
+        }

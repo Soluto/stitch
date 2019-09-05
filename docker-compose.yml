@@ -1,64 +1,55 @@
-version: "3.7"
+version: '3.7'
 
 services:
-  gateway:
-    build: services/graphql-server
-    depends_on:
-      - registry
-    ports:
-      - "8011:8011"
-    environment:
-      LOG_LEVEL: DEBUG
-      REGISTRY_URL: registry:81
+    gateway:
+        build: services/graphql-server
+        depends_on:
+            - registry
+        ports:
+            - '8000:80'
+        environment:
+            PORT: 80
+            LOG_LEVEL: DEBUG
+            REGISTRY_URL: registry
 
-  registry:
-    build:
-      args:
-        target: DEBUG
-      context: services/registry
-    depends_on:
-      - resources
-    ports:
-      - "8080:80"
-      - "8081:81"
-    environment:
-      LOG_LEVEL: INFO
-      PORT: 80
-      GRPC_PORT: 81
+    registry:
+        build:
+            context: services/registry
+            args:
+                target: DEBUG
 
-      REMOTESOURCE__FILESYSTEM: http://resources:3000
+        depends_on:
+            - k8s-fs-resources
+        environment:
+            LOG_LEVEL: INFO
+            PORT: 80
+            GRPC_PORT: 81
 
-  resources:
-    build: remote-sources/filesystem
-    ports:
-      - "3000:3000"
-    environment:
-      PORT: 3000
-      SOURCE_FOLDER: /resources
-    volumes:
-      - ./remote-sources/filesystem/resources:/resources
+            REMOTESOURCE__KUBERNETES_FS: http://k8s-fs-resources
 
-  # Mock services
-  customer-api:
-    container_name: customer-api
-    build: e2e/mocks/customer-api
-    environment:
-      - PORT=3000
-    ports:
-      - "8101:3000"
+    k8s-fs-resources:
+        build: remote-sources/kubernetes-fs
+        environment:
+            PORT: 80
+            RESOURCE_FOLDER: /resources
+        volumes:
+            - ./remote-sources/kubernetes-fs/resources:/resources
 
-  hotel-api:
-    container_name: hotel-api
-    build: e2e/mocks/hotel-api
-    environment:
-      - PORT=3000
-    ports:
-      - "8102:3000"
+    # Mock services
+    customer-api:
+        container_name: customer-api
+        build: e2e/mocks/customer-api
+        environment:
+            PORT: 80
 
-  order-api:
-    container_name: order-api
-    build: e2e/mocks/order-api
-    environment:
-      - PORT=3000
-    ports:
-      - "8103:3000"
+    hotel-api:
+        container_name: hotel-api
+        build: e2e/mocks/hotel-api
+        environment:
+            PORT: 80
+
+    order-api:
+        container_name: order-api
+        build: e2e/mocks/order-api
+        environment:
+            PORT: 80
