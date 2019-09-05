@@ -2,16 +2,26 @@ version: "3.7"
 
 services:
   gateway:
-    build: services/graphql-server
+    container_name: gateway
+    build:
+      dockerfile: Debug.Dockerfile
+      context: services/graphql-server
     depends_on:
       - registry
+      - customer-api
+      - hotel-api
+      - order-api
     ports:
       - "8011:8011"
+      - "40000:40000"
+    security_opt:
+      - "seccomp:unconfined"
     environment:
       LOG_LEVEL: DEBUG
       REGISTRY_URL: registry:81
 
   registry:
+    container_name: registry
     build:
       args:
         target: DEBUG
@@ -29,6 +39,7 @@ services:
       REMOTESOURCE__FILESYSTEM: http://resources:3000
 
   resources:
+    container_name: resources
     build: remote-sources/filesystem
     ports:
       - "3000:3000"
