@@ -42,7 +42,7 @@
         "@types/pino": "^5.8.8",
         "@types/protobufjs": "^6.0.0",
         "@types/ramda": "^0.26.18",
-        "jest": "^24.8.0",
+        "jest": "^24.9.0",
         "ts-jest": "^24.0.2",
         "ts-node-dev": "^1.0.0-pre.40",
         "tslint": "^5.18.0",
