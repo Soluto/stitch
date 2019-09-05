@@ -61,27 +61,27 @@ func readResources(dirPath string) ([]AgogosResource, error) {
 	return resources, nil
 }
 
-var unknownKind = "UNKNOWN_KIND"
+var indices = map[string]string{
+	"UpstreamClientCredentials": "upstreamclientcredentials",
+	"Upstream":                  "upstreams",
+	"Schema":                    "schemas",
+}
 
-func toIndex(resource AgogosResource) string {
-	switch resource.Kind {
-	case "UpstreamClientCredentials":
-		return "upstreamclientcredentials"
-	case "Upstream":
-		return "upstreams"
-	case "Schema":
-		return "schemas"
-	default:
-		return unknownKind
+func toIndex(resource AgogosResource) (string, bool) {
+	index, ok := indices[resource.Kind]
+	if !ok {
+		return "", false
 	}
+
+	return index, true
 }
 
 func toResourceFormat(resources []AgogosResource) map[string]map[string]AgogosResourceSpec {
 	result := make(map[string]map[string]AgogosResourceSpec)
 
 	for _, resource := range resources {
-		index := toIndex(resource)
-		if index == unknownKind {
+		index, ok := toIndex(resource)
+		if !ok {
 			fmt.Printf("Unknown resource: %+v\n", resource)
 			continue
 		}
