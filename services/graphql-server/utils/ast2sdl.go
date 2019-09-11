@@ -2,53 +2,83 @@ package utils
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/language/ast"
+	"github.com/sirupsen/logrus"
 )
+
+type sdlQuery struct {
+	builder        *strings.Builder
+	fragmentsToAdd []string
+	addedFragments map[string]bool
+}
 
 // ResolveParamsToSDLQuery - generates SDL query from graphql.ResolveParams object
 func ResolveParamsToSDLQuery(queryName string, rp graphql.ResolveParams, args string) string {
-	builder := strings.Builder{}
+	query := sdlQuery{
+		builder:        &strings.Builder{},
+		addedFragments: make(map[string]bool),
+	}
 
-	builder.WriteString("query {\n")
-	builder.WriteString(queryName)
-	builder.WriteString(" ")
+	query.builder.WriteString("query {\n")
+	query.builder.WriteString(queryName)
+	query.builder.WriteString(" ")
 
-	buildCustomArgumentsClause(&builder, rp, args)
+	buildCustomArgumentsClause(query.builder, rp, args)
 
 	for _, field := range rp.Info.FieldASTs {
-		resolveParamsToQueryInner(&builder, field)
+		resolveParamsToQueryInner(&query, field)
 	}
-	builder.WriteString("}\n")
+	query.builder.WriteString("}\n")
 
-	return builder.String()
+	buildFragmentsClause(&query, rp)
+
+	return query.builder.String()
 }
 
-func resolveParamsToQueryInner(builder *strings.Builder, field *ast.Field) {
-	if field.SelectionSet == nil || len(field.SelectionSet.Selections) == 0 {
-		builder.WriteString("\n")
+func resolveParamsToQueryInner(query *sdlQuery, definition ast.Selection) {
+	selectionSet := definition.GetSelectionSet()
+
+	if selectionSet == nil || len(selectionSet.Selections) == 0 {
+		query.builder.WriteString("\n")
 		return
 	}
 
-	buildArgumentsClause(builder, field)
+	if field, ok := definition.(*ast.Field); ok {
+		buildArgumentsClause(query.builder, field)
+	}
 
-	builder.WriteString("{\n")
-	for _, selection := range field.SelectionSet.Selections {
+	query.builder.WriteString("{\n")
+	for _, selection := range selectionSet.Selections {
 		// TODO: filter out fields with own resolvers
-		if subField, ok := selection.(*ast.Field); ok {
 
+		switch selection.(type) {
+		case *ast.Field:
+			subField := selection.(*ast.Field)
 			if subField.Alias != nil {
-				builder.WriteString(subField.Alias.Value)
-				builder.WriteString(": ")
+				query.builder.WriteString(subField.Alias.Value)
+				query.builder.WriteString(": ")
 			}
 
-			builder.WriteString(subField.Name.Value)
-			resolveParamsToQueryInner(builder, subField)
+			query.builder.WriteString(subField.Name.Value)
+			resolveParamsToQueryInner(query, subField)
+
+		case *ast.FragmentSpread:
+			fragmentSpread := selection.(*ast.FragmentSpread)
+			query.builder.WriteString("...")
+			query.builder.WriteString(fragmentSpread.Name.Value)
+			query.builder.WriteString("\n")
+			if addedToQuery, ok := query.addedFragments[fragmentSpread.Name.Value]; !ok || !addedToQuery {
+				query.fragmentsToAdd = append(query.fragmentsToAdd, fragmentSpread.Name.Value)
+			}
+		default:
+			logrus.WithField("selectionType", reflect.TypeOf(selection)).Panic("Unknown selection type")
 		}
 	}
-	builder.WriteString("}\n")
+	query.builder.WriteString("}\n")
 }
 
 func buildArgumentsClause(builder *strings.Builder, field *ast.Field) {
@@ -80,4 +110,19 @@ func buildCustomArgumentsClause(builder *strings.Builder, rp graphql.ResolvePara
 	values := ReplaceWithParameters(rp, args)
 	builder.WriteString(values)
 	builder.WriteString(")")
+}
+
+func buildFragmentsClause(query *sdlQuery, rp graphql.ResolveParams) {
+	for len(query.fragmentsToAdd) > 0 {
+		fragmentName := query.fragmentsToAdd[0]
+		query.addedFragments[fragmentName] = true
+		query.fragmentsToAdd = query.fragmentsToAdd[1:]
+		fragment := rp.Info.Fragments[fragmentName].(*ast.FragmentDefinition)
+
+		query.builder.WriteString("fragment ")
+		query.builder.WriteString(fragmentName)
+		query.builder.WriteString(" on ")
+		query.builder.WriteString(fragment.TypeCondition.Name.Value)
+		resolveParamsToQueryInner(query, fragment)
+	}
 }
