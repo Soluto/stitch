@@ -106,4 +106,36 @@ describe("Graphql Directive tests", () => {
         expect(response).to.exist;
         expect(response).to.deep.equal(expectedResponse);
     });
+
+    it("should return hotel data for query with fragment and variables", async () => {
+        const hotelId = "hotel_ibis_london_blackfriars";
+        const expectedResponse = {
+            hotel: {
+                name: hotels.find(h => h.id === hotelId).name,
+                reviews: reviews.filter(r => r.hotelId === hotelId).slice(0, 2).map(r => ({ text: r.text })),
+            },
+        };
+
+        const response = await client.request(`
+        query($limit: Int) {
+            hotel(id: "${hotelId}") {
+              name
+              reviews(limit: $limit) {
+                ...ReviewFragment
+              }
+            }
+          }
+
+          fragment ReviewFragment on Review {
+            ...ReviewSecondFragment
+          }
+
+          fragment ReviewSecondFragment on Review {
+            text
+          }`, {
+            limit: 2
+        });
+        expect(response).to.exist;
+        expect(response).to.deep.equal(expectedResponse);
+    });
 });
