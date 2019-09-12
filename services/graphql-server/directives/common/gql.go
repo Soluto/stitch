@@ -78,8 +78,11 @@ func createGqlClient(url string) *gqlclient.Client {
 }
 
 func createGqlRequest(s server.ServerContext, gqlParams gqlParams, rp graphql.ResolveParams) (*gqlclient.Request, error) {
-	query := utils.ResolveParamsToSDLQuery(gqlParams.queryName, rp, gqlParams.args)
-	request := gqlclient.NewRequest(query)
+	requestConfig := utils.ResolveParamsToSDLRequest(gqlParams.queryName, rp, gqlParams.args)
+	request := gqlclient.NewRequest(requestConfig.Query)
+	for varName, varValue := range requestConfig.VariableValues {
+		request.Var(varName, varValue)
+	}
 
 	if gqlParams.upstream != nil {
 		gqlParams.upstream.ApplyUpstream(rp.Context, &request.Header)
