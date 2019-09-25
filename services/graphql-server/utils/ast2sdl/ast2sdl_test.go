@@ -39,7 +39,13 @@ func TestBuildSDLQuery(t *testing.T) {
 				args: "",
 			},
 			want: GqlRequestConfig{
-				Query:          "query{\nbooks {\nauthor\ntitle\n}\n}\n",
+				Query: strings.ReplaceAll(`query {
+					books {
+						author
+						title
+					}
+				}
+				`, "\t", ""),
 				VariableValues: make(map[string]interface{}),
 			},
 		},
@@ -65,7 +71,16 @@ func TestBuildSDLQuery(t *testing.T) {
 				args: "",
 			},
 			want: GqlRequestConfig{
-				Query:          "query{\nbooks {\nauthor{\nfirstName\nlastName\n}\ntitle\n}\n}\n",
+				Query: strings.ReplaceAll(`query {
+					books {
+						author {
+							firstName
+							lastName
+						}
+						title
+					}
+				}
+				`, "\t", ""),
 				VariableValues: make(map[string]interface{}),
 			},
 		},
@@ -102,8 +117,24 @@ func TestBuildSDLQuery(t *testing.T) {
 				args: "",
 			},
 			want: GqlRequestConfig{
-				Query: "query{\nbooks {\nauthor{\nfirstName\nlastName\n}\ntitle\nreviews{\n...reviewFragment\n}\n}\n}\n" +
-					"fragment reviewFragment on Review{\nreviewer\ntext\nstars\n}\n",
+				Query: strings.ReplaceAll(`query {
+					books {
+						author {
+							firstName
+							lastName
+							}
+							title
+							reviews {
+								...reviewFragment
+							}
+						}
+					}
+					fragment reviewFragment on Review {
+						reviewer
+						text
+						stars
+					}
+					`, "\t", ""),
 				VariableValues: make(map[string]interface{}),
 			},
 		},

@@ -30,9 +30,7 @@ func BuildSDLQuery(queryName string, rp graphql.ResolveParams, args string) GqlR
 		variablesClause: makeVariablesClause(),
 	}
 
-	query.builder.WriteString("{\n")
-	query.builder.WriteString(queryName)
-	query.builder.WriteString(" ")
+	query.builder.WriteString(fmt.Sprintf("{\n%s", queryName))
 
 	if args != "" {
 		query.builder.WriteString(fmt.Sprintf("(%s)", args))
@@ -46,7 +44,7 @@ func BuildSDLQuery(queryName string, rp graphql.ResolveParams, args string) GqlR
 	writeFragmentsClause(&query, rp)
 
 	return GqlRequestConfig{
-		Query:          fmt.Sprintf("query%s%s", query.variablesClause.String(), query.builder.String()),
+		Query:          fmt.Sprintf("query%s %s", query.variablesClause.String(), query.builder.String()),
 		VariableValues: query.variablesClause.Values(rp),
 	}
 
@@ -65,7 +63,7 @@ func writeFieldsClause(query *sdlQuery, definition ast.Selection, rp graphql.Res
 		writeArgumentsClause(query, field, rp)
 	}
 
-	query.builder.WriteString("{\n")
+	query.builder.WriteString(" {\n")
 	for _, selection := range selectionSet.Selections {
 		// TODO: filter out fields with own resolvers
 
