@@ -3,6 +3,7 @@ package ast2sdl
 import (
 	"fmt"
 	"reflect"
+	"sort"
 	"strings"
 
 	"github.com/graphql-go/graphql"
@@ -20,6 +21,18 @@ type sdlQuery struct {
 	builder         *strings.Builder
 	fragmentClause  fragmentClause
 	variablesClause variablesClause
+}
+
+func fieldSorter(fields []ast.Selection) func(int, int) bool {
+	return func(i, j int) bool {
+		lName := reflect.Indirect(reflect.ValueOf(fields[i])).FieldByName("Name")
+		left := reflect.Indirect(lName).FieldByName("Value").String()
+
+		rName := reflect.Indirect(reflect.ValueOf(fields[j])).FieldByName("Name")
+		right := reflect.Indirect(rName).FieldByName("Value").String()
+
+		return left < right
+	}
 }
 
 // BuildSDLQuery - generates SDL query and variables from graphql.ResolveParams object
@@ -64,7 +77,11 @@ func writeFieldsClause(query *sdlQuery, definition ast.Selection, rp graphql.Res
 	}
 
 	query.builder.WriteString(" {\n")
-	for _, selection := range selectionSet.Selections {
+
+	// Sorting fields to ensure their order in query string
+	fields := selectionSet.Selections
+	sort.Slice(fields, fieldSorter(fields))
+	for _, selection := range fields {
 		// TODO: filter out fields with own resolvers
 
 		switch selection.(type) {

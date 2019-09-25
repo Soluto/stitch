@@ -97,8 +97,8 @@ func TestBuildSDLQuery(t *testing.T) {
 								Name: newAstName("books"),
 								SelectionSet: newNestedSelectionSet(map[string][]string{
 									"author":  {"firstName", "lastName"},
-									"title":   {},
 									"reviews": {"...reviewFragment"},
+									"title":   {},
 								}),
 							},
 						},
@@ -123,16 +123,16 @@ func TestBuildSDLQuery(t *testing.T) {
 							firstName
 							lastName
 							}
-							title
 							reviews {
 								...reviewFragment
 							}
+							title
 						}
 					}
 					fragment reviewFragment on Review {
 						reviewer
-						text
 						stars
+						text
 					}
 					`, "\t", ""),
 				VariableValues: make(map[string]interface{}),
