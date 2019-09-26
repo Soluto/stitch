@@ -1,7 +1,7 @@
-import fastify from "fastify";
-import { ApolloServer, gql } from "apollo-server-fastify";
-import hotels from "../data/hotels.json";
-import reviews from "../data/reviews.json";
+import fastify from 'fastify';
+import { ApolloServer, gql } from 'apollo-server-fastify';
+import hotels from '../data/hotels.json';
+import reviews from '../data/reviews.json';
 
 const port = Number(process.env.PORT) || 3000;
 
@@ -50,23 +50,23 @@ const typeDefs = gql`
 // Resolvers define the technique for fetching the types in the
 // schema.  We'll retrieve books from the "books" array above.
 const resolvers = {
-    Query: {
-        hotel: (_, { id }): Hotel => hotels.find(h => h.id === id),
-        hotels: (): Array<Hotel> => hotels,
-    },
-    Hotel: {
-        reviews: ({ id }, { limit }): Array<Review> => reviews.filter(r => r.hotelId === id).slice(0, limit),
-    }
+  Query: {
+    hotel: (_, { id }): Hotel => hotels.find(h => h.id === id),
+    hotels: (): Array<Hotel> => hotels
+  },
+  Hotel: {
+    reviews: ({ id }, { limit }): Array<Review> => reviews.filter(r => r.hotelId === id).slice(0, limit)
+  }
 };
 
 (async () => {
-    const server = new ApolloServer({ typeDefs, resolvers });
+  const server = new ApolloServer({ typeDefs, resolvers });
 
-    const app = fastify();
+  const app = fastify();
 
-    app.get("/health", (req, res) => { res.status(200).send(true); });
+  app.get('/health', (req, res) => { res.status(200).send(true); });
 
-    app.register(server.createHandler())
-    await app.ready();
-    await app.listen(port, "0.0.0.0", () => console.log(`Server is listening to port: ${port}`));
+  app.register(server.createHandler());
+  await app.ready();
+  await app.listen(port, '0.0.0.0', () => console.log(`Server is listening to port: ${port}`));
 })();

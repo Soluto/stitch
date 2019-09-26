@@ -4,7 +4,8 @@
     "license": "MIT",
     "scripts": {
         "test": "mocha --require ./tsnodeRegister.js ./**/*.spec.ts --exit",
-        "lint": "eslint ./**/*.ts"
+        "lint": "eslint ./**/*.ts",
+        "pretest": "yarn lint"
     },
     "devDependencies": {
         "@types/axios": "0.14.0",
