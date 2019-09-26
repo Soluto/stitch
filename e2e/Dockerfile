@@ -6,6 +6,7 @@ COPY ./utils ./utils
 COPY ./tests ./tests
 
 # Data for tests
+COPY .eslintrc .eslintignore ./
 COPY ./data ./data
 COPY ./mocks ./mocks
 
