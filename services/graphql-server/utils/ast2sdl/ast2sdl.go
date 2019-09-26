@@ -23,15 +23,26 @@ type sdlQuery struct {
 	variablesClause variablesClause
 }
 
+func getFieldName(selection ast.Selection) string {
+	switch selection.(type) {
+	case *ast.Field:
+		field := selection.(*ast.Field)
+		return field.Name.Value
+	case *ast.FragmentSpread:
+		fragmentSpread := selection.(*ast.FragmentSpread)
+		return fmt.Sprintf("...%s\n", fragmentSpread.Name.Value)
+
+	case *ast.InlineFragment:
+		inlineFragment := selection.(*ast.InlineFragment)
+		name := inlineFragment.TypeCondition.Name.Value
+		return fmt.Sprintf("... on %s", name)
+	}
+	return "Error"
+}
+
 func fieldSorter(fields []ast.Selection) func(int, int) bool {
 	return func(i, j int) bool {
-		lName := reflect.Indirect(reflect.ValueOf(fields[i])).FieldByName("Name")
-		left := reflect.Indirect(lName).FieldByName("Value").String()
-
-		rName := reflect.Indirect(reflect.ValueOf(fields[j])).FieldByName("Name")
-		right := reflect.Indirect(rName).FieldByName("Value").String()
-
-		return left < right
+		return getFieldName(fields[i]) < getFieldName(fields[j])
 	}
 }
 
@@ -77,11 +88,7 @@ func writeFieldsClause(query *sdlQuery, definition ast.Selection, rp graphql.Res
 	}
 
 	query.builder.WriteString(" {\n")
-	writeFieldsClauseInternal(query, selectionSet, rp)
-	query.builder.WriteString("}\n")
-}
 
-func writeFieldsClauseInternal(query *sdlQuery, selectionSet *ast.SelectionSet, rp graphql.ResolveParams) {
 	// Sorting fields to ensure their order in query string
 	fields := selectionSet.Selections
 	sort.Slice(fields, fieldSorter(fields))
@@ -106,18 +113,16 @@ func writeFieldsClauseInternal(query *sdlQuery, selectionSet *ast.SelectionSet, 
 
 		case *ast.InlineFragment:
 			inlineFragment := selection.(*ast.InlineFragment)
-			selectionSet := inlineFragment.GetSelectionSet()
-			print(selectionSet)
 			if inlineFragment.TypeCondition != nil {
-				query.builder.WriteString(fmt.Sprintf("... on %s {\n", inlineFragment.TypeCondition.Name.Value))
-				writeFieldsClauseInternal(query, inlineFragment.SelectionSet, rp)
-				query.builder.WriteString("}\n")
+				query.builder.WriteString(fmt.Sprintf("... on %s", inlineFragment.TypeCondition.Name.Value))
+				writeFieldsClause(query, inlineFragment, rp)
 			}
 
 		default:
 			logrus.WithField("selectionType", reflect.TypeOf(selection)).Panic("Unknown selection type")
 		}
 	}
+	query.builder.WriteString("}\n")
 }
 
 // buildArgumentsClause - builds arguments clause for fields with arguments
