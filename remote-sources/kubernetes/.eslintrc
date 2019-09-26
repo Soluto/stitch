@@ -1,0 +1,31 @@
+{
+    "env": {
+        "es6": true,
+        "mocha": true
+    },
+    "extends": [
+        "standard"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": 2018,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "@typescript-eslint"
+    ],
+    "rules": {
+        "@typescript-eslint/no-unused-vars": "error",
+        "space-before-function-paren": "off",
+        "space-in-parens": "off",
+        "array-bracket-spacing": "off",
+        "semi": "off",
+        "@typescript-eslint/semi": ["error"]
+    },
+    "overrides": [{
+        "files": ["tests/**"],
+        "rules": {
+            "no-unused-expressions": "off"
+        }
+    }]
+}

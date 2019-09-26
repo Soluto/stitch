@@ -7,7 +7,8 @@
         "start": "node ./dist/index.js",
         "debug": "tsnd --inspect=0.0.0.0:5858 --respawn  -- ./src/index.ts",
         "test": "jest --passWithNoTests",
-        "test:watch": "jest --watch"
+        "test:watch": "jest --watch",
+        "lint": "eslint ./**/*.ts"
     },
     "dependencies": {
         "@kubernetes/client-node": "0.10.2",
@@ -28,9 +29,14 @@
         "jest": "^24.9.0",
         "ts-jest": "^24.0.2",
         "ts-node-dev": "^1.0.0-pre.40",
-        "tslint": "5.18.0",
-        "tslint-config-prettier": "1.18.0",
-        "tslint-eslint-rules": "5.4.0",
+        "@typescript-eslint/eslint-plugin": "2.0.0",
+        "@typescript-eslint/parser": "2.0.0",
+        "eslint": "6.2.2",
+        "eslint-config-standard": "14.0.1",
+        "eslint-plugin-import": "2.18.2",
+        "eslint-plugin-node": "9.1.0",
+        "eslint-plugin-promise": "4.2.1",
+        "eslint-plugin-standard": "4.0.1",
         "typescript": "^3.5.3"
     }
 }

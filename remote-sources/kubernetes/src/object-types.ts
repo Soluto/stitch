@@ -2,7 +2,7 @@ import k8s = require('@kubernetes/client-node');
 
 export type SchemaConfig = {
     definition: string;
-}
+};
 
 export type UpstreamConfig = {
     host: string;
@@ -15,7 +15,7 @@ export type UpstreamConfig = {
         authority: string;
         scope: string;
     };
-}
+};
 
 export type UpstreamClientCredentialsConfig = {
     authType: string;
@@ -31,7 +31,7 @@ export type UpstreamClientCredentialsConfig = {
             };
         };
     };
-}
+};
 
 export type AgogosObjectConfig = SchemaConfig | UpstreamConfig | UpstreamClientCredentialsConfig;
 

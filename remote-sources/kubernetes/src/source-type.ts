@@ -1,4 +1,4 @@
-import { AgogosObjectConfig } from "./object-types";
+import { AgogosObjectConfig } from './object-types';
 
 export default interface Source {
     getAgogosObjects(): Promise<{ [kind: string]: { [name: string]: AgogosObjectConfig } }>;
