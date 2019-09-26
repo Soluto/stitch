@@ -162,7 +162,7 @@ describe('Graphql Directive tests', () => {
 
         const response = await client.request(
             `
-        query($limit: Int) {
+        query {
             hotels {
               ... on Hotel {
                   address
