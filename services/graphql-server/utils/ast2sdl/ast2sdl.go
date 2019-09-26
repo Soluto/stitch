@@ -77,7 +77,11 @@ func writeFieldsClause(query *sdlQuery, definition ast.Selection, rp graphql.Res
 	}
 
 	query.builder.WriteString(" {\n")
+	writeFieldsClauseInternal(query, selectionSet, rp)
+	query.builder.WriteString("}\n")
+}
 
+func writeFieldsClauseInternal(query *sdlQuery, selectionSet *ast.SelectionSet, rp graphql.ResolveParams) {
 	// Sorting fields to ensure their order in query string
 	fields := selectionSet.Selections
 	sort.Slice(fields, fieldSorter(fields))
@@ -100,11 +104,20 @@ func writeFieldsClause(query *sdlQuery, definition ast.Selection, rp graphql.Res
 			query.builder.WriteString(fmt.Sprintf("...%s\n", fragmentSpread.Name.Value))
 			query.fragmentClause.PushFragmentIfNotExists(fragmentSpread.Name.Value)
 
+		case *ast.InlineFragment:
+			inlineFragment := selection.(*ast.InlineFragment)
+			selectionSet := inlineFragment.GetSelectionSet()
+			print(selectionSet)
+			if inlineFragment.TypeCondition != nil {
+				query.builder.WriteString(fmt.Sprintf("... on %s {\n", inlineFragment.TypeCondition.Name.Value))
+				writeFieldsClauseInternal(query, inlineFragment.SelectionSet, rp)
+				query.builder.WriteString("}\n")
+			}
+
 		default:
 			logrus.WithField("selectionType", reflect.TypeOf(selection)).Panic("Unknown selection type")
 		}
 	}
-	query.builder.WriteString("}\n")
 }
 
 // buildArgumentsClause - builds arguments clause for fields with arguments
