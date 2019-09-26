@@ -23,15 +23,26 @@ type sdlQuery struct {
 	variablesClause variablesClause
 }
 
+func getFieldName(selection ast.Selection) string {
+	switch selection.(type) {
+	case *ast.Field:
+		field := selection.(*ast.Field)
+		return field.Name.Value
+	case *ast.FragmentSpread:
+		fragmentSpread := selection.(*ast.FragmentSpread)
+		return fmt.Sprintf("...%s\n", fragmentSpread.Name.Value)
+
+	case *ast.InlineFragment:
+		inlineFragment := selection.(*ast.InlineFragment)
+		name := inlineFragment.TypeCondition.Name.Value
+		return fmt.Sprintf("... on %s", name)
+	}
+	return "Error"
+}
+
 func fieldSorter(fields []ast.Selection) func(int, int) bool {
 	return func(i, j int) bool {
-		lName := reflect.Indirect(reflect.ValueOf(fields[i])).FieldByName("Name")
-		left := reflect.Indirect(lName).FieldByName("Value").String()
-
-		rName := reflect.Indirect(reflect.ValueOf(fields[j])).FieldByName("Name")
-		right := reflect.Indirect(rName).FieldByName("Value").String()
-
-		return left < right
+		return getFieldName(fields[i]) < getFieldName(fields[j])
 	}
 }
 
@@ -99,6 +110,13 @@ func writeFieldsClause(query *sdlQuery, definition ast.Selection, rp graphql.Res
 			fragmentSpread := selection.(*ast.FragmentSpread)
 			query.builder.WriteString(fmt.Sprintf("...%s\n", fragmentSpread.Name.Value))
 			query.fragmentClause.PushFragmentIfNotExists(fragmentSpread.Name.Value)
+
+		case *ast.InlineFragment:
+			inlineFragment := selection.(*ast.InlineFragment)
+			if inlineFragment.TypeCondition != nil {
+				query.builder.WriteString(fmt.Sprintf("... on %s", inlineFragment.TypeCondition.Name.Value))
+				writeFieldsClause(query, inlineFragment, rp)
+			}
 
 		default:
 			logrus.WithField("selectionType", reflect.TypeOf(selection)).Panic("Unknown selection type")

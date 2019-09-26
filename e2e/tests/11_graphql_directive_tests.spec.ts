@@ -108,7 +108,10 @@ describe('Graphql Directive tests', () => {
     const expectedResponse = {
       hotel: {
         name: hotels.find(h => h.id === hotelId).name,
-        reviews: reviews.filter(r => r.hotelId === hotelId).slice(0, 2).map(r => ({ text: r.text }))
+        reviews: reviews
+          .filter(r => r.hotelId === hotelId)
+          .slice(0, 2)
+          .map(r => ({ text: r.text }))
       }
     };
 
@@ -128,9 +131,30 @@ describe('Graphql Directive tests', () => {
 
           fragment ReviewSecondFragment on Review {
             text
-          }`, {
+          }`,
+    {
       limit: 2
-    });
+    }
+    );
+    expect(response).to.exist;
+    expect(response).to.deep.equal(expectedResponse);
+  });
+
+  it('should return hotels data for query with inline fragment', async () => {
+    const expectedResponse = {
+      hotels: hotels.map(({ name, address }) => ({ name, address }))
+    };
+
+    const response = await client.request(`
+        query {
+            hotels {
+              ... on Hotel {
+                  address
+                  name
+              }
+            }
+          }`
+    );
     expect(response).to.exist;
     expect(response).to.deep.equal(expectedResponse);
   });

@@ -138,6 +138,41 @@ func TestBuildSDLQuery(t *testing.T) {
 				VariableValues: make(map[string]interface{}),
 			},
 		},
+
+		{
+			name: "Query with inline fragment",
+			args: args{
+				queryName: "books",
+				rp: graphql.ResolveParams{
+					Info: graphql.ResolveInfo{
+						FieldASTs: []*ast.Field{
+							{
+								Kind: "Field",
+								Name: newAstName("books"),
+								SelectionSet: newSelectionSetWithInlineFragment("HistoryBook",
+									[]string{"era"},
+									[]string{"title", "author"},
+								),
+							},
+						},
+					},
+				},
+				args: "",
+			},
+			want: GqlRequestConfig{
+				Query: strings.ReplaceAll(`query {
+					books {
+						... on HistoryBook {
+							era
+						}
+						author
+						title
+					}
+				}
+				`, "\t", ""),
+				VariableValues: make(map[string]interface{}),
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -194,6 +229,33 @@ func newNestedSelectionSet(fields map[string][]string) *ast.SelectionSet {
 		}
 		i++
 	}
+
+	return result
+}
+
+func newSelectionSetWithInlineFragment(conditionType string, fragmentFields []string, outerFields []string) *ast.SelectionSet {
+	innerSelectionSet := newSelectionSet(fragmentFields)
+	typeCondition := &ast.Named{
+		Name: newAstName(conditionType),
+	}
+
+	inlineFragment := &ast.InlineFragment{
+		SelectionSet:  innerSelectionSet,
+		TypeCondition: typeCondition,
+	}
+
+	result := &ast.SelectionSet{
+		Selections: make([]ast.Selection, len(outerFields)+1),
+	}
+
+	for i, field := range outerFields {
+		result.Selections[i] = &ast.Field{
+			Name: newAstName(field),
+			Kind: "Field",
+		}
+	}
+
+	result.Selections[len(outerFields)] = inlineFragment
 
 	return result
 }
