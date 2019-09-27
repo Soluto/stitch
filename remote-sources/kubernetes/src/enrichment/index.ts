@@ -9,7 +9,7 @@ const enrichers: {
 
 export default async (resource: AgogosCustomResource<AgogosObjectConfig>): Promise<AgogosObjectConfig> => {
     const kind = resource.kind.toLowerCase();
-    if (enrichers.hasOwnProperty(kind)) {
+    if (enrichers[kind]) {
         return enrichers[kind](resource);
     }
     return resource.spec;

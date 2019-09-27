@@ -11,7 +11,7 @@
         "debug": "tsnd --inspect=0.0.0.0:5858 --respawn  -- ./src/index.ts",
         "test": "jest",
         "test:watch": "jest --watch",
-        "lint": "eslint ./**/*.ts"
+        "lint": "eslint ./src/**/*.ts"
     },
     "dependencies": {
         "body-parser": "^1.19.0",
@@ -43,17 +43,18 @@
         "@types/pino": "^5.8.8",
         "@types/protobufjs": "^6.0.0",
         "@types/ramda": "^0.26.18",
-        "jest": "^24.9.0",
-        "ts-jest": "^24.0.2",
-        "ts-node-dev": "^1.0.0-pre.40",
         "@typescript-eslint/eslint-plugin": "2.0.0",
         "@typescript-eslint/parser": "2.0.0",
-        "eslint": "6.2.2",
+        "eslint": "^6.4.0",
         "eslint-config-standard": "14.0.1",
         "eslint-plugin-import": "2.18.2",
+        "eslint-plugin-jest": "^22.17.0",
         "eslint-plugin-node": "9.1.0",
         "eslint-plugin-promise": "4.2.1",
         "eslint-plugin-standard": "4.0.1",
+        "jest": "^24.9.0",
+        "ts-jest": "^24.0.2",
+        "ts-node-dev": "^1.0.0-pre.40",
         "typescript": "^3.5.3"
     }
 }

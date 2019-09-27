@@ -1,7 +1,8 @@
 {
     "env": {
         "es6": true,
-        "mocha": true
+        "mocha": true,
+        "jest/globals": true
     },
     "extends": [
         "standard"
@@ -12,7 +13,8 @@
         "sourceType": "module"
     },
     "plugins": [
-        "@typescript-eslint"
+        "@typescript-eslint",
+        "jest"
     ],
     "rules": {
         "@typescript-eslint/no-unused-vars": "error",
@@ -20,7 +22,12 @@
         "space-in-parens": "off",
         "array-bracket-spacing": "off",
         "semi": "off",
-        "@typescript-eslint/semi": ["error"]
+        "@typescript-eslint/semi": ["error"],
+        "jest/no-disabled-tests": "warn",
+        "jest/no-focused-tests": "error",
+        "jest/no-identical-title": "error",
+        "jest/prefer-to-have-length": "warn",
+        "jest/valid-expect": "error"
     },
     "overrides": [{
         "files": ["tests/**"],

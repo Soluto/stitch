@@ -1,6 +1,6 @@
 export type SchemaConfig = {
     definition: string;
-}
+};
 
 export type UpstreamConfig = {
     host: string;
@@ -13,14 +13,14 @@ export type UpstreamConfig = {
         authority: string;
         scope: string;
     };
-}
+};
 
 export type UpstreamAuthCredentialsConfig = {
     authType: string;
     authority: string;
     clientId: string;
     clientSecret: string;
-}
+};
 
 export type AgogosObjectConfig =
     | SchemaConfig
@@ -31,4 +31,4 @@ export type AgogosConfiguration = {
     schema: string,
     upstreams: { [name: string]: UpstreamConfig },
     upstreamAuthCredentials: { [name: string]: UpstreamAuthCredentialsConfig },
-}
+};

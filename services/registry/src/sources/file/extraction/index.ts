@@ -28,7 +28,7 @@ export default async (
 ): Promise<AgogosObjectConfig> => {
     const mimeType = mime.lookup(file) || "unknown";
     const content = await readFileAsync(file, "utf8");
-    if (extractors.hasOwnProperty(kind)) {
+    if (extractors[kind]) {
         return extractors[kind](mimeType, content);
     }
     return JSON.parse(content);
