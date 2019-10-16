@@ -1,11 +1,15 @@
 package common
 
-import "agogos/directives/middlewares"
+import (
+	"agogos/directives/common/rest"
+	"agogos/directives/middlewares"
+)
 
 // MiddlewareDefinitions common
 var MiddlewareDefinitions = map[string]middlewares.MiddlewareDefinition{
-	"stub":            stub,
-	"http":            httpMiddleware,
-	"select":          selectMiddleware,
-	"gql":             gqlMiddleware,
+	"stub":   stub,
+	"http":   httpMiddleware,
+	"select": selectMiddleware,
+	"gql":    gqlMiddleware,
+	"rest":   rest.RestMiddleware,
 }
