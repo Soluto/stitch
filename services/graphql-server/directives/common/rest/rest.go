@@ -134,8 +134,8 @@ func getKeyValueList(args map[string]interface{}, field string) KeyValueList {
 }
 
 func createHTTPClient(timeoutMs int) http.Client {
-	timeoutNs := time.Millisecond.Nanoseconds() * int64(timeoutMs)
-	return http.Client{Timeout: time.Duration(timeoutNs)}
+	timeout := time.Duration(timeoutMs) * time.Millisecond
+	return http.Client{Timeout: timeout}
 }
 
 func createHTTPRequest(serverCtx server.ServerContext, rstParams restParams, resolveParams graphql.ResolveParams) (*http.Request, error) {
