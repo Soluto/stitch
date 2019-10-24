@@ -18,13 +18,13 @@ import (
 	"github.com/vektah/gqlparser/ast"
 )
 
-type RestParams struct {
+type restParams struct {
 	url         string
 	method      string
-	contentType string
+	contentType contentTypeData
 	bodyArg     string
-	query       NameValueList
-	headers     NameValueList
+	query       KeyValueList
+	headers     KeyValueList
 	timeoutMs   int
 }
 
@@ -37,8 +37,6 @@ const (
 	defaultMethod    = "GET"
 	defaultBodyArg   = "input"
 )
-
-var defaultContentType = contentTypes.JSON.name
 
 var RestMiddleware = middlewares.DirectiveDefinition{
 	MiddlewareFactory: func(serverCtx server.ServerContext, fieldDef *ast.FieldDefinition, directive *ast.Directive) middlewares.Middleware {
@@ -56,36 +54,35 @@ var RestMiddleware = middlewares.DirectiveDefinition{
 	},
 }
 
-func parseRestParams(directive *ast.Directive) RestParams {
-	params := RestParams{}
+func parseRestParams(directive *ast.Directive) restParams {
+	rstParams := restParams{}
 	var ok bool
 
 	args := directive.ArgumentMap(make(map[string]interface{}))
 
-	params.url, ok = args["url"].(string)
+	rstParams.url, ok = args["url"].(string)
 	if !ok {
 		logrus.Panic("url argument missing from rest directive")
 	}
 
-	params.method = getMethod(args)
-	params.contentType = getContentTypeName(args)
-	params.timeoutMs = getTimeout(args)
-	params.bodyArg = getBodyArg(args)
+	rstParams.method = getMethod(args)
+	rstParams.contentType = getContentTypeFromArgs(args)
+	rstParams.timeoutMs = getTimeout(args)
+	rstParams.bodyArg = getBodyArg(args)
 
-	params.query = getNameValueList(args, "query")
-	params.headers = getNameValueList(args, "headers")
+	rstParams.query = getKeyValueList(args, "query")
+	rstParams.headers = getKeyValueList(args, "headers")
 
-	return params
+	return rstParams
 }
 
-func getContentTypeName(args map[string]interface{}) string {
+func getContentTypeFromArgs(args map[string]interface{}) contentTypeData {
 	contentTypeName, ok := args["contentType"].(string)
 	if !ok {
 		return defaultContentType
 	}
 
-	contentType := getContentType(contentTypeName)
-	return contentType.name
+	return getContentType(contentTypeName)
 }
 
 func getTimeout(args map[string]interface{}) int {
@@ -120,20 +117,20 @@ func getBodyArg(args map[string]interface{}) string {
 	return bodyArg
 }
 
-func getNameValueList(args map[string]interface{}, field string) NameValueList {
+func getKeyValueList(args map[string]interface{}, field string) KeyValueList {
 	fieldArgs, ok := args[field].([]interface{})
 	if !ok {
 		return nil
 	}
 
-	nameValueList := make(NameValueList, 0, len(fieldArgs))
+	keyValueList := make(KeyValueList, 0, len(fieldArgs))
 
 	for _, arg := range fieldArgs {
-		nameValuePair := arg.(map[string]interface{})
-		nameValueList.append(nameValuePair["name"].(string), nameValuePair["value"].(string))
+		keyValuePair := arg.(map[string]interface{})
+		keyValueList.append(keyValuePair["key"].(string), keyValuePair["value"].(string))
 	}
 
-	return nameValueList
+	return keyValueList
 }
 
 func createHTTPClient(timeoutMs int) http.Client {
@@ -141,24 +138,24 @@ func createHTTPClient(timeoutMs int) http.Client {
 	return http.Client{Timeout: time.Duration(timeoutNs)}
 }
 
-func createHTTPRequest(serverCtx server.ServerContext, restParams RestParams, resolveParams graphql.ResolveParams) (*http.Request, error) {
-	URL, err := getURL(restParams.url, restParams.query, resolveParams)
+func createHTTPRequest(serverCtx server.ServerContext, rstParams restParams, resolveParams graphql.ResolveParams) (*http.Request, error) {
+	URL, err := getURL(rstParams.url, rstParams.query, resolveParams)
 	if err != nil {
 		return nil, err
 	}
 
-	bodyReader, err := getBodyReader(restParams, resolveParams)
+	bodyReader, err := getBodyReader(rstParams, resolveParams)
 	if err != nil {
 		return nil, err
 	}
 
-	request, err := http.NewRequest(restParams.method, URL, bodyReader)
+	request, err := http.NewRequest(rstParams.method, URL, bodyReader)
 	if err != nil {
 		return nil, err
 	}
 
 	request = request.WithContext(resolveParams.Context)
-	addHeadersToRequest(request, restParams, resolveParams)
+	addHeadersToRequest(request, rstParams, resolveParams)
 
 	upstream, ok := serverCtx.Upstream(request.URL.Host)
 	if ok {
@@ -168,39 +165,36 @@ func createHTTPRequest(serverCtx server.ServerContext, restParams RestParams, re
 	return request, nil
 }
 
-func getURL(destURL string, queryParams NameValueList, resolveParams graphql.ResolveParams) (string, error) {
+func getURL(destURL string, queryParams KeyValueList, resolveParams graphql.ResolveParams) (string, error) {
 	mappedURL := utils.ReplaceWithParameters(resolveParams, destURL)
 	urlObject, err := url.Parse(mappedURL)
 	if err != nil {
 		return "", err
 	}
 
-	addQueryParamsToURL(urlObject, queryParams, resolveParams)
+	urlObject.RawQuery = getQuerystring(urlObject.Query(), queryParams, resolveParams)
 
 	finalURL := urlObject.String()
 	return finalURL, nil
 }
 
-func addQueryParamsToURL(urlObject *url.URL, queryParams NameValueList, resolveParams graphql.ResolveParams) {
+func getQuerystring(urlQueryParams url.Values, queryParams KeyValueList, resolveParams graphql.ResolveParams) string {
 	mappedQueryParams := queryParams.replaceParamsForQuery(resolveParams)
-	urlQueryParams := urlObject.Query()
 
 	for _, queryParam := range mappedQueryParams {
-		urlQueryParams.Add(queryParam.name, queryParam.value)
+		urlQueryParams.Add(queryParam.key, queryParam.value)
 	}
 
-	urlObject.RawQuery = urlQueryParams.Encode()
+	return urlQueryParams.Encode()
 }
 
-func getBodyReader(restParams RestParams, resolveParams graphql.ResolveParams) (io.Reader, error) {
-	if !isMethodWithBody(restParams.method) {
+func getBodyReader(rstParams restParams, resolveParams graphql.ResolveParams) (io.Reader, error) {
+	if !isMethodWithBody(rstParams.method) {
 		return nil, nil
 	}
 
-	contentType := getContentType(restParams.contentType)
-	inputBody := getBody(resolveParams.Args, restParams.bodyArg)
-
-	inputBodyString, err := contentType.bodyHandler(inputBody)
+	inputBody := getBody(resolveParams.Args, rstParams.bodyArg)
+	inputBodyString, err := rstParams.contentType.serializer(inputBody)
 	if err != nil {
 		return nil, err
 	}
@@ -222,15 +216,14 @@ func getBody(args map[string]interface{}, bodyArg string) (body map[string]inter
 	return
 }
 
-func addHeadersToRequest(request *http.Request, restParams RestParams, resolveParams graphql.ResolveParams) {
-	mappedHeaders := restParams.headers.replaceParams(resolveParams)
+func addHeadersToRequest(request *http.Request, rstParams restParams, resolveParams graphql.ResolveParams) {
+	mappedHeaders := rstParams.headers.replaceParams(resolveParams)
 	for _, header := range mappedHeaders {
-		request.Header.Set(header.name, header.value)
+		request.Header.Set(header.key, header.value)
 	}
 
-	if isMethodWithBody(restParams.method) {
-		contentType := getContentType(restParams.contentType)
-		request.Header.Set("Content-Type", contentType.headerValue)
+	if isMethodWithBody(rstParams.method) {
+		request.Header.Set("Content-Type", rstParams.contentType.headerValue)
 	}
 }
 

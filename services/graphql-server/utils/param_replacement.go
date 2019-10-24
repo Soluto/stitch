@@ -32,19 +32,7 @@ func resolveFromParams(rp graphql.ResolveParams, sourceName string, propName str
 	}
 }
 
-// ReplaceWithParameters replaces template strings that look like "something {args.id} {source.someotherprop}", replacing those templates with the corresponding properties in the ResolveParams
-func ReplaceWithParameters(rp graphql.ResolveParams, str string) string {
-	return re.ReplaceAllStringFunc(str, func(s string) string {
-		prop := getProp(rp, s)
-		if prop == nil {
-			return ""
-		}
-
-		return fmt.Sprintf("%v", prop)
-	})
-}
-
-func getProp(rp graphql.ResolveParams, template string) interface{} {
+func resolveTemplate(rp graphql.ResolveParams, template string) interface{} {
 	sepIndex := strings.IndexRune(template, '.')
 
 	sourceName := template[1:sepIndex]
@@ -53,14 +41,26 @@ func getProp(rp graphql.ResolveParams, template string) interface{} {
 	return resolveFromParams(rp, sourceName, propName)
 }
 
-// GetReplacementIfArray - If str is only a single template that resolves to an array, it returns that array, otherwise it returns nil
-func GetReplacementIfArray(rp graphql.ResolveParams, str string) []interface{} {
+// ReplaceWithParameters replaces template strings that look like "something {args.id} {source.someotherprop}", replacing those templates with the corresponding properties in the ResolveParams
+func ReplaceWithParameters(rp graphql.ResolveParams, str string) string {
+	return re.ReplaceAllStringFunc(str, func(s string) string {
+		prop := resolveTemplate(rp, s)
+		if prop == nil {
+			return ""
+		}
+
+		return fmt.Sprintf("%v", prop)
+	})
+}
+
+// ResolveSingleArrayTemplate - If str is only a single template that resolves to an array, it returns that array, otherwise it returns nil
+func ResolveSingleArrayTemplate(rp graphql.ResolveParams, str string) []interface{} {
 	s := reExactlyOne.FindString(str)
 	if s == "" {
 		return nil
 	}
 
-	prop := getProp(rp, str)
+	prop := resolveTemplate(rp, str)
 	if prop == nil {
 		return nil
 	}

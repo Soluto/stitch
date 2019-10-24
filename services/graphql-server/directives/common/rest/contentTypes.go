@@ -2,36 +2,35 @@ package rest
 
 import (
 	"encoding/json"
+	"strings"
 )
 
 type contentTypeData struct {
-	name        string
 	headerValue string
-	bodyHandler func(map[string]interface{}) (string, error)
+	serializer  func(map[string]interface{}) (string, error)
 }
 
-type contentTypesStruct struct {
-	JSON contentTypeData
-}
-
-var contentTypes = contentTypesStruct{
-	JSON: contentTypeData{
-		name:        "json",
+var contentTypes = map[string]contentTypeData{
+	"json": contentTypeData{
 		headerValue: "application/json",
-		bodyHandler: jsonBodyHandler,
+		serializer:  jsonSerializer,
 	},
 }
 
-func getContentType(contentType string) contentTypeData {
-	switch contentType {
-	case contentTypes.JSON.name:
-		return contentTypes.JSON
-	default:
-		return contentTypes.JSON
+var defaultContentType = contentTypes["json"]
+
+func getContentType(contentTypeString string) contentTypeData {
+	contentTypeString = strings.ToLower(contentTypeString)
+
+	contentType, ok := contentTypes[contentTypeString]
+	if !ok {
+		contentType = defaultContentType
 	}
+
+	return contentType
 }
 
-func jsonBodyHandler(body map[string]interface{}) (string, error) {
+func jsonSerializer(body map[string]interface{}) (string, error) {
 	bodyJSON, err := json.Marshal(body)
 	if err != nil {
 		return "", err
