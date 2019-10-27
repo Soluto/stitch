@@ -4,12 +4,12 @@ import { getToken } from '../utils/token-utils';
 
 import customers from '../mocks/customer-api/data/customers.json';
 
-describe('@http directive tests', () => {
+describe('@rest directive tests', () => {
   let client: GraphQLClient;
 
   const customerId = '1';
   const expectedResponse = {
-    customerHttp: {
+    customer: {
       id: customerId,
       ...customers[customerId]
     }
@@ -22,18 +22,19 @@ describe('@http directive tests', () => {
         authorization: `Bearer ${token}`
       }
     };
+
     client = new GraphQLClient(`${process.env.GRAPHQL_SERVER_URL}/graphql`, options);
   });
 
   it('should return customer data', async () => {
     const response = await client.request(`{
-      customerHttp(id: "1") {
-        id
-        lastName
-        firstName
+      customer(id: "1") {
+          id
+          lastName
+          firstName
       }
     }`);
-    expect(response).to.exist;
-    expect(response).to.deep.equal(expectedResponse);
+
+    expect(response).to.eql(expectedResponse);
   });
 });

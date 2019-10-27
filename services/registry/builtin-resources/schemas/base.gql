@@ -19,6 +19,25 @@ directive @http(
     headers: [HttpNameValue!]
 ) on FIELD_DEFINITION
 
+enum ContentTypes {
+    json
+}
+
+input NameValue {
+    name: String!
+    value: String!
+}
+
+directive @rest(
+    url: String!
+    method: String
+    contentType: ContentTypes
+    bodyArg: String
+    query: [NameValue!]
+    headers: [NameValue!]
+    timeoutMs: Int
+) on FIELD_DEFINITION
+
 directive @select(path: [String!]!) on FIELD_DEFINITION
 
 directive @gql(

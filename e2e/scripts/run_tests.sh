@@ -182,7 +182,7 @@ parse_options() {
 
     if [[ -z "$STARTUP_TIMEOUT" ]]
     then
-        STARTUP_TIMEOUT=60
+        STARTUP_TIMEOUT=180
     fi
 
     if [[ -z "$TEST_TIMEOUT" ]]

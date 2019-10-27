@@ -7,8 +7,10 @@ spec:
   definition: |
     type Order {
       id: ID!
+      customerId: ID!
       customer: Customer
-        @http(url: "http://customer-api.user-namespace/customer/:customerId")
+        @rest(url: "http://customer-api.user-namespace/customer/{source.customerId}")
+      hotelId: ID!
       hotel: Hotel
         @gql(url: "http://hotel-api.user-namespace/graphql", queryName: "hotel", arguments: "id:\"{source.hotelId}\"")
       startDate: String!
@@ -21,10 +23,10 @@ spec:
 
     type Customer {
       orders: [Order]
-        @http(url: "http://order-api.user-namespace/customerOrders/:id")
+        @rest(url: "http://order-api.user-namespace/customerOrders/{source.id}")
     }
 
     type Hotel {
       orders: [Order]
-        @http(url: "http://order-api.user-namespace/hotelOrders/:id")
+        @rest(url: "http://order-api.user-namespace/hotelOrders/{source.id}")
     }

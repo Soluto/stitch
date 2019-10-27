@@ -33,7 +33,7 @@ func TestParseHTTPParams(t *testing.T) {
 		timeout: Int
 		headers: [HttpNameValue!]
 	) on FIELD_DEFINITION
-	
+
 	type Query {
 		some: String
 		%s
@@ -73,9 +73,9 @@ func TestParseHTTPParams(t *testing.T) {
 		},
 		{
 			"Should parse name-value lists",
-			`@http(url: "some-url", 
-				query: [{name: "some-query-name", value: "some-query-value"}], 
-				body: [{name: "some-body-name", value: "some-body-value"}], 
+			`@http(url: "some-url",
+				query: [{name: "some-query-name", value: "some-query-value"}],
+				body: [{name: "some-body-name", value: "some-body-value"}],
 				headers: [{name: "some-header-name", value: "some-header-value"}])`,
 			httpParams{
 				templateURL: "some-url",

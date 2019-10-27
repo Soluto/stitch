@@ -12,5 +12,6 @@ spec:
     }
 
     type Query {
-      customer(id: ID!): Customer @http(url: "http://customer-api.user-namespace/customer/:id")
+      customer(id: ID!): Customer @rest(url: "http://customer-api.user-namespace/customer/{args.id}")
+      customerHttp(id: ID!): Customer @http(url: "http://customer-api.user-namespace/customer/:id")
     }
