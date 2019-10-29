@@ -7,6 +7,7 @@ import (
 	"agogos/server"
 	"agogos/utils"
 	"fmt"
+	"strings"
 
 	graphql "github.com/graphql-go/graphql"
 	"github.com/vektah/gqlparser/ast"
@@ -226,7 +227,7 @@ func convertSchemaInterface(d *ast.Definition, c schemaContext) *graphql.Interfa
 	fieldsThunk := graphql.FieldsThunk(func() graphql.Fields {
 		fields := make(map[string]*graphql.Field)
 		for _, field := range d.Fields {
-			if field.Name[:2] == "__" {
+			if strings.HasPrefix(field.Name, "__") {
 				continue
 			}
 
