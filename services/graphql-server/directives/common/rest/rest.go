@@ -39,12 +39,12 @@ const (
 )
 
 var RestMiddleware = middlewares.DirectiveDefinition{
-	MiddlewareFactory: func(serverCtx server.ServerContext, fieldDef *ast.FieldDefinition, directive *ast.Directive) middlewares.Middleware {
-		params := parseRestParams(directive)
+	MiddlewareFactory: func(ctx middlewares.MiddlewareContext) middlewares.Middleware {
+		params := parseRestParams(ctx.Directive)
 		client := createHTTPClient(params.timeoutMs)
 
 		return middlewares.ConcurrentLeaf(func(resolveParams graphql.ResolveParams) (interface{}, error) {
-			request, err := createHTTPRequest(serverCtx, params, resolveParams)
+			request, err := createHTTPRequest(ctx.ServerContext, params, resolveParams)
 			if err != nil {
 				return nil, err
 			}

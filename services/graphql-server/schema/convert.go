@@ -104,7 +104,7 @@ func convertFieldArgs(a ast.ArgumentDefinitionList, c schemaContext) (graphql.Fi
 	return args, nil
 }
 
-func createResolver(f *ast.FieldDefinition, c schemaContext) middlewares.Resolver {
+func createResolver(parent *ast.Definition, f *ast.FieldDefinition, c schemaContext) middlewares.Resolver {
 	resolver := fieldIdentityResolver
 
 	for _, d := range f.Directives {
@@ -114,8 +114,13 @@ func createResolver(f *ast.FieldDefinition, c schemaContext) middlewares.Resolve
 			continue
 		}
 
-		middleware := middlewareDefinition.CreateMiddleware(c, f, d)
-
+		ctx := middlewares.MiddlewareContext{
+			ServerContext: c,
+			Parent:        parent,
+			Field:         f,
+			Directive:     d,
+		}
+		middleware := middlewareDefinition.CreateMiddleware(ctx)
 		resolver = middleware.Wrap(resolver)
 	}
 
@@ -127,7 +132,7 @@ func fieldIdentityResolver(rp graphql.ResolveParams) (interface{}, error) {
 	return utils.IdentityResolver(fieldName, rp.Source)
 }
 
-func convertSchemaField(f *ast.FieldDefinition, c schemaContext) (*graphql.Field, error) {
+func convertSchemaField(parent *ast.Definition, f *ast.FieldDefinition, c schemaContext) (*graphql.Field, error) {
 	args, err := convertFieldArgs(f.Arguments, c)
 
 	if err != nil {
@@ -137,7 +142,7 @@ func convertSchemaField(f *ast.FieldDefinition, c schemaContext) (*graphql.Field
 	return &graphql.Field{
 		Description: f.Description,
 		Type:        convertType(f.Type, c),
-		Resolve:     createResolver(f, c),
+		Resolve:     createResolver(parent, f, c),
 		Args:        args,
 	}, nil
 }
@@ -232,7 +237,7 @@ func convertSchemaInterface(d *ast.Definition, c schemaContext) *graphql.Interfa
 				continue
 			}
 
-			schemaField, err := convertSchemaField(field, c)
+			schemaField, err := convertSchemaField(d, field, c)
 			if err != nil {
 				log.Panic(err)
 			}
@@ -267,7 +272,7 @@ func convertSchemaObject(d *ast.Definition, c schemaContext) *graphql.Object {
 				continue
 			}
 
-			schemaField, err := convertSchemaField(field, c)
+			schemaField, err := convertSchemaField(d, field, c)
 			if err != nil {
 				log.Panic(err)
 			}

@@ -25,12 +25,12 @@ type gqlParams struct {
 }
 
 var gqlMiddleware = middlewares.DirectiveDefinition{
-	MiddlewareFactory: func(s server.ServerContext, f *ast.FieldDefinition, d *ast.Directive) middlewares.Middleware {
-		params := parseGqlParams(d, s)
+	MiddlewareFactory: func(ctx middlewares.MiddlewareContext) middlewares.Middleware {
+		params := parseGqlParams(ctx.Directive, ctx.ServerContext)
 		client := createGqlClient(params.url.String())
 
 		return middlewares.ConcurrentLeaf(func(rp graphql.ResolveParams) (interface{}, error) {
-			request, err := createGqlRequest(s, params, rp)
+			request, err := createGqlRequest(ctx.ServerContext, params, rp)
 			if err != nil {
 				return nil, err
 			}

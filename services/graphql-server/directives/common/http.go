@@ -41,11 +41,11 @@ type httpClient interface {
 }
 
 var httpMiddleware = middlewares.DirectiveDefinition{
-	MiddlewareFactory: func(s server.ServerContext, f *ast.FieldDefinition, d *ast.Directive) middlewares.Middleware {
-		params := parseHTTPParams(d)
+	MiddlewareFactory: func(ctx middlewares.MiddlewareContext) middlewares.Middleware {
+		params := parseHTTPParams(ctx.Directive)
 		client := createHTTPClient(params.timeout)
 		return middlewares.ConcurrentLeaf(func(rp graphql.ResolveParams) (interface{}, error) {
-			request, err := createHTTPRequest(s, params, rp)
+			request, err := createHTTPRequest(ctx.ServerContext, params, rp)
 			if err != nil {
 				return nil, err
 			}
