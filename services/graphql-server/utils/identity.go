@@ -1,6 +1,12 @@
 package utils
 
-import "reflect"
+import (
+	"reflect"
+)
+
+type FieldResolver interface {
+	Field(fieldName string) (interface{}, error)
+}
 
 func IdentityResolver(fieldName string, source interface{}) (res interface{}, err error) {
 	defer Recovery(&err)
@@ -11,6 +17,9 @@ func IdentityResolver(fieldName string, source interface{}) (res interface{}, er
 
 	case map[string]interface{}:
 		res = src[fieldName]
+
+	case FieldResolver:
+		res, err = src.Field(fieldName)
 
 	default:
 		value := reflect.ValueOf(source)

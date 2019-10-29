@@ -2,6 +2,7 @@ package schema
 
 import (
 	"agogos/directives/common"
+	"agogos/directives/common/exports"
 	"agogos/directives/middlewares"
 	"agogos/scalars"
 	"agogos/server"
@@ -118,7 +119,7 @@ func createResolver(f *ast.FieldDefinition, c schemaContext) middlewares.Resolve
 		resolver = middleware.Wrap(resolver)
 	}
 
-	return resolver
+	return exports.WrapperMiddleware.Wrap(resolver)
 }
 
 func fieldIdentityResolver(rp graphql.ResolveParams) (interface{}, error) {
