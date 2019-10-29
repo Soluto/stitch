@@ -8,8 +8,8 @@ import (
 	"reflect"
 
 	"agogos/extensions/upstreams"
-	"agogos/utils"
 	"agogos/utils/ast2sdl"
+	"agogos/utils/templating"
 
 	"github.com/graphql-go/graphql"
 	gqlclient "github.com/machinebox/graphql"
@@ -79,7 +79,7 @@ func createGqlClient(url string) *gqlclient.Client {
 }
 
 func createGqlRequest(s server.ServerContext, gqlParams gqlParams, rp graphql.ResolveParams) (*gqlclient.Request, error) {
-	queryArgs := utils.ReplaceWithParameters(rp, gqlParams.args)
+	queryArgs := templating.ReplaceWithParameters(rp, gqlParams.args)
 
 	requestConfig := ast2sdl.BuildSDLQuery(gqlParams.queryName, rp, queryArgs)
 	request := gqlclient.NewRequest(requestConfig.Query)

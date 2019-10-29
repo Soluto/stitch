@@ -3,7 +3,7 @@ package rest
 import (
 	"agogos/directives/middlewares"
 	"agogos/server"
-	"agogos/utils"
+	"agogos/utils/templating"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -166,7 +166,7 @@ func createHTTPRequest(serverCtx server.ServerContext, rstParams restParams, res
 }
 
 func getURL(destURL string, queryParams KeyValueList, resolveParams graphql.ResolveParams) (string, error) {
-	mappedURL := utils.ReplaceWithParameters(resolveParams, destURL)
+	mappedURL := templating.ReplaceWithParameters(resolveParams, destURL)
 	urlObject, err := url.Parse(mappedURL)
 	if err != nil {
 		return "", err
@@ -199,7 +199,7 @@ func getBodyReader(rstParams restParams, resolveParams graphql.ResolveParams) (i
 		return nil, err
 	}
 
-	body := utils.ReplaceWithParameters(resolveParams, inputBodyString)
+	body := templating.ReplaceWithParameters(resolveParams, inputBodyString)
 	return strings.NewReader(body), nil
 }
 

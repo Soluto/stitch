@@ -2,7 +2,7 @@ package schema
 
 import (
 	"agogos/directives/common"
-	"agogos/directives/common/exports"
+	"agogos/directives/exports"
 	"agogos/directives/middlewares"
 	"agogos/scalars"
 	"agogos/server"

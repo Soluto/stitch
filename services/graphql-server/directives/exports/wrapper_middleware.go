@@ -19,9 +19,20 @@ var WrapperMiddleware = middlewares.ResultTransform(func(rp graphql.ResolveParam
 	}
 })
 
-type typeFieldContextMap map[string]map[string][]string
+// exportKey->TypeName->[]Field
+var keyMap = make(map[string]map[string][]string)
 
-func ResolveContextValue(contextMap typeFieldContextMap, pc parentConnector, exportKey string) interface{} {
+func ResolveExport(value interface{}, exportKey string) interface{} {
+	pc, ok := value.(parentConnector)
+	if !ok {
+		// Log, this shouldn't happen I think? Maybe around Query
+		return nil
+	}
+
+	return resolveExport(keyMap, pc, exportKey)
+}
+
+func resolveExport(contextMap map[string]map[string][]string, pc parentConnector, exportKey string) interface{} {
 	if pc.Type.Name() == "Query" {
 		return nil
 	}
@@ -47,7 +58,5 @@ func ResolveContextValue(contextMap typeFieldContextMap, pc parentConnector, exp
 		return nil
 	}
 
-	return ResolveContextValue(contextMap, parentPc, exportKey)
+	return resolveExport(contextMap, parentPc, exportKey)
 }
-
-var ContextKeyToField map[string]string

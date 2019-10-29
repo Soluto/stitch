@@ -1,7 +1,7 @@
 package rest
 
 import (
-	"agogos/utils"
+	"agogos/utils/templating"
 	"fmt"
 
 	"github.com/graphql-go/graphql"
@@ -26,11 +26,11 @@ func (kvl KeyValueList) _replaceParams(resolveParams graphql.ResolveParams, isQu
 	var newList KeyValueList
 
 	for _, kvp := range kvl {
-		paramName := utils.ReplaceWithParameters(resolveParams, kvp.key)
+		paramName := templating.ReplaceWithParameters(resolveParams, kvp.key)
 		values, shouldSpreadArray := _getArrayToSpread(resolveParams, kvp.value, isQuery)
 
 		if !shouldSpreadArray {
-			newValue := utils.ReplaceWithParameters(resolveParams, kvp.value)
+			newValue := templating.ReplaceWithParameters(resolveParams, kvp.value)
 			newList.append(paramName, newValue)
 
 			continue
@@ -60,7 +60,7 @@ func _getArrayToSpread(resolveParams graphql.ResolveParams, value string, isQuer
 	shouldSpreadArray = false
 
 	if isQuery {
-		valuesArray = utils.ResolveSingleArrayTemplate(resolveParams, value)
+		valuesArray = templating.ResolveSingleArrayTemplate(resolveParams, value)
 		shouldSpreadArray = valuesArray != nil
 	}
 
