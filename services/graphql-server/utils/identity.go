@@ -5,13 +5,12 @@ import "reflect"
 func IdentityResolver(fieldName string, source interface{}) (res interface{}, err error) {
 	defer Recovery(&err)
 
-	switch source.(type) {
+	switch src := source.(type) {
 	case nil:
 		res = nil
 
 	case map[string]interface{}:
-		m := source.(map[string]interface{})
-		res = m[fieldName]
+		res = src[fieldName]
 
 	default:
 		value := reflect.ValueOf(source)
