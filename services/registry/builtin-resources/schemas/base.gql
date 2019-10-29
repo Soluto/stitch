@@ -47,3 +47,7 @@ directive @gql(
 ) on FIELD_DEFINITION
 
 scalar JSON
+
+directive @exportAs(
+    key: String!
+) on FIELD_DEFINITION

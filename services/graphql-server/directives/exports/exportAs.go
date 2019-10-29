@@ -20,7 +20,7 @@ var ExportAsMiddleware = middlewares.DirectiveDefinition{
 		}
 
 		if _, ok := keyMap[exportKey][ctx.Parent.Name]; !ok {
-			keyMap[exportKey][ctx.Parent.Name] = make([]string, 1)
+			keyMap[exportKey][ctx.Parent.Name] = make([]string, 0, 1)
 		}
 
 		keyMap[exportKey][ctx.Parent.Name] = append(keyMap[exportKey][ctx.Parent.Name], ctx.Field.Name)
