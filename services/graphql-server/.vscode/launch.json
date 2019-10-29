@@ -9,8 +9,9 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${fileDirname}",
+            "program": "${workspaceFolder}",
             "env": {
+                "PORT": "8000",
                 "REGISTRY_URL": "localhost:8081"
             },
             "args": []
