@@ -13,12 +13,27 @@ var WrapperMiddleware = middlewares.ResultTransform(func(rp graphql.ResolveParam
 		return result
 	}
 
+	if _, ok := rp.Info.ReturnType.(*graphql.List); ok {
+		resultList := result.([]interface{})
+		pcList := make([]interface{}, len(resultList))
+
+		for i, elem := range resultList {
+			pcList[i] = wrapToParentConnector(rp, elem)
+		}
+
+		return pcList
+	}
+
+	return wrapToParentConnector(rp, result)
+})
+
+func wrapToParentConnector(rp graphql.ResolveParams, value interface{}) parentConnector {
 	return parentConnector{
-		Value:  result,
+		Value:  value,
 		Parent: rp.Source,
 		Type:   rp.Info.ReturnType,
 	}
-})
+}
 
 func ResolveExport(rp graphql.ResolveParams, exportKey string) interface{} {
 	pc, ok := rp.Source.(parentConnector)
