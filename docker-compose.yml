@@ -10,14 +10,15 @@ services:
         environment:
             PORT: 80
             LOG_LEVEL: DEBUG
-            REGISTRY_URL: registry
+            REGISTRY_URL: registry:81
 
     registry:
         build:
             context: services/registry
             args:
                 target: DEBUG
-
+        ports:
+            - '8081:81'
         depends_on:
             - k8s-fs-resources
         environment:
