@@ -30,7 +30,7 @@ func resolveFromParams(rp graphql.ResolveParams, sourceName string, propName str
 		}
 		return res
 	case "exports":
-		return exports.ResolveExport(rp.Source, propName)
+		return exports.ResolveExport(rp, propName)
 	default:
 		return nil
 	}

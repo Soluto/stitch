@@ -2,6 +2,7 @@ package exports
 
 import (
 	"agogos/directives/middlewares"
+	"agogos/server"
 	"agogos/utils"
 
 	"github.com/graphql-go/graphql"
@@ -19,15 +20,14 @@ var WrapperMiddleware = middlewares.ResultTransform(func(rp graphql.ResolveParam
 	}
 })
 
-// exportKey->TypeName->[]Field
-var keyMap = make(map[string]map[string][]string)
-
-func ResolveExport(value interface{}, exportKey string) interface{} {
-	pc, ok := value.(parentConnector)
+func ResolveExport(rp graphql.ResolveParams, exportKey string) interface{} {
+	pc, ok := rp.Source.(parentConnector)
 	if !ok {
 		// Log, this shouldn't happen I think? Maybe around Query
 		return nil
 	}
+
+	keyMap := server.GetServerContext(rp.Context).ExportKeys()
 
 	return resolveExport(keyMap, pc, exportKey)
 }

@@ -15,6 +15,7 @@ var ExportAsMiddleware = middlewares.DirectiveDefinition{
 			logrus.Panic("'key' argument missing or not an array in @context directive")
 		}
 
+		keyMap := ctx.ServerContext.ExportKeys()
 		if _, ok := keyMap[exportKey]; !ok {
 			keyMap[exportKey] = make(map[string][]string, 1)
 		}
