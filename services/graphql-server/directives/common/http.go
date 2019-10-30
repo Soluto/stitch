@@ -197,7 +197,7 @@ func doHTTP(request *http.Request, client httpClient) (interface{}, error) {
 	return result, nil
 }
 
-func getArgs(g graphql.ResolveParams) (args dictionary, input dictionary, source dictionary) {
+func getArgs(g graphql.ResolveParams) (args dictionary, input dictionary, source interface{}) {
 	args = g.Args
 	input, ok := args["input"].(map[string]interface{})
 
@@ -205,12 +205,12 @@ func getArgs(g graphql.ResolveParams) (args dictionary, input dictionary, source
 		input = make(map[string]interface{})
 	}
 
-	source, ok = g.Source.(map[string]interface{})
+	source = g.Source
 
 	return
 }
 
-func getURL(templateURL string, queryParams []nameValue, args dictionary, input dictionary, source dictionary) (*string, error) {
+func getURL(templateURL string, queryParams []nameValue, args dictionary, input dictionary, source interface{}) (*string, error) {
 	mappedURL, err := url.Parse(replace(templateURL, args, input, source))
 	if err != nil {
 		return nil, err
@@ -240,7 +240,7 @@ func getURL(templateURL string, queryParams []nameValue, args dictionary, input 
 	return &finalURL, nil
 }
 
-func getReader(bodyParams []nameValue, args dictionary, input dictionary, source dictionary) (io.Reader, error) {
+func getReader(bodyParams []nameValue, args dictionary, input dictionary, source interface{}) (io.Reader, error) {
 	body := make(map[string]interface{})
 
 	for k, v := range input {
@@ -262,14 +262,14 @@ func getReader(bodyParams []nameValue, args dictionary, input dictionary, source
 
 var placeholderRegex = regexp.MustCompile(`:([^0-9/&?]+)`)
 
-func replace(t string, dictionaries ...dictionary) string {
+func replace(t string, dictionaries ...interface{}) string {
 	return utils.ReplaceAllStringSubmatchFunc(placeholderRegex, t, func(k []string) string {
 		key := k[1]
 
 		for _, d := range dictionaries {
-			val, ok := d[key]
+			val, _ := utils.IdentityResolver(key, d)
 
-			if ok {
+			if val != nil {
 				return fmt.Sprint(val)
 			}
 		}
