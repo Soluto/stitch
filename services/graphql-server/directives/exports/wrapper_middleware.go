@@ -59,7 +59,7 @@ func resolveExport(contextMap map[string]map[string][]string, pc parentConnector
 
 	if fields, ok := typeFieldMap[pc.Type.Name()]; ok {
 		for _, field := range fields {
-			if val, err := utils.IdentityResolver(field, pc.Value); err == nil {
+			if val, err := utils.IdentityResolver(field, pc.Value); err == nil && val != nil {
 				return val
 			}
 		}
