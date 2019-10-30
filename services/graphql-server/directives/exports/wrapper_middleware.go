@@ -4,6 +4,9 @@ import (
 	"agogos/directives/middlewares"
 	"agogos/server"
 	"agogos/utils"
+	"reflect"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/graphql-go/graphql"
 )
@@ -18,16 +21,16 @@ var WrapperMiddleware = middlewares.ResultTransform(func(rp graphql.ResolveParam
 		pcList := make([]interface{}, len(resultList))
 
 		for i, elem := range resultList {
-			pcList[i] = wrapToParentConnector(rp, elem)
+			pcList[i] = wrapWithParentConnector(rp, elem)
 		}
 
 		return pcList
 	}
 
-	return wrapToParentConnector(rp, result)
+	return wrapWithParentConnector(rp, result)
 })
 
-func wrapToParentConnector(rp graphql.ResolveParams, value interface{}) parentConnector {
+func wrapWithParentConnector(rp graphql.ResolveParams, value interface{}) parentConnector {
 	return parentConnector{
 		Value:  value,
 		Parent: rp.Source,
@@ -38,21 +41,21 @@ func wrapToParentConnector(rp graphql.ResolveParams, value interface{}) parentCo
 func ResolveExport(rp graphql.ResolveParams, exportKey string) interface{} {
 	pc, ok := rp.Source.(parentConnector)
 	if !ok {
-		// Log, this shouldn't happen I think? Maybe around Query
+		log.WithField("exportKey", exportKey).WithField("sourceType", reflect.TypeOf(rp.Source)).Infoln("Source not found or is not a parentConnector")
 		return nil
 	}
 
-	keyMap := server.GetServerContext(rp.Context).ExportKeys()
+	keyMap := server.GetServerContext(rp.Context).GetExportKeys()
 
 	return resolveExport(keyMap, pc, exportKey)
 }
 
-func resolveExport(contextMap map[string]map[string][]string, pc parentConnector, exportKey string) interface{} {
-	if pc.Type.Name() == "Query" {
+func resolveExport(keyMap map[string]map[string][]string, pc parentConnector, exportKey string) interface{} {
+	if pc.Type.Name() == "Query" || pc.Type.Name() == "Mutation" {
 		return nil
 	}
 
-	typeFieldMap, ok := contextMap[exportKey]
+	typeFieldMap, ok := keyMap[exportKey]
 	if !ok {
 		return nil
 	}
@@ -61,17 +64,17 @@ func resolveExport(contextMap map[string]map[string][]string, pc parentConnector
 		for _, field := range fields {
 			if val, err := utils.IdentityResolver(field, pc.Value); err == nil && val != nil {
 				return val
+			} else if err != nil {
+				log.WithError(err).Warnln("Error while resolving fields in resolveExport")
 			}
 		}
-
-		// TODO: Log the errors or nulls or something?
 	}
 
 	parentPc, ok := pc.Parent.(parentConnector)
 	if !ok {
-		// TODO: Log, this shouldn't happen
+		log.WithField("exportKey", exportKey).WithField("sourceType", reflect.TypeOf(pc.Parent)).Infoln("Parent not found or is not a parentConnector")
 		return nil
 	}
 
-	return resolveExport(contextMap, parentPc, exportKey)
+	return resolveExport(keyMap, parentPc, exportKey)
 }

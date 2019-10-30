@@ -13,7 +13,7 @@ type serverContext struct {
 
 type ServerContext interface {
 	Upstream(host string) (upstreams.Upstream, bool)
-	ExportKeys() map[string]map[string][]string
+	GetExportKeys() map[string]map[string][]string
 }
 
 func (sc *serverContext) Upstream(host string) (upstreams.Upstream, bool) {
@@ -21,7 +21,7 @@ func (sc *serverContext) Upstream(host string) (upstreams.Upstream, bool) {
 	return up, ok
 }
 
-func (sc *serverContext) ExportKeys() map[string]map[string][]string {
+func (sc *serverContext) GetExportKeys() map[string]map[string][]string {
 	return sc.exportKeys
 }
 
