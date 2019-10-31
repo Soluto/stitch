@@ -7,7 +7,7 @@ spec:
   definition: |
     type Customer {
       id: ID!
-      firstName: String
+      firstName: String @exportAs(key: "customer_first_name")
       lastName: String
     }
 

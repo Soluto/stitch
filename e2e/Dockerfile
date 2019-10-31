@@ -13,6 +13,6 @@ COPY ./mocks ./mocks
 COPY ./mocks/customer-api/data ./mocks/customer-api/data
 COPY ./mocks/order-api/data ./mocks/order-api/data
 
-ENV TIMOUT=60000
+ENV TIMEOUT=60000
 
 CMD yarn test
