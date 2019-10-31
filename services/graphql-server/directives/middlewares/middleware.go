@@ -13,16 +13,23 @@ type Middleware interface {
 	Wrap(next Resolver) Resolver
 }
 
-type MiddlewareFactory = func(server.ServerContext, *ast.FieldDefinition, *ast.Directive) Middleware
+type MiddlewareContext struct {
+	ServerContext server.ServerContext
+	Parent        *ast.Definition
+	Field         *ast.FieldDefinition
+	Directive     *ast.Directive
+}
+
+type MiddlewareFactory = func(MiddlewareContext) Middleware
 
 type MiddlewareDefinition interface {
-	CreateMiddleware(server.ServerContext, *ast.FieldDefinition, *ast.Directive) Middleware
+	CreateMiddleware(MiddlewareContext) Middleware
 }
 
 type DirectiveDefinition struct {
 	MiddlewareFactory MiddlewareFactory
 }
 
-func (dd DirectiveDefinition) CreateMiddleware(s server.ServerContext, f *ast.FieldDefinition, d *ast.Directive) Middleware {
-	return dd.MiddlewareFactory(s, f, d)
+func (dd DirectiveDefinition) CreateMiddleware(ctx MiddlewareContext) Middleware {
+	return dd.MiddlewareFactory(ctx)
 }

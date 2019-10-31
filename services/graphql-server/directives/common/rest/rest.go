@@ -3,7 +3,7 @@ package rest
 import (
 	"agogos/directives/middlewares"
 	"agogos/server"
-	"agogos/utils"
+	"agogos/utils/templating"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -39,12 +39,12 @@ const (
 )
 
 var RestMiddleware = middlewares.DirectiveDefinition{
-	MiddlewareFactory: func(serverCtx server.ServerContext, fieldDef *ast.FieldDefinition, directive *ast.Directive) middlewares.Middleware {
-		params := parseRestParams(directive)
+	MiddlewareFactory: func(ctx middlewares.MiddlewareContext) middlewares.Middleware {
+		params := parseRestParams(ctx.Directive)
 		client := createHTTPClient(params.timeoutMs)
 
 		return middlewares.ConcurrentLeaf(func(resolveParams graphql.ResolveParams) (interface{}, error) {
-			request, err := createHTTPRequest(serverCtx, params, resolveParams)
+			request, err := createHTTPRequest(ctx.ServerContext, params, resolveParams)
 			if err != nil {
 				return nil, err
 			}
@@ -166,7 +166,7 @@ func createHTTPRequest(serverCtx server.ServerContext, rstParams restParams, res
 }
 
 func getURL(destURL string, queryParams KeyValueList, resolveParams graphql.ResolveParams) (string, error) {
-	mappedURL := utils.ReplaceWithParameters(resolveParams, destURL)
+	mappedURL := templating.ReplaceWithParameters(resolveParams, destURL)
 	urlObject, err := url.Parse(mappedURL)
 	if err != nil {
 		return "", err
@@ -199,7 +199,7 @@ func getBodyReader(rstParams restParams, resolveParams graphql.ResolveParams) (i
 		return nil, err
 	}
 
-	body := utils.ReplaceWithParameters(resolveParams, inputBodyString)
+	body := templating.ReplaceWithParameters(resolveParams, inputBodyString)
 	return strings.NewReader(body), nil
 }
 

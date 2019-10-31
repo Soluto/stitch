@@ -3,6 +3,7 @@ package main
 import (
 	"agogos/registry"
 	"agogos/schema"
+	"agogos/server"
 	"agogos/server/runtime"
 	"agogos/utils"
 	"context"
@@ -64,12 +65,13 @@ func main() {
 
 			log.Info("Updating graphql server...")
 
-			graphqlHTTPHandler = handler.New(&handler.Config{
+			h := handler.New(&handler.Config{
 				Schema:     schemaResult.Schema,
 				Pretty:     true,
 				Playground: true,
 				GraphiQL:   false,
 			})
+			graphqlHTTPHandler = enrichContextHandler(h, schemaResult.ServerContext)
 
 			log.Info("New schema applied to gateway!")
 		}
@@ -77,7 +79,6 @@ func main() {
 
 	graphqlHandler := metrics.InstrumentHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if graphqlHTTPHandler != nil {
-			r = runtime.BindRequestContext(r)
 			graphqlHTTPHandler.ServeHTTP(w, r)
 		} else {
 			http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
@@ -94,4 +95,12 @@ func main() {
 	http.Handle("/health", healthHandler)
 	http.Handle("/metrics", metricsHandler)
 	log.Fatalln(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
+}
+
+func enrichContextHandler(h http.Handler, serverContext server.ServerContext) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r = runtime.BindRequestContext(r)
+		r = server.BindServerContext(r, serverContext)
+		h.ServeHTTP(w, r)
+	})
 }

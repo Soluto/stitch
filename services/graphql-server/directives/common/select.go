@@ -2,13 +2,11 @@ package common
 
 import (
 	"agogos/directives/middlewares"
-	"agogos/server"
 	"agogos/utils"
 	"fmt"
 
 	"github.com/graphql-go/graphql"
 	"github.com/sirupsen/logrus"
-	"github.com/vektah/gqlparser/ast"
 )
 
 func toStringSlice(slice []interface{}) ([]string, error) {
@@ -27,8 +25,8 @@ func toStringSlice(slice []interface{}) ([]string, error) {
 }
 
 var selectMiddleware = middlewares.DirectiveDefinition{
-	MiddlewareFactory: func(s server.ServerContext, f *ast.FieldDefinition, d *ast.Directive) middlewares.Middleware {
-		args := d.ArgumentMap(make(map[string]interface{}))
+	MiddlewareFactory: func(ctx middlewares.MiddlewareContext) middlewares.Middleware {
+		args := ctx.Directive.ArgumentMap(make(map[string]interface{}))
 		pathRaw, ok := args["path"].([]interface{})
 
 		if !ok {

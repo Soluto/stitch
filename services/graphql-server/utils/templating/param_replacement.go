@@ -1,6 +1,8 @@
-package utils
+package templating
 
 import (
+	"agogos/directives/exports"
+	"agogos/utils"
 	"fmt"
 	"regexp"
 	"strings"
@@ -22,11 +24,13 @@ func resolveFromParams(rp graphql.ResolveParams, sourceName string, propName str
 		}
 		return val
 	case "source":
-		res, err := IdentityResolver(propName, rp.Source)
+		res, err := utils.IdentityResolver(propName, rp.Source)
 		if err != nil {
 			return nil
 		}
 		return res
+	case "exports":
+		return exports.ResolveExport(rp, propName)
 	default:
 		return nil
 	}

@@ -8,8 +8,8 @@ import (
 	"reflect"
 
 	"agogos/extensions/upstreams"
-	"agogos/utils"
 	"agogos/utils/ast2sdl"
+	"agogos/utils/templating"
 
 	"github.com/graphql-go/graphql"
 	gqlclient "github.com/machinebox/graphql"
@@ -25,12 +25,12 @@ type gqlParams struct {
 }
 
 var gqlMiddleware = middlewares.DirectiveDefinition{
-	MiddlewareFactory: func(s server.ServerContext, f *ast.FieldDefinition, d *ast.Directive) middlewares.Middleware {
-		params := parseGqlParams(d, s)
+	MiddlewareFactory: func(ctx middlewares.MiddlewareContext) middlewares.Middleware {
+		params := parseGqlParams(ctx.Directive, ctx.ServerContext)
 		client := createGqlClient(params.url.String())
 
 		return middlewares.ConcurrentLeaf(func(rp graphql.ResolveParams) (interface{}, error) {
-			request, err := createGqlRequest(s, params, rp)
+			request, err := createGqlRequest(ctx.ServerContext, params, rp)
 			if err != nil {
 				return nil, err
 			}
@@ -79,7 +79,7 @@ func createGqlClient(url string) *gqlclient.Client {
 }
 
 func createGqlRequest(s server.ServerContext, gqlParams gqlParams, rp graphql.ResolveParams) (*gqlclient.Request, error) {
-	queryArgs := utils.ReplaceWithParameters(rp, gqlParams.args)
+	queryArgs := templating.ReplaceWithParameters(rp, gqlParams.args)
 
 	requestConfig := ast2sdl.BuildSDLQuery(gqlParams.queryName, rp, queryArgs)
 	request := gqlclient.NewRequest(requestConfig.Query)

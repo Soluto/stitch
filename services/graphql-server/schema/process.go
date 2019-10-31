@@ -25,14 +25,17 @@ func parseSdl(name, sdl string) (*ast.Schema, error) {
 	return schema, nil
 }
 
-func transformToSchema(config *agogos.ConfigurationMessage) (*graphql.Schema, error) {
+func transformToSchema(config *agogos.ConfigurationMessage) SchemaResult {
 	astSchema, err := parseSdl(
 		"schema registry sdl",
 		config.Schema.Definition,
 	)
 	if err != nil {
 		log.WithError(err).WithField("schema", config.Schema.Definition).Warn("Error parsing SDL")
-		return nil, err
+
+		return SchemaResult{
+			Error: err,
+		}
 	}
 
 	upstreamsMap := createUpstreams(config.Upstreams, config.UpstreamAuthCredentials)
@@ -41,10 +44,17 @@ func transformToSchema(config *agogos.ConfigurationMessage) (*graphql.Schema, er
 	convertedSchema, err := convertSchema(serverContext, astSchema)
 	if err != nil {
 		log.WithError(err).Warn("Error converting schema")
-		return nil, err
+
+		return SchemaResult{
+			Error: err,
+		}
 	}
 
-	return convertedSchema, nil
+	return SchemaResult{
+		Schema:        convertedSchema,
+		ServerContext: serverContext,
+		Error:         err,
+	}
 }
 
 func createUpstreams(upsConfigs []*agogos.Upstream, upsAuthConfigs []*agogos.UpstreamAuthCredentials) map[string]upstreams.Upstream {
@@ -60,8 +70,9 @@ func createUpstreams(upsConfigs []*agogos.Upstream, upsAuthConfigs []*agogos.Ups
 }
 
 type SchemaResult struct {
-	Schema *graphql.Schema
-	Error  error
+	Schema        *graphql.Schema
+	ServerContext server.ServerContext
+	Error         error
 }
 
 func Process(configCh chan *agogos.ConfigurationMessage) chan SchemaResult {
@@ -73,11 +84,7 @@ func Process(configCh chan *agogos.ConfigurationMessage) chan SchemaResult {
 		for {
 			config := <-configCh
 			log.Infoln("Got new configuration from registry")
-			schema, err := transformToSchema(config)
-			schemaCh <- SchemaResult{
-				Schema: schema,
-				Error:  err,
-			}
+			schemaCh <- transformToSchema(config)
 		}
 	}()
 
