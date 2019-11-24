@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -42,20 +43,24 @@ func readResources(dirPath string) ([]AgogosResource, error) {
 		return nil, err
 	}
 
-	resources := make([]AgogosResource, len(files))
+	resources := make([]AgogosResource, 0)
 
-	for i, file := range files {
-		content, err := os.Open(path.Join(dirPath, file.Name()))
+	for _, file := range files {
+		content, err := ioutil.ReadFile(path.Join(dirPath, file.Name()))
 		if err != nil {
 			return nil, err
 		}
+		documents := bytes.Split(content, []byte("---"))
 
-		defer content.Close()
+		for _, doc := range documents {
+			var resource AgogosResource
+			err := yaml.Unmarshal(doc, &resource)
+			if err != nil {
+				return nil, err
+			}
 
-		decoder := yaml.NewDecoder(content)
-		var resource AgogosResource
-		decoder.Decode(&resource)
-		resources[i] = resource
+			resources = append(resources, resource)
+		}
 	}
 
 	return resources, nil
