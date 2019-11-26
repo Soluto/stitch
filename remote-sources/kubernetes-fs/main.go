@@ -8,7 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path"
+	"path/filepath"
 
 	"github.com/icza/dyno"
 	"gopkg.in/yaml.v2"
@@ -38,32 +38,38 @@ func (r AgogosResource) FullName() string {
 }
 
 func readResources(dirPath string) ([]AgogosResource, error) {
-	files, err := ioutil.ReadDir(dirPath)
-	if err != nil {
-		return nil, err
-	}
-
 	resources := make([]AgogosResource, 0)
 
-	for _, file := range files {
-		content, err := ioutil.ReadFile(path.Join(dirPath, file.Name()))
+	walkErr := filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return nil, err
+			return err
 		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		content, err := ioutil.ReadFile(path)
+		if err != nil {
+			return err
+		}
+
 		documents := bytes.Split(content, []byte("---"))
 
 		for _, doc := range documents {
 			var resource AgogosResource
 			err := yaml.Unmarshal(doc, &resource)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 			resources = append(resources, resource)
 		}
-	}
 
-	return resources, nil
+		return nil
+	})
+
+	return resources, walkErr
 }
 
 var indices = map[string]string{
@@ -108,8 +114,10 @@ var (
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Reading resources...")
 		resources, err := readResources(resourceFolder)
 		if err != nil {
+			log.Println("Error reading resources", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -119,6 +127,7 @@ func main() {
 		encoder := json.NewEncoder(w)
 		err = encoder.Encode(result)
 		if err != nil {
+			log.Println("Error in encoding response", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
