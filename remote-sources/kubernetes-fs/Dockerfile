@@ -1,4 +1,4 @@
-FROM golang:1.12.7-stretch as base
+FROM golang:1.13.4-stretch as base
 
 WORKDIR /src
 COPY . /src/
