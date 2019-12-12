@@ -96,7 +96,7 @@ func createGqlRequest(s server.ServerContext, gqlParams gqlParams, rp graphql.Re
 func sendRequest(request *gqlclient.Request, client *gqlclient.Client, rp graphql.ResolveParams, gqlParams gqlParams) (interface{}, error) {
 	var respData interface{}
 	if err := client.Run(rp.Context, request, &respData); err != nil {
-		logrus.WithError(err).Error("error while graphql request")
+		logrus.WithError(err).Error("error in graphql request")
 		return nil, err
 	}
 	responseBody, ok := respData.(map[string]interface{})
