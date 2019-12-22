@@ -240,7 +240,7 @@ func sendHTTPRequest(request *http.Request, client httpClient) (interface{}, err
 		return nil, err
 	}
 
-	if response.StatusCode == 404 {
+	if response.StatusCode == 404 || response.StatusCode == 204 {
 		return nil, nil
 	}
 	if response.StatusCode >= 400 {
