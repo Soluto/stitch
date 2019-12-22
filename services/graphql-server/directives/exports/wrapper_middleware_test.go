@@ -124,3 +124,24 @@ func Test_resolveExport_MultipleAncestorsWithKey_YoungestIsNull_TakeOlderOne(t *
 
 	assert.Equal(t, "parent-device-id", result)
 }
+
+func Test_wrapWithParentConnector_Scalar(t *testing.T) {
+	assert.Equal(t, "asd", wrapWithParentConnector(nil, graphql.String, "asd"))
+	assert.Equal(t, 123, wrapWithParentConnector(nil, graphql.Int, 123))
+	assert.Equal(t, 123.321, wrapWithParentConnector(nil, graphql.Float, 123.321))
+	assert.Equal(t, true, wrapWithParentConnector(nil, graphql.Boolean, true))
+	assert.Equal(t, "asd-dsa", wrapWithParentConnector(nil, graphql.ID, "asd-dsa"))
+}
+
+func Test_wrapWithParentConnector_ListOfScalar(t *testing.T) {
+	value := []interface{}{"asd"}
+	assert.Equal(t, value, wrapWithParentConnector(nil, graphql.NewList(graphql.String), value))
+}
+
+func Test_wrapWithParentConnector_Objects_ScalarFields(t *testing.T) {
+	value := map[string]interface{}{"one": 1}
+	objType := graphql.NewObject(graphql.ObjectConfig{Fields: graphql.Fields{"one": &graphql.Field{Name: "one", Type: graphql.Int}}})
+
+	pc := wrapWithParentConnector(nil, objType, value).(parentConnector)
+	assert.Equal(t, pc.Value, value)
+}
