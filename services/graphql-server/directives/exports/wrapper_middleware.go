@@ -12,29 +12,40 @@ import (
 )
 
 var WrapperMiddleware = middlewares.ResultTransform(func(rp graphql.ResolveParams, result interface{}) interface{} {
-	if graphql.IsLeafType(rp.Info.ReturnType) {
-		return result
+	return wrapWithParentConnector(rp.Source, rp.Info.ReturnType, result)
+})
+
+func wrapWithParentConnector(parent interface{}, valueType graphql.Type, value interface{}) interface{} {
+
+	if nonNullValueType, ok := valueType.(*graphql.NonNull); ok {
+		valueType = nonNullValueType.OfType
 	}
 
-	if _, ok := rp.Info.ReturnType.(*graphql.List); ok {
-		resultList := result.([]interface{})
+	if graphql.IsLeafType(valueType) || value == nil {
+		return value
+	}
+
+	if listType, ok := valueType.(*graphql.List); ok {
+		resultList, ok := value.([]interface{})
+		if !ok {
+			log.WithField("Type", valueType.String()).
+				WithField("TypeOfValue", reflect.TypeOf(value)).
+				WithField("TypeOfType", reflect.TypeOf(valueType)).
+				Panicln("Expected []interface{}, found something else")
+		}
 		pcList := make([]interface{}, len(resultList))
 
 		for i, elem := range resultList {
-			pcList[i] = wrapWithParentConnector(rp, elem)
+			pcList[i] = wrapWithParentConnector(parent, listType.OfType, elem)
 		}
 
 		return pcList
 	}
 
-	return wrapWithParentConnector(rp, result)
-})
-
-func wrapWithParentConnector(rp graphql.ResolveParams, value interface{}) parentConnector {
 	return parentConnector{
 		Value:  value,
-		Parent: rp.Source,
-		Type:   rp.Info.ReturnType,
+		Parent: parent,
+		Type:   valueType,
 	}
 }
 
