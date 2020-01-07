@@ -56,12 +56,8 @@ func BuildSDLQuery(queryName string, rp graphql.ResolveParams, args string) GqlR
 
 	query.builder.WriteString(fmt.Sprintf("{\n%s", queryName))
 
-	if args != "" {
-		query.builder.WriteString(fmt.Sprintf("(%s)", args))
-	}
-
 	for _, field := range rp.Info.FieldASTs {
-		writeFieldsClause(&query, field, rp)
+		writeFieldsClause(&query, field, rp, args)
 	}
 	query.builder.WriteString("}\n")
 
@@ -75,7 +71,7 @@ func BuildSDLQuery(queryName string, rp graphql.ResolveParams, args string) GqlR
 }
 
 // writeFieldsClause - recursive method that walks over fields and fields of fields and builds query
-func writeFieldsClause(query *sdlQuery, definition ast.Selection, rp graphql.ResolveParams) {
+func writeFieldsClause(query *sdlQuery, definition ast.Selection, rp graphql.ResolveParams, args string) {
 	selectionSet := definition.GetSelectionSet()
 
 	if selectionSet == nil || len(selectionSet.Selections) == 0 {
@@ -83,7 +79,9 @@ func writeFieldsClause(query *sdlQuery, definition ast.Selection, rp graphql.Res
 		return
 	}
 
-	if field, ok := definition.(*ast.Field); ok {
+	if args != "" {
+		query.builder.WriteString(fmt.Sprintf("(%s)", args))
+	} else if field, ok := definition.(*ast.Field); ok {
 		writeArgumentsClause(query, field, rp)
 	}
 
@@ -104,7 +102,7 @@ func writeFieldsClause(query *sdlQuery, definition ast.Selection, rp graphql.Res
 			}
 
 			query.builder.WriteString(subField.Name.Value)
-			writeFieldsClause(query, subField, rp)
+			writeFieldsClause(query, subField, rp, "")
 
 		case *ast.FragmentSpread:
 			fragmentSpread := selection.(*ast.FragmentSpread)
@@ -115,7 +113,7 @@ func writeFieldsClause(query *sdlQuery, definition ast.Selection, rp graphql.Res
 			inlineFragment := selection.(*ast.InlineFragment)
 			if inlineFragment.TypeCondition != nil {
 				query.builder.WriteString(fmt.Sprintf("... on %s", inlineFragment.TypeCondition.Name.Value))
-				writeFieldsClause(query, inlineFragment, rp)
+				writeFieldsClause(query, inlineFragment, rp, "")
 			}
 
 		default:
@@ -157,6 +155,6 @@ func writeFragmentsClause(query *sdlQuery, rp graphql.ResolveParams) {
 		}
 		fragment := rp.Info.Fragments[fragmentName].(*ast.FragmentDefinition)
 		query.builder.WriteString(fmt.Sprintf("fragment %s on %s", fragmentName, fragment.TypeCondition.Name.Value))
-		writeFieldsClause(query, fragment, rp)
+		writeFieldsClause(query, fragment, rp, "")
 	}
 }

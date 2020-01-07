@@ -7,6 +7,7 @@ import (
 
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/language/ast"
+	"github.com/graphql-go/graphql/language/kinds"
 )
 
 func TestBuildSDLQuery(t *testing.T) {
@@ -41,6 +42,42 @@ func TestBuildSDLQuery(t *testing.T) {
 			want: GqlRequestConfig{
 				Query: strings.ReplaceAll(`query {
 					books {
+						author
+						title
+					}
+				}
+				`, "\t", ""),
+				VariableValues: make(map[string]interface{}),
+			},
+		},
+
+		{
+			name: "Simple query with single argument",
+			args: args{
+				queryName: "books",
+				rp: graphql.ResolveParams{
+					Info: graphql.ResolveInfo{
+						FieldASTs: []*ast.Field{
+							{
+								Kind:         "Field",
+								Name:         newAstName("books"),
+								SelectionSet: newSelectionSet([]string{"author", "title"}),
+								Arguments: []*ast.Argument{
+									&ast.Argument{
+										Kind:  kinds.Argument,
+										Name:  newAstName("homeUserId"),
+										Value: newAstStringValue("me-guid-yes"),
+									},
+								},
+							},
+						},
+					},
+				},
+				args: `filter: {HomeUserId: {EQ: "me-guid-yes"}}`,
+			},
+			want: GqlRequestConfig{
+				Query: strings.ReplaceAll(`query {
+					books(filter: {HomeUserId: {EQ: "me-guid-yes"}}) {
 						author
 						title
 					}
@@ -186,6 +223,13 @@ func TestBuildSDLQuery(t *testing.T) {
 func newAstName(name string) *ast.Name {
 	return &ast.Name{
 		Value: name,
+	}
+}
+
+func newAstStringValue(value string) ast.Value {
+	return &ast.StringValue{
+		Kind:  kinds.StringValue,
+		Value: value,
 	}
 }
 
