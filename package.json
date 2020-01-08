@@ -1,0 +1,32 @@
+{
+    "name": "stitch",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "build:dev": "tsc --watch",
+        "start": "node dist/index.js",
+        "temp:start:dev": "concurrently 'nodemon dist/index.js' 'tsc --watch'",
+        "start:dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
+    },
+    "license": "ISC",
+    "dependencies": {
+        "@apollo/federation": "^0.11.2",
+        "@apollo/gateway": "^0.11.6",
+        "apollo-datasource-rest": "^0.6.11",
+        "apollo-server-core": "^2.9.15",
+        "apollo-server-fastify": "^2.9.15",
+        "fastify": "^2.11.0",
+        "graphql": "^14.5.8",
+        "graphql-tools": "^4.0.6",
+        "node-fetch": "^2.6.0",
+        "tslib": "^1.10.0"
+    },
+    "devDependencies": {
+        "@types/node": "^13.1.4",
+        "concurrently": "^5.0.2",
+        "nodemon": "^2.0.2",
+        "ts-node": "^8.5.4",
+        "typescript": "^3.7.4"
+    }
+}
