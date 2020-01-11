@@ -2,6 +2,7 @@ import {ApolloGateway, LocalGraphQLDataSource, ServiceEndpointDefinition} from '
 import {directiveMap} from './directives';
 import {ResourceGroup} from './resource-fetcher';
 import {buildFederatedSchemaDirectivesHack} from './buildFederatedSchema';
+import {parse} from 'graphql';
 
 type LocalGatewayConfig = {
     resources: ResourceGroup;
@@ -13,7 +14,7 @@ export class StitchGateway extends ApolloGateway {
             serviceList: Object.keys(config.resources.schemas).map(name => ({name, url: `http://graph/${name}`})),
             buildService(definition: ServiceEndpointDefinition) {
                 const typeDef = config.resources.schemas[definition.name];
-                const schema = buildFederatedSchemaDirectivesHack(typeDef, directiveMap);
+                const schema = buildFederatedSchemaDirectivesHack(parse(typeDef), directiveMap);
                 return new LocalGraphQLDataSource(schema);
             },
         });
