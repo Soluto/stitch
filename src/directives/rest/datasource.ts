@@ -1,40 +1,69 @@
 import {RESTDataSource} from 'apollo-datasource-rest';
 import {KeyValue, RestParams} from './types';
+import {injectParameters, resolveParameters} from '../../param-injection';
+import {RequestContext} from '../../context';
+import {RequestInit, Headers} from 'apollo-server-env';
 
-function keyValueArrayToDictionary(kvs: KeyValue[]): {[key: string]: string} {
-    const dict: {[key: string]: string} = {};
-    for (const {key, value} of kvs) {
-        dict[key] = value;
-    }
-    return dict;
-}
+type GraphQLArguments = {[key: string]: any};
 
-export class RESTDirectiveDataSource extends RESTDataSource {
-    doRequest(params: RestParams, _parent: any, _args: {[key: string]: any}) {
-        const query = params.query && ((params.query as unknown) as [string, Object][]);
-        const headers = params.headers && keyValueArrayToDictionary(params.headers);
+export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
+    doRequest(params: RestParams, parent: any, args: GraphQLArguments) {
+        const headers = this.parseHeaders(params.headers, parent, args);
+        const requestInit: RequestInit = {headers, timeout: params.timeoutMs};
+        const body = params.bodyArg && args[params.bodyArg];
+        const url = new URL(injectParameters(params.url, parent, args, this.context));
+        this.addQueryParams(url.searchParams, params.query, parent, args);
 
-        let doFetch: RESTDataSource['get'];
-        switch (params.method?.toUpperCase()) {
-            case 'GET':
+        const method = params.method?.toUpperCase();
+
+        switch (method) {
             default:
-                doFetch = this.get;
-                break;
-            case 'POST':
-                doFetch = this.post;
-                break;
+            case 'GET':
+                return this.get(url.href, undefined, requestInit);
             case 'DELETE':
-                doFetch = this.delete;
-                break;
+                return this.delete(url.href, undefined, requestInit);
+            case 'POST':
+                return this.post(url.href, body, requestInit);
             case 'PUT':
-                doFetch = this.put;
-                break;
+                return this.put(url.href, body, requestInit);
             case 'PATCH':
-                doFetch = this.patch;
-                break;
+                return this.patch(url.href, body, requestInit);
+        }
+    }
+
+    parseHeaders(kvs: KeyValue[] | undefined, parent: any, args: GraphQLArguments) {
+        if (!kvs || kvs.length == 0) return;
+
+        const headers = new Headers();
+
+        for (const kv of kvs) {
+            headers.append(kv.key, injectParameters(kv.value, parent, args, this.context));
         }
 
-        return doFetch.call(this, params.url, query, {headers});
+        return headers;
+    }
+
+    addQueryParams(params: URLSearchParams, kvs: KeyValue[] | undefined, parent: any, args: GraphQLArguments) {
+        if (!kvs || kvs.length == 0) return;
+
+        for (const kv of kvs) {
+            const parameters = resolveParameters(kv.value, parent, args, this.context);
+            if (!parameters) {
+                params.append(kv.key, kv.value);
+                continue;
+            }
+
+            for (const originalValue in parameters) {
+                const paramValue = parameters[originalValue];
+                if (Array.isArray(paramValue)) {
+                    for (const elem of paramValue) {
+                        params.append(kv.key, elem);
+                    }
+                } else {
+                    params.append(kv.key, paramValue);
+                }
+            }
+        }
     }
 }
 
