@@ -20,17 +20,26 @@ import {
 import {SchemaDirectiveVisitor} from 'graphql-tools';
 import {buildFederatedSchema} from '@apollo/federation';
 import {federationDirectives} from '@apollo/federation/dist/directives';
+import {GraphQLResolverMap} from 'apollo-graphql';
 
-type DirectiveVisitors = {[directiveName: string]: typeof SchemaDirectiveVisitor};
+interface DirectiveVisitors {
+    [directiveName: string]: typeof SchemaDirectiveVisitor;
+}
 
-export function buildFederatedSchemaDirectivesHack(typeDefs: DocumentNode, directiveVisitors: DirectiveVisitors) {
+interface FederatedSchemaBase {
+    typeDef: DocumentNode;
+    resolvers: GraphQLResolverMap;
+    schemaDirectives: DirectiveVisitors;
+}
+
+export function buildFederatedSchemaDirectivesHack({typeDef, resolvers, schemaDirectives}: FederatedSchemaBase) {
     const directives: Array<{
         objectName: string;
         directiveName: string;
         fieldName: string;
         args: {[name: string]: any};
     }> = [];
-    const defsWithoutDirectives = visit(typeDefs, {
+    const defsWithoutDirectives = visit(typeDef, {
         DirectiveDefinition() {
             return null;
         },
@@ -57,11 +66,11 @@ export function buildFederatedSchemaDirectivesHack(typeDefs: DocumentNode, direc
         },
     }) as DocumentNode;
 
-    const schema = buildFederatedSchema(defsWithoutDirectives);
+    const schema = buildFederatedSchema({typeDefs: defsWithoutDirectives, resolvers});
     for (const {objectName, directiveName, fieldName, args} of directives) {
-        const directiveVisitor = directiveVisitors[directiveName];
+        const schemaDirective = schemaDirectives[directiveName];
         // @ts-ignore SchemaDirectiveVisitor constructor is protected...
-        const visitor = new directiveVisitor({
+        const visitor = new schemaDirective({
             name: directiveName,
             args,
             visitedType: schema,
