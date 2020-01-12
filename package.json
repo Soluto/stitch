@@ -16,6 +16,7 @@
         "@apollo/federation": "^0.11.2",
         "@apollo/gateway": "^0.11.6",
         "apollo-datasource-rest": "^0.6.11",
+        "apollo-link-http": "^1.5.16",
         "apollo-server-core": "^2.9.15",
         "apollo-server-fastify": "^2.9.15",
         "fastify": "^2.11.0",

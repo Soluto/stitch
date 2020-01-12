@@ -3,6 +3,43 @@ export interface ResourceGroup {
 }
 
 const sdls = {
+    postmanEcho: `
+    type Query {
+        echo(in: JSON!): JSON @rest(url: "https://postman-echo.com/post", method: "POST", bodyArg: "in")
+    }
+    `,
+    countries: `
+    type Continent {
+        code: String
+        name: String
+        something: String @stub(value: "rawr")
+        countries: [Country]
+      }
+      
+      type Country {
+        code: String
+        name: String
+        native: String
+        phone: String
+        continent: Continent
+        currency: String
+        languages: [Language]
+        emoji: String
+        emojiU: String
+      }
+      
+      type Language {
+        code: String
+        name: String
+        native: String
+        rtl: Int
+      }
+      
+      type Query {
+        continents: [Continent] @gql(url: "https://countries.trevorblades.com/", fieldName: "continents")
+        country(countryCode: String!): Country @gql(url: "https://countries.trevorblades.com/", fieldName: "country", arguments: {code: "{args.countryCode}"})
+        estonia: Country @gql(url: "https://countries.trevorblades.com/", fieldName: "country", arguments: {code: "EE"})
+      }`,
     users: `
     type Query {
         user(id: String): User @rest(url: "https://jsonplaceholder.typicode.com/users/{args.id}")
