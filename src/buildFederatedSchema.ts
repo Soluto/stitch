@@ -8,14 +8,12 @@ import {
     FieldDefinitionNode,
     ASTNode,
     GraphQLObjectType,
-    ArgumentNode,
-    ObjectFieldNode,
-    valueFromASTUntyped,
     InterfaceTypeDefinitionNode,
     InterfaceTypeExtensionNode,
     ObjectTypeExtensionNode,
     ObjectTypeDefinitionNode,
     GraphQLInterfaceType,
+    DirectiveNode,
 } from 'graphql';
 import {SchemaDirectiveVisitor} from 'graphql-tools';
 import {buildFederatedSchema} from '@apollo/federation';
@@ -32,14 +30,42 @@ interface FederatedSchemaBase {
     schemaDirectives: DirectiveVisitors;
 }
 
+/** The idea is:
+ * 1. Remove non-federation directives from SDL, save them to an array
+ * 2. Run buildFederatedSchema on the directiveless SDL & original resolvers
+ * 3. Re-add directives to final schema to allow SchemaDirectiveVisitor to work normally
+ * 4. Finally, run SchemaDirectiveVisitors
+ */
+
 export function buildFederatedSchemaDirectivesHack({typeDef, resolvers, schemaDirectives}: FederatedSchemaBase) {
-    const directives: Array<{
+    const {directivesUsages, typeDef: typeDefWithoutDirectives} = collectAndRemoveCustomDirectives(typeDef);
+
+    const schema = buildFederatedSchema({typeDefs: typeDefWithoutDirectives, resolvers});
+
+    for (const {objectName, directiveNode, fieldName} of directivesUsages) {
+        const object = schema.getType(objectName) as GraphQLObjectType | GraphQLInterfaceType;
+        const field = object!.getFields()[fieldName];
+
+        if (!field.astNode!.directives) {
+            ((field.astNode!.directives as unknown) as DirectiveNode[]) = [directiveNode];
+        } else {
+            (field.astNode!.directives as DirectiveNode[]).push(directiveNode);
+        }
+    }
+
+    SchemaDirectiveVisitor.visitSchemaDirectives(schema, schemaDirectives);
+
+    return schema;
+}
+
+function collectAndRemoveCustomDirectives(typeDef: DocumentNode) {
+    const directivesUsages: Array<{
         objectName: string;
-        directiveName: string;
         fieldName: string;
-        args: {[name: string]: any};
+        directiveNode: DirectiveNode;
     }> = [];
-    const defsWithoutDirectives = visit(typeDef, {
+
+    const typeDefWithoutDirectives = visit(typeDef, {
         DirectiveDefinition() {
             return null;
         },
@@ -59,30 +85,13 @@ export function buildFederatedSchemaDirectivesHack({typeDef, resolvers, schemaDi
             }
             const objectName = objectNode.name.value;
             const fieldName = fieldNode.name.value;
-            const directiveName = node.name.value;
 
-            directives.push({directiveName, objectName, fieldName, args: argumentsToDictionary(node.arguments)});
+            directivesUsages.push({directiveNode: node, objectName, fieldName});
             return null;
         },
     }) as DocumentNode;
 
-    const schema = buildFederatedSchema({typeDefs: defsWithoutDirectives, resolvers});
-    for (const {objectName, directiveName, fieldName, args} of directives) {
-        const schemaDirective = schemaDirectives[directiveName];
-        // @ts-ignore SchemaDirectiveVisitor constructor is protected...
-        const visitor = new schemaDirective({
-            name: directiveName,
-            args,
-            visitedType: schema,
-            schema,
-            context: {},
-        }) as SchemaDirectiveVisitor;
-        const object = schema.getType(objectName) as GraphQLObjectType | GraphQLInterfaceType;
-        const field = object!.getFields()[fieldName];
-        visitor.visitFieldDefinition(field, {objectType: object});
-    }
-
-    return schema;
+    return {directivesUsages, typeDef: typeDefWithoutDirectives};
 }
 
 function isFieldDefinitionNode(node: ASTNode): node is FieldDefinitionNode {
@@ -102,17 +111,4 @@ function isObjectOrInterfaceOrExtensionOfThose(node: ASTNode): node is ObjectOrI
         node.kind === 'InterfaceTypeDefinition' ||
         node.kind === 'InterfaceTypeExtension'
     );
-}
-
-function argumentsToDictionary(argsArr?: readonly ArgumentNode[] | readonly ObjectFieldNode[]) {
-    const argsDict: {[name: string]: any} = {};
-    if (typeof argsArr === 'undefined') {
-        return argsDict;
-    }
-
-    for (const arg of argsArr) {
-        argsDict[arg.name.value] = valueFromASTUntyped(arg.value);
-    }
-
-    return argsDict;
 }
