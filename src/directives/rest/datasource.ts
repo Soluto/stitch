@@ -2,38 +2,28 @@ import {RESTDataSource} from 'apollo-datasource-rest';
 import {KeyValue, RestParams} from './types';
 import {injectParameters, resolveParameters} from '../../param-injection';
 import {RequestContext} from '../../context';
-import {RequestInit, Headers} from 'apollo-server-env';
+import {RequestInit, Headers, Request} from 'apollo-server-env';
 
 type GraphQLArguments = {[key: string]: any};
 
 export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
-    doRequest(params: RestParams, parent: any, args: GraphQLArguments) {
+    async doRequest(params: RestParams, parent: any, args: GraphQLArguments) {
         const headers = this.parseHeaders(params.headers, parent, args);
-        const requestInit: RequestInit = {headers, timeout: params.timeoutMs};
+        const requestInit: RequestInit = {headers, timeout: params.timeoutMs, method: params.method};
         const url = new URL(injectParameters(params.url, parent, args, this.context));
         this.addQueryParams(url.searchParams, params.query, parent, args);
 
-        let body: string | undefined;
-        if (params.bodyArg && args[params.bodyArg]) {
-            body = JSON.stringify(args[params.bodyArg]);
+        requestInit.body = args[params.bodyArg || 'input'];
+        if (requestInit.body) {
+            requestInit.body = JSON.stringify(requestInit.body);
             headers.append('Content-Type', 'application/json');
         }
 
-        const method = params.method?.toUpperCase();
+        const request = new Request(String(url), requestInit);
+        const cacheKey = this.cacheKeyFor(request);
+        const response = await this.httpCache.fetch(request, {cacheKey});
 
-        switch (method) {
-            default:
-            case 'GET':
-                return this.get(url.href, undefined, requestInit);
-            case 'DELETE':
-                return this.delete(url.href, undefined, requestInit);
-            case 'POST':
-                return this.post(url.href, body, requestInit);
-            case 'PUT':
-                return this.put(url.href, body, requestInit);
-            case 'PATCH':
-                return this.patch(url.href, body, requestInit);
-        }
+        return this.didReceiveResponse(response, request);
     }
 
     parseHeaders(kvs: KeyValue[] | undefined, parent: any, args: GraphQLArguments) {

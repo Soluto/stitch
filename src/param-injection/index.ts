@@ -14,7 +14,7 @@ function resolveTemplate(template: string, parent: any, args: GraphQLArguments, 
             return parent && parent[propName];
         case 'args':
             return args && args[propName];
-        case 'context':
+        case 'exports':
             return readFromContext(context, propName);
         default:
             return null;

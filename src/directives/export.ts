@@ -1,12 +1,6 @@
-import {SchemaDirectiveVisitor, gql} from 'apollo-server';
-import {
-    GraphQLArgument,
-    GraphQLField,
-    GraphQLObjectType,
-    GraphQLInterfaceType,
-    defaultFieldResolver,
-    GraphQLSchema,
-} from 'graphql';
+import {SchemaDirectiveVisitor} from 'graphql-tools';
+import {gql} from 'apollo-server-core';
+import {GraphQLField, defaultFieldResolver} from 'graphql';
 import {writeToContext} from '../param-injection/context';
 
 export class ExportDirective extends SchemaDirectiveVisitor {

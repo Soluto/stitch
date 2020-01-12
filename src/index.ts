@@ -20,7 +20,7 @@ async function run() {
 
     const app = fastify();
     app.register(apollo.createHandler({path: '/graphql'}));
-    const res = await app.listen(8080);
+    const res = await app.listen(8080, '0.0.0.0');
     console.log('Server is up at', res);
 }
 
