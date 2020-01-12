@@ -10,9 +10,14 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     doRequest(params: RestParams, parent: any, args: GraphQLArguments) {
         const headers = this.parseHeaders(params.headers, parent, args);
         const requestInit: RequestInit = {headers, timeout: params.timeoutMs};
-        const body = params.bodyArg && args[params.bodyArg];
         const url = new URL(injectParameters(params.url, parent, args, this.context));
         this.addQueryParams(url.searchParams, params.query, parent, args);
+
+        let body: string | undefined;
+        if (params.bodyArg && args[params.bodyArg]) {
+            body = JSON.stringify(args[params.bodyArg]);
+            headers.append('Content-Type', 'application/json');
+        }
 
         const method = params.method?.toUpperCase();
 
@@ -32,12 +37,12 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     }
 
     parseHeaders(kvs: KeyValue[] | undefined, parent: any, args: GraphQLArguments) {
-        if (!kvs || kvs.length == 0) return;
-
         const headers = new Headers();
 
-        for (const kv of kvs) {
-            headers.append(kv.key, injectParameters(kv.value, parent, args, this.context));
+        if (typeof kvs !== 'undefined') {
+            for (const kv of kvs) {
+                headers.append(kv.key, injectParameters(kv.value, parent, args, this.context));
+            }
         }
 
         return headers;

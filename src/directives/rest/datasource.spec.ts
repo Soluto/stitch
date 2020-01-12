@@ -95,6 +95,7 @@ describe('REST directive data source', () => {
         const req = fetchMock.mock.calls[0][0] as Request;
         expect(req.url).toBe('http://somewhere/');
         expect(req.method).toBe('POST');
+        expect(req.headers.get('Content-Type')).toBe('application/json');
         expect(await req.text()).toBe('{"name":"aviv"}');
     });
 });
