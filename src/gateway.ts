@@ -1,31 +1,27 @@
-import {ApolloGateway, LocalGraphQLDataSource, ServiceEndpointDefinition} from '@apollo/gateway';
-import {directiveMap} from './directives';
-import {ResourceGroup} from './resource-fetcher';
-import {buildFederatedSchemaDirectivesHack} from './buildFederatedSchema';
-import {gql} from 'apollo-server-core';
-import * as baseSchema from './baseSchema';
+import {ApolloServer} from 'apollo-server-fastify';
+import * as fastify from 'fastify';
+import {StitchGateway} from './modules/stitchGateway';
+import {fetch} from './modules/resource-repository';
+import {RESTDirectiveDataSource} from './modules/directives/rest';
 
-type LocalGatewayConfig = {
-    resources: ResourceGroup;
-};
+async function run() {
+    const gateway = new StitchGateway({resources: await fetch()});
+    const {schema, executor} = await gateway.load();
+    const apollo = new ApolloServer({
+        schema,
+        executor,
+        tracing: true,
+        dataSources() {
+            return {
+                rest: new RESTDirectiveDataSource(),
+            };
+        },
+    });
 
-export class StitchGateway extends ApolloGateway {
-    constructor(config: LocalGatewayConfig) {
-        super({
-            serviceList: Object.keys(config.resources.schemas).map(name => ({name, url: `http://graph/${name}`})),
-            buildService(definition: ServiceEndpointDefinition) {
-                const typeDef = config.resources.schemas[definition.name];
-                const typeDefWithBase = gql`
-                    ${baseSchema.typeDef}
-                    ${typeDef}
-                `;
-                const schema = buildFederatedSchemaDirectivesHack({
-                    typeDef: typeDefWithBase,
-                    resolvers: baseSchema.resolvers,
-                    schemaDirectives: directiveMap,
-                });
-                return new LocalGraphQLDataSource(schema);
-            },
-        });
-    }
+    const app = fastify();
+    app.register(apollo.createHandler({path: '/graphql'}));
+    const res = await app.listen(8080, '0.0.0.0');
+    console.log('Server is up at', res);
 }
+
+run();

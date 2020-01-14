@@ -58,7 +58,7 @@ export function buildFederatedSchemaDirectivesHack({typeDef, resolvers, schemaDi
     return schema;
 }
 
-function collectAndRemoveCustomDirectives(typeDef: DocumentNode) {
+export function collectAndRemoveCustomDirectives(typeDef: DocumentNode) {
     const directivesUsages: Array<{
         objectName: string;
         fieldName: string;
