@@ -1,10 +1,11 @@
 import * as AWS from 'aws-sdk';
+import {resourceBucketName, s3endpoint, awsAccessKeyId, awsSecretAccessKey, resourcesObjectKey} from '../config';
 import {ResourceGroup} from '.';
 
 const s3 = new AWS.S3({
-    accessKeyId: 'minioadmin',
-    secretAccessKey: 'minioadmin',
-    endpoint: 'http://localhost:9000',
+    accessKeyId: awsAccessKeyId,
+    secretAccessKey: awsSecretAccessKey,
+    endpoint: s3endpoint,
     s3ForcePathStyle: true,
     signatureVersion: 'v4',
 });
@@ -34,8 +35,8 @@ async function getObjectIfChanged(request: AWS.S3.GetObjectRequest) {
 /** Returns latest resource group, or null if etag matches */
 export async function fetch(currentEtag?: string): Promise<ResourceGroup | null> {
     const response = await getObjectIfChanged({
-        Bucket: 'mybucket',
-        Key: 'latest.json',
+        Bucket: resourceBucketName,
+        Key: resourcesObjectKey,
         IfNoneMatch: currentEtag,
     });
 
@@ -56,6 +57,7 @@ export async function fetch(currentEtag?: string): Promise<ResourceGroup | null>
 }
 
 export async function update(rg: ResourceGroup): Promise<void> {
-    await s3.putObject({Bucket: 'mybucket', Key: 'latest.json', Body: JSON.stringify(rg.schemas)});
-    await s3.copyObject({Bucket: 'mybucket', Key: 'someversion.json', CopySource: '/mybucket/latest.json'});
+    await s3
+        .putObject({Bucket: resourceBucketName, Key: resourcesObjectKey, Body: JSON.stringify(rg.schemas)})
+        .promise();
 }

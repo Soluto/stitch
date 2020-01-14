@@ -1,0 +1,28 @@
+version: '3.7'
+
+services:
+    gateway:
+        depends_on:
+            - minio
+        ports:
+            - 8080:8080
+        build: ../..
+        command: dist/gateway.js
+        env_file: config.env
+
+    registry:
+        depends_on:
+            - minio
+        ports:
+            - 8090:8080
+        build: ../..
+        command: dist/registry.js
+        env_file: config.env
+
+    minio:
+        image: minio/minio
+        ports:
+            - 9000:9000
+        command: server /var/minio
+        volumes:
+            - './minio_mount:/var/minio:rw'
