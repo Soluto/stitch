@@ -3,5 +3,4 @@ export interface ResourceGroup {
     schemas: {[name: string]: string};
 }
 
-export {fetch as bucketFetch} from './s3';
-export {fetch} from './static';
+export {fetch, update} from './s3';

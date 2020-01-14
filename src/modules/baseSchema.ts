@@ -8,6 +8,7 @@ export const baseTypeDef = gql`
 `;
 
 export const typeDef = gql`
+    ${baseTypeDef}
     ${directivesSdl}
 `;
 

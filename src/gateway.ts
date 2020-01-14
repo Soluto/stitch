@@ -5,7 +5,7 @@ import {fetch} from './modules/resource-repository';
 import {RESTDirectiveDataSource} from './modules/directives/rest';
 
 async function run() {
-    const gateway = new StitchGateway({resources: await fetch()});
+    const gateway = new StitchGateway({resources: (await fetch())!}); // TODO Handle optionality here
     const {schema, executor} = await gateway.load();
     const apollo = new ApolloServer({
         schema,

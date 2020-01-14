@@ -15,4 +15,4 @@ WORKDIR /service
 COPY --from=dependencies /build/node_modules ./node_modules
 COPY --from=build /build/dist ./dist
 
-CMD ["node", "./dist/index.js"]
+ENTRYPOINT ["node"]

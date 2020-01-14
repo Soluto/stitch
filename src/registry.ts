@@ -2,7 +2,7 @@ import {ApolloServer, gql, IResolvers, ApolloError} from 'apollo-server-fastify'
 import * as fastify from 'fastify';
 import {parse, DocumentNode, visit, print, GraphQLError} from 'graphql';
 import {composeAndValidate} from '@apollo/federation';
-import {fetch, ResourceGroup} from './modules/resource-repository';
+import {fetch, ResourceGroup, update} from './modules/resource-repository';
 import * as baseSchema from './modules/baseSchema';
 import federationDirectives from '@apollo/federation/dist/directives';
 
@@ -76,7 +76,9 @@ const resolvers: IResolvers = {
     Query: {
         async testSchema(_, {input}: {input: UpsertSchemaInput}) {
             const rg = await fetch();
-            const schemas = {...rg.schemas, [`${input.namespace}.${input.name}`]: input.schema};
+
+            // TODO Handle optionality here
+            const schemas = {...rg!.schemas, [`${input.namespace}.${input.name}`]: input.schema};
 
             validateResourceGroup({schemas});
 
@@ -86,11 +88,13 @@ const resolvers: IResolvers = {
     Mutation: {
         async upsertSchema(_, {input}: {input: UpsertSchemaInput}) {
             const rg = await fetch();
-            const schemas = {...rg.schemas, [`${input.namespace}.${input.name}`]: input.schema};
+
+            // TODO Handle optionality here
+            const schemas = {...rg!.schemas, [`${input.namespace}.${input.name}`]: input.schema};
 
             validateResourceGroup({schemas});
 
-            // save schemas
+            await update({schemas});
 
             return {success: true};
         },

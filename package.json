@@ -1,14 +1,12 @@
 {
     "name": "stitch",
     "version": "1.0.0",
-    "main": "dist/index.js",
     "scripts": {
         "test": "jest",
         "test:watch": "jest --watch",
         "build": "tsc",
         "build:dev": "tsc --watch",
-        "start": "node dist/index.js",
-        "start:dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
+        "start:gateway:dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/gateway.ts",
         "start:registry:dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/registry.ts"
     },
     "license": "ISC",
