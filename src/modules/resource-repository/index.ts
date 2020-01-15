@@ -4,3 +4,4 @@ export interface ResourceGroup {
 }
 
 export {fetch, update} from './s3';
+export {pollForUpdates} from './stream';

@@ -1,15 +1,17 @@
 import {ApolloServer} from 'apollo-server-fastify';
 import * as fastify from 'fastify';
+import {map} from 'rxjs/operators';
 import {StitchGateway} from './modules/stitchGateway';
-import {fetch} from './modules/resource-repository';
 import {RESTDirectiveDataSource} from './modules/directives/rest';
+import {DelegatingGraphQLService} from './modules/delegatingGraphQLService';
+import {pollForUpdates} from './modules/resource-repository';
 
 async function run() {
-    const gateway = new StitchGateway({resources: (await fetch())!}); // TODO Handle optionality here
-    const {schema, executor} = await gateway.load();
+    const gateway$ = pollForUpdates(2000).pipe(map(rg => new StitchGateway({resources: rg})));
+    const gateway = new DelegatingGraphQLService(gateway$);
     const apollo = new ApolloServer({
-        schema,
-        executor,
+        gateway,
+        subscriptions: false,
         tracing: true,
         dataSources() {
             return {
