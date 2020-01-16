@@ -7,30 +7,30 @@ import * as baseSchema from './modules/baseSchema';
 import federationDirectives from '@apollo/federation/dist/directives';
 
 const typeDefs = gql`
-    input UpsertSchemaInput {
+    input UpdateSchemasInput {
         namespace: String!
         name: String!
         schema: String!
     }
 
-    type UpsertSchemaResult {
+    type UpdateSchemasResult {
         success: Boolean!
     }
 
     type Query {
-        testSchema(input: UpsertSchemaInput!): UpsertSchemaResult
+        testSchemas(input: [UpdateSchemasInput!]!): UpdateSchemasResult
     }
 
     type Mutation {
-        upsertSchema(input: UpsertSchemaInput!): UpsertSchemaResult
+        upsertSchemas(input: [UpdateSchemasInput!]!): UpdateSchemasResult
     }
 `;
 
-interface UpsertSchemaInput {
+type UpdateSchemasInput = Array<{
     namespace: string;
     name: string;
     schema: string;
-}
+}>;
 
 const removeNonFederationDirectives = (typeDef: DocumentNode) => {
     // If we don't print and re-parse, some old bits of the directives still remain in the data structure <_<
@@ -74,11 +74,15 @@ function validateResourceGroup(rg: ResourceGroup) {
 
 const resolvers: IResolvers = {
     Query: {
-        async testSchema(_, {input}: {input: UpsertSchemaInput}) {
+        async testSchemas(_, args: {input: UpdateSchemasInput}) {
             const rg = await fetch();
 
-            // TODO Handle optionality here
-            const schemas = {...rg!.schemas, [`${input.namespace}.${input.name}`]: input.schema};
+            const schemas = {
+                ...rg.schemas,
+                ...Object.fromEntries(
+                    args.input.map(resource => [`${resource.namespace}.${resource.name}`, resource.schema])
+                ),
+            };
 
             validateResourceGroup({schemas});
 
@@ -86,11 +90,15 @@ const resolvers: IResolvers = {
         },
     },
     Mutation: {
-        async upsertSchema(_, {input}: {input: UpsertSchemaInput}) {
+        async updateSchemas(_, args: {input: UpdateSchemasInput}) {
             const rg = await fetch();
 
-            // TODO Handle optionality here
-            const schemas = {...rg!.schemas, [`${input.namespace}.${input.name}`]: input.schema};
+            const schemas = {
+                ...rg.schemas,
+                ...Object.fromEntries(
+                    args.input.map(resource => [`${resource.namespace}.${resource.name}`, resource.schema])
+                ),
+            };
 
             validateResourceGroup({schemas});
 

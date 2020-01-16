@@ -32,7 +32,10 @@ async function getObjectIfChanged(request: AWS.S3.GetObjectRequest) {
     }
 }
 
+/** Returns latest resource group */
+export function fetch(): Promise<ResourceGroup>;
 /** Returns latest resource group, or null if etag matches */
+export function fetch(currentEtag?: string): Promise<ResourceGroup | null>;
 export async function fetch(currentEtag?: string): Promise<ResourceGroup | null> {
     const response = await getObjectIfChanged({
         Bucket: resourceBucketName,
