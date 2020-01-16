@@ -22,7 +22,7 @@ function isAwsError(e: any): e is AWS.AWSError {
 
 async function getObjectIfChanged(request: AWS.S3.GetObjectRequest) {
     try {
-        return await s3.getObject({...request}).promise();
+        return await s3.getObject(request).promise();
     } catch (err) {
         if ((isAwsError(err) && err.code === 'NotModified') || err.statusCode === 304) {
             return null;
@@ -55,12 +55,13 @@ export async function fetch(currentEtag?: string): Promise<ResourceGroup | null>
 
     return {
         etag: response.ETag,
-        schemas: JSON.parse(bodyRaw),
+        ...JSON.parse(bodyRaw),
     };
 }
 
 export async function update(rg: ResourceGroup): Promise<void> {
+    const {etag, ...rgWithoutEtag} = rg;
     await s3
-        .putObject({Bucket: resourceBucketName, Key: resourcesObjectKey, Body: JSON.stringify(rg.schemas)})
+        .putObject({Bucket: resourceBucketName, Key: resourcesObjectKey, Body: JSON.stringify(rgWithoutEtag)})
         .promise();
 }

@@ -1,14 +1,14 @@
 import {ApolloServer} from 'apollo-server-fastify';
 import * as fastify from 'fastify';
 import {map} from 'rxjs/operators';
-import {StitchGateway} from './modules/stitchGateway';
+import {createApolloGateway} from './modules/stitchGateway';
 import {RESTDirectiveDataSource} from './modules/directives/rest';
 import {DelegatingGraphQLService} from './modules/delegatingGraphQLService';
 import {pollForUpdates} from './modules/resource-repository';
 import {resourceUpdateInterval, httpPort} from './modules/config';
 
 async function run() {
-    const gateway$ = pollForUpdates(resourceUpdateInterval).pipe(map(rg => new StitchGateway({resources: rg})));
+    const gateway$ = pollForUpdates(resourceUpdateInterval).pipe(map(createApolloGateway));
     const gateway = new DelegatingGraphQLService(gateway$);
     const apollo = new ApolloServer({
         gateway,

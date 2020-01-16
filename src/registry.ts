@@ -5,6 +5,7 @@ import pLimit from 'p-limit';
 import {fetch, update} from './modules/resource-repository';
 import {httpPort} from './modules/config';
 import {validateResourceGroup} from './modules/validation';
+import {distinct} from './modules/collectionUtils';
 
 const typeDefs = gql`
     # General
@@ -48,15 +49,7 @@ const resolvers: IResolvers = {
         async testSchemas(_, args: {input: UpdateSchemasInput[]}) {
             const rg = await fetch();
 
-            const schemas = {
-                ...rg.schemas,
-                ...Object.fromEntries(
-                    args.input.map(resource => [
-                        `${resource.metadata.namespace}.${resource.metadata.name}`,
-                        resource.schema,
-                    ])
-                ),
-            };
+            const schemas = distinct([...rg.schemas, ...args.input], s => `${s.metadata.namespace}.${s.metadata.name}`);
 
             validateResourceGroup({schemas});
 
@@ -68,15 +61,10 @@ const resolvers: IResolvers = {
             return singleton(async () => {
                 const rg = await fetch();
 
-                const schemas = {
-                    ...rg.schemas,
-                    ...Object.fromEntries(
-                        args.input.map(resource => [
-                            `${resource.metadata.namespace}.${resource.metadata.name}`,
-                            resource.schema,
-                        ])
-                    ),
-                };
+                const schemas = distinct(
+                    [...rg.schemas, ...args.input],
+                    s => `${s.metadata.namespace}.${s.metadata.name}`
+                );
 
                 validateResourceGroup({schemas});
 

@@ -15,8 +15,8 @@
             "env": {
                 "RESOURCE_BUCKET_NAME": "stitch-resources",
                 "S3_ENDPOINT": "http://localhost:9000",
-                "AWS_ACCESS_KEY_ID": "minioadmin",
-                "AWS_SECRET_ACCESS_KEY": "minioadmin",
+                "AWS_ACCESS_KEY_ID": "stitch_key_id",
+                "AWS_SECRET_ACCESS_KEY": "stitch_secret_key",
                 "PORT": "8080"
             }
         },
@@ -31,8 +31,8 @@
             "env": {
                 "RESOURCE_BUCKET_NAME": "stitch-resources",
                 "S3_ENDPOINT": "http://localhost:9000",
-                "AWS_ACCESS_KEY_ID": "minioadmin",
-                "AWS_SECRET_ACCESS_KEY": "minioadmin",
+                "AWS_ACCESS_KEY_ID": "stitch_key_id",
+                "AWS_SECRET_ACCESS_KEY": "stitch_secret_key",
                 "PORT": "8090"
             }
         },

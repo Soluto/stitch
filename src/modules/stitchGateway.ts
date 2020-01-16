@@ -5,27 +5,30 @@ import {ResourceGroup} from './resource-repository';
 import {buildFederatedSchemaDirectivesHack} from './buildFederatedSchema';
 import * as baseSchema from './baseSchema';
 
-type LocalGatewayConfig = {
-    resources: ResourceGroup;
-};
+export function createApolloGateway(rg: ResourceGroup) {
+    const schemas = Object.fromEntries(
+        rg.schemas.map(schema => {
+            const name = `${schema.metadata.namespace}.${schema.metadata.name}`;
+            return [name, {schema: schema.schema, url: `http://graph/${name}`, name}];
+        })
+    );
 
-export class StitchGateway extends ApolloGateway {
-    constructor(config: LocalGatewayConfig) {
-        super({
-            serviceList: Object.keys(config.resources.schemas).map(name => ({name, url: `http://graph/${name}`})),
-            buildService(definition: ServiceEndpointDefinition) {
-                const typeDef = config.resources.schemas[definition.name];
-                const typeDefWithBase = gql`
-                    ${baseSchema.typeDef}
-                    ${typeDef}
-                `;
-                const schema = buildFederatedSchemaDirectivesHack({
-                    typeDef: typeDefWithBase,
-                    resolvers: baseSchema.resolvers,
-                    schemaDirectives: directiveMap,
-                });
-                return new LocalGraphQLDataSource(schema);
-            },
-        });
-    }
+    const gateway = new ApolloGateway({
+        serviceList: Object.values(schemas),
+        buildService: (definition: ServiceEndpointDefinition) => {
+            const typeDef = schemas[definition.name].schema;
+            const typeDefWithBase = gql`
+                ${baseSchema.typeDef}
+                ${typeDef}
+            `;
+            const schema = buildFederatedSchemaDirectivesHack({
+                typeDef: typeDefWithBase,
+                resolvers: baseSchema.resolvers,
+                schemaDirectives: directiveMap,
+            });
+            return new LocalGraphQLDataSource(schema);
+        },
+    });
+
+    return gateway;
 }
