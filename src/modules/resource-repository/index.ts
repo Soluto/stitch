@@ -1,16 +1,37 @@
 export interface ResourceGroup {
     etag?: string;
     schemas: Schema[];
+    upstreams: Upstream[];
 }
 
-interface ResourceMetadata {
+export interface ResourceMetadata {
     namespace: string;
     name: string;
 }
 
-interface Schema {
+export interface Schema {
     metadata: ResourceMetadata;
     schema: string;
+}
+
+export interface Upstream {
+    metadata: ResourceMetadata;
+    host: string;
+    auth: Auth;
+}
+
+export enum AuthType {
+    ActiveDirectory = 'ActiveDirectory',
+}
+
+export interface Auth {
+    type: AuthType;
+    activeDirectory: ActiveDirectoryAuth;
+}
+
+export interface ActiveDirectoryAuth {
+    authority: string;
+    resource: string;
 }
 
 export {fetch, update} from './s3';

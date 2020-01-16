@@ -6,8 +6,8 @@
         "test:watch": "jest --watch",
         "build": "tsc",
         "build:dev": "tsc --watch",
-        "start:gateway:dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/gateway.ts",
-        "start:registry:dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/registry.ts"
+        "start:gateway:watch": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/gateway.ts",
+        "start:registry:watch": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/registry.ts"
     },
     "license": "ISC",
     "dependencies": {

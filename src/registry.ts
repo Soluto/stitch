@@ -19,17 +19,40 @@ const typeDefs = gql`
     }
 
     type Query {
-        testSchemas(input: [UpdateSchemasInput!]!): Result
+        validateSchemas(input: [UpdateSchemasInput!]!): Result
+        validateUpstreams(input: [UpdateUpstreamsInput!]!): Result
     }
 
     type Mutation {
         updateSchemas(input: [UpdateSchemasInput!]!): Result
+        updateUpstreams(input: [UpdateUpstreamsInput!]!): Result
     }
 
     # Schemas
     input UpdateSchemasInput {
         metadata: ResourceMetadata!
         schema: String!
+    }
+
+    # Upstreams
+    enum AuthType {
+        ActiveDirectory
+    }
+
+    input Auth {
+        type: AuthType!
+        activeDirectory: ActiveDirectoryAuth!
+    }
+
+    input ActiveDirectoryAuth {
+        authority: String!
+        resource: String!
+    }
+
+    input UpdateUpstreamsInput {
+        metadata: ResourceMetadata!
+        host: String!
+        auth: Auth!
     }
 `;
 
@@ -43,15 +66,60 @@ interface UpdateSchemasInput {
     schema: string;
 }
 
+enum AuthType {
+    ActiveDirectory = 'ActiveDirectory',
+}
+
+interface Auth {
+    type: AuthType;
+    activeDirectory: ActiveDirectoryAuth;
+}
+
+interface ActiveDirectoryAuth {
+    authority: string;
+    resource: string;
+}
+
+interface UpdateUpstreamsInput {
+    metadata: ResourceMetadata;
+    host: string;
+    auth: Auth;
+}
+
+async function validateSchemas(input: UpdateSchemasInput[]) {
+    const rg = await fetch();
+
+    const schemas = distinct([...rg.schemas, ...input], s => `${s.metadata.namespace}.${s.metadata.name}`);
+
+    const newRg = {...rg, schemas};
+
+    validateResourceGroup(newRg);
+
+    return newRg;
+}
+
+async function validateUpstreams(input: UpdateUpstreamsInput[]) {
+    const rg = await fetch();
+
+    const upstreams = distinct([...rg.upstreams, ...input], s => `${s.metadata.namespace}.${s.metadata.name}`);
+
+    const newRg = {...rg, upstreams};
+
+    validateResourceGroup(newRg);
+
+    return newRg;
+}
+
 const singleton = pLimit(1);
 const resolvers: IResolvers = {
     Query: {
-        async testSchemas(_, args: {input: UpdateSchemasInput[]}) {
-            const rg = await fetch();
+        async validateSchemas(_, args: {input: UpdateSchemasInput[]}) {
+            await validateSchemas(args.input);
 
-            const schemas = distinct([...rg.schemas, ...args.input], s => `${s.metadata.namespace}.${s.metadata.name}`);
-
-            validateResourceGroup({schemas});
+            return {success: true};
+        },
+        async validateUpstreams(_, args: {input: UpdateUpstreamsInput[]}) {
+            await validateUpstreams(args.input);
 
             return {success: true};
         },
@@ -59,16 +127,18 @@ const resolvers: IResolvers = {
     Mutation: {
         updateSchemas(_, args: {input: UpdateSchemasInput[]}) {
             return singleton(async () => {
-                const rg = await fetch();
+                const rg = await validateSchemas(args.input);
 
-                const schemas = distinct(
-                    [...rg.schemas, ...args.input],
-                    s => `${s.metadata.namespace}.${s.metadata.name}`
-                );
+                await update(rg);
 
-                validateResourceGroup({schemas});
+                return {success: true};
+            });
+        },
+        updateUpstreams(_, args: {input: UpdateUpstreamsInput[]}) {
+            return singleton(async () => {
+                const rg = await validateUpstreams(args.input);
 
-                await update({schemas});
+                await update(rg);
 
                 return {success: true};
             });
