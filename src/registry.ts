@@ -56,7 +56,7 @@ function validateResourceGroup(rg: ResourceGroup) {
 
         const finalTypeDef = gql`
             ${baseSchema.baseTypeDef}
-            ${print(typeDefWithoutDirectives)}
+            ${typeDefWithoutDirectives}
         `;
 
         return {
