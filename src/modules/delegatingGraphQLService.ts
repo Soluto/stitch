@@ -41,6 +41,7 @@ export class DelegatingGraphQLService implements GraphQLService {
 
     onSchemaChange(callback: SchemaChangeCallback): Unsubscriber {
         const subscription = this.serviceConfigs.subscribe(config => callback(config.schema));
+        this.subscription.add(subscription);
 
         return subscription.unsubscribe.bind(subscription);
     }

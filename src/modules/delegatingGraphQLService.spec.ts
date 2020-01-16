@@ -29,8 +29,10 @@ describe('DelegatingGraphQLService', () => {
     it('Delegates executor to provided services', async () => {
         const servicesSource = new Subject<GraphQLService>();
         service = new DelegatingGraphQLService(servicesSource);
+        const schemaCallback = jest.fn();
+        service.onSchemaChange(schemaCallback);
 
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 10; i++) {
             const executor = jest.fn().mockResolvedValueOnce('executor result' + i);
             const schema = new GraphQLSchema({query: null});
             const implementation = {
@@ -52,5 +54,7 @@ describe('DelegatingGraphQLService', () => {
             expect(executor).toBeCalledWith(executorInput);
             expect(executorResult).toBe('executor result' + i);
         }
+
+        expect(schemaCallback).toHaveBeenCalledTimes(10);
     });
 });
