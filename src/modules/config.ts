@@ -17,3 +17,5 @@ export const awsSecretAccessKey = envVar
     .get('AWS_SECRET_ACCESS_KEY')
     .required()
     .asString();
+export const resourceUpdateInterval = envVar.get('RESOURCE_UPDATE_INTERVAL', '60000').asIntPositive();
+export const httpPort = envVar.get('PORT', '8080').asIntPositive();

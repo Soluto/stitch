@@ -5,9 +5,10 @@ import {StitchGateway} from './modules/stitchGateway';
 import {RESTDirectiveDataSource} from './modules/directives/rest';
 import {DelegatingGraphQLService} from './modules/delegatingGraphQLService';
 import {pollForUpdates} from './modules/resource-repository';
+import {resourceUpdateInterval, httpPort} from './modules/config';
 
 async function run() {
-    const gateway$ = pollForUpdates(2000).pipe(map(rg => new StitchGateway({resources: rg})));
+    const gateway$ = pollForUpdates(resourceUpdateInterval).pipe(map(rg => new StitchGateway({resources: rg})));
     const gateway = new DelegatingGraphQLService(gateway$);
     const apollo = new ApolloServer({
         gateway,
@@ -22,7 +23,7 @@ async function run() {
 
     const app = fastify();
     app.register(apollo.createHandler({path: '/graphql'}));
-    const res = await app.listen(8080, '0.0.0.0');
+    const res = await app.listen(httpPort, '0.0.0.0');
     console.log('Server is up at', res);
 }
 
