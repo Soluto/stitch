@@ -2,9 +2,10 @@ import {ApolloServer, gql, IResolvers, ApolloError} from 'apollo-server-fastify'
 import * as fastify from 'fastify';
 import {parse, DocumentNode, visit, print, GraphQLError} from 'graphql';
 import {composeAndValidate} from '@apollo/federation';
+import federationDirectives from '@apollo/federation/dist/directives';
 import {fetch, ResourceGroup, update} from './modules/resource-repository';
 import * as baseSchema from './modules/baseSchema';
-import federationDirectives from '@apollo/federation/dist/directives';
+import pLimit from 'p-limit';
 
 const typeDefs = gql`
     input UpdateSchemasInput {
@@ -22,7 +23,7 @@ const typeDefs = gql`
     }
 
     type Mutation {
-        upsertSchemas(input: [UpdateSchemasInput!]!): UpdateSchemasResult
+        updateSchemas(input: [UpdateSchemasInput!]!): UpdateSchemasResult
     }
 `;
 
@@ -72,6 +73,7 @@ function validateResourceGroup(rg: ResourceGroup) {
     }
 }
 
+const singleton = pLimit(1);
 const resolvers: IResolvers = {
     Query: {
         async testSchemas(_, args: {input: UpdateSchemasInput}) {
@@ -90,21 +92,23 @@ const resolvers: IResolvers = {
         },
     },
     Mutation: {
-        async updateSchemas(_, args: {input: UpdateSchemasInput}) {
-            const rg = await fetch();
+        updateSchemas(_, args: {input: UpdateSchemasInput}) {
+            return singleton(async () => {
+                const rg = await fetch();
 
-            const schemas = {
-                ...rg.schemas,
-                ...Object.fromEntries(
-                    args.input.map(resource => [`${resource.namespace}.${resource.name}`, resource.schema])
-                ),
-            };
+                const schemas = {
+                    ...rg.schemas,
+                    ...Object.fromEntries(
+                        args.input.map(resource => [`${resource.namespace}.${resource.name}`, resource.schema])
+                    ),
+                };
 
-            validateResourceGroup({schemas});
+                validateResourceGroup({schemas});
 
-            await update({schemas});
+                await update({schemas});
 
-            return {success: true};
+                return {success: true};
+            });
         },
     },
 };
