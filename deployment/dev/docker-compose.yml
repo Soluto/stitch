@@ -5,19 +5,23 @@ services:
         depends_on:
             - minio
         ports:
-            - 8080:8080
+            - 8080:80
         build: ../..
         command: dist/gateway.js
         env_file: .env
+        environment:
+            PORT: 80
 
     registry:
         depends_on:
             - minio
         ports:
-            - 8090:8080
+            - 8090:80
         build: ../..
         command: dist/registry.js
         env_file: .env
+        environment:
+            PORT: 80
 
     minio:
         image: minio/minio

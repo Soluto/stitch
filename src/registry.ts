@@ -3,9 +3,11 @@ import * as fastify from 'fastify';
 import {parse, DocumentNode, visit, print, GraphQLError} from 'graphql';
 import {composeAndValidate} from '@apollo/federation';
 import federationDirectives from '@apollo/federation/dist/directives';
+import pLimit from 'p-limit';
+
 import {fetch, ResourceGroup, update} from './modules/resource-repository';
 import * as baseSchema from './modules/baseSchema';
-import pLimit from 'p-limit';
+import {httpPort} from './modules/config';
 
 const typeDefs = gql`
     input UpdateSchemasInput {
@@ -121,7 +123,7 @@ async function run() {
 
     const app = fastify();
     app.register(apollo.createHandler({path: '/graphql'}));
-    const res = await app.listen(8080, '0.0.0.0');
+    const res = await app.listen(httpPort, '0.0.0.0');
     console.log('Server is up at', res);
 }
 
