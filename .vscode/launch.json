@@ -16,7 +16,8 @@
                 "RESOURCE_BUCKET_NAME": "stitch-resources",
                 "S3_ENDPOINT": "http://localhost:9000",
                 "AWS_ACCESS_KEY_ID": "minioadmin",
-                "AWS_SECRET_ACCESS_KEY": "minioadmin"
+                "AWS_SECRET_ACCESS_KEY": "minioadmin",
+                "PORT": "8080"
             }
         },
         {
@@ -26,7 +27,14 @@
             "program": "${workspaceFolder}/dist/registry.js",
             "preLaunchTask": "tsc: build - tsconfig.json",
             "outFiles": ["${workspaceFolder}/dist/**/*.js"],
-            "skipFiles": ["<node_internals>/**/*.js"]
+            "skipFiles": ["<node_internals>/**/*.js"],
+            "env": {
+                "RESOURCE_BUCKET_NAME": "stitch-resources",
+                "S3_ENDPOINT": "http://localhost:9000",
+                "AWS_ACCESS_KEY_ID": "minioadmin",
+                "AWS_SECRET_ACCESS_KEY": "minioadmin",
+                "PORT": "8090"
+            }
         },
         {
             "type": "node",
