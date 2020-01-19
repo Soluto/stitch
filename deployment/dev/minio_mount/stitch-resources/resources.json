@@ -29,5 +29,6 @@
             "schema": "extend type User @key(fields: \"id\") {\n        id: ID! @external\n        posts: [Post] @rest(url: \"https://jsonplaceholder.typicode.com/posts?userId={source.id}\")\n    }\n\n    type Post {\n        id: ID!\n        title: String!\n        body: String!\n        comments: [Comment] @rest(url: \"https://jsonplaceholder.typicode.com/comments?postId={source.id}\")\n    }\n\n    type Comment {\n        id: ID!\n        name: String!\n        email: String!\n        body: String!\n    }\n    "
         }
     ],
-    "upstreams": []
+    "upstreams": [],
+    "upstreamClientCredentials": []
 }

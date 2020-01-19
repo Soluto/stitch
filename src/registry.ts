@@ -2,10 +2,10 @@ import {ApolloServer, gql, IResolvers} from 'apollo-server-fastify';
 import * as fastify from 'fastify';
 import pLimit from 'p-limit';
 
-import {fetch, update} from './modules/resource-repository';
+import {fetch, update, ResourceGroup} from './modules/resource-repository';
 import {httpPort} from './modules/config';
-import {validateResourceGroup} from './modules/validation';
-import {distinct} from './modules/collectionUtils';
+import {validateResourceGroupOrThrow} from './modules/validation';
+import {applyResourceGroupUpdates} from './modules/resource-repository/util';
 
 const typeDefs = gql`
     # General
@@ -19,17 +19,19 @@ const typeDefs = gql`
     }
 
     type Query {
-        validateSchemas(input: [UpdateSchemasInput!]!): Result
-        validateUpstreams(input: [UpdateUpstreamsInput!]!): Result
+        validateSchemas(input: [SchemaInput!]!): Result
+        validateUpstreams(input: [UpstreamInput!]!): Result
+        validateUpstreamClientCredentials(input: [UpstreamClientCredentialsInput!]!): Result
     }
 
     type Mutation {
-        updateSchemas(input: [UpdateSchemasInput!]!): Result
-        updateUpstreams(input: [UpdateUpstreamsInput!]!): Result
+        updateSchemas(input: [SchemaInput!]!): Result
+        updateUpstreams(input: [UpstreamInput!]!): Result
+        updateUpstreamClientCredentials(input: [UpstreamClientCredentialsInput!]!): Result
     }
 
     # Schemas
-    input UpdateSchemasInput {
+    input SchemaInput {
         metadata: ResourceMetadata!
         schema: String!
     }
@@ -49,10 +51,17 @@ const typeDefs = gql`
         resource: String!
     }
 
-    input UpdateUpstreamsInput {
+    input UpstreamInput {
         metadata: ResourceMetadata!
         host: String!
         auth: Auth!
+    }
+
+    input UpstreamClientCredentialsInput {
+        metadata: ResourceMetadata!
+        auth: Auth!
+        clientId: String!
+        clientSecret: String!
     }
 `;
 
@@ -61,7 +70,7 @@ interface ResourceMetadata {
     name: string;
 }
 
-interface UpdateSchemasInput {
+interface SchemaInput {
     metadata: ResourceMetadata;
     schema: string;
 }
@@ -80,32 +89,23 @@ interface ActiveDirectoryAuth {
     resource: string;
 }
 
-interface UpdateUpstreamsInput {
+interface UpstreamInput {
     metadata: ResourceMetadata;
     host: string;
     auth: Auth;
 }
 
-async function validateSchemas(input: UpdateSchemasInput[]) {
-    const rg = await fetch();
-
-    const schemas = distinct([...rg.schemas, ...input], s => `${s.metadata.namespace}.${s.metadata.name}`);
-
-    const newRg = {...rg, schemas};
-
-    validateResourceGroup(newRg);
-
-    return newRg;
+interface UpstreamClientCredentialsInput {
+    metadata: ResourceMetadata;
+    auth: Auth;
+    clientId: string;
+    clientSecret: string;
 }
 
-async function validateUpstreams(input: UpdateUpstreamsInput[]) {
+async function fetchAndValidate(updates: Partial<ResourceGroup>): Promise<ResourceGroup> {
     const rg = await fetch();
-
-    const upstreams = distinct([...rg.upstreams, ...input], s => `${s.metadata.namespace}.${s.metadata.name}`);
-
-    const newRg = {...rg, upstreams};
-
-    validateResourceGroup(newRg);
+    const newRg = applyResourceGroupUpdates(rg, updates);
+    validateResourceGroupOrThrow(newRg);
 
     return newRg;
 }
@@ -113,31 +113,42 @@ async function validateUpstreams(input: UpdateUpstreamsInput[]) {
 const singleton = pLimit(1);
 const resolvers: IResolvers = {
     Query: {
-        async validateSchemas(_, args: {input: UpdateSchemasInput[]}) {
-            await validateSchemas(args.input);
+        async validateSchemas(_, args: {input: SchemaInput[]}) {
+            await fetchAndValidate({schemas: args.input});
 
             return {success: true};
         },
-        async validateUpstreams(_, args: {input: UpdateUpstreamsInput[]}) {
-            await validateUpstreams(args.input);
+        async validateUpstreams(_, args: {input: UpstreamInput[]}) {
+            await fetchAndValidate({upstreams: args.input});
+
+            return {success: true};
+        },
+        async validateUpstreamClientCredentials(_, args: {input: UpstreamClientCredentialsInput[]}) {
+            await fetchAndValidate({upstreamClientCredentials: args.input});
 
             return {success: true};
         },
     },
     Mutation: {
-        updateSchemas(_, args: {input: UpdateSchemasInput[]}) {
+        updateSchemas(_, args: {input: SchemaInput[]}) {
             return singleton(async () => {
-                const rg = await validateSchemas(args.input);
-
+                const rg = await fetchAndValidate({schemas: args.input});
                 await update(rg);
 
                 return {success: true};
             });
         },
-        updateUpstreams(_, args: {input: UpdateUpstreamsInput[]}) {
+        updateUpstreams(_, args: {input: UpstreamInput[]}) {
             return singleton(async () => {
-                const rg = await validateUpstreams(args.input);
+                const rg = await fetchAndValidate({upstreams: args.input});
+                await update(rg);
 
+                return {success: true};
+            });
+        },
+        updateUpstreamClientCredentials(_, args: {input: UpstreamClientCredentialsInput[]}) {
+            return singleton(async () => {
+                const rg = await fetchAndValidate({upstreamClientCredentials: args.input});
                 await update(rg);
 
                 return {success: true};

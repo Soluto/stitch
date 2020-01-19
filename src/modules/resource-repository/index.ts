@@ -2,6 +2,11 @@ export interface ResourceGroup {
     etag?: string;
     schemas: Schema[];
     upstreams: Upstream[];
+    upstreamClientCredentials: UpstreamClientCredentials[];
+}
+
+export interface Resource {
+    metadata: ResourceMetadata;
 }
 
 export interface ResourceMetadata {
@@ -9,15 +14,19 @@ export interface ResourceMetadata {
     name: string;
 }
 
-export interface Schema {
-    metadata: ResourceMetadata;
+export interface Schema extends Resource {
     schema: string;
 }
 
-export interface Upstream {
-    metadata: ResourceMetadata;
+export interface Upstream extends Resource {
     host: string;
     auth: Auth;
+}
+
+export interface UpstreamClientCredentials extends Resource {
+    auth: Auth;
+    clientId: string;
+    clientSecret: string;
 }
 
 export enum AuthType {

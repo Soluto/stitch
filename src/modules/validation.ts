@@ -21,7 +21,7 @@ const removeNonFederationDirectives = (typeDef: DocumentNode) => {
     );
 };
 
-export function validateResourceGroup(rg: ResourceGroup) {
+export function validateResourceGroupOrThrow(rg: ResourceGroup) {
     const serviceDefs = Object.entries(rg.schemas).map(([name, typeDef]) => {
         const typeDefWithoutDirectives = removeNonFederationDirectives(parse(typeDef.schema));
 
