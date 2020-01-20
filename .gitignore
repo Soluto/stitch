@@ -10,5 +10,4 @@ node_modules/
 .yarn-integrity
 
 dist/
-.vscode/
 deployment/dev/minio_mount/
