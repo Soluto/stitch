@@ -61,11 +61,21 @@ const typeDefs = gql`
         auth: Auth!
     }
 
-    input UpstreamClientCredentialsInput {
-        metadata: ResourceMetadata!
-        auth: Auth!
+    # Upstream client credentials
+    input ActiveDirectoryCredentials {
+        authority: String!
         clientId: String!
         clientSecret: String!
+    }
+
+    """
+    GraphQL doesn't support unions for input types, otherwise this would be a union of different auth types.
+    Instead, the AuthType enum indicates which auth type is needed, and there's a property which corresponds to each auth type, which we validate in the registry.
+    """
+    input UpstreamClientCredentialsInput {
+        metadata: ResourceMetadata!
+        authType: AuthType!
+        activeDirectory: ActiveDirectoryCredentials!
     }
 `;
 
@@ -83,11 +93,6 @@ enum AuthType {
     ActiveDirectory = 'ActiveDirectory',
 }
 
-interface Auth {
-    type: AuthType;
-    activeDirectory: ActiveDirectoryAuth;
-}
-
 interface ActiveDirectoryAuth {
     authority: string;
     resource: string;
@@ -96,14 +101,20 @@ interface ActiveDirectoryAuth {
 interface UpstreamInput {
     metadata: ResourceMetadata;
     host: string;
-    auth: Auth;
+    auth: {
+        type: AuthType;
+        activeDirectory: ActiveDirectoryAuth;
+    };
 }
 
 interface UpstreamClientCredentialsInput {
     metadata: ResourceMetadata;
-    auth: Auth;
-    clientId: string;
-    clientSecret: string;
+    authType: AuthType;
+    activeDirectory: {
+        authority: string;
+        clientId: string;
+        clientSecret: string;
+    };
 }
 
 async function fetchAndValidate(updates: Partial<ResourceGroup>): Promise<ResourceGroup> {

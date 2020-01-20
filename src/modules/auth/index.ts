@@ -7,9 +7,9 @@ export async function getAuthHeaders(context: RequestContext, url: URL) {
         const credentials = context.upstreamClientCredentials.get(upstream.auth.activeDirectory.authority);
         if (typeof credentials !== 'undefined') {
             const token = await context.activeDirectoryAuth.getToken(
-                upstream.auth.activeDirectory.authority,
-                credentials.clientId,
-                credentials.clientSecret,
+                credentials.activeDirectory.authority,
+                credentials.activeDirectory.clientId,
+                credentials.activeDirectory.clientSecret,
                 upstream.auth.activeDirectory.resource
             );
             return {

@@ -9,7 +9,7 @@ export interface Resource {
     metadata: ResourceMetadata;
 }
 
-export interface ResourceMetadata {
+interface ResourceMetadata {
     namespace: string;
     name: string;
 }
@@ -24,21 +24,24 @@ export interface Upstream extends Resource {
 }
 
 export interface UpstreamClientCredentials extends Resource {
-    auth: Auth;
-    clientId: string;
-    clientSecret: string;
+    authType: AuthType;
+    activeDirectory: {
+        authority: string;
+        clientId: string;
+        clientSecret: string;
+    };
 }
 
-export enum AuthType {
+enum AuthType {
     ActiveDirectory = 'ActiveDirectory',
 }
 
-export interface Auth {
+interface Auth {
     type: AuthType;
     activeDirectory: ActiveDirectoryAuth;
 }
 
-export interface ActiveDirectoryAuth {
+interface ActiveDirectoryAuth {
     authority: string;
     resource: string;
 }

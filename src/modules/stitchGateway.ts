@@ -23,7 +23,7 @@ export function createApolloGateway(rg: ResourceGroup): GraphQLService {
     const activeDirectoryAuth = new ActiveDirectoryAuth();
     const upstreamsByHost = new Map(rg.upstreams.map(u => [u.host, u]));
     const upstreamClientCredentialsByAuthority = new Map(
-        rg.upstreamClientCredentials.map(u => [u.auth.activeDirectory.authority, u])
+        rg.upstreamClientCredentials.map(u => [u.activeDirectory.authority, u])
     );
 
     const gateway = new ApolloGateway({
