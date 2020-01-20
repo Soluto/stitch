@@ -1,6 +1,6 @@
 import {from, Subject} from 'rxjs';
 import {GraphQLService} from 'apollo-server-core';
-import {DelegatingGraphQLService} from './delegatingGraphQLService';
+import {DelegatingGraphQLService} from '.';
 import {GraphQLSchema} from 'graphql';
 
 describe('DelegatingGraphQLService', () => {
