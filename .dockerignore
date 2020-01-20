@@ -11,5 +11,5 @@ node_modules/
 
 dist/
 
-deployment/
+deployment/dev
 .vscode/

@@ -6,8 +6,10 @@ services:
             - minio
         ports:
             - 8080:80
-        build: ../..
-        command: dist/gateway.js
+        build:
+            dockerfile: deployment/docker/Dockerfile
+            context: ../..
+        command: gateway
         env_file: .env
         environment:
             PORT: 80
@@ -17,8 +19,10 @@ services:
             - minio
         ports:
             - 8090:80
-        build: ../..
-        command: dist/registry.js
+        build:
+            dockerfile: deployment/docker/Dockerfile
+            context: ../..
+        command: registry
         env_file: .env
         environment:
             PORT: 80
