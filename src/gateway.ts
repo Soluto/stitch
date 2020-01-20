@@ -14,6 +14,9 @@ async function run() {
         gateway,
         subscriptions: false,
         tracing: true,
+        context(request: fastify.FastifyRequest) {
+            return {request};
+        },
         dataSources() {
             return {
                 rest: new RESTDirectiveDataSource(),
@@ -28,3 +31,9 @@ async function run() {
 }
 
 run();
+
+declare module './modules/context' {
+    interface RequestContext {
+        request: fastify.FastifyRequest;
+    }
+}
