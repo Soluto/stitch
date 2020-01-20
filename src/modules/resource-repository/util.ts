@@ -1,6 +1,9 @@
 import {ResourceGroup, Resource} from '.';
 
-function applyResourceUpdates<TResource extends Resource>(resources: TResource[], updates?: TResource[]): TResource[] {
+export function applyResourceUpdates<TResource extends Resource>(
+    resources: TResource[],
+    updates?: TResource[]
+): TResource[] {
     if (updates === undefined) {
         return resources;
     }
@@ -8,7 +11,7 @@ function applyResourceUpdates<TResource extends Resource>(resources: TResource[]
     const newResources = resources.slice();
 
     for (const resourceUpdate of updates) {
-        const existingResourceIndex = updates.findIndex(
+        const existingResourceIndex = newResources.findIndex(
             existing =>
                 existing.metadata.name === resourceUpdate.metadata.name &&
                 existing.metadata.namespace === resourceUpdate.metadata.namespace

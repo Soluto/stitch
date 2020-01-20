@@ -45,3 +45,4 @@ export interface ActiveDirectoryAuth {
 
 export {fetch, update} from './s3';
 export {pollForUpdates} from './stream';
+export {applyResourceGroupUpdates} from './util';

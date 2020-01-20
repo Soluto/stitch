@@ -41,6 +41,10 @@ const typeDefs = gql`
         ActiveDirectory
     }
 
+    """
+    GraphQL doesn't support unions for input types, otherwise this would be a union of different auth types.
+    Instead, the AuthType enum indicates which auth type is needed, and there's a property which corresponds to each auth type, which we validate in the registry.
+    """
     input Auth {
         type: AuthType!
         activeDirectory: ActiveDirectoryAuth!
