@@ -1,7 +1,7 @@
 import {Unsubscriber, GraphQLServiceConfig, SchemaChangeCallback} from 'apollo-server-core';
 import {parse, execute} from 'graphql';
 import {Observable, Subscription} from 'rxjs';
-import {shareReplay, map, take} from 'rxjs/operators';
+import {shareReplay, map, take, tap} from 'rxjs/operators';
 
 import {directiveMap} from './directives';
 import {ResourceGroup, UpstreamClientCredentials, Upstream} from './resource-repository';
@@ -15,22 +15,21 @@ export function createStitchGateway(config: {resourceGroups: Observable<Resource
     let currentSchemaConfig: GraphQLServiceConfig | null = null;
 
     const subscription = new Subscription();
-    const resourceGroupsObs = config.resourceGroups.pipe(
-        map(rg => ({...createSchemaConfig(rg), resourceGroup: rg})),
+    const newSchemaConfigs = config.resourceGroups.pipe(
+        tap(rg => logger.info({etag: rg.etag}, 'Loading new resources')),
+        map(createSchemaConfig),
         shareReplay(1)
     );
     const startListening = () =>
-        subscription.add(
-            resourceGroupsObs.subscribe(schemaConfig => {
-                logger.info({resourceGroupEtag: schemaConfig.resourceGroup.etag}, 'New resources loaded');
-                currentSchemaConfig = schemaConfig;
-            })
-        );
+        newSchemaConfigs.subscribe(schemaConfig => {
+            currentSchemaConfig = schemaConfig;
+            logger.info('New resources loaded');
+        });
 
     return {
         async load(): Promise<GraphQLServiceConfig> {
-            startListening();
-            currentSchemaConfig = await resourceGroupsObs.pipe(take(1)).toPromise();
+            subscription.add(startListening());
+            currentSchemaConfig = await newSchemaConfigs.pipe(take(1)).toPromise();
 
             return {
                 schema: currentSchemaConfig.schema,
@@ -40,7 +39,8 @@ export function createStitchGateway(config: {resourceGroups: Observable<Resource
             };
         },
         onSchemaChange(callback: SchemaChangeCallback): Unsubscriber {
-            const sub = resourceGroupsObs.pipe(map(sc => sc.schema)).subscribe(callback);
+            const sub = newSchemaConfigs.pipe(map(sc => sc.schema)).subscribe(callback);
+            subscription.add(sub);
 
             return sub.unsubscribe.bind(sub);
         },

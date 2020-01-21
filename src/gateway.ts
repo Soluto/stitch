@@ -28,6 +28,8 @@ async function run() {
     app.register(apollo.createHandler({path: '/graphql'}));
     const address = await app.listen(httpPort, '0.0.0.0');
     logger.info({address}, 'Stitch gateway started');
+
+    process.on('beforeExit', () => gateway.dispose());
 }
 
 run();
