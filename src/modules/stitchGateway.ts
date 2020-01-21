@@ -9,21 +9,27 @@ import {buildSchemaFromFederatedTypeDefs} from './buildFederatedSchema';
 import * as baseSchema from './baseSchema';
 import {ActiveDirectoryAuth} from './activeDirectoryAuth';
 import {sdl as directivesSdl} from './directives';
+import logger from './logger';
 
-export function createApolloGateway(config: {resourceGroups: Observable<ResourceGroup>}) {
+export function createStitchGateway(config: {resourceGroups: Observable<ResourceGroup>}) {
     let currentSchemaConfig: GraphQLServiceConfig | null = null;
 
     const subscription = new Subscription();
-    const resourceGroupsObs = config.resourceGroups.pipe(map(createSchemaConfig), shareReplay(1));
-    subscription.add(
-        resourceGroupsObs.subscribe(schemaConfig => {
-            console.log('New schema loaded');
-            currentSchemaConfig = schemaConfig;
-        })
+    const resourceGroupsObs = config.resourceGroups.pipe(
+        map(rg => ({...createSchemaConfig(rg), resourceGroup: rg})),
+        shareReplay(1)
     );
+    const startListening = () =>
+        subscription.add(
+            resourceGroupsObs.subscribe(schemaConfig => {
+                logger.info({resourceGroupEtag: schemaConfig.resourceGroup.etag}, 'New resources loaded');
+                currentSchemaConfig = schemaConfig;
+            })
+        );
 
     return {
         async load(): Promise<GraphQLServiceConfig> {
+            startListening();
             currentSchemaConfig = await resourceGroupsObs.pipe(take(1)).toPromise();
 
             return {

@@ -6,6 +6,7 @@ import {fetch, update, ResourceGroup} from './modules/resource-repository';
 import {httpPort} from './modules/config';
 import {validateResourceGroupOrThrow} from './modules/validation';
 import {applyResourceGroupUpdates} from './modules/resource-repository/util';
+import logger from './modules/logger';
 
 const typeDefs = gql`
     # General
@@ -180,8 +181,8 @@ async function run() {
 
     const app = fastify();
     app.register(apollo.createHandler({path: '/graphql'}));
-    const res = await app.listen(httpPort, '0.0.0.0');
-    console.log('Server is up at', res);
+    const address = await app.listen(httpPort, '0.0.0.0');
+    logger.info({address}, 'Stitch registry started');
 }
 
 run();

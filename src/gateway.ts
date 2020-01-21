@@ -1,12 +1,13 @@
 import {ApolloServer} from 'apollo-server-fastify';
 import * as fastify from 'fastify';
-import {createApolloGateway} from './modules/stitchGateway';
+import {createStitchGateway} from './modules/stitchGateway';
 import {RESTDirectiveDataSource} from './modules/directives/rest';
 import {pollForUpdates} from './modules/resource-repository';
 import {resourceUpdateInterval, httpPort} from './modules/config';
+import logger from './modules/logger';
 
 async function run() {
-    const gateway = createApolloGateway({
+    const gateway = createStitchGateway({
         resourceGroups: pollForUpdates(resourceUpdateInterval),
     });
     const apollo = new ApolloServer({
@@ -25,8 +26,8 @@ async function run() {
 
     const app = fastify();
     app.register(apollo.createHandler({path: '/graphql'}));
-    const res = await app.listen(httpPort, '0.0.0.0');
-    console.log('Server is up at', res);
+    const address = await app.listen(httpPort, '0.0.0.0');
+    logger.info({address}, 'Stitch gateway started');
 }
 
 run();
