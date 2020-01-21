@@ -12,7 +12,6 @@
     "license": "ISC",
     "dependencies": {
         "@apollo/federation": "^0.11.3",
-        "@apollo/gateway": "^0.11.7",
         "apollo-datasource-rest": "^0.6.11",
         "apollo-link-http": "^1.5.16",
         "apollo-server-core": "^2.9.16",
@@ -34,7 +33,6 @@
         "@types/graphql-type-json": "^0.3.2",
         "@types/jest": "^24.9.0",
         "@types/node": "^13.1.7",
-        "concurrently": "^5.0.2",
         "husky": "^4.0.10",
         "jest": "^24.9.0",
         "jest-fetch-mock": "^3.0.1",
