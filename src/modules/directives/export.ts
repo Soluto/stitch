@@ -1,7 +1,7 @@
 import {SchemaDirectiveVisitor} from 'graphql-tools';
 import {gql} from 'apollo-server-core';
 import {GraphQLField, GraphQLInterfaceType, GraphQLObjectType} from 'graphql';
-import {markExport} from '../exportsExtension';
+import {markExport} from '../exports';
 
 export class ExportDirective extends SchemaDirectiveVisitor {
     visitFieldDefinition(

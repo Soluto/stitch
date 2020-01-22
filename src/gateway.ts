@@ -5,7 +5,7 @@ import {RESTDirectiveDataSource} from './modules/directives/rest';
 import {pollForUpdates} from './modules/resource-repository';
 import {resourceUpdateInterval, httpPort} from './modules/config';
 import logger from './modules/logger';
-import {ExportTrackingExtension} from './modules/exportsExtension';
+import {ExportTrackingExtension} from './modules/exports';
 
 async function run() {
     const gateway = createStitchGateway({
