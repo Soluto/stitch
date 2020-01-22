@@ -1,6 +1,6 @@
-import {RequestContext} from '../context';
-import {resolveExport} from '../exports';
 import {GraphQLResolveInfo} from 'graphql';
+import {RequestContext} from './context';
+import {resolveExport} from './exports';
 
 interface GraphQLArguments {
     [key: string]: any;

@@ -1,6 +1,6 @@
 import {GraphQLObjectType, GraphQLResolveInfo, GraphQLField, GraphQLInterfaceType} from 'graphql';
 import {GraphQLExtension} from 'apollo-server-core';
-import {RequestContext} from '../context';
+import {RequestContext} from './context';
 
 function isObject(val: any): val is object {
     return Object(val) === val;
