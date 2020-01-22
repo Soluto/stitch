@@ -7,11 +7,10 @@ import {resourceUpdateInterval, httpPort} from './modules/config';
 import logger from './modules/logger';
 import {ExportTrackingExtension} from './modules/exports';
 
-async function run() {
-    const gateway = createStitchGateway({
-        resourceGroups: pollForUpdates(resourceUpdateInterval),
-    });
-    const apollo = new ApolloServer({
+// exported for integration testing
+export function createApolloServer() {
+    const gateway = createStitchGateway({resourceGroups: pollForUpdates(resourceUpdateInterval)});
+    const server = new ApolloServer({
         gateway,
         extensions: [() => new ExportTrackingExtension()],
         subscriptions: false,
@@ -26,15 +25,30 @@ async function run() {
         },
     });
 
+    return {
+        server,
+        dispose: async () => {
+            await server.stop();
+            gateway.dispose();
+        },
+    };
+}
+
+async function run() {
+    const {server, dispose} = createApolloServer();
+
     const app = fastify();
-    app.register(apollo.createHandler({path: '/graphql'}));
+    app.register(server.createHandler({path: '/graphql'}));
     const address = await app.listen(httpPort, '0.0.0.0');
     logger.info({address}, 'Stitch gateway started');
 
-    process.on('beforeExit', () => gateway.dispose());
+    process.on('beforeExit', dispose);
 }
 
-run();
+// Only run when file is being executed, not when being imported
+if (require.main === module) {
+    run();
+}
 
 declare module './modules/context' {
     interface RequestContext {

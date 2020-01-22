@@ -78,8 +78,15 @@ function validateUpstreams(upstreams: Upstream[]) {
 }
 
 export function validateResourceGroupOrThrow(rg: ResourceGroup) {
-    const errors = validateSchemas(rg.schemas);
-    errors.push(...validateUpstreams(rg.upstreams));
+    const errors: GraphQLError[] = [];
+
+    if (rg.schemas.length > 0) {
+        errors.push(...validateSchemas(rg.schemas));
+    }
+
+    if (rg.upstreams.length > 0) {
+        errors.push(...validateUpstreams(rg.upstreams));
+    }
 
     if (errors.length > 0) {
         throw new ApolloError('Resource validation failed', 'RESOURCE_VALIDATION_FAILURE', {

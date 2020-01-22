@@ -90,7 +90,7 @@ interface SchemaInput {
     schema: string;
 }
 
-enum AuthType {
+export enum AuthType {
     ActiveDirectory = 'ActiveDirectory',
 }
 
@@ -173,16 +173,19 @@ const resolvers: IResolvers = {
     },
 };
 
-async function run() {
-    const apollo = new ApolloServer({
-        typeDefs,
-        resolvers,
-    });
+export const app = new ApolloServer({
+    typeDefs,
+    resolvers,
+});
 
-    const app = fastify();
-    app.register(apollo.createHandler({path: '/graphql'}));
-    const address = await app.listen(httpPort, '0.0.0.0');
+async function run() {
+    const server = fastify();
+    server.register(app.createHandler({path: '/graphql'}));
+    const address = await server.listen(httpPort, '0.0.0.0');
     logger.info({address}, 'Stitch registry started');
 }
 
-run();
+// Only run when file is being executed, not when being imported
+if (require.main === module) {
+    run();
+}
