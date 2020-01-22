@@ -5,6 +5,7 @@ import {RESTDirectiveDataSource} from './modules/directives/rest';
 import {pollForUpdates} from './modules/resource-repository';
 import {resourceUpdateInterval, httpPort} from './modules/config';
 import logger from './modules/logger';
+import {ExportTrackingExtension} from './modules/exportsExtension';
 
 async function run() {
     const gateway = createStitchGateway({
@@ -12,6 +13,7 @@ async function run() {
     });
     const apollo = new ApolloServer({
         gateway,
+        extensions: [() => new ExportTrackingExtension()],
         subscriptions: false,
         tracing: true,
         context(request: fastify.FastifyRequest) {

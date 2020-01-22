@@ -5,9 +5,9 @@ import {RequestContext} from '../../context';
 import {RestParams} from './types';
 
 export class RestDirective extends SchemaDirectiveVisitor {
-    visitFieldDefinition(field: GraphQLField<any, any>) {
-        field.resolve = (parent, args, {dataSources: {rest}}: RequestContext) =>
-            rest.doRequest(this.args as RestParams, parent, args);
+    visitFieldDefinition(field: GraphQLField<any, RequestContext>) {
+        field.resolve = (parent, args, {dataSources: {rest}}, info) =>
+            rest.doRequest(this.args as RestParams, parent, args, info);
     }
 }
 

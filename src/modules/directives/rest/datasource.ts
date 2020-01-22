@@ -3,15 +3,16 @@ import {KeyValue, RestParams} from './types';
 import {injectParameters, resolveParameters} from '../../param-injection';
 import {RequestContext} from '../../context';
 import {RequestInit, Headers, Request} from 'apollo-server-env';
+import {GraphQLResolveInfo} from 'graphql';
 
 type GraphQLArguments = {[key: string]: any};
 
 export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
-    async doRequest(params: RestParams, parent: any, args: GraphQLArguments) {
-        const headers = this.parseHeaders(params.headers, parent, args);
+    async doRequest(params: RestParams, parent: any, args: GraphQLArguments, info: GraphQLResolveInfo) {
+        const headers = this.parseHeaders(params.headers, parent, args, info);
         const requestInit: RequestInit = {headers, timeout: params.timeoutMs, method: params.method};
-        const url = new URL(injectParameters(params.url, parent, args, this.context));
-        this.addQueryParams(url.searchParams, params.query, parent, args);
+        const url = new URL(injectParameters(params.url, parent, args, this.context, info));
+        this.addQueryParams(url.searchParams, params.query, parent, args, info);
 
         requestInit.body = args[params.bodyArg || 'input'];
         if (requestInit.body) {
@@ -26,23 +27,29 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
         return this.didReceiveResponse(response, request);
     }
 
-    parseHeaders(kvs: KeyValue[] | undefined, parent: any, args: GraphQLArguments) {
+    parseHeaders(kvs: KeyValue[] | undefined, parent: any, args: GraphQLArguments, info: GraphQLResolveInfo) {
         const headers = new Headers();
 
         if (typeof kvs !== 'undefined') {
             for (const kv of kvs) {
-                headers.append(kv.key, injectParameters(kv.value, parent, args, this.context));
+                headers.append(kv.key, injectParameters(kv.value, parent, args, this.context, info));
             }
         }
 
         return headers;
     }
 
-    addQueryParams(params: URLSearchParams, kvs: KeyValue[] | undefined, parent: any, args: GraphQLArguments) {
+    addQueryParams(
+        params: URLSearchParams,
+        kvs: KeyValue[] | undefined,
+        parent: any,
+        args: GraphQLArguments,
+        info: GraphQLResolveInfo
+    ) {
         if (!kvs || kvs.length == 0) return;
 
         for (const kv of kvs) {
-            const parameters = resolveParameters(kv.value, parent, args, this.context);
+            const parameters = resolveParameters(kv.value, parent, args, this.context, info);
             if (!parameters) {
                 params.append(kv.key, kv.value);
                 continue;

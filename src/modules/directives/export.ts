@@ -1,19 +1,14 @@
 import {SchemaDirectiveVisitor} from 'graphql-tools';
 import {gql} from 'apollo-server-core';
-import {GraphQLField, defaultFieldResolver} from 'graphql';
-import {writeToContext} from '../param-injection/context';
+import {GraphQLField, GraphQLInterfaceType, GraphQLObjectType} from 'graphql';
+import {markExport} from '../exportsExtension';
 
 export class ExportDirective extends SchemaDirectiveVisitor {
-    visitFieldDefinition(field: GraphQLField<any, any>) {
-        const originalResolve = field.resolve || defaultFieldResolver;
-
-        field.resolve = async (parent, args, context, info) => {
-            const result = await originalResolve(parent, args, context, info);
-
-            writeToContext(context, this.args.key, result);
-
-            return result;
-        };
+    visitFieldDefinition(
+        field: GraphQLField<any, any>,
+        details: {objectType: GraphQLObjectType | GraphQLInterfaceType}
+    ) {
+        markExport(details.objectType, field, this.args.key);
     }
 }
 

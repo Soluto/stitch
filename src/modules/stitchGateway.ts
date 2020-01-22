@@ -78,7 +78,7 @@ function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
                 document: requestContext.document,
                 schema: schema,
                 contextValue: requestContext.context,
-                operationName: requestContext.operationName,
+                operationName: requestContext.operationName ?? requestContext.request.operationName,
                 variableValues: requestContext.request.variables,
             });
         },

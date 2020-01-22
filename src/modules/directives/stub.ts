@@ -7,7 +7,7 @@ export class StubDirective extends SchemaDirectiveVisitor {
     visitFieldDefinition(field: GraphQLField<any, any>) {
         const {value} = this.args;
 
-        field.resolve = (parent, args, context) => injectParameters(value, parent, args, context);
+        field.resolve = (parent, args, context, info) => injectParameters(value, parent, args, context, info);
     }
 }
 

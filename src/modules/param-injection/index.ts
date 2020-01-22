@@ -1,12 +1,19 @@
-import {readFromContext} from './context';
 import {RequestContext} from '../context';
+import {resolveExport} from '../exportsExtension';
+import {GraphQLResolveInfo} from 'graphql';
 
 interface GraphQLArguments {
     [key: string]: any;
 }
 const paramRegex = /{(\w+\.\w+)}/g;
 
-function resolveTemplate(template: string, parent: any, args: GraphQLArguments, context: RequestContext) {
+function resolveTemplate(
+    template: string,
+    parent: any,
+    args: GraphQLArguments,
+    _context: RequestContext,
+    info: GraphQLResolveInfo
+) {
     const [sourceName, propName] = template.split('.');
 
     switch (sourceName.toLowerCase()) {
@@ -15,17 +22,29 @@ function resolveTemplate(template: string, parent: any, args: GraphQLArguments, 
         case 'args':
             return args && args[propName];
         case 'exports':
-            return readFromContext(context, propName);
+            return resolveExport(info.parentType, parent, propName);
         default:
             return null;
     }
 }
 
-export function injectParameters(template: string, parent: any, args: GraphQLArguments, context: RequestContext) {
-    return template.replace(paramRegex, (_, match) => resolveTemplate(match, parent, args, context));
+export function injectParameters(
+    template: string,
+    parent: any,
+    args: GraphQLArguments,
+    context: RequestContext,
+    info: GraphQLResolveInfo
+) {
+    return template.replace(paramRegex, (_, match) => resolveTemplate(match, parent, args, context, info));
 }
 
-export function resolveParameters(template: string, parent: any, args: GraphQLArguments, context: RequestContext) {
+export function resolveParameters(
+    template: string,
+    parent: any,
+    args: GraphQLArguments,
+    context: RequestContext,
+    info: GraphQLResolveInfo
+) {
     let foundMatches = false;
     const matches = template.matchAll(paramRegex);
 
@@ -38,7 +57,7 @@ export function resolveParameters(template: string, parent: any, args: GraphQLAr
             continue;
         }
 
-        parameters[group] = resolveTemplate(group, parent, args, context);
+        parameters[group] = resolveTemplate(group, parent, args, context, info);
     }
 
     return foundMatches ? parameters : null;
@@ -48,7 +67,8 @@ export function injectParametersToObject(
     obj: {[key: string]: any},
     parent: any,
     args: GraphQLArguments,
-    context: RequestContext
+    context: RequestContext,
+    info: GraphQLResolveInfo
 ) {
     const newObj = {...obj};
 
@@ -56,9 +76,9 @@ export function injectParametersToObject(
         const value = obj[key];
 
         if (typeof value === 'string') {
-            newObj[key] = injectParameters(value, parent, args, context);
+            newObj[key] = injectParameters(value, parent, args, context, info);
         } else if (isObject(value)) {
-            newObj[key] = injectParametersToObject(value, parent, args, context);
+            newObj[key] = injectParametersToObject(value, parent, args, context, info);
         }
     }
 

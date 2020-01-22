@@ -17,7 +17,7 @@ export class GqlDirective extends SchemaDirectiveVisitor {
                 schema: await remoteSchema, // TODO: Take this "await" outside of the hot path somehow
                 operation: operationType,
                 fieldName,
-                args: injectParametersToObject(gqlArgs, parent, args, context),
+                args: injectParametersToObject(gqlArgs, parent, args, context, info),
                 context,
                 info,
             });
