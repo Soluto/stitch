@@ -1,1 +1,7 @@
 docker_compose('./docker-compose.yml')
+docker_build('local.dev/stitch', '../..',
+  dockerfile='Dockerfile',
+  live_update = [
+    sync('../..', '/service'),
+    run('npm install', trigger='package.json'),
+  ])

@@ -2,27 +2,23 @@ version: '3.7'
 
 services:
     gateway:
+        image: local.dev/stitch
         depends_on:
             - minio
         ports:
             - 8080:80
-        build:
-            dockerfile: deployment/docker/Dockerfile
-            context: ../..
-        command: gateway
+        command: npm run start:gateway:watch
         env_file: .env
         environment:
             PORT: 80
 
     registry:
+        image: local.dev/stitch
         depends_on:
             - minio
         ports:
             - 8090:80
-        build:
-            dockerfile: deployment/docker/Dockerfile
-            context: ../..
-        command: registry
+        command: npm run start:registry:watch
         env_file: .env
         environment:
             PORT: 80
