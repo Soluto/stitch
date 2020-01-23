@@ -12,7 +12,7 @@ describe('REST directive data source', () => {
     });
 
     it('Defaults to GET', async () => {
-        await ds.doRequest({url: 'http://somewhere'}, null, {});
+        await ds.doRequest({url: 'http://somewhere'}, null, {}, {} as any);
 
         expect(fetchMock).toHaveBeenCalledTimes(1);
         const req = fetchMock.mock.calls[0][0] as Request;
@@ -31,7 +31,8 @@ describe('REST directive data source', () => {
                 ],
             },
             {children: ['one', 'two', 3]},
-            {name: 'aviv'}
+            {name: 'aviv'},
+            {} as any
         );
 
         expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -49,7 +50,8 @@ describe('REST directive data source', () => {
                 ],
             },
             null,
-            {name: 'aviv'}
+            {name: 'aviv'},
+            {} as any
         );
 
         expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -70,7 +72,8 @@ describe('REST directive data source', () => {
                         method,
                     },
                     null,
-                    {}
+                    {},
+                    {} as any
                 );
 
                 expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -88,7 +91,8 @@ describe('REST directive data source', () => {
                 bodyArg: 'input',
             },
             null,
-            {input: {name: 'aviv'}}
+            {input: {name: 'aviv'}},
+            {} as any
         );
 
         expect(fetchMock).toHaveBeenCalledTimes(1);
