@@ -8,3 +8,6 @@ lerna-debug.log*
 node_modules/
 *.tsbuildinfo
 .yarn-integrity
+
+dist/
+deployment/dev/minio_mount/.minio.sys

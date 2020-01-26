@@ -36,13 +36,10 @@
         "@types/node": "^13.1.8",
         "@types/pino": "^5.15.3",
         "apollo-server-testing": "^2.9.16",
-        "husky": "^4.0.10",
         "jest": "^24.9.0",
         "jest-fetch-mock": "^3.0.1",
         "nock": "^11.7.2",
         "pino-pretty": "^3.5.0",
-        "prettier": "^1.19.1",
-        "pretty-quick": "^2.0.1",
         "ts-jest": "^24.3.0",
         "ts-node-dev": "^1.0.0-pre.44",
         "typescript": "^3.7.5"
