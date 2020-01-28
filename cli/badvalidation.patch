@@ -1,0 +1,169 @@
+diff --git a/services/src/integration/registry/create-invalid-schemas.spec.ts b/services/src/integration/registry/create-invalid-schemas.spec.ts
+index 5de6cf4..ad786c2 100644
+--- a/services/src/integration/registry/create-invalid-schemas.spec.ts
++++ b/services/src/integration/registry/create-invalid-schemas.spec.ts
+@@ -11,6 +11,16 @@ const badSdlSchema = {
+     schema: 'type Query { something: String! ',
+ };
+ 
++const badDirectiveSchema = {
++    metadata: {namespace: 'namespace', name: 'name'},
++    schema: 'type Query { something: String! @mySpecialIntegrationTestingDirective }',
++};
++
++const badTyperefSchema = {
++    metadata: {namespace: 'namespace', name: 'name'},
++    schema: 'type Query { something: SomeTypeThatDoesNotExist! }',
++};
++
+ const badFederationSchemas = [
+     {
+         metadata: {namespace: 'namespace', name: 'basePerson'},
+@@ -41,7 +51,7 @@ describe('Creation of invalid schemas', () => {
+         return () => nock.cleanAll();
+     });
+ 
+-    it('Invalid SDL in schema gets rejected', async () => {
++    it('Invalid SDL in schema - rejected', async () => {
+         const response = await client.mutate({
+             mutation: gql`
+                 mutation CreateSchema($schema: SchemaInput!) {
+@@ -60,7 +70,49 @@ describe('Creation of invalid schemas', () => {
+         expect(response.errors).not.toBeUndefined();
+     });
+ 
+-    it('Bad federation composition in schema gets rejected', async () => {
++    it('Unknown directive used - rejected', async () => {
++        const response = await client.mutate({
++            mutation: gql`
++                mutation CreateSchema($schema: SchemaInput!) {
++                    updateSchemas(input: [$schema]) {
++                        success
++                    }
++                }
++            `,
++            variables: {
++                schema: badDirectiveSchema,
++            },
++        });
++
++        expect(response.errors).toHaveProperty([0, 'message'], 'Resource validation failed');
++        expect(response.errors).toHaveProperty(
++            [0, 'extensions', 'errors', 0, 'message'],
++            'Unknown directive "mySpecialIntegrationTestingDirective".'
++        );
++        expect(response.errors).toHaveLength(1);
++        expect(response.errors).not.toBeUndefined();
++    });
++
++    it('Unknown type used - rejected', async () => {
++        const response = await client.mutate({
++            mutation: gql`
++                mutation CreateSchema($schema: SchemaInput!) {
++                    updateSchemas(input: [$schema]) {
++                        success
++                    }
++                }
++            `,
++            variables: {
++                schema: badTyperefSchema,
++            },
++        });
++
++        expect(response.errors).toHaveProperty([0, 'message'], 'Unknown type: "SomeTypeThatDoesNotExist".');
++        expect(response.errors).toHaveLength(1);
++        expect(response.errors).not.toBeUndefined();
++    });
++
++    it('Bad federation composition in schema - rejected', async () => {
+         const response = await client.mutate({
+             mutation: gql`
+                 mutation CreateSchema($schemas: [SchemaInput!]!) {
+diff --git a/services/src/modules/validation.ts b/services/src/modules/validation.ts
+index bce6314..530302c 100644
+--- a/services/src/modules/validation.ts
++++ b/services/src/modules/validation.ts
+@@ -1,4 +1,4 @@
+-import {gql, ApolloError} from 'apollo-server-fastify';
++import {gql, ApolloError, makeExecutableSchema} from 'apollo-server-fastify';
+ import {parse, DocumentNode, visit, print, GraphQLError} from 'graphql';
+ import {composeAndValidate} from '@apollo/federation';
+ import federationDirectives from '@apollo/federation/dist/directives';
+@@ -6,6 +6,32 @@ import federationDirectives from '@apollo/federation/dist/directives';
+ import {ResourceGroup, Schema, Upstream} from './resource-repository';
+ import * as baseSchema from './baseSchema';
+ 
++// Copied from https://www.apollographql.com/docs/apollo-server/federation/federation-spec/#federation-schema-specification
++const federationDirectivesSdl = gql`
++    scalar _Any
++    scalar _FieldSet
++
++    # a union of all types that use the @key directive
++    union _Entity
++
++    type _Service {
++        sdl: String
++    }
++
++    extend type Query {
++        _entities(representations: [_Any!]!): [_Entity]!
++        _service: _Service!
++    }
++
++    directive @external on FIELD_DEFINITION
++    directive @requires(fields: _FieldSet!) on FIELD_DEFINITION
++    directive @provides(fields: _FieldSet!) on FIELD_DEFINITION
++    directive @key(fields: _FieldSet!) on OBJECT | INTERFACE
++
++    # this is an optional directive discussed below
++    directive @extends on OBJECT | INTERFACE
++`;
++
+ const removeNonFederationDirectives = (typeDef: DocumentNode) => {
+     // If we don't print and re-parse, some old bits of the directives still remain in the data structure <_<
+     return parse(
+@@ -21,12 +47,13 @@ const removeNonFederationDirectives = (typeDef: DocumentNode) => {
+     );
+ };
+ 
+-function validateSchemas(schemas: Schema[]) {
++function validateFederation(schemas: Schema[]) {
+     const serviceDefs = Object.entries(schemas).map(([name, typeDef]) => {
+         const typeDefWithoutDirectives = removeNonFederationDirectives(parse(typeDef.schema));
+ 
++        // concatAST([baseSchema.typeDef, typeDefWithoutDirectives])
+         const finalTypeDef = gql`
+-            ${baseSchema.baseTypeDef}
++            ${baseSchema.typeDef}
+             ${typeDefWithoutDirectives}
+         `;
+ 
+@@ -40,6 +67,20 @@ function validateSchemas(schemas: Schema[]) {
+     return composeResults.errors;
+ }
+ 
++function validateSchemas(schemas: Schema[]) {
++    const errors: GraphQLError[] = [];
++
++    for (const schema of schemas) {
++        try {
++            makeExecutableSchema({typeDefs: [baseSchema.typeDef, federationDirectivesSdl, schema.schema]});
++        } catch (err) {
++            errors.push(err);
++        }
++    }
++
++    return errors;
++}
++
+ function validateUpstreams(upstreams: Upstream[]) {
+     const errors: GraphQLError[] = [];
+ 
+@@ -81,6 +122,7 @@ export function validateResourceGroupOrThrow(rg: ResourceGroup) {
+     const errors: GraphQLError[] = [];
+ 
+     if (rg.schemas.length > 0) {
++        errors.push(...validateFederation(rg.schemas));
+         errors.push(...validateSchemas(rg.schemas));
+     }
+ 

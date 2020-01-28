@@ -1,0 +1,11 @@
+{
+    "name": "stitch-package",
+    "version": "1.0.0",
+    "description": "Stitch main workspace package",
+    "devDependencies": {
+        "husky": "^4.2.1",
+        "pretty-quick": "^2.0.1",
+        "prettier": "^1.19.1"
+    },
+    "license": "MIT"
+}
