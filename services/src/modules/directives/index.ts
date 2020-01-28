@@ -1,4 +1,4 @@
-import {gql} from 'apollo-server-core';
+import {concatAST} from 'graphql';
 import {SchemaDirectiveVisitor} from 'graphql-tools';
 import {sdl as stubSdl, StubDirective} from './stub';
 import {sdl as restSdl, RestDirective} from './rest';
@@ -12,9 +12,4 @@ export const directiveMap: {[visitorName: string]: typeof SchemaDirectiveVisitor
     export: ExportDirective,
 };
 
-export const sdl = gql`
-    ${stubSdl}
-    ${restSdl}
-    ${gqlSdl}
-    ${exportSdl}
-`;
+export const sdl = concatAST([stubSdl, restSdl, gqlSdl, exportSdl]);

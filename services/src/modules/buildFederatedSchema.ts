@@ -14,14 +14,14 @@ import {
     DirectiveNode,
     printSchema,
     parse,
-    print,
     GraphQLError,
+    concatAST,
 } from 'graphql';
 import {makeExecutableSchema, SchemaDirectiveVisitor} from 'graphql-tools';
 import {composeAndValidate} from '@apollo/federation';
 import {federationDirectives} from '@apollo/federation/dist/directives';
 import {GraphQLResolverMap} from 'apollo-graphql';
-import {gql, ApolloError} from 'apollo-server-core';
+import {ApolloError} from 'apollo-server-core';
 
 interface DirectiveVisitors {
     [directiveName: string]: typeof SchemaDirectiveVisitor;
@@ -52,10 +52,7 @@ export function buildSchemaFromFederatedTypeDefs({
 
         return {
             directivesUsages,
-            typeDefs: gql`
-                ${baseTypeDefs}
-                ${print(typeDef)}
-            `,
+            typeDefs: concatAST([baseTypeDefs, typeDef]),
             name,
             url: `https://stitch/${name}`,
         };
@@ -78,10 +75,7 @@ export function buildSchemaFromFederatedTypeDefs({
 
     // Create final schema, re-adding directive definitions and directive implementations
     const schema = makeExecutableSchema({
-        typeDefs: gql`
-            ${directiveTypeDefs}
-            ${fullTypeDefWithDirectives}
-        `,
+        typeDefs: [directiveTypeDefs, fullTypeDefWithDirectives],
         resolvers,
         schemaDirectives,
     });
@@ -90,29 +84,25 @@ export function buildSchemaFromFederatedTypeDefs({
 }
 
 function addDirectivesToTypedefs(directives: DirectivesUsagesByObjectAndFieldNames, typeDef: DocumentNode) {
-    return print(
-        visit(typeDef, {
-            FieldDefinition(node, _key, _parent, _path, ancestors) {
-                const objectNode = ancestors[ancestors.length - 1] as ASTNode;
-                if (!isObjectOrInterfaceOrExtensionOfThose(objectNode)) {
-                    throw new Error(
-                        `Expected {Object,Interface}Type{Definition,Extension}Node, found ${objectNode.kind}`
-                    );
-                }
+    return visit(typeDef, {
+        FieldDefinition(node, _key, _parent, _path, ancestors) {
+            const objectNode = ancestors[ancestors.length - 1] as ASTNode;
+            if (!isObjectOrInterfaceOrExtensionOfThose(objectNode)) {
+                throw new Error(`Expected {Object,Interface}Type{Definition,Extension}Node, found ${objectNode.kind}`);
+            }
 
-                const fieldDirectives =
-                    directives[objectNode.name.value] && directives[objectNode.name.value][node.name.value];
+            const fieldDirectives =
+                directives[objectNode.name.value] && directives[objectNode.name.value][node.name.value];
 
-                if (!fieldDirectives || fieldDirectives.length === 0) {
-                    return;
-                }
+            if (!fieldDirectives || fieldDirectives.length === 0) {
+                return;
+            }
 
-                const existingDirectives = node.directives ?? [];
+            const existingDirectives = node.directives ?? [];
 
-                return {...node, directives: [...existingDirectives, ...fieldDirectives]};
-            },
-        })
-    );
+            return {...node, directives: [...existingDirectives, ...fieldDirectives]};
+        },
+    });
 }
 
 export function collectAndRemoveCustomDirectives(typeDef: DocumentNode) {
