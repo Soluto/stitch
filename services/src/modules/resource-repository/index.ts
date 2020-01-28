@@ -20,7 +20,13 @@ export interface Schema extends Resource {
 
 export interface Upstream extends Resource {
     host: string;
-    auth: Auth;
+    auth: {
+        type: AuthType;
+        activeDirectory: {
+            authority: string;
+            resource: string;
+        };
+    };
 }
 
 export interface UpstreamClientCredentials extends Resource {
@@ -34,16 +40,6 @@ export interface UpstreamClientCredentials extends Resource {
 
 enum AuthType {
     ActiveDirectory = 'ActiveDirectory',
-}
-
-interface Auth {
-    type: AuthType;
-    activeDirectory: ActiveDirectoryAuth;
-}
-
-interface ActiveDirectoryAuth {
-    authority: string;
-    resource: string;
 }
 
 export {fetch, update} from './s3';

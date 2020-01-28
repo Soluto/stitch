@@ -1,12 +1,12 @@
 import * as pino from 'pino';
 import {logLevel, nodeEnv} from './config';
 
-const loggerConfig = {
+const loggerConfig: pino.LoggerOptions = {
     level: logLevel.toLowerCase(),
     messageKey: 'message',
 };
 
-const devLoggerConfig = {
+const devLoggerConfig: pino.LoggerOptions = {
     level: 'debug',
     prettyPrint: {
         colorize: true,
