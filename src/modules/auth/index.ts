@@ -6,15 +6,21 @@ export async function getAuthHeaders(context: RequestContext, url: URL) {
     if (typeof upstream !== 'undefined') {
         const credentials = context.upstreamClientCredentials.get(upstream.auth.activeDirectory.authority);
         if (typeof credentials !== 'undefined') {
-            const token = await context.activeDirectoryAuth.getToken(
-                credentials.activeDirectory.authority,
-                credentials.activeDirectory.clientId,
-                credentials.activeDirectory.clientSecret,
-                upstream.auth.activeDirectory.resource
-            );
-            return {
-                Authorization: `Bearer ${token}`,
-            };
+            try {
+                const token = await context.activeDirectoryAuth.getToken(
+                    credentials.activeDirectory.authority,
+                    credentials.activeDirectory.clientId,
+                    credentials.activeDirectory.clientSecret,
+                    upstream.auth.activeDirectory.resource
+                );
+
+                return {
+                    Authorization: `Bearer ${token}`,
+                };
+            } catch (ex) {
+                console.error(ex);
+                throw ex;
+            }
         }
     }
 

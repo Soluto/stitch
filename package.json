@@ -13,6 +13,7 @@
     "dependencies": {
         "@apollo/federation": "^0.11.3",
         "apollo-datasource-rest": "^0.6.11",
+        "apollo-link-context": "^1.0.19",
         "apollo-link-http": "^1.5.16",
         "apollo-server-core": "^2.9.16",
         "apollo-server-fastify": "^2.9.16",
