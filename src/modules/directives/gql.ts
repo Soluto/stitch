@@ -6,6 +6,7 @@ import {setContext} from 'apollo-link-context';
 import fetch from 'node-fetch';
 import {injectParametersToObject} from '../param-injection';
 import {getAuthHeaders} from '../auth';
+import logger from '../logger';
 
 export class GqlDirective extends SchemaDirectiveVisitor {
     visitFieldDefinition(field: GraphQLField<any, any>) {
@@ -13,11 +14,10 @@ export class GqlDirective extends SchemaDirectiveVisitor {
         const operationType = operationTypeParam?.toLowerCase() ?? 'query';
 
         const http = new HttpLink({uri: url, fetch: fetch as any});
-        let schemaInitialized = false;
-        let remoteSchema = {} as GraphQLSchema;
+        let remoteSchema: GraphQLSchema | null;
 
         field.resolve = async (parent, args, context, info) => {
-            if (!schemaInitialized) {
+            if (remoteSchema == null) {
                 const link = setContext(async () => ({
                     headers: await getAuthHeaders(context, new URL(url)),
                 })).concat(http);
@@ -25,14 +25,13 @@ export class GqlDirective extends SchemaDirectiveVisitor {
                 remoteSchema = await introspectSchema(link)
                     .then(schema => makeRemoteExecutableSchema({schema, link}))
                     .catch(ex => {
-                        console.error(ex);
+                        logger.error('Failed to introspect GQL schema', ex);
                         throw ex;
                     });
-                schemaInitialized = true;
             }
 
             return await delegateToSchema({
-                schema: remoteSchema,
+                schema: remoteSchema as GraphQLSchema,
                 operation: operationType,
                 fieldName,
                 args: injectParametersToObject(gqlArgs, parent, args, context, info),

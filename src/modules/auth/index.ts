@@ -1,4 +1,5 @@
 import {RequestContext} from '../context';
+import logger from '../logger';
 
 export async function getAuthHeaders(context: RequestContext, url: URL) {
     // Try AD auth
@@ -18,7 +19,7 @@ export async function getAuthHeaders(context: RequestContext, url: URL) {
                     Authorization: `Bearer ${token}`,
                 };
             } catch (ex) {
-                console.error(ex);
+                logger.error('Failed to authenticate with Active Directory', ex);
                 throw ex;
             }
         }
