@@ -4,7 +4,7 @@ import {injectParameters, resolveParameters} from '../../param-injection';
 import {RequestContext} from '../../context';
 import {RequestInit, Headers, Request} from 'apollo-server-env';
 import {GraphQLResolveInfo} from 'graphql';
-import {getAuthHeaders} from '../../auth';
+import {getAuthHeaders} from '../../auth/getAuthHeaders';
 
 type GraphQLArguments = {[key: string]: any};
 
@@ -15,7 +15,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
         const url = new URL(injectParameters(params.url, parent, args, this.context, info));
         this.addQueryParams(url.searchParams, params.query, parent, args, info);
 
-        const authHeaders = await getAuthHeaders(this.context, url);
+        const authHeaders = await getAuthHeaders(this.context.authenticationConfig, url.host, this.context.request);
         if (authHeaders != null) {
             headers.append('Authorization', authHeaders.Authorization);
         }

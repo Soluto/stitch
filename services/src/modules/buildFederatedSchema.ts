@@ -33,6 +33,7 @@ interface FederatedSchemaBase {
     directiveTypeDefs: DocumentNode;
     resolvers: GraphQLResolverMap;
     schemaDirectives: DirectiveVisitors;
+    schemaDirectivesContext: Record<string, any>;
 }
 
 type DirectivesUsagesByObjectAndFieldNames = Record<string, Record<string, DirectiveNode[]>>;
@@ -43,6 +44,7 @@ export function buildSchemaFromFederatedTypeDefs({
     baseTypeDefs,
     directiveTypeDefs,
     schemaDirectives,
+    schemaDirectivesContext,
 }: FederatedSchemaBase) {
     // Federation throws away non federation/builtin directives, so we need to do some shenanigans here
 
@@ -77,8 +79,9 @@ export function buildSchemaFromFederatedTypeDefs({
     const schema = makeExecutableSchema({
         typeDefs: [directiveTypeDefs, fullTypeDefWithDirectives],
         resolvers,
-        schemaDirectives,
     });
+
+    SchemaDirectiveVisitor.visitSchemaDirectives(schema, schemaDirectives, schemaDirectivesContext);
 
     return schema;
 }

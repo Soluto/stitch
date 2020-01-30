@@ -4,12 +4,13 @@ import {Observable, Subscription} from 'rxjs';
 import {shareReplay, map, take, tap, catchError, skip} from 'rxjs/operators';
 
 import {directiveMap} from './directives';
-import {ResourceGroup, UpstreamClientCredentials, Upstream} from './resource-repository';
+import {ResourceGroup} from './resource-repository';
 import {buildSchemaFromFederatedTypeDefs} from './buildFederatedSchema';
 import * as baseSchema from './baseSchema';
-import {ActiveDirectoryAuth} from './activeDirectoryAuth';
+import {ActiveDirectoryAuth} from './auth/activeDirectoryAuth';
 import {sdl as directivesSdl} from './directives';
 import logger from './logger';
+import {AuthenticationConfig} from './auth/types';
 
 export function createStitchGateway(config: {resourceGroups: Observable<ResourceGroup>}) {
     let currentSchemaConfig: GraphQLServiceConfig | null = null;
@@ -61,6 +62,16 @@ function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
         rg.upstreamClientCredentials.map(u => [u.activeDirectory.authority, u])
     );
 
+    const authenticationConfig: AuthenticationConfig = {
+        getUpstreamByHost(host: string) {
+            return upstreamsByHost.get(host);
+        },
+        getUpstreamClientCredentialsByAuthority(authority: string) {
+            return upstreamClientCredentialsByAuthority.get(authority);
+        },
+        activeDirectoryAuth,
+    };
+
     const schema = buildSchemaFromFederatedTypeDefs({
         typeDefs: Object.fromEntries(
             rg.schemas.map(s => [`${s.metadata.namespace}/${s.metadata.name}`, parse(s.schema)])
@@ -69,14 +80,13 @@ function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
         directiveTypeDefs: directivesSdl,
         resolvers: baseSchema.resolvers,
         schemaDirectives: directiveMap,
+        schemaDirectivesContext: {authenticationConfig},
     });
 
     return {
         schema,
         executor(requestContext) {
-            requestContext.context.upstreams = upstreamsByHost;
-            requestContext.context.upstreamClientCredentials = upstreamClientCredentialsByAuthority;
-            requestContext.context.activeDirectoryAuth = activeDirectoryAuth;
+            requestContext.context.authenticationConfig = authenticationConfig;
 
             return execute({
                 document: requestContext.document,
@@ -91,8 +101,6 @@ function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
 
 declare module './context' {
     interface RequestContext {
-        upstreams: Map<string, Upstream>; // By host
-        upstreamClientCredentials: Map<string, UpstreamClientCredentials>; // By authority
-        activeDirectoryAuth: ActiveDirectoryAuth;
+        authenticationConfig: AuthenticationConfig;
     }
 }
