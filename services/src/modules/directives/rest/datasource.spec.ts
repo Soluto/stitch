@@ -1,14 +1,19 @@
 import 'jest-fetch-mock';
-import {RESTDirectiveDataSource} from './datasource';
 import {InMemoryLRUCache} from 'apollo-server-caching';
+import {RESTDirectiveDataSource} from './datasource';
+jest.mock('../../logger');
 
+const emptyContext = {
+    upstreams: new Map(),
+    request: {headers: {}},
+};
 describe('REST directive data source', () => {
     let ds: RESTDirectiveDataSource;
 
     beforeEach(() => {
         fetchMock.resetMocks();
         ds = new RESTDirectiveDataSource(fetchMock as any);
-        ds.initialize({context: {} as any, cache: new InMemoryLRUCache()});
+        ds.initialize({context: emptyContext as any, cache: new InMemoryLRUCache()});
     });
 
     it('Defaults to GET', async () => {
