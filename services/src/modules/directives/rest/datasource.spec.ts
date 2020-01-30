@@ -4,7 +4,9 @@ import {RESTDirectiveDataSource} from './datasource';
 jest.mock('../../logger');
 
 const emptyContext = {
-    upstreams: new Map(),
+    authenticationConfig: {
+        getUpstreamByHost() {},
+    },
     request: {headers: {}},
 };
 describe('REST directive data source', () => {
