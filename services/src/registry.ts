@@ -210,6 +210,9 @@ async function run() {
     server.register(app.createHandler({path: '/graphql'}));
     const address = await server.listen(httpPort, '0.0.0.0');
     logger.info({address}, 'Stitch registry started');
+
+    handleSignals(() => app.stop());
+    handleUncaughtErrors();
 }
 
 // Only run when file is being executed, not when being imported

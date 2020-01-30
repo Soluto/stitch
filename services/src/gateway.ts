@@ -6,6 +6,7 @@ import {pollForUpdates} from './modules/resource-repository';
 import {resourceUpdateInterval, httpPort} from './modules/config';
 import logger from './modules/logger';
 import {ExportTrackingExtension} from './modules/exports';
+import {handleSignals, handleUncaughtErrors} from './modules/shutdownHandler';
 
 // exported for integration testing
 export function createApolloServer() {
@@ -42,7 +43,8 @@ async function run() {
     const address = await app.listen(httpPort, '0.0.0.0');
     logger.info({address}, 'Stitch gateway started');
 
-    process.on('beforeExit', dispose);
+    handleSignals(dispose);
+    handleUncaughtErrors();
 }
 
 // Only run when file is being executed, not when being imported
