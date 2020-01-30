@@ -26,7 +26,7 @@ export async function getAuthHeaders(context: RequestContext, url: URL) {
     }
 
     // If AD auth doesn't apply, pass along the header we got from the request
-    const incomingAuthHeader = context.request.headers['authorization'];
+    const incomingAuthHeader = context.request.headers?.['authorization'];
     if (incomingAuthHeader) {
         return {
             Authorization: incomingAuthHeader as string,
