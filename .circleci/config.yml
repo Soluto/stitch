@@ -1,0 +1,36 @@
+version: 2.1
+orbs:
+    docker: circleci/docker@0.5.20
+executors:
+    linux:
+        machine:
+            image: ubuntu-1604:201903-01
+workflows:
+    version: 2
+    build_push:
+        jobs:
+            - docker/publish:
+                  executor: linux
+                  deploy: false
+                  docker-username: DOCKERHUB_USERNAME
+                  docker-password: DOCKERHUB_PASSWORD
+                  image: soluto/stitch
+                  path: ./services
+                  dockerfile: deployment/docker/Dockerfile
+                  filters:
+                      branches:
+                          ignore:
+                              - stitch
+            - docker/publish:
+                  executor: linux
+                  deploy: true
+                  docker-username: DOCKERHUB_USERNAME
+                  docker-password: DOCKERHUB_PASSWORD
+                  image: soluto/stitch
+                  path: ./services
+                  dockerfile: deployment/docker/Dockerfile
+                  tag: '$CIRCLE_SHA1,latest'
+                  filters:
+                      branches:
+                          only:
+                              - stitch

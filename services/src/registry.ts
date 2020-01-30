@@ -19,13 +19,21 @@ const typeDefs = gql`
         success: Boolean!
     }
 
+    input ResourceGroupInput {
+        schemas: [SchemaInput!]
+        upstreams: [UpstreamInput!]
+        upstreamClientCredentials: [UpstreamClientCredentialsInput!]
+    }
+
     type Query {
+        validateResourceGroup(input: ResourceGroupInput!): Result
         validateSchemas(input: [SchemaInput!]!): Result
         validateUpstreams(input: [UpstreamInput!]!): Result
         validateUpstreamClientCredentials(input: [UpstreamClientCredentialsInput!]!): Result
     }
 
     type Mutation {
+        updateResourceGroup(input: ResourceGroupInput!): Result
         updateSchemas(input: [SchemaInput!]!): Result
         updateUpstreams(input: [UpstreamInput!]!): Result
         updateUpstreamClientCredentials(input: [UpstreamClientCredentialsInput!]!): Result
@@ -85,6 +93,12 @@ interface ResourceMetadata {
     name: string;
 }
 
+interface ResourceGroupInput {
+    schemas?: SchemaInput[];
+    upstreams?: UpstreamInput[];
+    upstreamClientCredentials?: UpstreamClientCredentialsInput[];
+}
+
 interface SchemaInput {
     metadata: ResourceMetadata;
     schema: string;
@@ -129,6 +143,11 @@ async function fetchAndValidate(updates: Partial<ResourceGroup>): Promise<Resour
 const singleton = pLimit(1);
 const resolvers: IResolvers = {
     Query: {
+        async validateResourceGroup(_, args: {input: ResourceGroupInput}) {
+            await fetchAndValidate(args.input);
+
+            return {success: true};
+        },
         async validateSchemas(_, args: {input: SchemaInput[]}) {
             await fetchAndValidate({schemas: args.input});
 
@@ -146,6 +165,14 @@ const resolvers: IResolvers = {
         },
     },
     Mutation: {
+        updateResourceGroup(_, args: {input: ResourceGroupInput}) {
+            return singleton(async () => {
+                const rg = await fetchAndValidate(args.input);
+                await update(rg);
+
+                return {success: true};
+            });
+        },
         updateSchemas(_, args: {input: SchemaInput[]}) {
             return singleton(async () => {
                 const rg = await fetchAndValidate({schemas: args.input});

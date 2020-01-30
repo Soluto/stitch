@@ -1,7 +1,7 @@
 import {Unsubscriber, GraphQLServiceConfig, SchemaChangeCallback} from 'apollo-server-core';
 import {parse, execute} from 'graphql';
 import {Observable, Subscription} from 'rxjs';
-import {shareReplay, map, take, tap} from 'rxjs/operators';
+import {shareReplay, map, take, tap, catchError, skip} from 'rxjs/operators';
 
 import {directiveMap} from './directives';
 import {ResourceGroup, UpstreamClientCredentials, Upstream} from './resource-repository';
@@ -18,10 +18,14 @@ export function createStitchGateway(config: {resourceGroups: Observable<Resource
     const newSchemaConfigs = config.resourceGroups.pipe(
         tap(rg => logger.info({etag: rg.etag}, 'Loading new resources')),
         map(createSchemaConfig),
+        catchError((error, obs) => {
+            logger.error(error, 'Error creating schema config');
+            return obs.pipe(skip(1));
+        }),
         shareReplay(1)
     );
     const startListening = () =>
-        newSchemaConfigs.subscribe(schemaConfig => {
+        newSchemaConfigs.subscribe((schemaConfig: GraphQLServiceConfig) => {
             currentSchemaConfig = schemaConfig;
             logger.info('New resources loaded');
         });

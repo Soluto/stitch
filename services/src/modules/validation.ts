@@ -1,5 +1,5 @@
-import {gql, ApolloError} from 'apollo-server-fastify';
-import {parse, DocumentNode, visit, print, GraphQLError} from 'graphql';
+import {ApolloError} from 'apollo-server-fastify';
+import {parse, DocumentNode, visit, GraphQLError, concatAST} from 'graphql';
 import {composeAndValidate} from '@apollo/federation';
 import federationDirectives from '@apollo/federation/dist/directives';
 
@@ -7,28 +7,17 @@ import {ResourceGroup, Schema, Upstream} from './resource-repository';
 import * as baseSchema from './baseSchema';
 
 const removeNonFederationDirectives = (typeDef: DocumentNode) => {
-    // If we don't print and re-parse, some old bits of the directives still remain in the data structure <_<
-    return parse(
-        print(
-            visit(typeDef, {
-                Directive(node) {
-                    return federationDirectives.some(directive => directive.name === node.name.value)
-                        ? undefined
-                        : null;
-                },
-            })
-        )
-    );
+    return visit(typeDef, {
+        Directive(node) {
+            return federationDirectives.some(directive => directive.name === node.name.value) ? undefined : null;
+        },
+    });
 };
 
 function validateSchemas(schemas: Schema[]) {
     const serviceDefs = Object.entries(schemas).map(([name, typeDef]) => {
         const typeDefWithoutDirectives = removeNonFederationDirectives(parse(typeDef.schema));
-
-        const finalTypeDef = gql`
-            ${baseSchema.baseTypeDef}
-            ${typeDefWithoutDirectives}
-        `;
+        const finalTypeDef = concatAST([baseSchema.baseTypeDef, typeDefWithoutDirectives]);
 
         return {
             name,
