@@ -207,6 +207,7 @@ export const app = new ApolloServer({
 });
 
 async function run() {
+    logger.info('Stitch registry booting up...');
     const server = fastify();
     server.register(app.createHandler({path: '/graphql'}));
     const address = await server.listen(httpPort, '0.0.0.0');

@@ -36,6 +36,7 @@ export function createApolloServer() {
 }
 
 async function run() {
+    logger.info('Stitch gateway booting up...');
     const {server, dispose} = createApolloServer();
 
     const app = fastify();
