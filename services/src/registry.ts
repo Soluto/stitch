@@ -7,6 +7,7 @@ import {httpPort} from './modules/config';
 import {validateResourceGroupOrThrow} from './modules/validation';
 import {applyResourceGroupUpdates} from './modules/resource-repository/util';
 import logger from './modules/logger';
+import {handleSignals, handleUncaughtErrors} from './modules/shutdownHandler';
 
 const typeDefs = gql`
     # General

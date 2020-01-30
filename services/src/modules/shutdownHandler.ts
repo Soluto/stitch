@@ -16,7 +16,7 @@ export function handleUncaughtErrors() {
 }
 
 export function handleSignals(dispose: DisposeFn) {
-    for (const signal of ['SIGINT', 'SIGTERM']) {
+    for (const signal of ['SIGINT', 'SIGTERM'] as NodeJS.Signals[]) {
         process.on(signal, async () => {
             await dispose();
             process.exit();
