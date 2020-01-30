@@ -1,4 +1,4 @@
-import process from 'process';
+import * as process from 'process';
 import logger from './logger';
 
 type DisposeFn = () => Promise<void> | void;
