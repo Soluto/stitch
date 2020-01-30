@@ -1,4 +1,5 @@
 import {RequestContext} from '../context';
+import logger from '../logger';
 
 export async function getAuthHeaders(context: RequestContext, url: URL) {
     // Try AD auth
@@ -6,15 +7,21 @@ export async function getAuthHeaders(context: RequestContext, url: URL) {
     if (typeof upstream !== 'undefined') {
         const credentials = context.upstreamClientCredentials.get(upstream.auth.activeDirectory.authority);
         if (typeof credentials !== 'undefined') {
-            const token = await context.activeDirectoryAuth.getToken(
-                credentials.activeDirectory.authority,
-                credentials.activeDirectory.clientId,
-                credentials.activeDirectory.clientSecret,
-                upstream.auth.activeDirectory.resource
-            );
-            return {
-                Authorization: `Bearer ${token}`,
-            };
+            try {
+                const token = await context.activeDirectoryAuth.getToken(
+                    credentials.activeDirectory.authority,
+                    credentials.activeDirectory.clientId,
+                    credentials.activeDirectory.clientSecret,
+                    upstream.auth.activeDirectory.resource
+                );
+
+                return {
+                    Authorization: `Bearer ${token}`,
+                };
+            } catch (ex) {
+                logger.error('Failed to authenticate with Active Directory', ex);
+                throw ex;
+            }
         }
     }
 
