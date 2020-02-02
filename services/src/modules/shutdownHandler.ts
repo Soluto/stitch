@@ -1,16 +1,18 @@
 import * as process from 'process';
-import logger from './logger';
+// import logger from './logger';
 
 type DisposeFn = () => Promise<void> | void;
 
 export function handleUncaughtErrors() {
     process.on('uncaughtException', (error: any) => {
-        logger.fatal({error}, 'Uncaught exception caught in global handler');
+        console.log('Uncaught exception caught in global handler', error);
+        // logger.fatal({error}, 'Uncaught exception caught in global handler');
         process.exit(1);
     });
 
     process.on('unhandledRejection', (error: any) => {
-        logger.fatal({error}, 'Unhandled promise rejection caught in global handler');
+        console.log('Uncaught exception caught in global handler', error);
+        // logger.fatal({error}, 'Unhandled promise rejection caught in global handler');
         process.exit(1);
     });
 }
