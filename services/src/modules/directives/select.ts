@@ -6,9 +6,9 @@ export class SelectDirective extends SchemaDirectiveVisitor {
     visitFieldDefinition(field: GraphQLField<any, any>) {
         const {path} = this.args as {path: string[]};
 
+        const originalResolve = field.resolve || defaultFieldResolver;
         field.resolve = async (parent, args, context, info) => {
-            const resolve = field.resolve || defaultFieldResolver;
-            const result = await resolve.call(field, parent, args, context, info);
+            const result = await originalResolve.call(field, parent, args, context, info);
 
             return path.reduce((value, segment) => value && value[segment], result);
         };
