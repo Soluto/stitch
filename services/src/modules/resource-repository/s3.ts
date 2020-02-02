@@ -20,31 +20,33 @@ function isAwsError(e: any): e is AWS.AWSError {
     );
 }
 
-async function getObjectIfChanged(request: AWS.S3.GetObjectRequest) {
-    try {
-        return await s3.getObject(request).promise();
-    } catch (err) {
-        if ((isAwsError(err) && err.code === 'NotModified') || err.statusCode === 304) {
-            return null;
-        }
-
-        throw err;
-    }
-}
-
 /** Returns latest resource group */
 export function fetch(): Promise<ResourceGroup>;
 /** Returns latest resource group, or null if etag matches */
 export function fetch(currentEtag?: string): Promise<ResourceGroup | null>;
 export async function fetch(currentEtag?: string): Promise<ResourceGroup | null> {
-    const response = await getObjectIfChanged({
-        Bucket: resourceBucketName,
-        Key: resourcesObjectKey,
-        IfNoneMatch: currentEtag,
-    });
+    let response: AWS.S3.GetObjectOutput | undefined;
 
-    if (response === null) {
-        return null;
+    try {
+        response = await s3
+            .getObject({
+                Bucket: resourceBucketName,
+                Key: resourcesObjectKey,
+                IfNoneMatch: currentEtag,
+            })
+            .promise();
+    } catch (err) {
+        if (isAwsError(err)) {
+            if (err.code === 'NotModified') {
+                return null;
+            }
+
+            if (err.code === 'NoSuchKey') {
+                return {schemas: [], upstreams: [], upstreamClientCredentials: []};
+            }
+        }
+
+        throw err;
     }
 
     const bodyRaw = response.Body?.toString();
