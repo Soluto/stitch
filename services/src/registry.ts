@@ -3,7 +3,7 @@ import * as fastify from 'fastify';
 import pLimit from 'p-limit';
 
 import {fetch, update, ResourceGroup} from './modules/resource-repository';
-import {httpPort} from './modules/config';
+import * as config from './modules/config';
 import {validateResourceGroupOrThrow} from './modules/validation';
 import {applyResourceGroupUpdates} from './modules/resource-repository/util';
 import logger from './modules/logger';
@@ -204,14 +204,16 @@ const resolvers: IResolvers = {
 export const app = new ApolloServer({
     typeDefs,
     resolvers,
-    playground: true,
+    tracing: config.enableGraphQLTracing,
+    playground: config.enableGraphQLPlayground,
+    introspection: config.enableGraphQLIntrospection,
 });
 
 async function run() {
     logger.info('Stitch registry booting up...');
     const server = fastify();
     server.register(app.createHandler({path: '/graphql'}));
-    const address = await server.listen(httpPort, '0.0.0.0');
+    const address = await server.listen(config.httpPort, '0.0.0.0');
     logger.info({address}, 'Stitch registry started');
 
     handleSignals(() => app.stop());
