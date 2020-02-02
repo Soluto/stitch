@@ -5,9 +5,25 @@ executors:
     linux:
         machine:
             image: ubuntu-1604:201903-01
+jobs:
+    create_docker_tag:
+        executor: linux
+        steps:
+            - checkout
+            - docker/check:
+                  docker-username: DOCKERHUB_USERNAME
+                  docker-password: DOCKERHUB_PASSWORD
+            - docker/pull:
+                  images: 'soluto/stitch:$CIRCLE_SHA1'
+            - run:
+                  command: 'docker tag soluto/stitch:$CIRCLE_SHA1 soluto/stitch:$CIRCLE_TAG'
+            - docker/push:
+                  image: 'soluto/stitch:$CIRCLE_TAG'
+                  tag: '$CIRCLE_TAG'
+
 workflows:
     version: 2
-    build_push:
+    pull_request:
         jobs:
             - docker/publish:
                   executor: linux
@@ -21,6 +37,8 @@ workflows:
                       branches:
                           ignore:
                               - stitch
+    master:
+        jobs:
             - docker/publish:
                   executor: linux
                   deploy: true
@@ -34,3 +52,11 @@ workflows:
                       branches:
                           only:
                               - stitch
+    release_tag:
+        jobs:
+            - create_docker_tag:
+                  filters:
+                      tags:
+                          only: /^v.*/
+                      branches:
+                          ignore: /.*/
