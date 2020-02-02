@@ -16,6 +16,7 @@ export function createApolloServer() {
         extensions: [() => new ExportTrackingExtension()],
         subscriptions: false,
         tracing: true,
+        playground: true,
         context(request: fastify.FastifyRequest) {
             return {request};
         },

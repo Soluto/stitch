@@ -204,6 +204,7 @@ const resolvers: IResolvers = {
 export const app = new ApolloServer({
     typeDefs,
     resolvers,
+    playground: true,
 });
 
 async function run() {
