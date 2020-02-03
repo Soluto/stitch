@@ -15,6 +15,7 @@
         "apollo-datasource-rest": "^0.6.11",
         "apollo-link-context": "^1.0.19",
         "apollo-link-http": "^1.5.16",
+        "apollo-link-retry": "^2.2.15",
         "apollo-server-core": "^2.9.16",
         "apollo-server-fastify": "^2.9.16",
         "aws-sdk": "^2.607.0",

@@ -3,20 +3,34 @@ import {GraphQLField} from 'graphql';
 import {gql} from 'apollo-server-core';
 import {ApolloLink} from 'apollo-link';
 import {HttpLink} from 'apollo-link-http';
+import {RetryLink} from 'apollo-link-retry';
 import {setContext} from 'apollo-link-context';
 import fetch from 'node-fetch';
 import {injectParametersToObject} from '../param-injection';
 import {getAuthHeaders} from '../auth/getAuthHeaders';
 import {AuthenticationConfig} from '../auth/types';
+import logger from '../logger';
 
 export class GqlDirective extends SchemaDirectiveVisitor {
     async createRemoteSchema(url: string, config: AuthenticationConfig) {
-        const httpLink: ApolloLink = new HttpLink({uri: url, fetch: fetch as any});
-        const link = setContext(async (_, context) => ({
+        const httpLink: ApolloLink = new HttpLink({uri: url, fetch: fetch as any, fetchOptions: {timeout: 10000}});
+        const authLink = setContext(async (_, context) => ({
             headers: await getAuthHeaders(config, new URL(url).host, context?.graphqlContext?.request as any),
         })).concat(httpLink);
+        const retryLink = new RetryLink({
+            delay: {max: 5000},
+            attempts: {
+                max: 10,
+                retryIf(error) {
+                    logger.warn({error, url}, 'Failed fetching introspection query');
+                    return !!error;
+                },
+            },
+        }).concat(authLink);
 
-        return await introspectSchema(link).then(schema => makeRemoteExecutableSchema({schema, link}));
+        // Only introspection should retry, because if we don't have the introspection result this entire resolver will fail.
+        // Normal gql requests should not retry, at least for now, because that is more complicated than introspection.
+        return await introspectSchema(authLink).then(schema => makeRemoteExecutableSchema({schema, link: retryLink}));
     }
 
     visitFieldDefinition(field: GraphQLField<any, any>) {

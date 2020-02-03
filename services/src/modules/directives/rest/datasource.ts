@@ -11,7 +11,7 @@ type GraphQLArguments = {[key: string]: any};
 export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     async doRequest(params: RestParams, parent: any, args: GraphQLArguments, info: GraphQLResolveInfo) {
         const headers = this.parseHeaders(params.headers, parent, args, info);
-        const requestInit: RequestInit = {headers, timeout: params.timeoutMs, method: params.method};
+        const requestInit: RequestInit = {headers, timeout: params.timeoutMs ?? 10000, method: params.method};
         const url = new URL(injectParameters(params.url, parent, args, this.context, info));
         this.addQueryParams(url.searchParams, params.query, parent, args, info);
 
