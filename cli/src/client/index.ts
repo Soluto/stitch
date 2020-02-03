@@ -1,4 +1,4 @@
-import {GraphQLClient, ClientError} from 'graphql-request';
+import {GraphQLClient} from 'graphql-request';
 import {ResourceGroupInput} from './types';
 
 const UploadResourceGroupMutation = `
@@ -9,7 +9,7 @@ mutation UploadResources($resourceGroup: ResourceGroupInput!) {
 }
 `;
 export async function uploadResourceGroup(registryUrl: string, rg: ResourceGroupInput) {
-    const registryClient = new GraphQLClient(registryUrl);
+    const registryClient = new GraphQLClient(registryUrl, {timeout: 10000} as any);
 
     try {
         const data = await registryClient.request(UploadResourceGroupMutation, {resourceGroup: rg});
@@ -17,6 +17,7 @@ export async function uploadResourceGroup(registryUrl: string, rg: ResourceGroup
             console.log('Success updating resource group!', data);
         }
     } catch (err) {
-        console.log('Failed upload. Error:', err);
+        console.log('FAILURE applying resources!');
+        throw err;
     }
 }

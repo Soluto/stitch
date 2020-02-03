@@ -7,6 +7,7 @@
 
 <!-- toc -->
 
+-   [cli](#cli)
 -   [Usage](#usage)
 -   [Commands](#commands)
     <!-- tocstop -->
@@ -16,11 +17,11 @@
 <!-- usage -->
 
 ```sh-session
-$ npm install -g cli
+$ npm install -g stitch-cli
 $ stitch COMMAND
 running command...
 $ stitch (-v|--version|version)
-cli/0.0.0 darwin-x64 node-v13.6.0
+stitch-cli/0.0.1 darwin-x64 node-v13.7.0
 $ stitch --help [COMMAND]
 USAGE
   $ stitch COMMAND
@@ -33,28 +34,26 @@ USAGE
 
 <!-- commands -->
 
--   [`stitch hello [FILE]`](#stitch-hello-file)
+-   [`stitch apply:resources FILEORDIRECTORY`](#stitch-applyresources-fileordirectory)
 -   [`stitch help [COMMAND]`](#stitch-help-command)
 
-## `stitch hello [FILE]`
+## `stitch apply:resources FILEORDIRECTORY`
 
-describe the command here
+Apply resources
 
 ```
 USAGE
-  $ stitch hello [FILE]
+  $ stitch apply:resources FILEORDIRECTORY
 
 OPTIONS
-  -f, --force
-  -h, --help       show CLI help
-  -n, --name=name  name to print
+  --registryUrl=registryUrl  (required) Url of the registry
 
 EXAMPLE
-  $ stitch hello
-  hello world from ./src/hello.ts!
+  $ stitch apply:resources schema.gql
+  Uploaded successfully!
 ```
 
-_See code: [src/commands/hello.ts](https://github.com/Soluto/agogos/blob/v0.0.0/src/commands/hello.ts)_
+_See code: [src/commands/apply/resources.ts](https://github.com/Soluto/agogos/blob/v0.0.1/src/commands/apply/resources.ts)_
 
 ## `stitch help [COMMAND]`
 
