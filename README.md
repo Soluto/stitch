@@ -1,3 +1,7 @@
+# Stitch
+
+[![Stitch](https://circleci.com/gh/Soluto/agogos/tree/stitch.svg?style=svg)](https://circleci.com/gh/Soluto/agogos/tree/stitch)
+
 ## Running locally
 
 Use the Tiltfile/docker-compose.yml located in `deployment/dev` to get a local env running quickly
