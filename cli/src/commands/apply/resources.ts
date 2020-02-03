@@ -30,7 +30,7 @@ Uploaded successfully!
         await uploadResourceGroup(flags.registryUrl, resourceGroup);
     }
 
-    async pathToResourceGroup(filePath: string) {
+    async pathToResourceGroup(filePath: string): Promise<ResourceGroupInput> {
         const fileStats = await fs.stat(filePath);
 
         if (fileStats.isFile()) {
@@ -45,16 +45,19 @@ Uploaded successfully!
             const subRgs = await Promise.all(
                 dir.map(subPath => this.pathToResourceGroup(path.join(filePath, subPath)))
             );
-            const rg = subRgs.reduce(
+            const resultRg = subRgs.reduce(
                 (rg, subRg) => ({
-                    schemas: [...rg.schemas, ...subRg.schemas],
-                    upstreams: [...rg.upstreams, ...subRg.upstreams],
-                    upstreamClientCredentials: [...rg.upstreamClientCredentials, ...subRg.upstreamClientCredentials],
+                    schemas: safeConcat(rg.schemas, subRg.schemas),
+                    upstreams: safeConcat(rg.upstreams, subRg.upstreams),
+                    upstreamClientCredentials: safeConcat(
+                        rg.upstreamClientCredentials,
+                        subRg.upstreamClientCredentials
+                    ),
                 }),
                 {schemas: [], upstreams: [], upstreamClientCredentials: []}
             );
 
-            return rg;
+            return resultRg;
         }
 
         // This should only happen with weird symlinks etc
@@ -62,7 +65,7 @@ Uploaded successfully!
     }
 
     resourcesToResourceGroup(files: {[filepath: string]: any[]}) {
-        const rg = {schemas: [], upstreams: [], upstreamClientCredentials: []};
+        const rg: ResourceGroupInput = {schemas: [], upstreams: [], upstreamClientCredentials: []};
 
         for (const filepath in files) {
             const resources = files[filepath];
@@ -72,13 +75,13 @@ Uploaded successfully!
                 // Client-side validation can be added later on to not require a server hop
                 switch (kind) {
                     case 'Schema':
-                        rg.schemas.push(resource);
+                        rg.schemas!.push(resource);
                         continue;
                     case 'Upstream':
-                        rg.upstreams.push(resource);
+                        rg.upstreams!.push(resource);
                         continue;
                     case 'UpstreamClientCredentials':
-                        rg.upstreamClientCredentials.push(resource);
+                        rg.upstreamClientCredentials!.push(resource);
                         continue;
                     default:
                         this.log('Unknown resource kind', filepath);
@@ -89,4 +92,8 @@ Uploaded successfully!
 
         return rg;
     }
+}
+
+function safeConcat<T>(...arrays: (T[] | null | undefined)[]) {
+    return ([] as T[]).concat(...arrays.filter(Array.isArray));
 }
