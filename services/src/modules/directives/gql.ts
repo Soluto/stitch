@@ -30,7 +30,7 @@ export class GqlDirective extends SchemaDirectiveVisitor {
 
         // Only introspection should retry, because if we don't have the introspection result this entire resolver will fail.
         // Normal gql requests should not retry, at least for now, because that is more complicated than introspection.
-        return await introspectSchema(authLink).then(schema => makeRemoteExecutableSchema({schema, link: retryLink}));
+        return await introspectSchema(retryLink).then(schema => makeRemoteExecutableSchema({schema, link: authLink}));
     }
 
     visitFieldDefinition(field: GraphQLField<any, any>) {
