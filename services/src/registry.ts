@@ -11,7 +11,7 @@ import {handleSignals, handleUncaughtErrors} from './modules/shutdownHandler';
 
 const typeDefs = gql`
     # General
-    input ResourceMetadata {
+    input ResourceMetadataInput {
         namespace: String!
         name: String!
     }
@@ -42,7 +42,7 @@ const typeDefs = gql`
 
     # Schemas
     input SchemaInput {
-        metadata: ResourceMetadata!
+        metadata: ResourceMetadataInput!
         schema: String!
     }
 
@@ -55,18 +55,18 @@ const typeDefs = gql`
     GraphQL doesn't support unions for input types, otherwise this would be a union of different auth types.
     Instead, the AuthType enum indicates which auth type is needed, and there's a property which corresponds to each auth type, which we validate in the registry.
     """
-    input Auth {
+    input AuthInput {
         type: AuthType!
-        activeDirectory: ActiveDirectoryAuth!
+        activeDirectory: ActiveDirectoryAuthInput!
     }
 
-    input ActiveDirectoryAuth {
+    input ActiveDirectoryAuthInput {
         authority: String!
         resource: String!
     }
 
     input UpstreamInput {
-        metadata: ResourceMetadata!
+        metadata: ResourceMetadataInput!
         host: String!
         auth: Auth!
     }
@@ -83,13 +83,13 @@ const typeDefs = gql`
     Instead, the AuthType enum indicates which auth type is needed, and there's a property which corresponds to each auth type, which we validate in the registry.
     """
     input UpstreamClientCredentialsInput {
-        metadata: ResourceMetadata!
+        metadata: ResourceMetadataInput!
         authType: AuthType!
         activeDirectory: ActiveDirectoryCredentials!
     }
 `;
 
-interface ResourceMetadata {
+interface ResourceMetadataInput {
     namespace: string;
     name: string;
 }
@@ -101,7 +101,7 @@ interface ResourceGroupInput {
 }
 
 interface SchemaInput {
-    metadata: ResourceMetadata;
+    metadata: ResourceMetadataInput;
     schema: string;
 }
 
@@ -109,22 +109,22 @@ export enum AuthType {
     ActiveDirectory = 'ActiveDirectory',
 }
 
-interface ActiveDirectoryAuth {
+interface ActiveDirectoryAuthInput {
     authority: string;
     resource: string;
 }
 
 interface UpstreamInput {
-    metadata: ResourceMetadata;
+    metadata: ResourceMetadataInput;
     host: string;
     auth: {
         type: AuthType;
-        activeDirectory: ActiveDirectoryAuth;
+        activeDirectory: ActiveDirectoryAuthInput;
     };
 }
 
 interface UpstreamClientCredentialsInput {
-    metadata: ResourceMetadata;
+    metadata: ResourceMetadataInput;
     authType: AuthType;
     activeDirectory: {
         authority: string;
