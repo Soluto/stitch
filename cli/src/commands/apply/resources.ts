@@ -2,7 +2,7 @@ import {Command, flags} from '@oclif/command';
 import {promises as fs} from 'fs';
 import * as path from 'path';
 import {safeLoadAll} from 'js-yaml';
-import {uploadResourceGroup} from '../../client';
+import {uploadResourceGroup, validateResourceGroup} from '../../client';
 import {ResourceGroupInput} from '../../client/types';
 
 export default class ApplyResources extends Command {
@@ -16,6 +16,7 @@ Uploaded successfully!
 
     static flags = {
         registryUrl: flags.string({required: true, env: 'STITCH_REGISTRY_URL', description: 'Url of the registry'}),
+        dryRun: flags.boolean({required: false, description: 'Should perform a dry run'}),
     };
 
     static args = [{name: 'fileOrDirectory', required: true}];
@@ -27,7 +28,11 @@ Uploaded successfully!
 
         const resourceGroup = await this.pathToResourceGroup(args.fileOrDirectory);
 
-        await uploadResourceGroup(flags.registryUrl, resourceGroup);
+        if (flags.dryRun) {
+            await validateResourceGroup(flags.registryUrl, resourceGroup);
+        } else {
+            await uploadResourceGroup(flags.registryUrl, resourceGroup);
+        }
     }
 
     async pathToResourceGroup(filePath: string): Promise<ResourceGroupInput> {
