@@ -2,8 +2,7 @@ import {Command, flags} from '@oclif/command';
 import {promises as fs} from 'fs';
 import * as path from 'path';
 import {safeLoadAll} from 'js-yaml';
-import {uploadResourceGroup, validateResourceGroup} from '../../client';
-import {ResourceGroupInput} from '../../client/types';
+import {ResourceGroupInput, uploadResourceGroup} from '../../client';
 
 export default class ApplyResources extends Command {
     static description = 'Apply resources';
@@ -17,6 +16,7 @@ Uploaded successfully!
     static flags = {
         registryUrl: flags.string({required: true, env: 'STITCH_REGISTRY_URL', description: 'Url of the registry'}),
         dryRun: flags.boolean({required: false, description: 'Should perform a dry run'}),
+        authorizationHeader: flags.string({required: false, description: 'Custom authorization header'}),
     };
 
     static args = [{name: 'fileOrDirectory', required: true}];
@@ -24,15 +24,19 @@ Uploaded successfully!
     async run() {
         const {args, flags} = this.parse(ApplyResources);
 
+        if (flags.dryRun) {
+            this.log(`Dry run mode ON - No changes will be made to the registry`);
+        }
+
         this.log(`Uploading resource ${args.fileOrDirectory}`);
 
         const resourceGroup = await this.pathToResourceGroup(args.fileOrDirectory);
 
-        if (flags.dryRun) {
-            await validateResourceGroup(flags.registryUrl, resourceGroup);
-        } else {
-            await uploadResourceGroup(flags.registryUrl, resourceGroup);
-        }
+        await uploadResourceGroup(resourceGroup, {
+            registryUrl: flags.registryUrl,
+            authorizationHeader: flags.authorizationHeader,
+            dryRun: flags.dryRun,
+        });
     }
 
     async pathToResourceGroup(filePath: string): Promise<ResourceGroupInput> {
