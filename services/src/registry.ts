@@ -68,7 +68,7 @@ const typeDefs = gql`
     input UpstreamInput {
         metadata: ResourceMetadataInput!
         host: String!
-        auth: Auth!
+        auth: AuthInput!
     }
 
     # Upstream client credentials
