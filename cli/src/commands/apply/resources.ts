@@ -14,9 +14,9 @@ Uploaded successfully!
     ];
 
     static flags = {
-        registryUrl: flags.string({required: true, env: 'STITCH_REGISTRY_URL', description: 'Url of the registry'}),
-        dryRun: flags.boolean({required: false, description: 'Should perform a dry run'}),
-        authorizationHeader: flags.string({required: false, description: 'Custom authorization header'}),
+        'registry-url': flags.string({required: true, env: 'STITCH_REGISTRY_URL', description: 'Url of the registry'}),
+        'dry-run': flags.boolean({required: false, default: false, description: 'Should perform a dry run'}),
+        'authorization-header': flags.string({required: false, description: 'Custom authorization header'}),
     };
 
     static args = [{name: 'fileOrDirectory', required: true}];
@@ -24,7 +24,7 @@ Uploaded successfully!
     async run() {
         const {args, flags} = this.parse(ApplyResources);
 
-        if (flags.dryRun) {
+        if (flags['dry-run']) {
             this.log(`Dry run mode ON - No changes will be made to the registry`);
         }
 
@@ -33,9 +33,9 @@ Uploaded successfully!
         const resourceGroup = await this.pathToResourceGroup(args.fileOrDirectory);
 
         await uploadResourceGroup(resourceGroup, {
-            registryUrl: flags.registryUrl,
-            authorizationHeader: flags.authorizationHeader,
-            dryRun: flags.dryRun,
+            registryUrl: flags['registry-url'],
+            authorizationHeader: flags['authorization-header'],
+            dryRun: flags['dry-run'],
         });
     }
 
