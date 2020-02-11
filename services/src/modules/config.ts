@@ -34,3 +34,7 @@ if (
 export const enableGraphQLTracing = envVar.get('GRAPHQL_TRACING', 'true').asBool();
 export const enableGraphQLPlayground = envVar.get('GRAPHQL_PLAYGROUND', 'true').asBoolStrict();
 export const enableGraphQLIntrospection = envVar.get('GRAPHQL_INTROSPECTION', 'true').asBoolStrict();
+
+export const enableS3ResourceRepository = envVar.get('S3_RESOURCE_REPO', 'true').asBool();
+export const enableLocalResourceRepository = envVar.get('LOCAL_RESOURCE_REPO', 'true').asBool();
+export const localResourceRepositoryPath = envVar.get('LOCAL_RESOURCE_REPO_PATH').asString();

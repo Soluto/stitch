@@ -38,10 +38,15 @@ export interface UpstreamClientCredentials extends Resource {
     };
 }
 
+export interface ResourceRepository {
+    fetch: (currentEtag?: string) => Promise<ResourceGroup> | null;
+    update: (rg: ResourceGroup) => Promise<void>;
+}
+
 enum AuthType {
     ActiveDirectory = 'ActiveDirectory',
 }
 
-export {fetch, update} from './s3';
+export {fetchAll, updateAll} from './repositoryManager';
 export {pollForUpdates} from './stream';
 export {applyResourceGroupUpdates} from './util';
