@@ -3,21 +3,40 @@ import {ResourceGroupInput} from './types';
 
 const UploadResourceGroupMutation = `
 mutation UploadResources($resourceGroup: ResourceGroupInput!) {
-    updateResourceGroup(input: $resourceGroup) {
+    result: updateResourceGroup(input: $resourceGroup) {
         success
     }
-}
-`;
-export async function uploadResourceGroup(registryUrl: string, rg: ResourceGroupInput) {
-    const registryClient = new GraphQLClient(registryUrl, {timeout: 10000} as any);
+}`;
+
+const ValidateResourceGroupQuery = `
+query ValidateResources($resourceGroup: ResourceGroupInput!) {
+    result: validateResourceGroup(input: $resourceGroup) {
+        success
+    }
+}`;
+export async function uploadResourceGroup(
+    rg: ResourceGroupInput,
+    options: {
+        registryUrl: string;
+        dryRun?: boolean;
+        authorizationHeader?: string;
+    }
+) {
+    const clientOptions = {timeout: 10000, headers: {} as {[name: string]: string}};
+    if (typeof options.authorizationHeader !== 'undefined') {
+        clientOptions.headers['Authorization'] = options.authorizationHeader;
+    }
+    const registryClient = new GraphQLClient(options.registryUrl, clientOptions);
+
+    const query = options.dryRun ? ValidateResourceGroupQuery : UploadResourceGroupMutation;
 
     try {
-        const data = await registryClient.request(UploadResourceGroupMutation, {resourceGroup: rg});
-        if (data?.updateResourceGroup?.success) {
-            console.log('Success updating resource group!', data);
-        }
+        const data = await registryClient.request(query, {resourceGroup: rg});
+        console.log(data?.result);
     } catch (err) {
-        console.log('FAILURE applying resources!');
+        console.log('FAILURE');
         throw err;
     }
 }
+
+export * from './types';

@@ -1,0 +1,35 @@
+{
+    "version": "0.0.5",
+    "commands": {
+        "apply:resources": {
+            "id": "apply:resources",
+            "description": "Apply resources",
+            "pluginName": "stitch-cli",
+            "pluginType": "core",
+            "aliases": [],
+            "examples": ["$ stitch apply:resources schema.gql\nUploaded successfully!\n"],
+            "flags": {
+                "registry-url": {
+                    "name": "registry-url",
+                    "type": "option",
+                    "description": "Url of the registry",
+                    "required": true
+                },
+                "dry-run": {
+                    "name": "dry-run",
+                    "type": "boolean",
+                    "description": "Should perform a dry run",
+                    "required": false,
+                    "allowNo": false
+                },
+                "authorization-header": {
+                    "name": "authorization-header",
+                    "type": "option",
+                    "description": "Custom authorization header",
+                    "required": false
+                }
+            },
+            "args": [{"name": "fileOrDirectory", "required": true}]
+        }
+    }
+}

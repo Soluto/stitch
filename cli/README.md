@@ -21,7 +21,7 @@ $ npm install -g stitch-cli
 $ stitch COMMAND
 running command...
 $ stitch (-v|--version|version)
-stitch-cli/0.0.1 darwin-x64 node-v13.7.0
+stitch-cli/0.0.5 darwin-x64 node-v13.7.0
 $ stitch --help [COMMAND]
 USAGE
   $ stitch COMMAND
@@ -46,14 +46,16 @@ USAGE
   $ stitch apply:resources FILEORDIRECTORY
 
 OPTIONS
-  --registryUrl=registryUrl  (required) Url of the registry
+  --authorization-header=authorization-header  Custom authorization header
+  --dry-run                                    Should perform a dry run
+  --registry-url=registry-url                  (required) Url of the registry
 
 EXAMPLE
   $ stitch apply:resources schema.gql
   Uploaded successfully!
 ```
 
-_See code: [src/commands/apply/resources.ts](https://github.com/Soluto/agogos/blob/v0.0.1/src/commands/apply/resources.ts)_
+_See code: [src/commands/apply/resources.ts](https://github.com/Soluto/agogos/blob/v0.0.5/src/commands/apply/resources.ts)_
 
 ## `stitch help [COMMAND]`
 
