@@ -1,6 +1,6 @@
 import {RESTDataSource} from 'apollo-datasource-rest';
 import {KeyValue, RestParams} from './types';
-import {injectParameters, resolveParameters} from '../../param-injection';
+import {injectParameters, injectParametersDetailed, resolveParameters} from '../../param-injection';
 import {RequestContext} from '../../context';
 import {RequestInit, Headers, Request} from 'apollo-server-env';
 import {GraphQLResolveInfo} from 'graphql';
@@ -36,9 +36,23 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     parseHeaders(kvs: KeyValue[] | undefined, parent: any, args: GraphQLArguments, info: GraphQLResolveInfo) {
         const headers = new Headers();
 
-        if (typeof kvs !== 'undefined') {
-            for (const kv of kvs) {
-                headers.append(kv.key, injectParameters(kv.value, parent, args, this.context, info));
+        if (typeof kvs === 'undefined') {
+            return headers;
+        }
+
+        for (const kv of kvs) {
+            const {result, foundAny, foundNonNull} = injectParametersDetailed(
+                kv.value,
+                parent,
+                args,
+                this.context,
+                info
+            );
+
+            if (foundAny && foundNonNull) {
+                headers.append(kv.key, result);
+            } else if (!foundAny && !foundNonNull) {
+                headers.append(kv.key, kv.value);
             }
         }
 
@@ -63,7 +77,10 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
 
             for (const originalValue in parameters) {
                 const paramValue = parameters[originalValue];
-                if (Array.isArray(paramValue)) {
+
+                if (typeof paramValue === 'undefined') {
+                    continue;
+                } else if (Array.isArray(paramValue)) {
                     for (const elem of paramValue) {
                         params.append(kv.key, elem);
                     }

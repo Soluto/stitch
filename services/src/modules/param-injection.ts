@@ -38,6 +38,25 @@ export function injectParameters(
     return template.replace(paramRegex, (_, match) => resolveTemplate(match, parent, args, context, info));
 }
 
+export function injectParametersDetailed(
+    template: string,
+    parent: any,
+    args: GraphQLArguments,
+    context: RequestContext,
+    info: GraphQLResolveInfo
+) {
+    let foundNonNull = false;
+    let foundAny = false;
+    const result = template.replace(paramRegex, (_, match) => {
+        const resolved = resolveTemplate(match, parent, args, context, info);
+        foundAny = true;
+        foundNonNull = foundNonNull || (resolved !== null && typeof resolved !== 'undefined');
+        return resolved;
+    });
+
+    return {result, foundNonNull, foundAny};
+}
+
 export function resolveParameters(
     template: string,
     parent: any,
