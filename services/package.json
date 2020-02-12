@@ -21,6 +21,7 @@
         "aws-sdk": "^2.607.0",
         "env-var": "^5.2.0",
         "fastify": "^2.11.0",
+        "fastify-metrics": "^4.0.9",
         "graphql": "^14.5.8",
         "graphql-tools": "^4.0.6",
         "graphql-type-json": "^0.3.1",
