@@ -1,6 +1,6 @@
 # Stitch
 
-[![Stitch](https://circleci.com/gh/Soluto/agogos/tree/stitch.svg?style=svg)](https://circleci.com/gh/Soluto/agogos/tree/stitch)
+[![Stitch](https://circleci.com/gh/Soluto/stitch.svg?style=svg)](https://circleci.com/gh/Soluto/stitch)
 
 ## Running locally
 
