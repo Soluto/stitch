@@ -24,7 +24,9 @@ export class ExportTrackingExtension implements GraphQLExtension<RequestContext>
             // The fact that WeakMap doesn't support non-object keys is a happy coincidence
             if (Array.isArray(result)) {
                 for (let i = 0; i < result.length; i++) {
-                    parentMap.set(result[i], {parent: source, parentType: info.parentType});
+                    if (isObject(result[i])) {
+                        parentMap.set(result[i], {parent: source, parentType: info.parentType});
+                    }
                 }
             } else if (isObject(result)) {
                 parentMap.set(result, {parent: source, parentType: info.parentType});
