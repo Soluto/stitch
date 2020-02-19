@@ -7,10 +7,11 @@ export class StubDirective extends SchemaDirectiveVisitor {
     visitFieldDefinition(field: GraphQLField<any, any>) {
         const {value} = this.args;
 
-        field.resolve = (parent, args, context, info) => injectParameters(value, parent, args, context, info);
+        field.resolve = (parent, args, context, info) =>
+            typeof value === 'string' ? injectParameters(value, parent, args, context, info) : value;
     }
 }
 
 export const sdl = gql`
-    directive @stub(value: String!) on FIELD_DEFINITION
+    directive @stub(value: JSON!) on FIELD_DEFINITION
 `;
