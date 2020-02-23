@@ -12,9 +12,11 @@ The registry is our attempt at solving the issue of collaborating on a single gr
 
 # Documentation
 
+-   [Graph Composition Model](docs/graph_composition.md)
 -   [Data Sources](./docs/data_sources.md)
 -   [Parameter Injection](./docs/parameter_injection.md)
 -   [Scalars](./docs/scalars.md)
+-   [CLI](./cli)
 
 # Development
 
