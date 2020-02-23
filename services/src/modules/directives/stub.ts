@@ -8,7 +8,7 @@ export class StubDirective extends SchemaDirectiveVisitor {
         const {value} = this.args;
 
         field.resolve = (parent, args, context, info) =>
-            typeof value === 'string' ? injectParameters(value, parent, args, context, info) : value;
+            typeof value === 'string' ? injectParameters(value, parent, args, context, info).value : value;
     }
 }
 

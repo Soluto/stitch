@@ -1,6 +1,6 @@
 import {RESTDataSource} from 'apollo-datasource-rest';
 import {KeyValue, RestParams} from './types';
-import {injectParameters, injectParametersDetailed, resolveParameters} from '../../param-injection';
+import {injectParameters, resolveParameters} from '../../param-injection';
 import {RequestContext} from '../../context';
 import {RequestInit, Headers, Request} from 'apollo-server-env';
 import {GraphQLResolveInfo} from 'graphql';
@@ -12,7 +12,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     async doRequest(params: RestParams, parent: any, args: GraphQLArguments, info: GraphQLResolveInfo) {
         const headers = this.parseHeaders(params.headers, parent, args, info);
         const requestInit: RequestInit = {headers, timeout: params.timeoutMs ?? 10000, method: params.method};
-        const url = new URL(injectParameters(params.url, parent, args, this.context, info));
+        const url = new URL(injectParameters(params.url, parent, args, this.context, info).value);
         this.addQueryParams(url.searchParams, params.query, parent, args, info);
 
         const authHeaders = await getAuthHeaders(this.context.authenticationConfig, url.host, this.context.request);
@@ -41,7 +41,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
         }
 
         for (const kv of kvs) {
-            const {result, foundAny, foundNonNull} = injectParametersDetailed(
+            const {value, didFindTemplates, didFindValues} = injectParameters(
                 kv.value,
                 parent,
                 args,
@@ -49,9 +49,9 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
                 info
             );
 
-            if (foundAny && foundNonNull) {
-                headers.append(kv.key, result);
-            } else if (!foundAny && !foundNonNull) {
+            if (didFindTemplates && didFindValues) {
+                headers.append(kv.key, value);
+            } else if (!didFindTemplates && !didFindValues) {
                 headers.append(kv.key, kv.value);
             }
         }
