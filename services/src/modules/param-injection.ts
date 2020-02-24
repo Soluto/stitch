@@ -1,6 +1,5 @@
 import {GraphQLResolveInfo} from 'graphql';
 import {RequestContext} from './context';
-import {resolveExport} from './exports';
 
 interface GraphQLArguments {
     [key: string]: any;
@@ -11,7 +10,7 @@ function resolveTemplate(
     template: string,
     parent: any,
     args: GraphQLArguments,
-    _context: RequestContext,
+    context: RequestContext,
     info: GraphQLResolveInfo
 ) {
     const [sourceName, propName] = template.split('.');
@@ -22,7 +21,7 @@ function resolveTemplate(
         case 'args':
             return args && args[propName];
         case 'exports':
-            return resolveExport(info.parentType, parent, propName);
+            return context.exports.resolve(info.parentType, parent, propName);
         default:
             return null;
     }
@@ -35,26 +34,16 @@ export function injectParameters(
     context: RequestContext,
     info: GraphQLResolveInfo
 ) {
-    return template.replace(paramRegex, (_, match) => resolveTemplate(match, parent, args, context, info));
-}
-
-export function injectParametersDetailed(
-    template: string,
-    parent: any,
-    args: GraphQLArguments,
-    context: RequestContext,
-    info: GraphQLResolveInfo
-) {
-    let foundNonNull = false;
-    let foundAny = false;
-    const result = template.replace(paramRegex, (_, match) => {
+    let didFindValues = false;
+    let didFindTemplates = false;
+    const value = template.replace(paramRegex, (_, match) => {
         const resolved = resolveTemplate(match, parent, args, context, info);
-        foundAny = true;
-        foundNonNull = foundNonNull || (resolved !== null && typeof resolved !== 'undefined');
+        didFindTemplates = true;
+        didFindValues = didFindValues || (resolved !== null && typeof resolved !== 'undefined');
         return resolved;
     });
 
-    return {result, foundNonNull, foundAny};
+    return {value, didFindValues, didFindTemplates};
 }
 
 export function resolveParameters(
@@ -82,7 +71,7 @@ export function resolveParameters(
     return foundMatches ? parameters : null;
 }
 
-export function injectParametersToObject(
+export function deepInjectParameters(
     obj: {[key: string]: any},
     parent: any,
     args: GraphQLArguments,
@@ -95,9 +84,9 @@ export function injectParametersToObject(
         const value = obj[key];
 
         if (typeof value === 'string') {
-            newObj[key] = injectParameters(value, parent, args, context, info);
+            newObj[key] = injectParameters(value, parent, args, context, info).value;
         } else if (isObject(value)) {
-            newObj[key] = injectParametersToObject(value, parent, args, context, info);
+            newObj[key] = deepInjectParameters(value, parent, args, context, info);
         }
     }
 
