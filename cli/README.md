@@ -1,49 +1,60 @@
-# cli
+# Stitch CLI
 
-[![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
-[![Version](https://img.shields.io/npm/v/cli.svg)](https://npmjs.org/package/cli)
-[![Downloads/week](https://img.shields.io/npm/dw/cli.svg)](https://npmjs.org/package/cli)
-[![License](https://img.shields.io/npm/l/cli.svg)](https://github.com/Soluto/agogos/blob/master/package.json)
+# Resources
 
-<!-- toc -->
+Commands like `apply:resources` expect resources in YAML files in a specific format:
 
--   [cli](#cli)
--   [Usage](#usage)
--   [Commands](#commands)
-    <!-- tocstop -->
-
-# Usage
-
-<!-- usage -->
-
-```sh-session
-$ npm install -g stitch-cli
-$ stitch COMMAND
-running command...
-$ stitch (-v|--version|version)
-stitch-cli/0.0.5 darwin-x64 node-v13.7.0
-$ stitch --help [COMMAND]
-USAGE
-  $ stitch COMMAND
-...
+```yaml
+kind: Schema
+metadata:
+    name: users-api
+    namespace: users
+schema: |
+    type Query {
+        getUser(id: ID!): String
+            @rest(url: "http://users-service/users/{args.id}")
+    }
 ```
 
-<!-- usagestop -->
+```yaml
+kind: Upstream
+metadata:
+    name: users-api
+    namespace: users
+host: 'users-service'
+auth:
+    type: ActiveDirectory
+    activeDirectory:
+        authority: https://login.microsoftonline.com/<TENANT_ID>
+        resource: http://user-service-ad-resource
+```
+
+```yaml
+kind: UpstreamClientCredentials
+metadata:
+    name: activedirectory-tenant
+    namespace: users
+authType: ActiveDirectory
+activeDirectory:
+    authority: https://login.microsoftonline.com/<TENANT_ID>
+    clientId: myAdClientId
+    clientSecret: myAdClientSecret
+```
 
 # Commands
 
 <!-- commands -->
 
--   [`stitch apply:resources FILEORDIRECTORY`](#stitch-applyresources-fileordirectory)
+-   [`stitch apply:resources RESOURCESPATH`](#stitch-applyresources-resourcespath)
 -   [`stitch help [COMMAND]`](#stitch-help-command)
 
-## `stitch apply:resources FILEORDIRECTORY`
+## `stitch apply:resources RESOURCESPATH`
 
 Apply resources
 
 ```
 USAGE
-  $ stitch apply:resources FILEORDIRECTORY
+  $ stitch apply:resources RESOURCESPATH
 
 OPTIONS
   --authorization-header=authorization-header  Custom authorization header
@@ -55,7 +66,7 @@ EXAMPLE
   Uploaded successfully!
 ```
 
-_See code: [src/commands/apply/resources.ts](https://github.com/Soluto/agogos/blob/v0.0.5/src/commands/apply/resources.ts)_
+_See code: [src/commands/apply/resources.ts](https://github.com/Soluto/agogos/blob/master/src/commands/apply/resources.ts)_
 
 ## `stitch help [COMMAND]`
 
@@ -71,7 +82,5 @@ ARGUMENTS
 OPTIONS
   --all  see all commands in CLI
 ```
-
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.3/src/commands/help.ts)_
 
 <!-- commandsstop -->
