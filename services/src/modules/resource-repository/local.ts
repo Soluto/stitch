@@ -1,10 +1,6 @@
 import {ResourceGroup, ResourceRepository} from '.';
 import {localResourceRepositoryPath} from '../config';
-import fs from 'fs';
-import {promisify} from 'util';
-
-const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
+import {promises as fs} from 'fs';
 
 export class LocalResourceRepository implements ResourceRepository {
     protected localPath: string;
@@ -20,12 +16,12 @@ export class LocalResourceRepository implements ResourceRepository {
     /** Returns latest resource group */
     fetch(): Promise<ResourceGroup>;
     async fetch(): Promise<ResourceGroup | null> {
-        const json = await readFile(this.localPath, 'utf8');
+        const json = await fs.readFile(this.localPath, 'utf8');
         return JSON.parse(json);
     }
 
     async update(rg: ResourceGroup): Promise<void> {
         const {etag, ...rgWithoutEtag} = rg;
-        await writeFile(this.localPath, JSON.stringify(rgWithoutEtag));
+        await fs.writeFile(this.localPath, JSON.stringify(rgWithoutEtag));
     }
 }
