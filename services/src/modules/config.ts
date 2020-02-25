@@ -36,5 +36,11 @@ export const enableGraphQLPlayground = envVar.get('GRAPHQL_PLAYGROUND', 'true').
 export const enableGraphQLIntrospection = envVar.get('GRAPHQL_INTROSPECTION', 'true').asBoolStrict();
 
 export const enableS3ResourceRepository = envVar.get('S3_RESOURCE_REPO', 'true').asBool();
-export const enableLocalResourceRepository = envVar.get('LOCAL_RESOURCE_REPO', 'true').asBool();
+export const enableLocalResourceRepository = envVar.get('LOCAL_RESOURCE_REPO', 'false').asBool();
 export const localResourceRepositoryPath = envVar.get('LOCAL_RESOURCE_REPO_PATH').asString();
+
+if (enableLocalResourceRepository && typeof localResourceRepositoryPath === 'undefined') {
+    throw new Error(
+        'Local repository is enabled, you must configure LOCAL_RESOURCE_REPO_PATH for Local repository to work!'
+    );
+}
