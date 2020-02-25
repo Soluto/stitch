@@ -68,6 +68,23 @@ describe('REST directive data source', () => {
         expect(req.method).toBe('GET');
     });
 
+    it('Skips headers and query params who resolve to undefined', async () => {
+        await ds.doRequest(
+            {
+                url: 'http://somewhere',
+                query: [{key: 'name', value: '{source.firstName}'}],
+                headers: [{key: 'name', value: '{source.firstName}'}],
+            },
+            {firstName: undefined},
+            {},
+            {} as any
+        );
+
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+        const req = fetchMock.mock.calls[0][0] as Request;
+        expect(req.url).toBe('http://somewhere/');
+    });
+
     describe('Supported http methods dispatch with the correct http method', () => {
         const methods = ['GET', 'DELETE', 'POST', 'PUT', 'PATCH'];
 

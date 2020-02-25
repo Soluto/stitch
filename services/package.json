@@ -21,7 +21,9 @@
         "aws-sdk": "^2.607.0",
         "env-var": "^5.2.0",
         "fastify": "^2.11.0",
+        "fastify-metrics": "^4.0.9",
         "graphql": "^14.5.8",
+        "graphql-iso-date": "^3.6.1",
         "graphql-tools": "^4.0.6",
         "graphql-type-json": "^0.3.1",
         "node-cache": "^5.1.0",
@@ -33,6 +35,7 @@
         "tslib": "^1.10.0"
     },
     "devDependencies": {
+        "@types/graphql-iso-date": "^3.3.3",
         "@types/graphql-type-json": "^0.3.2",
         "@types/jest": "^24.9.0",
         "@types/node": "^13.1.8",

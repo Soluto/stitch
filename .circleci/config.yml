@@ -36,7 +36,7 @@ workflows:
                   filters:
                       branches:
                           ignore:
-                              - stitch
+                              - master
     master:
         jobs:
             - docker/publish:
@@ -51,7 +51,7 @@ workflows:
                   filters:
                       branches:
                           only:
-                              - stitch
+                              - master
     release_tag:
         jobs:
             - create_docker_tag:

@@ -1,5 +1,6 @@
 import {ApolloServer} from 'apollo-server-fastify';
 import * as fastify from 'fastify';
+import * as fastifyMetrics from 'fastify-metrics';
 import {createStitchGateway} from './modules/stitchGateway';
 import {RESTDirectiveDataSource} from './modules/directives/rest';
 import {pollForUpdates} from './modules/resource-repository';
@@ -42,6 +43,7 @@ async function run() {
     const {server, dispose} = createApolloServer();
 
     const app = fastify();
+    app.register(fastifyMetrics, {endpoint: '/metrics'});
     app.register(server.createHandler({path: '/graphql'}));
     const address = await app.listen(config.httpPort, '0.0.0.0');
     logger.info({address}, 'Stitch gateway started');

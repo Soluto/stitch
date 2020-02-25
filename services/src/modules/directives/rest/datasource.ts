@@ -12,7 +12,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     async doRequest(params: RestParams, parent: any, args: GraphQLArguments, info: GraphQLResolveInfo) {
         const headers = this.parseHeaders(params.headers, parent, args, info);
         const requestInit: RequestInit = {headers, timeout: params.timeoutMs ?? 10000, method: params.method};
-        const url = new URL(injectParameters(params.url, parent, args, this.context, info));
+        const url = new URL(injectParameters(params.url, parent, args, this.context, info).value);
         this.addQueryParams(url.searchParams, params.query, parent, args, info);
 
         const authHeaders = await getAuthHeaders(this.context.authenticationConfig, url.host, this.context.request);
@@ -36,9 +36,23 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     parseHeaders(kvs: KeyValue[] | undefined, parent: any, args: GraphQLArguments, info: GraphQLResolveInfo) {
         const headers = new Headers();
 
-        if (typeof kvs !== 'undefined') {
-            for (const kv of kvs) {
-                headers.append(kv.key, injectParameters(kv.value, parent, args, this.context, info));
+        if (typeof kvs === 'undefined') {
+            return headers;
+        }
+
+        for (const kv of kvs) {
+            const {value, didFindTemplates, didFindValues} = injectParameters(
+                kv.value,
+                parent,
+                args,
+                this.context,
+                info
+            );
+
+            if (didFindTemplates && didFindValues) {
+                headers.append(kv.key, value);
+            } else if (!didFindTemplates && !didFindValues) {
+                headers.append(kv.key, kv.value);
             }
         }
 
@@ -63,7 +77,10 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
 
             for (const originalValue in parameters) {
                 const paramValue = parameters[originalValue];
-                if (Array.isArray(paramValue)) {
+
+                if (typeof paramValue === 'undefined') {
+                    continue;
+                } else if (Array.isArray(paramValue)) {
                     for (const elem of paramValue) {
                         params.append(kv.key, elem);
                     }

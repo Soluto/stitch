@@ -19,7 +19,7 @@ Uploaded successfully!
         'authorization-header': flags.string({required: false, description: 'Custom authorization header'}),
     };
 
-    static args = [{name: 'fileOrDirectory', required: true}];
+    static args = [{name: 'resourcesPath', required: true}];
 
     async run() {
         const {args, flags} = this.parse(ApplyResources);
@@ -28,9 +28,9 @@ Uploaded successfully!
             this.log(`Dry run mode ON - No changes will be made to the registry`);
         }
 
-        this.log(`Uploading resource ${args.fileOrDirectory}`);
+        this.log(`Uploading resource ${args.resourcesPath}`);
 
-        const resourceGroup = await this.pathToResourceGroup(args.fileOrDirectory);
+        const resourceGroup = await this.pathToResourceGroup(args.resourcesPath);
 
         await uploadResourceGroup(resourceGroup, {
             registryUrl: flags['registry-url'],
