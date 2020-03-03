@@ -3,6 +3,7 @@ import {logLevel, nodeEnv} from './config';
 
 const loggerConfig: pino.LoggerOptions = {
     level: logLevel.toLowerCase(),
+    timestamp: pino.stdTimeFunctions.unixTime,
     messageKey: 'message',
 };
 
