@@ -3,7 +3,6 @@
     "version": "1.0.0",
     "scripts": {
         "test": "jest",
-        "test:integration": "jest --config jest.config.integration.js",
         "build": "tsc",
         "build:dev": "tsc --watch",
         "start:gateway:watch": "ts-node-dev src/gateway.ts",
