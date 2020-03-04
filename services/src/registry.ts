@@ -8,6 +8,7 @@ import {validateResourceGroupOrThrow} from './modules/validation';
 import {applyResourceGroupUpdates} from './modules/resource-repository/util';
 import logger from './modules/logger';
 import {handleSignals, handleUncaughtErrors} from './modules/shutdownHandler';
+import {createSchemaConfig} from './modules/graphqlService';
 
 const typeDefs = gql`
     # General
@@ -137,6 +138,7 @@ async function fetchAndValidate(updates: Partial<ResourceGroup>): Promise<Resour
     const rg = await fetch();
     const newRg = applyResourceGroupUpdates(rg, updates);
     validateResourceGroupOrThrow(newRg);
+    createSchemaConfig(newRg);
 
     return newRg;
 }

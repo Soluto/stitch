@@ -1,46 +1,21 @@
-import {ApolloServer} from 'apollo-server-fastify';
 import * as fastify from 'fastify';
 import * as fastifyMetrics from 'fastify-metrics';
-import {createStitchGateway} from './modules/stitchGateway';
-import {RESTDirectiveDataSource} from './modules/directives/rest';
-import {pollForUpdates} from './modules/resource-repository';
 import * as config from './modules/config';
 import logger from './modules/logger';
-import {ExportTrackingExtension} from './modules/exports';
+
 import {handleSignals, handleUncaughtErrors} from './modules/shutdownHandler';
-
-// exported for integration testing
-export function createApolloServer() {
-    const gateway = createStitchGateway({resourceGroups: pollForUpdates(config.resourceUpdateInterval)});
-    const server = new ApolloServer({
-        gateway,
-        extensions: [() => new ExportTrackingExtension()],
-        subscriptions: false,
-        tracing: config.enableGraphQLTracing,
-        playground: config.enableGraphQLPlayground,
-        introspection: config.enableGraphQLIntrospection,
-        context(request: fastify.FastifyRequest) {
-            return {request};
-        },
-        dataSources() {
-            return {
-                rest: new RESTDirectiveDataSource(),
-            };
-        },
-    });
-
-    return {
-        server,
-        dispose: async () => {
-            await server.stop();
-            gateway.dispose();
-        },
-    };
-}
+import {createStitchGateway} from './modules/gateway';
+import {pollForUpdates} from './modules/resource-repository';
 
 async function run() {
     logger.info('Stitch gateway booting up...');
-    const {server, dispose} = createApolloServer();
+
+    const {server, dispose} = createStitchGateway({
+        resourceGroups: pollForUpdates(config.resourceUpdateInterval),
+        tracing: config.enableGraphQLTracing,
+        playground: config.enableGraphQLPlayground,
+        introspection: config.enableGraphQLIntrospection,
+    });
 
     const app = fastify();
     app.register(fastifyMetrics, {endpoint: '/metrics'});
@@ -55,10 +30,4 @@ async function run() {
 // Only run when file is being executed, not when being imported
 if (require.main === module) {
     run();
-}
-
-declare module './modules/context' {
-    interface RequestContext {
-        request: fastify.FastifyRequest;
-    }
 }

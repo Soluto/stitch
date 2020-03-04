@@ -1,33 +1,6 @@
 import {ApolloError} from 'apollo-server-fastify';
-import {parse, DocumentNode, visit, GraphQLError, concatAST} from 'graphql';
-import {composeAndValidate} from '@apollo/federation';
-import federationDirectives from '@apollo/federation/dist/directives';
-
-import {ResourceGroup, Schema, Upstream} from './resource-repository';
-import * as baseSchema from './baseSchema';
-
-const removeNonFederationDirectives = (typeDef: DocumentNode) => {
-    return visit(typeDef, {
-        Directive(node) {
-            return federationDirectives.some(directive => directive.name === node.name.value) ? undefined : null;
-        },
-    });
-};
-
-function validateSchemas(schemas: Schema[]) {
-    const serviceDefs = Object.entries(schemas).map(([name, typeDef]) => {
-        const typeDefWithoutDirectives = removeNonFederationDirectives(parse(typeDef.schema));
-        const finalTypeDef = concatAST([baseSchema.baseTypeDef, typeDefWithoutDirectives]);
-
-        return {
-            name,
-            typeDefs: finalTypeDef,
-        };
-    });
-
-    const composeResults = composeAndValidate(serviceDefs);
-    return composeResults.errors;
-}
+import {GraphQLError} from 'graphql';
+import {ResourceGroup, Upstream} from './resource-repository';
 
 function validateUpstreams(upstreams: Upstream[]) {
     const errors: GraphQLError[] = [];
@@ -68,10 +41,6 @@ function validateUpstreams(upstreams: Upstream[]) {
 
 export function validateResourceGroupOrThrow(rg: ResourceGroup) {
     const errors: GraphQLError[] = [];
-
-    if (rg.schemas.length > 0) {
-        errors.push(...validateSchemas(rg.schemas));
-    }
 
     if (rg.upstreams.length > 0) {
         errors.push(...validateUpstreams(rg.upstreams));

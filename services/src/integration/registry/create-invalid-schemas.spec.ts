@@ -76,6 +76,6 @@ describe('Creation of invalid schemas', () => {
 
         expect(response.errors).not.toBeUndefined();
         expect(response.errors).toHaveLength(1);
-        expect(response.errors).toHaveProperty([0, 'message'], 'Resource validation failed');
+        expect(response.errors).toHaveProperty([0, 'message'], 'Federation validation failed');
     });
 });

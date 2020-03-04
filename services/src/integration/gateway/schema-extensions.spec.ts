@@ -1,10 +1,10 @@
 import {createTestClient, ApolloServerTestClient} from 'apollo-server-testing';
+import * as Rx from 'rxjs';
 import {gql} from 'apollo-server-core';
 import {print} from 'graphql';
 import * as nock from 'nock';
 import {basename} from 'path';
-import {createApolloServer} from '../../gateway';
-import {mockResourceBucketReads} from '../resourceBucket';
+import {createStitchGateway} from '../../modules/gateway';
 import {beforeEachDispose} from '../beforeEachDispose';
 
 const organizations = [{name: 'EvilCorp'}, {name: 'GoodCorp'}];
@@ -83,9 +83,8 @@ describe('Schema Extensions', () => {
 
     beforeEachDispose(() => {
         mockRestBackend('http://test.api');
-        mockResourceBucketReads(resourceGroup);
 
-        const stitch = createApolloServer();
+        const stitch = createStitchGateway({resourceGroups: Rx.of(resourceGroup)});
         client = createTestClient(stitch.server);
 
         return () => {

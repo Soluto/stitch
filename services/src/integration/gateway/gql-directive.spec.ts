@@ -1,11 +1,11 @@
 import {createTestClient, ApolloServerTestClient} from 'apollo-server-testing';
+import * as Rx from 'rxjs';
 import * as nock from 'nock';
 import {makeExecutableSchema} from 'graphql-tools';
 import {gql} from 'apollo-server-core';
 import {graphqlSync, GraphQLSchema, print} from 'graphql';
-import {createApolloServer} from '../../gateway';
+import {createStitchGateway} from '../../modules/gateway';
 import {beforeEachDispose} from '../beforeEachDispose';
-import {mockResourceBucketReads} from '../resourceBucket';
 
 const miriam = {
     employeeId: '1',
@@ -76,9 +76,8 @@ describe('GQL Directive', () => {
 
     beforeEachDispose(() => {
         mockGqlBackend('http://test.gql', remoteSchema);
-        mockResourceBucketReads(resourceGroup);
 
-        const stitch = createApolloServer();
+        const stitch = createStitchGateway({resourceGroups: Rx.of(resourceGroup)});
         client = createTestClient(stitch.server);
 
         return () => {
