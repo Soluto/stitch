@@ -11,7 +11,6 @@ RUN npm ci
 
 FROM build-dependencies as test
 RUN npm run test
-RUN npm run test:integration
 
 FROM build-dependencies as build
 RUN npm run build

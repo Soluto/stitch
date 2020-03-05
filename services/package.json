@@ -30,6 +30,7 @@
         "openid-client": "^3.13.0",
         "p-limit": "^2.2.2",
         "pino": "^5.16.0",
+        "pino-pretty": "^3.6.1",
         "rxjs": "^6.5.4",
         "tslib": "^1.11.0"
     },
@@ -43,7 +44,6 @@
         "jest": "^25.1.0",
         "jest-fetch-mock": "^3.0.1",
         "nock": "^12.0.1",
-        "pino-pretty": "^3.6.0",
         "ts-jest": "^25.2.1",
         "ts-node-dev": "^1.0.0-pre.44",
         "typescript": "^3.7.5"
