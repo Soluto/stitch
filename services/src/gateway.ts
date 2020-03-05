@@ -1,17 +1,19 @@
 import * as fastify from 'fastify';
 import * as fastifyMetrics from 'fastify-metrics';
+
 import * as config from './modules/config';
 import logger from './modules/logger';
-
 import {handleSignals, handleUncaughtErrors} from './modules/shutdownHandler';
 import {createStitchGateway} from './modules/gateway';
-import {pollForUpdates} from './modules/resource-repository';
+import {pollForUpdates, S3ResourceRepository} from './modules/resource-repository';
 
 async function run() {
     logger.info('Stitch gateway booting up...');
 
+    const resourceRepository = new S3ResourceRepository();
+
     const {server, dispose} = createStitchGateway({
-        resourceGroups: pollForUpdates(config.resourceUpdateInterval),
+        resourceGroups: pollForUpdates(resourceRepository, config.resourceUpdateInterval),
         tracing: config.enableGraphQLTracing,
         playground: config.enableGraphQLPlayground,
         introspection: config.enableGraphQLIntrospection,

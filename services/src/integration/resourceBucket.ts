@@ -1,15 +1,15 @@
 import * as nock from 'nock';
 import {ResourceGroup} from '../modules/resource-repository';
-import {resourceBucketName, resourcesObjectKey, s3endpoint} from '../modules/config';
+import {defaultEndpoint, bucketName, objectKey} from '../modules/resource-repository/s3';
 
 export function mockResourceBucket(initialValue: ResourceGroup) {
     const value = {current: initialValue};
 
-    nock(s3endpoint)
+    nock(defaultEndpoint!)
         .persist()
-        .get(`/${resourceBucketName}/${resourcesObjectKey}`)
+        .get(`/${bucketName!}/${objectKey}`)
         .reply(200, value.current)
-        .put(`/${resourceBucketName}/${resourcesObjectKey}`)
+        .put(`/${bucketName!}/${objectKey}`)
         .reply(200, (_, body) => {
             value.current = JSON.parse(body as string) as ResourceGroup;
         });
