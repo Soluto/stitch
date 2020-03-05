@@ -1,9 +1,9 @@
 import {createTestClient, ApolloServerTestClient} from 'apollo-server-testing';
+import * as Rx from 'rxjs';
 import * as nock from 'nock';
 import {gql} from 'apollo-server-core';
 import {print} from 'graphql';
-import {createApolloServer} from '../../gateway';
-import {mockResourceBucketReads} from '../resourceBucket';
+import {createStitchGateway} from '../../modules/gateway';
 import {beforeEachDispose} from '../beforeEachDispose';
 
 const schema = {
@@ -29,9 +29,8 @@ describe('Hello world', () => {
     let client: ApolloServerTestClient;
 
     beforeEachDispose(() => {
-        const stitch = createApolloServer();
+        const stitch = createStitchGateway({resourceGroups: Rx.of(resourceGroup)});
         client = createTestClient(stitch.server);
-        mockResourceBucketReads(resourceGroup);
 
         return () => {
             nock.cleanAll();

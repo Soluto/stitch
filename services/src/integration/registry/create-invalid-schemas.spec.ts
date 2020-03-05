@@ -11,6 +11,11 @@ const badSdlSchema = {
     schema: 'type Query { something: String! ',
 };
 
+const badDirectiveSchema = {
+    metadata: {namespace: 'namespace', name: 'name'},
+    schema: 'type Query { something: String! @rest(url: "something", fakeArgument: 123) }',
+};
+
 const badFederationSchemas = [
     {
         metadata: {namespace: 'namespace', name: 'basePerson'},
@@ -60,6 +65,25 @@ describe('Creation of invalid schemas', () => {
         expect(response.errors).not.toBeUndefined();
     });
 
+    it('Invalid directive arguments in schema gets rejected', async () => {
+        const response = await client.mutate({
+            mutation: gql`
+                mutation CreateSchema($schema: SchemaInput!) {
+                    updateSchemas(input: [$schema]) {
+                        success
+                    }
+                }
+            `,
+            variables: {
+                schema: badDirectiveSchema,
+            },
+        });
+
+        expect(response.errors).toHaveProperty([0, 'message'], 'Unknown argument "fakeArgument" on directive "@rest".');
+        expect(response.errors).toHaveLength(1);
+        expect(response.errors).not.toBeUndefined();
+    });
+
     it('Bad federation composition in schema gets rejected', async () => {
         const response = await client.mutate({
             mutation: gql`
@@ -76,6 +100,6 @@ describe('Creation of invalid schemas', () => {
 
         expect(response.errors).not.toBeUndefined();
         expect(response.errors).toHaveLength(1);
-        expect(response.errors).toHaveProperty([0, 'message'], 'Resource validation failed');
+        expect(response.errors).toHaveProperty([0, 'message'], 'Federation validation failed');
     });
 });

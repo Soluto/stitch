@@ -2,12 +2,13 @@ import {ApolloServer, gql, IResolvers} from 'apollo-server-fastify';
 import * as fastify from 'fastify';
 import pLimit from 'p-limit';
 
-import {fetch, update, ResourceGroup} from './modules/resource-repository';
+import {S3ResourceRepository, ResourceGroup} from './modules/resource-repository';
 import * as config from './modules/config';
 import {validateResourceGroupOrThrow} from './modules/validation';
 import {applyResourceGroupUpdates} from './modules/resource-repository/util';
 import logger from './modules/logger';
 import {handleSignals, handleUncaughtErrors} from './modules/shutdownHandler';
+import {createSchemaConfig} from './modules/graphqlService';
 
 const typeDefs = gql`
     # General
@@ -133,10 +134,13 @@ interface UpstreamClientCredentialsInput {
     };
 }
 
+const resourceRepository = new S3ResourceRepository();
+
 async function fetchAndValidate(updates: Partial<ResourceGroup>): Promise<ResourceGroup> {
-    const rg = await fetch();
+    const rg = await resourceRepository.fetch();
     const newRg = applyResourceGroupUpdates(rg, updates);
     validateResourceGroupOrThrow(newRg);
+    createSchemaConfig(newRg);
 
     return newRg;
 }
@@ -169,7 +173,7 @@ const resolvers: IResolvers = {
         updateResourceGroup(_, args: {input: ResourceGroupInput}) {
             return singleton(async () => {
                 const rg = await fetchAndValidate(args.input);
-                await update(rg);
+                await resourceRepository.update(rg);
 
                 return {success: true};
             });
@@ -177,7 +181,7 @@ const resolvers: IResolvers = {
         updateSchemas(_, args: {input: SchemaInput[]}) {
             return singleton(async () => {
                 const rg = await fetchAndValidate({schemas: args.input});
-                await update(rg);
+                await resourceRepository.update(rg);
 
                 return {success: true};
             });
@@ -185,7 +189,7 @@ const resolvers: IResolvers = {
         updateUpstreams(_, args: {input: UpstreamInput[]}) {
             return singleton(async () => {
                 const rg = await fetchAndValidate({upstreams: args.input});
-                await update(rg);
+                await resourceRepository.update(rg);
 
                 return {success: true};
             });
@@ -193,7 +197,7 @@ const resolvers: IResolvers = {
         updateUpstreamClientCredentials(_, args: {input: UpstreamClientCredentialsInput[]}) {
             return singleton(async () => {
                 const rg = await fetchAndValidate({upstreamClientCredentials: args.input});
-                await update(rg);
+                await resourceRepository.update(rg);
 
                 return {success: true};
             });

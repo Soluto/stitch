@@ -83,7 +83,7 @@ describe('Create resource', () => {
     it('UpstreamClientCredentials', async () => {
         const response = await client.mutate({
             mutation: gql`
-                mutation CreateUpstream($upstreamClientCredentials: UpstreamClientCredentialsInput!) {
+                mutation CreateUpstreamClientCredentials($upstreamClientCredentials: UpstreamClientCredentialsInput!) {
                     updateUpstreamClientCredentials(input: [$upstreamClientCredentials]) {
                         success
                     }

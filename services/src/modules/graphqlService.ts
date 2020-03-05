@@ -12,7 +12,7 @@ import {sdl as directivesSdl} from './directives';
 import logger from './logger';
 import {AuthenticationConfig} from './auth/types';
 
-export function createStitchGateway(config: {resourceGroups: Observable<ResourceGroup>}) {
+export function createGraphQLService(config: {resourceGroups: Observable<ResourceGroup>}) {
     let currentSchemaConfig: GraphQLServiceConfig | null = null;
 
     const subscription = new Subscription();
@@ -55,12 +55,13 @@ export function createStitchGateway(config: {resourceGroups: Observable<Resource
     };
 }
 
-function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
+export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
     const activeDirectoryAuth = new ActiveDirectoryAuth();
     const upstreamsByHost = new Map(rg.upstreams.map(u => [u.host, u]));
     const upstreamClientCredentialsByAuthority = new Map(
         rg.upstreamClientCredentials.map(u => [u.activeDirectory.authority, u])
     );
+    const schemas = rg.schemas.length === 0 ? [defaultSchema] : rg.schemas;
 
     const authenticationConfig: AuthenticationConfig = {
         getUpstreamByHost(host: string) {
@@ -73,9 +74,7 @@ function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
     };
 
     const schema = buildSchemaFromFederatedTypeDefs({
-        typeDefs: Object.fromEntries(
-            rg.schemas.map(s => [`${s.metadata.namespace}/${s.metadata.name}`, parse(s.schema)])
-        ),
+        typeDefs: Object.fromEntries(schemas.map(s => [`${s.metadata.namespace}/${s.metadata.name}`, parse(s.schema)])),
         baseTypeDefs: baseSchema.baseTypeDef,
         directiveTypeDefs: directivesSdl,
         resolvers: baseSchema.resolvers,
@@ -98,6 +97,11 @@ function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
         },
     };
 }
+
+const defaultSchema = {
+    metadata: {namespace: '__internal__', name: 'default'},
+    schema: 'type Query { default: String! @stub(value: "default") }',
+};
 
 declare module './context' {
     interface RequestContext {

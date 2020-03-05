@@ -1,11 +1,11 @@
 import {createTestClient, ApolloServerTestClient} from 'apollo-server-testing';
+import * as Rx from 'rxjs';
 import * as nock from 'nock';
 import {gql} from 'apollo-server-core';
 import {print} from 'graphql';
-import {createApolloServer} from '../../gateway';
-import {mockResourceBucketReadsOverTime} from '../resourceBucket';
+import {createStitchGateway} from '../../modules/gateway';
 import {beforeEachDispose} from '../beforeEachDispose';
-import {resourceUpdateInterval} from '../../modules/config';
+import {ResourceGroup} from '../../modules/resource-repository';
 
 const schema1 = {
     metadata: {
@@ -36,22 +36,19 @@ const resourceGroup = {
     upstreamClientCredentials: [],
 };
 
-const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
-
 describe('Hello world', () => {
     let client: ApolloServerTestClient;
+    let resourceGroups: Rx.BehaviorSubject<ResourceGroup>;
 
     beforeEachDispose(() => {
-        mockResourceBucketReadsOverTime([
-            {...resourceGroup, etag: 'v1', schemas: [schema1]},
-            {...resourceGroup, etag: 'v2', schemas: [schema2]},
-        ]);
-        const stitch = createApolloServer();
+        resourceGroups = new Rx.BehaviorSubject({...resourceGroup, etag: 'v1', schemas: [schema1]} as ResourceGroup);
+        const stitch = createStitchGateway({resourceGroups});
         client = createTestClient(stitch.server);
 
         return () => {
             jest.useRealTimers();
             nock.cleanAll();
+            resourceGroups.complete();
             return stitch.dispose();
         };
     });
@@ -68,7 +65,7 @@ describe('Hello world', () => {
         expect(response1.errors).toBeUndefined();
         expect(response1.data).toEqual({version: 'v1'});
 
-        await sleep(resourceUpdateInterval);
+        resourceGroups.next({...resourceGroup, etag: 'v2', schemas: [schema2]});
 
         const response2 = await client.query({
             query: gql`
