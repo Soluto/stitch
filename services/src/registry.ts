@@ -2,10 +2,9 @@ import {ApolloServer, gql, IResolvers} from 'apollo-server-fastify';
 import * as fastify from 'fastify';
 import pLimit from 'p-limit';
 
-import {S3ResourceRepository, ResourceGroup} from './modules/resource-repository';
+import {S3ResourceRepository, ResourceGroup, applyResourceGroupUpdates} from './modules/resource-repository';
 import * as config from './modules/config';
 import {validateResourceGroupOrThrow} from './modules/validation';
-import {applyResourceGroupUpdates} from './modules/resource-repository/util';
 import logger from './modules/logger';
 import {handleSignals, handleUncaughtErrors} from './modules/shutdownHandler';
 import {createSchemaConfig} from './modules/graphqlService';
@@ -137,8 +136,8 @@ interface UpstreamClientCredentialsInput {
 const resourceRepository = S3ResourceRepository.fromEnvironment();
 
 async function fetchAndValidate(updates: Partial<ResourceGroup>): Promise<ResourceGroup> {
-    const rg = await resourceRepository.fetchLatest();
-    const newRg = applyResourceGroupUpdates(rg, updates);
+    const {resourceGroup} = await resourceRepository.fetchLatest();
+    const newRg = applyResourceGroupUpdates(resourceGroup, updates);
     validateResourceGroupOrThrow(newRg);
     createSchemaConfig(newRg);
 
