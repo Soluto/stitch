@@ -39,8 +39,8 @@ export interface UpstreamClientCredentials extends Resource {
 }
 
 export interface ResourceRepository {
-    fetch(): Promise<ResourceGroup>;
-    fetch(etag?: string): Promise<ResourceGroup | null>;
+    fetchLatest(): Promise<ResourceGroup>;
+    fetchLatestIfNeeded(etag?: string): Promise<ResourceGroup | null>;
     update(rg: ResourceGroup): Promise<void>;
 }
 

@@ -10,7 +10,7 @@ import {pollForUpdates, S3ResourceRepository} from './modules/resource-repositor
 async function run() {
     logger.info('Stitch gateway booting up...');
 
-    const resourceRepository = new S3ResourceRepository();
+    const resourceRepository = S3ResourceRepository.fromEnvironment();
 
     const {server, dispose} = createStitchGateway({
         resourceGroups: pollForUpdates(resourceRepository, config.resourceUpdateInterval),

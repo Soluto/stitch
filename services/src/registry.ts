@@ -134,10 +134,10 @@ interface UpstreamClientCredentialsInput {
     };
 }
 
-const resourceRepository = new S3ResourceRepository();
+const resourceRepository = S3ResourceRepository.fromEnvironment();
 
 async function fetchAndValidate(updates: Partial<ResourceGroup>): Promise<ResourceGroup> {
-    const rg = await resourceRepository.fetch();
+    const rg = await resourceRepository.fetchLatest();
     const newRg = applyResourceGroupUpdates(rg, updates);
     validateResourceGroupOrThrow(newRg);
     createSchemaConfig(newRg);

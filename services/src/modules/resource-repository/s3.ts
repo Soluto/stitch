@@ -9,52 +9,21 @@ export const objectKey = envVar
     .default('resources.json')
     .asString();
 
-function createFromEnvironment() {
-    const s3endpoint = envVar
-        .get('S3_ENDPOINT')
-        .required()
-        .asString();
-    const bucketName = envVar
-        .get('RESOURCE_BUCKET_NAME')
-        .required()
-        .asString();
-    const awsAccessKeyId = envVar.get('AWS_ACCESS_KEY_ID').asString();
-    const awsSecretAccessKey = envVar.get('AWS_SECRET_ACCESS_KEY').asString();
-
-    return {
-        s3: new AWS.S3({
-            accessKeyId: awsAccessKeyId,
-            secretAccessKey: awsSecretAccessKey,
-            endpoint: s3endpoint,
-            s3ForcePathStyle: true,
-            signatureVersion: 'v4',
-        }),
-        bucketName,
-        objectKey,
-    };
-}
-
 interface S3ResourceRepositoryConfig {
     s3: AWS.S3;
     bucketName: string;
     objectKey: string;
 }
 export class S3ResourceRepository implements ResourceRepository {
-    config: S3ResourceRepositoryConfig;
+    constructor(protected config: S3ResourceRepositoryConfig) {}
 
-    constructor(config?: S3ResourceRepositoryConfig) {
-        if (!config) {
-            this.config = createFromEnvironment();
-        } else {
-            this.config = config;
-        }
+    async fetchLatest(): Promise<ResourceGroup> {
+        const latest = await this.fetchLatestIfNeeded(undefined);
+        return latest !== null ? latest : {schemas: [], upstreams: [], upstreamClientCredentials: []};
     }
 
-    /** Returns latest resource group */
-    fetch(): Promise<ResourceGroup>;
-
     /** Returns latest resource group, or null if etag matches */
-    async fetch(etag?: string): Promise<ResourceGroup | null> {
+    async fetchLatestIfNeeded(etag?: string): Promise<ResourceGroup | null> {
         let response: AWS.S3.GetObjectOutput | undefined;
 
         try {
@@ -100,6 +69,31 @@ export class S3ResourceRepository implements ResourceRepository {
                 Body: JSON.stringify(rgWithoutEtag),
             })
             .promise();
+    }
+
+    static fromEnvironment() {
+        const s3endpoint = envVar
+            .get('S3_ENDPOINT')
+            .required()
+            .asString();
+        const bucketName = envVar
+            .get('RESOURCE_BUCKET_NAME')
+            .required()
+            .asString();
+        const awsAccessKeyId = envVar.get('AWS_ACCESS_KEY_ID').asString();
+        const awsSecretAccessKey = envVar.get('AWS_SECRET_ACCESS_KEY').asString();
+
+        return new S3ResourceRepository({
+            s3: new AWS.S3({
+                accessKeyId: awsAccessKeyId,
+                secretAccessKey: awsSecretAccessKey,
+                endpoint: s3endpoint,
+                s3ForcePathStyle: true,
+                signatureVersion: 'v4',
+            }),
+            bucketName,
+            objectKey,
+        });
     }
 }
 

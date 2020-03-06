@@ -10,7 +10,7 @@ export function pollForUpdates(resourceRepository: ResourceRepository, intervalM
     return interval(intervalMs).pipe(
         startWith(0),
         mergeScan(async rg => {
-            const newRg = await resourceRepository.fetch(rg?.etag);
+            const newRg = await resourceRepository.fetchLatestIfNeeded(rg?.etag);
             return newRg ?? rg;
         }, null as ResourceGroup | null),
         filter(isNonNull),
