@@ -41,7 +41,7 @@ describe('Hello world', () => {
     let resourceGroups: Rx.BehaviorSubject<ResourceGroup>;
 
     beforeEachDispose(() => {
-        resourceGroups = new Rx.BehaviorSubject({...resourceGroup, etag: 'v1', schemas: [schema1]} as ResourceGroup);
+        resourceGroups = new Rx.BehaviorSubject({...resourceGroup, schemas: [schema1]} as ResourceGroup);
         const stitch = createStitchGateway({resourceGroups});
         client = createTestClient(stitch.server);
 
@@ -65,7 +65,7 @@ describe('Hello world', () => {
         expect(response1.errors).toBeUndefined();
         expect(response1.data).toEqual({version: 'v1'});
 
-        resourceGroups.next({...resourceGroup, etag: 'v2', schemas: [schema2]});
+        resourceGroups.next({...resourceGroup, schemas: [schema2]});
 
         const response2 = await client.query({
             query: gql`

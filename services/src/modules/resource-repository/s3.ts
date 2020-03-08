@@ -2,13 +2,6 @@ import * as AWS from 'aws-sdk';
 import * as envVar from 'env-var';
 import {ResourceRepository, ResourceGroup, FetchLatestResult} from './types';
 
-export const defaultEndpoint = envVar.get('S3_ENDPOINT').asString();
-export const bucketName = envVar.get('RESOURCE_BUCKET_NAME').asString();
-export const objectKey = envVar
-    .get('RESOURCE_OBJECT_KEY')
-    .default('resources.json')
-    .asString();
-
 interface S3ResourceRepositoryConfig {
     s3: AWS.S3;
     bucketName: string;
@@ -71,6 +64,10 @@ export class S3ResourceRepository implements ResourceRepository {
         const bucketName = envVar
             .get('S3_RESOURCE_BUCKET_NAME')
             .required()
+            .asString();
+        const objectKey = envVar
+            .get('S3_RESOURCE_OBJECT_KEY')
+            .default('resources.json')
             .asString();
         const awsAccessKeyId = envVar.get('S3_AWS_ACCESS_KEY_ID').asString();
         const awsSecretAccessKey = envVar.get('S3_AWS_SECRET_ACCESS_KEY').asString();
