@@ -3,9 +3,9 @@ module.exports = {
         {
             displayName: 'Unit Tests',
             roots: ['<rootDir>/src'],
-            testPathIgnorePatterns: ['/node_modules/', '/src/integration'],
+            testPathIgnorePatterns: ['/node_modules/', '/src/integration', '/src/e2e'],
             setupFiles: ['./setupJestUnit.js'],
-
+            testEnvironment: 'node',
             testMatch: ['**/__tests__/**/*.+(ts|tsx|js)', '**/?(*.)+(spec|test).+(ts|tsx|js)'],
             transform: {
                 '^.+\\.(ts|tsx)$': 'ts-jest',
@@ -14,8 +14,8 @@ module.exports = {
         {
             displayName: 'Integration Tests',
             roots: ['<rootDir>/src/integration'],
-            setupFiles: ['./src/integration/setupJest.js'],
-
+            setupFiles: ['./src/integration/setup.js'],
+            testEnvironment: 'node',
             testMatch: ['**/__tests__/**/*.+(ts|tsx|js)', '**/?(*.)+(spec|test).+(ts|tsx|js)'],
             transform: {
                 '^.+\\.(ts|tsx)$': 'ts-jest',

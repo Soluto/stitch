@@ -10,7 +10,8 @@ FROM dependencies as build-dependencies
 RUN npm ci
 
 FROM build-dependencies as test
-RUN npm run test
+ARG RUN_TESTS=true
+RUN if [ "$RUN_TESTS" = "true" ]; then npm run test; fi
 
 FROM build-dependencies as build
 RUN npm run build
