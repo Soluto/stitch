@@ -5,15 +5,19 @@ import * as config from './modules/config';
 import logger from './modules/logger';
 import {handleSignals, handleUncaughtErrors} from './modules/shutdownHandler';
 import {createStitchGateway} from './modules/gateway';
-import {pollForUpdates, S3ResourceRepository} from './modules/resource-repository';
+import {
+    pollForUpdates,
+    S3ResourceRepository,
+    FileSystemResourceRepository,
+    ResourceRepository,
+    CompositeResourceRepository,
+} from './modules/resource-repository';
 
 async function run() {
     logger.info('Stitch gateway booting up...');
 
-    const resourceRepository = new S3ResourceRepository();
-
     const {server, dispose} = createStitchGateway({
-        resourceGroups: pollForUpdates(resourceRepository, config.resourceUpdateInterval),
+        resourceGroups: pollForUpdates(getResourceRepository(), config.resourceUpdateInterval),
         tracing: config.enableGraphQLTracing,
         playground: config.enableGraphQLPlayground,
         introspection: config.enableGraphQLIntrospection,
@@ -27,6 +31,28 @@ async function run() {
 
     handleSignals(dispose);
     handleUncaughtErrors();
+}
+
+function getResourceRepository() {
+    const repositories: ResourceRepository[] = [];
+
+    if (config.useS3ResourceRepository) {
+        repositories.push(S3ResourceRepository.fromEnvironment());
+    }
+
+    if (config.useFileSystemResourceRepository) {
+        repositories.push(FileSystemResourceRepository.fromEnvironment());
+    }
+
+    switch (true) {
+        case repositories.length === 0:
+            logger.fatal('Must enable at least one resource repository');
+            throw new Error('Must enable at least one resource repository');
+        case repositories.length === 1:
+            return repositories[0];
+        default:
+            return new CompositeResourceRepository(repositories);
+    }
 }
 
 // Only run when file is being executed, not when being imported

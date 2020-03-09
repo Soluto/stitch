@@ -14,7 +14,7 @@ module.exports = {
         {
             displayName: 'Integration Tests',
             roots: ['<rootDir>/src/integration'],
-            setupFiles: ['./setupJestIntegration.js'],
+            setupFiles: ['./src/integration/setupJest.js'],
 
             testMatch: ['**/__tests__/**/*.+(ts|tsx|js)', '**/?(*.)+(spec|test).+(ts|tsx|js)'],
             transform: {

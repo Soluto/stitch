@@ -1,4 +1,4 @@
-import {applyResourceUpdates} from './util';
+import {applyResourceUpdates} from './updates';
 
 describe('applyResourceUpdates', () => {
     it('Inserts new resources', () => {

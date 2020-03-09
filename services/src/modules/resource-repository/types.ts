@@ -1,5 +1,4 @@
 export interface ResourceGroup {
-    etag?: string;
     schemas: Schema[];
     upstreams: Upstream[];
     upstreamClientCredentials: UpstreamClientCredentials[];
@@ -38,9 +37,13 @@ export interface UpstreamClientCredentials extends Resource {
     };
 }
 
+export interface FetchLatestResult {
+    isNew: boolean;
+    resourceGroup: ResourceGroup;
+}
+
 export interface ResourceRepository {
-    fetch(): Promise<ResourceGroup>;
-    fetch(etag?: string): Promise<ResourceGroup | null>;
+    fetchLatest(): Promise<FetchLatestResult>;
     update(rg: ResourceGroup): Promise<void>;
 }
 

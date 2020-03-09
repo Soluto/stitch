@@ -17,7 +17,7 @@ export function createGraphQLService(config: {resourceGroups: Observable<Resourc
 
     const subscription = new Subscription();
     const newSchemaConfigs = config.resourceGroups.pipe(
-        tap(rg => logger.info({etag: rg.etag}, 'Loading new resources')),
+        tap(() => logger.info('Loading new resources')),
         map(createSchemaConfig),
         catchError((error, obs) => {
             logger.error(error, 'Error creating schema config');

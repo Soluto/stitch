@@ -14,6 +14,16 @@ export const nodeEnv = envVar
     .default('development')
     .asString();
 
+// Repositories
+export const useS3ResourceRepository = envVar
+    .get('USE_S3_RESOURCE_REPOSITORY')
+    .default('false')
+    .asBoolStrict();
+export const useFileSystemResourceRepository = envVar
+    .get('USE_FS_RESOURCE_REPOSITORY')
+    .default('true')
+    .asBoolStrict();
+
 // Resources
 export const resourceUpdateInterval = envVar
     .get('RESOURCE_UPDATE_INTERVAL')
