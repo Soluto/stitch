@@ -3,8 +3,8 @@ module.exports = {
         {
             displayName: 'Unit Tests',
             roots: ['<rootDir>/src'],
-            testPathIgnorePatterns: ['/node_modules/', '/src/integration', '/src/e2e'],
-            setupFiles: ['./setupJestUnit.js'],
+            testPathIgnorePatterns: ['/node_modules/', '/src/tests'],
+            setupFiles: ['<rootDir>/setupJestUnit.js'],
             testEnvironment: 'node',
             testMatch: ['**/__tests__/**/*.+(ts|tsx|js)', '**/?(*.)+(spec|test).+(ts|tsx|js)'],
             transform: {
@@ -13,8 +13,8 @@ module.exports = {
         },
         {
             displayName: 'Integration Tests',
-            roots: ['<rootDir>/src/integration'],
-            setupFiles: ['./src/integration/setup.js'],
+            roots: ['<rootDir>/src/tests/integration'],
+            setupFiles: ['<rootDir>/src/tests/integration/setup.js'],
             testEnvironment: 'node',
             testMatch: ['**/__tests__/**/*.+(ts|tsx|js)', '**/?(*.)+(spec|test).+(ts|tsx|js)'],
             transform: {

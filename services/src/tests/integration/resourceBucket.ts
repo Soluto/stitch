@@ -1,5 +1,5 @@
 import * as nock from 'nock';
-import {ResourceGroup} from '../modules/resource-repository';
+import {ResourceGroup} from '../../modules/resource-repository';
 
 export function mockResourceBucket(initialValue: ResourceGroup) {
     const s3endpoint = process.env.S3_ENDPOINT;

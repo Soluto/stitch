@@ -3,7 +3,7 @@ version: '3.7'
 services:
     gateway:
         build:
-            context: ../..
+            context: ../../..
             dockerfile: deployment/docker/Dockerfile
             args:
                 RUN_TESTS: 'false'
@@ -18,7 +18,7 @@ services:
 
     registry:
         build:
-            context: ../..
+            context: ../../..
             dockerfile: deployment/docker/Dockerfile
             args:
                 RUN_TESTS: 'false'

@@ -4,7 +4,7 @@ import * as nock from 'nock';
 import {makeExecutableSchema} from 'graphql-tools';
 import {gql} from 'apollo-server-core';
 import {graphqlSync, GraphQLSchema, print} from 'graphql';
-import {createStitchGateway} from '../../modules/gateway';
+import {createStitchGateway} from '../../../modules/gateway';
 import {beforeEachDispose} from '../beforeEachDispose';
 
 const miriam = {

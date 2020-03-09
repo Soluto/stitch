@@ -2,9 +2,9 @@ import {createTestClient, ApolloServerTestClient} from 'apollo-server-testing';
 import {gql} from 'apollo-server-core';
 import * as nock from 'nock';
 import {beforeEachDispose} from '../beforeEachDispose';
-import {app, AuthType} from '../../registry';
+import {app, AuthType} from '../../../registry';
 import {mockResourceBucket} from '../resourceBucket';
-import {ResourceGroup} from '../../modules/resource-repository';
+import {ResourceGroup} from '../../../modules/resource-repository';
 
 const schema = {
     metadata: {namespace: 'namespace', name: 'name'},
