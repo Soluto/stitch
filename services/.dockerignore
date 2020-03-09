@@ -13,4 +13,4 @@ dist/
 
 deployment/dev
 .vscode/
-src/e2e
+src/tests/e2e
