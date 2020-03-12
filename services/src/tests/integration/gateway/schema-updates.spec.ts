@@ -3,9 +3,9 @@ import * as Rx from 'rxjs';
 import * as nock from 'nock';
 import {gql} from 'apollo-server-core';
 import {print} from 'graphql';
-import {createStitchGateway} from '../../modules/gateway';
+import {createStitchGateway} from '../../../modules/gateway';
 import {beforeEachDispose} from '../beforeEachDispose';
-import {ResourceGroup} from '../../modules/resource-repository';
+import {ResourceGroup} from '../../../modules/resource-repository';
 
 const schema1 = {
     metadata: {

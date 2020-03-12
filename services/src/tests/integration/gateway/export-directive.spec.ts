@@ -3,7 +3,7 @@ import * as Rx from 'rxjs';
 import {gql} from 'apollo-server-core';
 import {print} from 'graphql';
 import * as nock from 'nock';
-import {createStitchGateway} from '../../modules/gateway';
+import {createStitchGateway} from '../../../modules/gateway';
 import {beforeEachDispose} from '../beforeEachDispose';
 
 const organizations = [

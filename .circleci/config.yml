@@ -1,6 +1,7 @@
 version: 2.1
 orbs:
     docker: circleci/docker@0.5.20
+    node: circleci/node@1.1.6
 executors:
     linux:
         machine:
@@ -20,19 +21,23 @@ jobs:
             - docker/push:
                   image: soluto/stitch
                   tag: '$CIRCLE_TAG'
+    build_test:
+        executor: linux
+        steps:
+            - checkout
+            - node/install:
+                  install-yarn: false
+            - run:
+                  command: |
+                      cd services
+                      npm ci
+                      npm run test:full
 
 workflows:
     version: 2
     pull_request:
         jobs:
-            - docker/publish:
-                  executor: linux
-                  deploy: false
-                  docker-username: DOCKERHUB_USERNAME
-                  docker-password: DOCKERHUB_PASSWORD
-                  image: soluto/stitch
-                  path: ./services
-                  dockerfile: deployment/docker/Dockerfile
+            - build_test:
                   filters:
                       branches:
                           ignore:
