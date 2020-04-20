@@ -1,7 +1,7 @@
 import {ResourceGroup, Resource} from '.';
 
 export function applyResourceUpdates<TResource extends Resource>(
-    resources: TResource[],
+    resources: TResource[] = [],
     updates?: TResource[]
 ): TResource[] {
     if (updates === undefined) {
@@ -43,6 +43,10 @@ export function applyResourceGroupUpdates(rg: ResourceGroup, update: Partial<Res
             newRg.upstreamClientCredentials,
             update.upstreamClientCredentials
         );
+    }
+
+    if (typeof update.policies !== 'undefined') {
+        newRg.policies = applyResourceUpdates(newRg.policies, update.policies);
     }
 
     return newRg;

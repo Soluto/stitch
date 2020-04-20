@@ -25,6 +25,7 @@ const resourceGroup = {
     schemas: [schema],
     upstreams: [],
     upstreamClientCredentials: [],
+    policies: [],
 };
 
 describe('Rest Directive', () => {

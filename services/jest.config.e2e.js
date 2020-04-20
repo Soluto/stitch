@@ -3,7 +3,7 @@ module.exports = {
         {
             displayName: 'End-to-End Tests',
             roots: ['<rootDir>/src/tests/e2e'],
-            testTimeout: 30000,
+            testTimeout: 60000,
             testEnvironment: '<rootDir>/src/tests/e2e/jest-e2e-environment.js',
             runner: '<rootDir>/src/tests/e2e/jest-e2e-runner.js',
             testMatch: ['**/__tests__/**/*.+(ts|tsx|js)', '**/?(*.)+(spec|test).+(ts|tsx|js)'],

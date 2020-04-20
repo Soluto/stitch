@@ -35,7 +35,7 @@ const badFederationSchemas = [
     },
 ];
 
-const baseResourceGroup = {schemas: [], upstreams: [], upstreamClientCredentials: []};
+const baseResourceGroup = {schemas: [], upstreams: [], upstreamClientCredentials: [], policies: []};
 describe('Creation of invalid schemas', () => {
     let client: ApolloServerTestClient;
 

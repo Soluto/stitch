@@ -6,7 +6,7 @@ import {HttpLink} from 'apollo-link-http';
 import {RetryLink} from 'apollo-link-retry';
 import {setContext} from 'apollo-link-context';
 import fetch from 'node-fetch';
-import {deepInjectParameters} from '../param-injection';
+import {deepInjectParameters} from '../paramInjection';
 import {getAuthHeaders} from '../auth/getAuthHeaders';
 import {AuthenticationConfig} from '../auth/types';
 import logger from '../logger';

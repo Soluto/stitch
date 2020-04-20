@@ -1,10 +1,23 @@
 import {createTestClient, ApolloServerTestClient} from 'apollo-server-testing';
 import {gql} from 'apollo-server-core';
+import {mocked} from 'ts-jest/utils';
+import {exec} from 'child_process';
+import {promises as fs} from 'fs';
+import * as path from 'path';
 import * as nock from 'nock';
 import {beforeEachDispose} from '../beforeEachDispose';
 import {app, AuthType} from '../../../registry';
 import {mockResourceBucket} from '../resourceBucket';
 import {ResourceGroup} from '../../../modules/resource-repository';
+import {PolicyType, PolicyQueryType} from '../../../modules/resource-repository/types';
+import {tmpPoliciesDir} from '../../../modules/config';
+import mockFsForOpa from '../../helpers/mockFsForOpa';
+
+jest.mock('child_process', () => ({
+    exec: jest.fn((_, cb) => cb()),
+}));
+
+const mockedExec = mocked(exec, true);
 
 const schema = {
     metadata: {namespace: 'namespace', name: 'name'},
@@ -33,18 +46,41 @@ const upstreamClientCredentials = {
 };
 const upstreamClientCredentialsActiveDirectoryUpdate = {clientSecret: 'myOtherClientSecret'};
 
+const policy = {
+    metadata: {namespace: 'namespace', name: 'name'},
+    type: PolicyType.opa,
+    code: `real rego code
+           with multiple
+           lines`,
+    args: {
+        an: 'arg',
+        another: 'one!',
+    },
+    queries: [
+        {type: PolicyQueryType.graphql, paramName: 'someGraphqlQuery', graphql: {query: 'actual gql'}},
+        {
+            type: PolicyQueryType.policy,
+            paramName: 'somePolicyQuery',
+            policy: {policyName: 'someOtherPolicy', args: {some: 'arg for the other policy'}},
+        },
+    ],
+};
+const policyUpdate = {code: 'changed code', args: {just: 'one arg'}};
+
 const baseResourceGroup = {
     schemas: [schema],
     upstreams: [upstream],
     upstreamClientCredentials: [upstreamClientCredentials],
+    policies: [policy],
 };
 describe('Update resource', () => {
     let client: ApolloServerTestClient;
-    let bucketContents: {current: ResourceGroup};
+    let bucketContents: {current: ResourceGroup; policyFiles: {[name: string]: string}};
 
     beforeEachDispose(() => {
         client = createTestClient(app);
-        bucketContents = mockResourceBucket(baseResourceGroup);
+        const initialPolicyFiles = {'namespace-name.wasm': 'old compiled code'};
+        bucketContents = mockResourceBucket(baseResourceGroup, initialPolicyFiles);
 
         return () => nock.cleanAll();
     });
@@ -117,5 +153,42 @@ describe('Update resource', () => {
             ...baseResourceGroup,
             upstreamClientCredentials: [newUpstreamClientCredentials],
         });
+    });
+
+    it('updates an opa type policy', async () => {
+        mockFsForOpa.mock();
+
+        const newPolicy = {...policy, ...policyUpdate};
+        const response = await client.mutate({
+            mutation: gql`
+                mutation CreatePolicy($policy: PolicyInput!) {
+                    updatePolicies(input: [$policy]) {
+                        success
+                    }
+                }
+            `,
+            variables: {
+                policy: newPolicy,
+            },
+        });
+
+        expect(response.errors).toBeUndefined();
+        expect(response.data).toEqual({updatePolicies: {success: true}});
+        expect(bucketContents.current).toEqual({...baseResourceGroup, policies: [newPolicy]});
+
+        const compiledFilename = 'namespace-name.wasm';
+        const uncompiledPath = path.resolve(tmpPoliciesDir, 'namespace-name.rego');
+        const compiledPath = path.resolve(tmpPoliciesDir, compiledFilename);
+        const regoCode = `package policy\n${newPolicy.code}`;
+        expect(fs.writeFile).toHaveBeenCalledWith(uncompiledPath, regoCode);
+        expect(fs.unlink).toHaveBeenCalledWith(uncompiledPath);
+        expect(fs.unlink).toHaveBeenCalledWith(compiledPath);
+        expect(fs.readFile).toHaveBeenCalledWith(compiledPath);
+        expect(bucketContents.policyFiles).toEqual({[compiledFilename]: 'compiled rego code'});
+
+        const expectedCommand = `opa build -d ${uncompiledPath} -o ${compiledPath} 'data.policy = result'`;
+        expect(mockedExec.mock.calls[0][0]).toBe(expectedCommand);
+
+        mockFsForOpa.restore();
     });
 });

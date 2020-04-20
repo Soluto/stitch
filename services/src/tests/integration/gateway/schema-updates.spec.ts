@@ -34,6 +34,7 @@ const schema2 = {
 const resourceGroup = {
     upstreams: [],
     upstreamClientCredentials: [],
+    policies: [],
 };
 
 describe('Hello world', () => {
