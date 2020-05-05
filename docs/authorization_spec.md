@@ -2,14 +2,14 @@
 
 ## Goals
 
-- Create building blocks for authorization that can satisfy common scenarios.
-- It should be easy to build, validate and test authorization schemes.
-- It should be possible to create high level authorization schemes on top of these building blocks.
+-   Create building blocks for authorization that can satisfy common scenarios.
+-   It should be easy to build, validate and test authorization schemes.
+-   It should be possible to create high level authorization schemes on top of these building blocks.
 
 ## Non-Goals
 
-- Specify mechanisms regarding authentication or jwt validation.
-- Create conventions or high-level abstractions for authorization. (although this document should show that such things can be implemented on top of this implementation)
+-   Specify mechanisms regarding authentication or jwt validation.
+-   Create conventions or high-level abstractions for authorization. (although this document should show that such things can be implemented on top of this implementation)
 
 ## Policy Spec
 
@@ -21,10 +21,11 @@ Some examples:
 ```yaml
 kind: Policy
 metadata:
-  name: public
+    namespace: some-namespace
+    name: public
 Spec:
-  type: js-expression
-  data: { "result": "allow" }
+    type: js-expression
+    data: {'result': 'allow'}
 ```
 
 ### Policy that allows access only if the issuer is "abc.com":
@@ -32,6 +33,7 @@ Spec:
 ```yaml
 kind: Policy
 metadata:
+  namespace: some-namespace
   name: abc-user
 Spec:
   type: js-expression
@@ -45,6 +47,7 @@ Spec:
 ```yaml
 kind: Policy
 metadata:
+  namespace: some-namespace
   name: my-user
 Spec:
   type: js-expression
@@ -62,29 +65,31 @@ _Note the js-expression type is an example of a possible type and not planned to
 ```yaml
 kind: Policy
 metadata:
-  name: my-user-family
+    namespace: some-namespace
+    name: my-user-family
 Spec:
-  type: opa
-  data: |
-    allow = false
-    allow = {
-      args.userId == data.familyQuery.family.members[_].id
-    }
-  args:
-    userId: ID!
-  side-effects:
-    - type: graphql
-      param-name: familyQuery
-      query: |
-        {
-          user({jwt.sub}) {
-            family {
-              members {
-                id
-              }
-            }
-          }
+    type: opa
+    code: |
+        allow = false
+        allow = {
+          args.userId == data.familyQuery.family.members[_].id
         }
+    args:
+        userId: ID!
+    sideEffects:
+        - type: graphql
+          paramName: familyQuery
+          graphql:
+              query: |
+                  {
+                    user({jwt.sub}) {
+                      family {
+                        members {
+                          id
+                        }
+                      }
+                    }
+                  }
 ```
 
 Side effects support the standard Stitch parameter injection syntax, but only support the `jwt` and `args` objects for injection
@@ -94,17 +99,18 @@ Side effects support the standard Stitch parameter injection syntax, but only su
 ```yaml
 kind: Policy
 metadata:
-  name: my-user-family
+    namespace: some-namespace
+    name: my-user-family
 Spec:
-  type: opa
-  data: |
-    query = sprintf(“graphql { user(%s) {family { members { id} } } }”, jwt.sub)
-    allow = false
-    allow = {
-      args.userId == data.query.family.members[_].id
-    }
-  args:
-    userId: ID!
+    type: opa
+    code: |
+        query = sprintf(“graphql { user(%s) {family { members { id} } } }”, jwt.sub)
+        allow = false
+        allow = {
+          args.userId == data.query.family.members[_].id
+        }
+    args:
+        userId: ID!
 ```
 
 This example always evaluates the graphql side effect, but generally this approach should be used when conditional side effect evaluation is needed
@@ -114,22 +120,24 @@ This example always evaluates the graphql side effect, but generally this approa
 ```yaml
 kind: Policy
 metadata:
-  name: my-user-by-policy
+    namespace: some-namespace
+    name: my-user-by-policy
 Spec:
-  type: opa
-  data: |
-    allow = false
-    allow = {
-      data.myUserPolicy == true
-    }
-  args:
-    userId: ID!
-  side-effects:
-    - type: policy
-      policy-name: my-user
-      param-name: myUserPolicy
-      args:
-        userId: "{args.userId}"
+    type: opa
+    code: |
+        allow = false
+        allow = {
+          data.myUserPolicy == true
+        }
+    args:
+        userId: ID!
+    sideEffects:
+        - type: policy
+          paramName: myUserPolicy
+          policy:
+              policyName: my-user
+              args:
+                  userId: '{args.userId}'
 ```
 
 `args` for side effect policy can use parameter injection from the `jwt` and `args` objects, similarly to the graphql side effect
@@ -168,7 +176,7 @@ Later on, for convenience and type safety, we will add an alternative syntax or 
 1. Client requests a graphql query that includes a field that has a `@role` directive.
 2. Server activates the policy resolver and reads the arguments with parameter injection.
 3. The resolver passes the args to a policy executor.
-The policy executor invokes the right binding (see policy implementation contract) and manages the side-effects for the policy.
+   The policy executor invokes the right binding (see policy implementation contract) and manages the side-effects for the policy.
 4. The policy executor should return true/false if the user has access or a string describing the failure.
 5. If the user has access, return the field value. Otherwise, return an error.
 
@@ -178,33 +186,34 @@ The naive js contract can be implemented with a generator, that has a result of 
 All side effects and policy evaluation itself are memoized for a request context for same side-effect/policy arguments.
 
 ```typescript
-type Policy = Generator<PolicySideEffect, PolicyResult, any>
-type FailureReason = string
-type PolicyResult = true | false | FailureReason
-type PolicySideEffect = GraphQLSideEffect | PolicyEvaluationSideEffect
+type Policy = Generator<PolicySideEffect, PolicyResult, any>;
+type FailureReason = string;
+type PolicyResult = true | false | FailureReason;
+type PolicySideEffect = GraphQLSideEffect | PolicyEvaluationSideEffect;
 type GraphQLSideEffect = {
-  type: "graphql",
-  query: string
-}
+    type: 'graphql';
+    query: string;
+};
 
 type PolicyEvaluationSideEffect = {
-  type: "policy-evaluation",
-  policy:  string
-  args: any[]
-}
+    type: 'policy';
+    policy: string;
+    args: any[];
+};
 ```
 
 ### Supported Side Effects
 
-- GraphQL query - run an internal graphql query in an unconstrained context
-- Policy Evaluation - run an additional policy
+-   GraphQL query - run an internal graphql query in an unconstrained context
+-   Policy Evaluation - run an additional policy
 
 ## OPA Policy
 
 Opa policy can be implemented by exporting several documents in rego file:
-- policies - for additional policies we want to evaluate (an object `{ [policyName]: args }`)
-- query - for a graphql query we want to evaluate (string)
-- allow - return the end result (boolean)
+
+-   policies - for additional policies we want to evaluate (an object `{ [policyName]: args }`)
+-   query - for a graphql query we want to evaluate (string)
+-   allow - return the end result (boolean)
 
 Since our implementation of stitch is based on Apollo and node.js runtime, we’ll need to run opa either by compiling opa-policies to wasm and using @open-policy-agent/opa-wasm package, or use additional process. Compilation should run by the registry using opa cli (opa build).
 
@@ -212,31 +221,32 @@ A naive opa-binding implementation:
 
 ```javascript
 async function createOpaBinding(policy_data) {
-  const rego = new Rego();
-  const policy = await rego.load_policy(policy_data)
-  return function* opaBinding(jwt:any, args:any) {
-    let { policies, query } = policy.evaluate({ jwt, args });
-    let data:any = {};
-    if (policies) {
-      let arr = Object.entries(policies)
-      let results = [...yield* arr.map(
-        ([name, args]) => ({
-          type: "policy-evaluation",
-          policy: name,
-          args: args
-        }))];
-        data.policies = Object.fromEntries(arr.map(([name, _],i)=> ([name,i])))
-    }
-    if (query) {
-      data.query = yield {
-        type: "graphql",
-        query: data.query
-      }
-    }
-    policy.set_data(data)
-    let {allow, reason} = policy.evaluate({ jwt, args });
-    return allow || reason || false
-  }
+    const rego = new Rego();
+    const policy = await rego.load_policy(policy_data);
+    return function* opaBinding(jwt: any, args: any) {
+        let {policies, query} = policy.evaluate({jwt, args});
+        let data: any = {};
+        if (policies) {
+            let arr = Object.entries(policies);
+            let results = [
+                ...(yield* arr.map(([name, args]) => ({
+                    type: 'policy-evaluation',
+                    policy: name,
+                    args: args,
+                }))),
+            ];
+            data.policies = Object.fromEntries(arr.map(([name, _], i) => [name, i]));
+        }
+        if (query) {
+            data.query = yield {
+                type: 'graphql',
+                query: data.query,
+            };
+        }
+        policy.set_data(data);
+        let {allow, reason} = policy.evaluate({jwt, args});
+        return allow || reason || false;
+    };
 }
 ```
 
@@ -250,17 +260,18 @@ Alternatively, we can check if the query/policies have changed between execution
 ```yaml
 kind: Policy
 metadata:
-  name: has-claims
+    namespace: some-namespace
+    name: has-claims
 Spec:
-  type: opa
-  data: |
-    allow = false
-    allow {
-      jwt.claims[args.claims[i]] == args.values[i]
-    }
-  args:
-    claims: [String]
-    values: [String]
+    type: opa
+    code: |
+        allow = false
+        allow {
+          jwt.claims[args.claims[i]] == args.values[i]
+        }
+    args:
+        claims: [String]
+        values: [String]
 ```
 
 Usage:
