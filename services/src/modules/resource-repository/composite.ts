@@ -20,4 +20,17 @@ export class CompositeResourceRepository implements ResourceRepository {
     async writePolicyAttachment(): Promise<void> {
         throw new Error('Multiplexed resource repository cannot handle updates');
     }
+
+    public getPolicyAttachment(filename: string): Buffer {
+        for (const repo of this.repositories) {
+            const policyAttachment = repo.getPolicyAttachment(filename);
+            if (policyAttachment) return policyAttachment;
+        }
+
+        throw new Error(`Policy attachment with the filename ${filename} was not found`);
+    }
+
+    public async initializePolicyAttachments() {
+        await Promise.all(this.repositories.map(repo => repo.initializePolicyAttachments()));
+    }
 }

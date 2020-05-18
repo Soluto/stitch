@@ -74,6 +74,8 @@ export interface ResourceRepository {
     fetchLatest(): Promise<FetchLatestResult>;
     update(rg: ResourceGroup): Promise<void>;
     writePolicyAttachment(filename: string, content: Buffer): Promise<void>;
+    getPolicyAttachment(filename: string): Buffer;
+    initializePolicyAttachments(): Promise<void>;
 }
 
 enum AuthType {
