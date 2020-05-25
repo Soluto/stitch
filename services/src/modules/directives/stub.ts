@@ -1,7 +1,7 @@
 import {SchemaDirectiveVisitor} from 'graphql-tools';
 import {GraphQLField} from 'graphql';
 import {gql} from 'apollo-server-core';
-import {injectParameters} from '../param-injection';
+import {injectParameters} from '../paramInjection';
 
 export class StubDirective extends SchemaDirectiveVisitor {
     visitFieldDefinition(field: GraphQLField<any, any>) {

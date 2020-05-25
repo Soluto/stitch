@@ -1,4 +1,5 @@
 import * as envVar from 'env-var';
+import * as path from 'path';
 
 // General
 export const httpPort = envVar
@@ -43,3 +44,9 @@ export const enableGraphQLIntrospection = envVar
     .get('GRAPHQL_INTROSPECTION')
     .default('true')
     .asBoolStrict();
+
+// Policies
+export const tmpPoliciesDir = envVar
+    .get('TMP_POLICIES_DIR')
+    .default(path.resolve(process.cwd(), 'tmp/policies'))
+    .asString();

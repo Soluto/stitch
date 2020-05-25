@@ -29,6 +29,7 @@ const resourceGroup = {
     schemas: [schema],
     upstreams: [],
     upstreamClientCredentials: [],
+    policies: [],
 };
 
 describe('Custom scalars', () => {

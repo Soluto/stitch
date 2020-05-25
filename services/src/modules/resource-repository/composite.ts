@@ -16,4 +16,8 @@ export class CompositeResourceRepository implements ResourceRepository {
     async update(): Promise<void> {
         throw new Error('Multiplexed resource repository cannot handle updates');
     }
+
+    async writePolicyAttachment(): Promise<void> {
+        throw new Error('Multiplexed resource repository cannot handle updates');
+    }
 }
