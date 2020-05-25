@@ -21,11 +21,11 @@ Some examples:
 ```yaml
 kind: Policy
 metadata:
-    namespace: some-namespace
+    namespace: some-ns
     name: public
 Spec:
     type: js-expression
-    data: {'result': 'allow'}
+    code: {'result': 'allow'}
 ```
 
 ### Policy that allows access only if the issuer is "abc.com":
@@ -33,50 +33,50 @@ Spec:
 ```yaml
 kind: Policy
 metadata:
-  namespace: some-namespace
+  namespace: some-ns
   name: abc-user
 Spec:
   type: js-expression
-  data: { "result": (jwt.issuer === "abc.com") ? "allow" : "deny" }
+  code: { "result": (data.jwt.issuer === "abc.com") ? "allow" : "deny" }
 ```
 
-`jwt` is available as a root object to validate fields from the web token
+`jwt` is available on the data object to validate fields from the web token
 
 ### Policy that allows access only if the subject matches the provided userId argument:
 
 ```yaml
 kind: Policy
 metadata:
-  namespace: some-namespace
+  namespace: some-ns
   name: my-user
 Spec:
   type: js-expression
-  data: { "result": (jwt.sub === args.userId) ? "allow" : "deny"}
+  code: { "result": (data.jwt.sub === data.args.userId) ? "allow" : "deny"}
   args:
     userId: ID!
 ```
 
-The `args` are available to use as a root object
+The `args` are available to use on the data object
 
 _Note the js-expression type is an example of a possible type and not planned to be implemented at this time._
 
-### Policy that uses a graphql side effect and allows based on the results and an argument:
+### Policy that uses a graphql query to fetch additional data and allows based on the results and an argument:
 
 ```yaml
 kind: Policy
 metadata:
-    namespace: some-namespace
+    namespace: some-ns
     name: my-user-family
 Spec:
     type: opa
     code: |
         allow = false
         allow = {
-          args.userId == data.familyQuery.family.members[_].id
+          data.args.userId == data.queries.familyQuery.family.members[_].id
         }
     args:
         userId: ID!
-    sideEffects:
+    queries:
         - type: graphql
           paramName: familyQuery
           graphql:
@@ -92,46 +92,46 @@ Spec:
                   }
 ```
 
-Side effects support the standard Stitch parameter injection syntax, but only support the `jwt` and `args` objects for injection
+Queries support the standard Stitch parameter injection syntax, but only support the `jwt` and `args` objects for injection
 
-### Same as the previous policy, but evaluates the side effect while opa is running:
+### Same as the previous policy, but evaluates the query while opa is running:
 
 ```yaml
 kind: Policy
 metadata:
-    namespace: some-namespace
+    namespace: some-ns
     name: my-user-family
 Spec:
     type: opa
     code: |
-        query = sprintf(“graphql { user(%s) {family { members { id} } } }”, jwt.sub)
+        query = sprintf(“graphql { user(%s) {family { members { id} } } }”, data.jwt.sub)
         allow = false
         allow = {
-          args.userId == data.query.family.members[_].id
+          data.args.userId == data.query.family.members[_].id
         }
     args:
         userId: ID!
 ```
 
-This example always evaluates the graphql side effect, but generally this approach should be used when conditional side effect evaluation is needed
+This example will always evaluate the graphql query, but generally this approach should be used when conditional side effect evaluation is needed
 
-### Policy that uses a policy side effect and allows based on the results:
+### Policy that uses a policy query and allows based on the results:
 
 ```yaml
 kind: Policy
 metadata:
-    namespace: some-namespace
+    namespace: some-ns
     name: my-user-by-policy
 Spec:
     type: opa
     code: |
         allow = false
         allow = {
-          data.myUserPolicy == true
+          data.queries.myUserPolicy == true
         }
     args:
         userId: ID!
-    sideEffects:
+    queries:
         - type: policy
           paramName: myUserPolicy
           policy:
@@ -140,17 +140,17 @@ Spec:
                   userId: '{args.userId}'
 ```
 
-`args` for side effect policy can use parameter injection from the `jwt` and `args` objects, similarly to the graphql side effect
+`args` for query policy can use parameter injection from the `jwt` and `args` objects, similarly to the graphql query
 
 ### Attach policy to fields:
 
 ```
 type User {
   ID: ID!
-  Picture: String @role-public
-  Friends: [User] @role-abc-user
-  Email: String @role-my-user(userId: "{source.UserId}")
-  NickName: @role-my-user-family(userId: "{source.UserId}")
+  Picture: String @policy-some-ns-public
+  Friends: [User] @policy-some-ns-abc-user
+  Email: String @policy-some-ns-my-user(userId: "{source.UserId}")
+  NickName: @policy-some-ns-my-user-family(userId: "{source.UserId}")
 }
 ```
 
@@ -158,13 +158,13 @@ type User {
 
 Adding args support to policies can ease memoization and remove hidden dependencies (Principle of Least Surprise) as we don’t need to pass the whole graphql context.
 
-Initially, we will support a single `@roles` directive that gets an array of role names and their args:
+Initially, we will support a single `@policy` directive that gets an array of policy names and their args:
 
 ```
 type User {
-  Picture: String @roles(roles: [
-    { name: “my-user”, args: { userId: “{source.UserId}” } },
-    { name: “my-user-family”, args: { userId: “{source.UserId}” } }
+  Picture: String @policy(policies: [
+    { namespace: "some-ns", name: “my-user”, args: { userId: “{source.UserId}” } },
+    { namespace: "some-ns", name: “my-user-family”, args: { userId: “{source.UserId}” } }
   ])
 }
 ```
@@ -173,38 +173,38 @@ Later on, for convenience and type safety, we will add an alternative syntax or 
 
 ## Control Flow
 
-1. Client requests a graphql query that includes a field that has a `@role` directive.
+1. Client requests a graphql query that includes a field that has a `@policy` directive.
 2. Server activates the policy resolver and reads the arguments with parameter injection.
 3. The resolver passes the args to a policy executor.
-   The policy executor invokes the right binding (see policy implementation contract) and manages the side-effects for the policy.
+   The policy executor invokes the right binding (see policy implementation contract) and manages the queries for the policy.
 4. The policy executor should return true/false if the user has access or a string describing the failure.
 5. If the user has access, return the field value. Otherwise, return an error.
 
 ## Policy implementation contract
 
-The naive js contract can be implemented with a generator, that has a result of true/false and can yield side effects.
-All side effects and policy evaluation itself are memoized for a request context for same side-effect/policy arguments.
+The naive js contract can be implemented with a generator, that has a result of true/false and can yield queries.
+All queries and policy evaluation itself are memoized for a request context for same query/policy arguments.
 
 ```typescript
-type Policy = Generator<PolicySideEffect, PolicyResult, any>;
+type Policy = Generator<PolicyQuery, PolicyResult, any>;
 type FailureReason = string;
 type PolicyResult = true | false | FailureReason;
-type PolicySideEffect = GraphQLSideEffect | PolicyEvaluationSideEffect;
-type GraphQLSideEffect = {
+type PolicyQuery = GraphQLQuery | PolicyEvaluationQuery;
+type GraphQLQuery = {
     type: 'graphql';
     query: string;
 };
 
-type PolicyEvaluationSideEffect = {
+type PolicyEvaluationQuery = {
     type: 'policy';
     policy: string;
     args: any[];
 };
 ```
 
-### Supported Side Effects
+### Supported Queries
 
--   GraphQL query - run an internal graphql query in an unconstrained context
+-   GraphQL - run an internal graphql query in an unconstrained context
 -   Policy Evaluation - run an additional policy
 
 ## OPA Policy
@@ -260,14 +260,14 @@ Alternatively, we can check if the query/policies have changed between execution
 ```yaml
 kind: Policy
 metadata:
-    namespace: some-namespace
+    namespace: some-ns
     name: has-claims
 Spec:
     type: opa
     code: |
         allow = false
         allow {
-          jwt.claims[args.claims[i]] == args.values[i]
+          data.jwt.claims[data.args.claims[i]] == data.args.values[i]
         }
     args:
         claims: [String]
@@ -279,6 +279,6 @@ Usage:
 ```
 type User {
   ID: ID!
-  Picture: String @role-has-claims(claims:["issuer", "sub"], values: ["soluto.com", "{source.UserId}"]
+  Picture: String @policy-some-ns-has-claims(claims:["issuer", "sub"], values: ["soluto.com", "{source.UserId}"]
 }
 ```
