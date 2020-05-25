@@ -6,6 +6,7 @@ interface S3ResourceRepositoryConfig {
     s3: AWS.S3;
     bucketName: string;
     objectKey: string;
+    policyAttachmentsKeyPrefix: string;
 }
 export class S3ResourceRepository implements ResourceRepository {
     protected current?: {etag?: string; rg: ResourceGroup};
@@ -56,6 +57,24 @@ export class S3ResourceRepository implements ResourceRepository {
             .promise();
     }
 
+    async writePolicyAttachment(filename: string, content: Buffer): Promise<void> {
+        const s3Key = this.getPolicyAttachmentKey(filename);
+
+        await this.config.s3
+            .putObject({
+                Bucket: this.config.bucketName,
+                Key: s3Key,
+                Body: content,
+            })
+            .promise();
+    }
+
+    private getPolicyAttachmentKey(filename: string) {
+        return this.config.policyAttachmentsKeyPrefix.endsWith('/')
+            ? `${this.config.policyAttachmentsKeyPrefix}${filename}`
+            : `${this.config.policyAttachmentsKeyPrefix}/${filename}`;
+    }
+
     static fromEnvironment() {
         const s3endpoint = envVar
             .get('S3_ENDPOINT')
@@ -68,6 +87,10 @@ export class S3ResourceRepository implements ResourceRepository {
         const objectKey = envVar
             .get('S3_RESOURCE_OBJECT_KEY')
             .default('resources.json')
+            .asString();
+        const policyAttachmentsKeyPrefix = envVar
+            .get('S3_POLICY_ATTACHMENTS_KEY_PREFIX')
+            .default('policyAttachments/')
             .asString();
         const awsAccessKeyId = envVar.get('S3_AWS_ACCESS_KEY_ID').asString();
         const awsSecretAccessKey = envVar.get('S3_AWS_SECRET_ACCESS_KEY').asString();
@@ -82,6 +105,7 @@ export class S3ResourceRepository implements ResourceRepository {
             }),
             bucketName,
             objectKey,
+            policyAttachmentsKeyPrefix,
         });
     }
 }
