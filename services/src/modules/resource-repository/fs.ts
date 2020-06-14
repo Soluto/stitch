@@ -29,6 +29,10 @@ export class FileSystemResourceRepository implements ResourceRepository {
         return {isNew: true, resourceGroup: rg};
     }
 
+    getResourceGroup(): ResourceGroup {
+        return this.current!.rg;
+    }
+
     async update(rg: ResourceGroup): Promise<void> {
         await fs.writeFile(this.pathToFile, JSON.stringify(rg));
     }

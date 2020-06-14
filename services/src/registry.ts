@@ -126,10 +126,9 @@ const typeDefs = gql`
     GraphQL doesn't support unions for input types, otherwise this would be a union of different policy query types.
     Instead, the PolicyQueryType enum indicates which policy query type is needed, and there's a property which corresponds to each policy query type, which we validate in the registry.
     """
-    input # The query result will be available to the policy code in a parameter named as chosen in paramName, under the "data.queries" object.
-    PolicyQueryInput {
+    input PolicyQueryInput {
         type: PolicyQueryType!
-        paramName: String!
+        name: String!
         graphql: PolicyQueryGraphQLInput
         policy: PolicyQueryPolicyInput
     }
@@ -199,7 +198,7 @@ interface PolicyQueryPolicyInput {
 
 interface PolicyQueryInput {
     type: PolicyQueryType;
-    paramName: string;
+    name: string;
     graphql?: PolicyQueryGraphQLInput;
     policy?: PolicyQueryPolicyInput;
 }

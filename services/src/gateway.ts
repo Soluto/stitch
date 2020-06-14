@@ -12,6 +12,7 @@ import {
     ResourceRepository,
     CompositeResourceRepository,
 } from './modules/resource-repository';
+import {PolicyExecutor} from './modules/directives/policy/policy-executor';
 
 async function run() {
     logger.info('Stitch gateway booting up...');
@@ -25,6 +26,7 @@ async function run() {
         introspection: config.enableGraphQLIntrospection,
     });
     await resourceRepository.initializePolicyAttachments();
+    PolicyExecutor.repo = resourceRepository;
 
     const app = fastify();
     app.register(fastifyMetrics, {endpoint: '/metrics'});

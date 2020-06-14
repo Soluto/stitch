@@ -1,4 +1,4 @@
-import {ResourceRepository, FetchLatestResult} from './types';
+import {ResourceRepository, FetchLatestResult, ResourceGroup} from './types';
 import {applyResourceGroupUpdates} from './updates';
 
 export class CompositeResourceRepository implements ResourceRepository {
@@ -11,6 +11,12 @@ export class CompositeResourceRepository implements ResourceRepository {
             isNew: res1.isNew || res2.isNew,
             resourceGroup: applyResourceGroupUpdates(res1.resourceGroup, res2.resourceGroup),
         }));
+    }
+
+    getResourceGroup(): ResourceGroup {
+        const rgs = this.repositories.map(r => r.getResourceGroup());
+
+        return rgs.reduce((rg1, rg2) => applyResourceGroupUpdates(rg1, rg2));
     }
 
     async update(): Promise<void> {

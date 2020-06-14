@@ -11,6 +11,8 @@ interface S3ResourceRepositoryConfig {
     objectKey: string;
     policyAttachmentsKeyPrefix: string;
 }
+type FileDetails = {filename: string; updatedAt: Date};
+
 export class S3ResourceRepository implements ResourceRepository {
     protected current?: {etag?: string; rg: ResourceGroup};
     protected policyAttachments: {[filename: string]: Buffer} = {};
@@ -50,6 +52,10 @@ export class S3ResourceRepository implements ResourceRepository {
             isNew: true,
             resourceGroup: rg,
         };
+    }
+
+    getResourceGroup(): ResourceGroup {
+        return this.current!.rg;
     }
 
     async update(rg: ResourceGroup): Promise<void> {
@@ -114,29 +120,29 @@ export class S3ResourceRepository implements ResourceRepository {
         this.policyAttachmentsRefreshedAt = newRefreshedAt;
     }
 
-    private shouldRefreshPolicyAttachment({filename, updatedAt}: {filename: string; updatedAt: Date}) {
+    private shouldRefreshPolicyAttachment({filename, updatedAt}: FileDetails) {
         if (!this.policyAttachments[filename]) return true;
         if (!this.policyAttachmentsRefreshedAt) return true;
 
         return updatedAt > this.policyAttachmentsRefreshedAt;
     }
 
-    private async getPolicyAttachmentsList(): Promise<{filename: string; updatedAt: Date}[]> {
-        const attachments: {filename: string; updatedAt: Date}[] = [];
+    private async getPolicyAttachmentsList(): Promise<FileDetails[]> {
+        const attachments: FileDetails[] = [];
         let isTruncated = true;
         let continuationToken;
 
         while (isTruncated) {
-            const params: any = {
+            const params: AWS.S3.Types.ListObjectsV2Request = {
                 Bucket: this.config.bucketName,
                 MaxKeys: 1000,
                 Prefix: this.config.policyAttachmentsKeyPrefix,
             };
-            if (continuationToken) params['ContinuationToken'] = continuationToken;
+            if (continuationToken) params.ContinuationToken = continuationToken;
 
             const listResult = await this.config.s3.listObjectsV2(params).promise();
             const keys = listResult.Contents || [];
-            const newAttachments = keys.map(k => ({
+            const newAttachments: FileDetails[] = keys.map(k => ({
                 filename: this.getPolicyAttachmentFilenameByKey(k.Key!),
                 updatedAt: k.LastModified!,
             }));
