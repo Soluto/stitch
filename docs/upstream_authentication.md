@@ -9,7 +9,7 @@ Just like the Schema object, stitch can accept more types of resources that do o
 
 ## Design
 
-Stitch works with two more resources:.
+Stitch works with two more resources:
 
 `Upstream` specifies how to identify requests going to some upstream data source, and what kind of authentication it requires.
 
