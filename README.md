@@ -17,6 +17,7 @@ The registry is our attempt at solving the issue of collaborating on a single gr
 -   [Parameter Injection](./docs/parameter_injection.md)
 -   [Scalars](./docs/scalars.md)
 -   [CLI](./cli)
+-   [Upstream Authentication](./docs/upstream_authentication.md)
 
 # Development
 
