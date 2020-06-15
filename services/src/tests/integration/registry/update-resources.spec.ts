@@ -57,10 +57,10 @@ const policy = {
         another: 'one!',
     },
     queries: [
-        {type: PolicyQueryType.graphql, paramName: 'someGraphqlQuery', graphql: {query: 'actual gql'}},
+        {type: PolicyQueryType.graphql, name: 'someGraphqlQuery', graphql: {query: 'actual gql'}},
         {
             type: PolicyQueryType.policy,
-            paramName: 'somePolicyQuery',
+            name: 'somePolicyQuery',
             policy: {policyName: 'someOtherPolicy', args: {some: 'arg for the other policy'}},
         },
     ],

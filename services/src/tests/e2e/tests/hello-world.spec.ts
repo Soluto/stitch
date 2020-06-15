@@ -1,6 +1,5 @@
-const {GraphQLClient} = require('graphql-request');
-const dockerCompose = require('docker-compose');
-const waitFor = require('../waitFor');
+import {GraphQLClient} from 'graphql-request';
+import {sleep} from '../../helpers/utility';
 
 const gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
 const registryClient = new GraphQLClient('http://localhost:8090/graphql');
@@ -16,8 +15,6 @@ mutation CreateSchema($schema: SchemaInput!) {
         success
     }
 }`;
-
-const sleep = (timeout: number) => new Promise(r => setTimeout(r, timeout));
 
 describe('Basic flow', () => {
     test('Default schema works', async () => {

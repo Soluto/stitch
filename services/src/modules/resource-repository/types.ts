@@ -47,7 +47,7 @@ export interface Policy extends Resource {
 
 interface PolicyQuery {
     type: PolicyQueryType;
-    paramName: string;
+    name: string;
     graphql?: PolicyQueryGraphQL;
     policy?: PolicyQueryPolicy;
 }
@@ -72,8 +72,11 @@ export interface FetchLatestResult {
 
 export interface ResourceRepository {
     fetchLatest(): Promise<FetchLatestResult>;
+    getResourceGroup(): ResourceGroup;
     update(rg: ResourceGroup): Promise<void>;
     writePolicyAttachment(filename: string, content: Buffer): Promise<void>;
+    getPolicyAttachment(filename: string): Buffer;
+    initializePolicyAttachments(): Promise<void>;
 }
 
 enum AuthType {

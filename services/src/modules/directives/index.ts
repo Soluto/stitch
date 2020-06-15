@@ -5,6 +5,7 @@ import {sdl as restSdl, RestDirective} from './rest';
 import {sdl as gqlSdl, GqlDirective} from './gql';
 import {sdl as exportSdl, ExportDirective} from './export';
 import {sdl as selectSdl, SelectDirective} from './select';
+import {sdl as policySdl, PolicyDirective} from './policy/policy';
 
 export const directiveMap: {[visitorName: string]: typeof SchemaDirectiveVisitor} = {
     stub: StubDirective,
@@ -12,6 +13,7 @@ export const directiveMap: {[visitorName: string]: typeof SchemaDirectiveVisitor
     gql: GqlDirective,
     export: ExportDirective,
     select: SelectDirective,
+    policy: PolicyDirective,
 };
 
-export const sdl = concatAST([stubSdl, restSdl, gqlSdl, exportSdl, selectSdl]);
+export const sdl = concatAST([stubSdl, restSdl, gqlSdl, exportSdl, selectSdl, policySdl]);
