@@ -51,12 +51,12 @@ metadata:
   name: my-user
 Spec:
   type: js-expression
-  code: { "result": (data.jwt.sub === data.args.userId) ? "allow" : "deny"}
+  code: { "result": (input.jwt.sub === input.args.userId) ? "allow" : "deny"}
   args:
     userId: ID!
 ```
 
-The `args` are available to use on the data object
+The `args` are available to use on the input object
 
 _Note the js-expression type is an example of a possible type and not planned to be implemented at this time._
 
@@ -72,13 +72,13 @@ Spec:
     code: |
         allow = false
         allow = {
-          data.args.userId == data.queries.familyQuery.family.members[_].id
+          input.args.userId == input.queries.familyQuery.family.members[_].id
         }
     args:
         userId: ID!
     queries:
         - type: graphql
-          paramName: familyQuery
+          name: familyQuery
           graphql:
               query: |
                   {
@@ -104,10 +104,10 @@ metadata:
 Spec:
     type: opa
     code: |
-        query = sprintf(“graphql { user(%s) {family { members { id} } } }”, data.jwt.sub)
+        query = sprintf(“graphql { user(%s) {family { members { id} } } }”, input.jwt.sub)
         allow = false
         allow = {
-          data.args.userId == data.query.family.members[_].id
+          input.args.userId == input.query.family.members[_].id
         }
     args:
         userId: ID!
@@ -127,13 +127,13 @@ Spec:
     code: |
         allow = false
         allow = {
-          data.queries.myUserPolicy == true
+          input.queries.myUserPolicy == true
         }
     args:
         userId: ID!
     queries:
         - type: policy
-          paramName: myUserPolicy
+          name: myUserPolicy
           policy:
               policyName: my-user
               args:
@@ -267,7 +267,7 @@ Spec:
     code: |
         allow = false
         allow {
-          data.jwt.claims[data.args.claims[i]] == data.args.values[i]
+          input.jwt.claims[input.args.claims[i]] == input.args.values[i]
         }
     args:
         claims: [String]

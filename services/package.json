@@ -13,6 +13,7 @@
     "license": "ISC",
     "dependencies": {
         "@apollo/federation": "^0.12.1",
+        "@open-policy-agent/opa-wasm": "^1.1.0",
         "apollo-datasource-rest": "^0.7.0",
         "apollo-link-context": "^1.0.19",
         "apollo-link-http": "^1.5.16",
