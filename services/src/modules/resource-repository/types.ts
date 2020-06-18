@@ -3,6 +3,7 @@ export interface ResourceGroup {
     upstreams: Upstream[];
     upstreamClientCredentials: UpstreamClientCredentials[];
     policies: Policy[];
+    policyAttachments?: PolicyAttachments;
 }
 
 export interface Resource {
@@ -70,13 +71,12 @@ export interface FetchLatestResult {
     resourceGroup: ResourceGroup;
 }
 
+export type PolicyAttachments = {[filename: string]: Buffer};
+
 export interface ResourceRepository {
     fetchLatest(): Promise<FetchLatestResult>;
-    getResourceGroup(): ResourceGroup;
     update(rg: ResourceGroup): Promise<void>;
     writePolicyAttachment(filename: string, content: Buffer): Promise<void>;
-    getPolicyAttachment(filename: string): Buffer;
-    initializePolicyAttachments(): Promise<void>;
 }
 
 enum AuthType {

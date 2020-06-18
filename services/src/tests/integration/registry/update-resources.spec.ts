@@ -102,7 +102,7 @@ describe('Update resource', () => {
 
         expect(response.errors).toBeUndefined();
         expect(response.data).toEqual({updateSchemas: {success: true}});
-        expect(bucketContents.current).toEqual({...baseResourceGroup, schemas: [newSchema]});
+        expect(bucketContents.current).toMatchObject({...baseResourceGroup, schemas: [newSchema]});
     });
 
     it('Upstream', async () => {
@@ -122,7 +122,7 @@ describe('Update resource', () => {
 
         expect(response.errors).toBeUndefined();
         expect(response.data).toEqual({updateUpstreams: {success: true}});
-        expect(bucketContents.current).toEqual({...baseResourceGroup, upstreams: [newUpstream]});
+        expect(bucketContents.current).toMatchObject({...baseResourceGroup, upstreams: [newUpstream]});
     });
 
     it('UpstreamClientCredentials', async () => {
@@ -149,7 +149,7 @@ describe('Update resource', () => {
 
         expect(response.errors).toBeUndefined();
         expect(response.data).toEqual({updateUpstreamClientCredentials: {success: true}});
-        expect(bucketContents.current).toEqual({
+        expect(bucketContents.current).toMatchObject({
             ...baseResourceGroup,
             upstreamClientCredentials: [newUpstreamClientCredentials],
         });
@@ -174,7 +174,7 @@ describe('Update resource', () => {
 
         expect(response.errors).toBeUndefined();
         expect(response.data).toEqual({updatePolicies: {success: true}});
-        expect(bucketContents.current).toEqual({...baseResourceGroup, policies: [newPolicy]});
+        expect(bucketContents.current).toMatchObject({...baseResourceGroup, policies: [newPolicy]});
 
         const compiledFilename = 'namespace-name.wasm';
         const uncompiledPath = path.resolve(tmpPoliciesDir, 'namespace-name.rego');

@@ -1,4 +1,5 @@
 import * as nock from 'nock';
+import * as xml2js from 'xml2js';
 import {ResourceGroup} from '../../modules/resource-repository';
 
 export function mockResourceBucket(initialValue: ResourceGroup, initialPolicyFiles: MockPolicyFiles = {}) {
@@ -17,13 +18,29 @@ export function mockResourceBucket(initialValue: ResourceGroup, initialPolicyFil
         .reply(200, (_, body) => {
             value.current = JSON.parse(body as string) as ResourceGroup;
         })
+        .get(new RegExp(`/${bucketName!}\?.*prefix=${encodeURIComponent(policiesKeyPrefix!)}.*`))
+        .reply(200, () => {
+            const filenames = Object.keys(value.policyFiles).map(filename => ({
+                Key: filename,
+                LastModified: new Date(),
+            }));
+            const xmlBuilder = new xml2js.Builder();
+            return xmlBuilder.buildObject({Contents: filenames, IsTruncated: false});
+        })
+        .get(new RegExp(`/${bucketName!}/${policiesKeyPrefix}.+`))
+        .reply(200, uri => {
+            const filename = getFilenameFromUri(uri);
+            return {Body: value.policyFiles[filename]};
+        })
         .put(new RegExp(`/${bucketName!}/${policiesKeyPrefix}.+`))
         .reply(200, (uri, body) => {
-            const filename = uri.split('/').slice(-1)[0];
+            const filename = getFilenameFromUri(uri);
             value.policyFiles[filename] = body as string;
         });
 
     return value;
 }
+
+const getFilenameFromUri = (uri: string) => uri.split('/').slice(-1)[0];
 
 type MockPolicyFiles = {[name: string]: string};

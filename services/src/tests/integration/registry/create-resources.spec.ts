@@ -67,7 +67,13 @@ const policy = {
     ],
 };
 
-const baseResourceGroup = {schemas: [], upstreams: [], upstreamClientCredentials: [], policies: []};
+const baseResourceGroup = {
+    schemas: [],
+    upstreams: [],
+    upstreamClientCredentials: [],
+    policies: [],
+    policyAttachments: {},
+};
 
 describe('Create resource', () => {
     let client: ApolloServerTestClient;

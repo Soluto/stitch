@@ -4,7 +4,7 @@ import {Observable, Subscription} from 'rxjs';
 import {shareReplay, map, take, tap, catchError, skip} from 'rxjs/operators';
 
 import {directiveMap} from './directives';
-import {ResourceGroup} from './resource-repository';
+import {ResourceGroup, Policy, PolicyAttachments} from './resource-repository';
 import {buildSchemaFromFederatedTypeDefs} from './buildFederatedSchema';
 import * as baseSchema from './baseSchema';
 import {ActiveDirectoryAuth} from './auth/activeDirectoryAuth';
@@ -86,6 +86,8 @@ export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
         schema,
         executor(requestContext) {
             requestContext.context.authenticationConfig = authenticationConfig;
+            requestContext.context.policies = rg.policies;
+            requestContext.context.policyAttachments = rg.policyAttachments;
 
             return execute({
                 document: requestContext.document,
@@ -106,5 +108,7 @@ const defaultSchema = {
 declare module './context' {
     interface RequestContext {
         authenticationConfig: AuthenticationConfig;
+        policies: Policy[];
+        policyAttachments: PolicyAttachments;
     }
 }
