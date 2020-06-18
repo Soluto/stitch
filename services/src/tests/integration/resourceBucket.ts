@@ -7,6 +7,8 @@ export function mockResourceBucket(initialValue: ResourceGroup, initialPolicyFil
     const bucketName = process.env.S3_RESOURCE_BUCKET_NAME;
     const objectKey = process.env.S3_RESOURCE_OBJECT_KEY;
     const policiesKeyPrefix = process.env.S3_POLICY_ATTACHMENTS_KEY_PREFIX;
+    const policiesPrefixQueryParamRegex = `prefix=${encodeURIComponent(policiesKeyPrefix!)}.*`;
+    const queryParamsSeparatorRegex = '?.*';
 
     const value = {current: initialValue, policyFiles: initialPolicyFiles};
 
@@ -18,7 +20,7 @@ export function mockResourceBucket(initialValue: ResourceGroup, initialPolicyFil
         .reply(200, (_, body) => {
             value.current = JSON.parse(body as string) as ResourceGroup;
         })
-        .get(new RegExp(`/${bucketName!}\?.*prefix=${encodeURIComponent(policiesKeyPrefix!)}.*`))
+        .get(new RegExp(`/${bucketName!}${queryParamsSeparatorRegex}${policiesPrefixQueryParamRegex}`))
         .reply(200, () => {
             const filenames = Object.keys(value.policyFiles).map(filename => ({
                 Key: filename,

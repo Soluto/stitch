@@ -3,6 +3,7 @@ export interface ResourceGroup {
     upstreams: Upstream[];
     upstreamClientCredentials: UpstreamClientCredentials[];
     policies: Policy[];
+    // policyAttachments are compiled from the Rego code in opa policies, they are not directly modified by users
     policyAttachments?: PolicyAttachments;
 }
 
