@@ -3,14 +3,12 @@ import * as envVar from 'env-var';
 import {promises as fs} from 'fs';
 import * as path from 'path';
 import pLimit from 'p-limit';
-import * as config from '../config';
-import logger from '../logger';
-import {FetchLatestResult} from './types';
+import {FetchLatestResult, PolicyAttachments} from './types';
 
 export class FileSystemResourceRepository implements ResourceRepository {
     protected current?: {mtime: number; rg: ResourceGroup};
     protected policyAttachmentsDirInitialized = false;
-    protected policyAttachments: {[filename: string]: Buffer} = {};
+    protected policyAttachments: PolicyAttachments = {};
     protected policyAttachmentsRefreshedAt?: Date;
 
     constructor(protected pathToFile: string, protected policyAttachmentsFolderPath: string) {}
@@ -26,11 +24,10 @@ export class FileSystemResourceRepository implements ResourceRepository {
         const rg = JSON.parse(contents) as ResourceGroup;
         this.current = {mtime: stats.mtimeMs, rg};
 
-        return {isNew: true, resourceGroup: rg};
-    }
+        await this.refreshPolicyAttachments();
+        rg.policyAttachments = {...this.policyAttachments};
 
-    getResourceGroup(): ResourceGroup {
-        return this.current!.rg;
+        return {isNew: true, resourceGroup: rg};
     }
 
     async update(rg: ResourceGroup): Promise<void> {
@@ -42,30 +39,6 @@ export class FileSystemResourceRepository implements ResourceRepository {
 
         const filePath = path.resolve(this.policyAttachmentsFolderPath, filename);
         await fs.writeFile(filePath, content);
-    }
-
-    public getPolicyAttachment(filename: string): Buffer {
-        return this.policyAttachments[filename];
-    }
-
-    public async initializePolicyAttachments() {
-        try {
-            await this.refreshPolicyAttachments();
-        } catch (err) {
-            logger.fatal({err}, 'Failed fetching fs policy attachments on startup');
-            throw err;
-        }
-
-        setInterval(async () => {
-            try {
-                await this.refreshPolicyAttachments();
-            } catch (err) {
-                logger.error(
-                    {err},
-                    `Failed refreshing fs policy attachments, last successful refresh was at ${this.policyAttachmentsRefreshedAt}`
-                );
-            }
-        }, config.resourceUpdateInterval);
     }
 
     private async refreshPolicyAttachments() {

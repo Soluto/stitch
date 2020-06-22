@@ -1,4 +1,4 @@
-import {PolicyArgsObject, ResourceRepository} from '../../resource-repository/types';
+import {PolicyArgsObject, PolicyAttachments} from '../../resource-repository/types';
 
 export type Policy = {
     namespace: string;
@@ -10,7 +10,7 @@ export type Policy = {
 export type PolicyExecutionContext = {
     namespace: string;
     name: string;
-    repo: ResourceRepository;
+    policyAttachments: PolicyAttachments;
     jwt?: JwtInput;
     args?: PolicyArgsObject;
     queries?: QueriesResults;

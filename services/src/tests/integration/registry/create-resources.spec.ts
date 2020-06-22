@@ -67,7 +67,12 @@ const policy = {
     ],
 };
 
-const baseResourceGroup = {schemas: [], upstreams: [], upstreamClientCredentials: [], policies: []};
+const baseResourceGroup = {
+    schemas: [],
+    upstreams: [],
+    upstreamClientCredentials: [],
+    policies: [],
+};
 
 describe('Create resource', () => {
     let client: ApolloServerTestClient;
@@ -96,7 +101,7 @@ describe('Create resource', () => {
 
         expect(response.errors).toBeUndefined();
         expect(response.data).toEqual({updateSchemas: {success: true}});
-        expect(bucketContents.current).toEqual({...baseResourceGroup, schemas: [schema]});
+        expect(bucketContents.current).toMatchObject({...baseResourceGroup, schemas: [schema]});
     });
 
     it('Upstream', async () => {
@@ -115,7 +120,7 @@ describe('Create resource', () => {
 
         expect(response.errors).toBeUndefined();
         expect(response.data).toEqual({updateUpstreams: {success: true}});
-        expect(bucketContents.current).toEqual({...baseResourceGroup, upstreams: [upstream]});
+        expect(bucketContents.current).toMatchObject({...baseResourceGroup, upstreams: [upstream]});
     });
 
     it('UpstreamClientCredentials', async () => {
@@ -134,7 +139,7 @@ describe('Create resource', () => {
 
         expect(response.errors).toBeUndefined();
         expect(response.data).toEqual({updateUpstreamClientCredentials: {success: true}});
-        expect(bucketContents.current).toEqual({
+        expect(bucketContents.current).toMatchObject({
             ...baseResourceGroup,
             upstreamClientCredentials: [upstreamClientCredentials],
         });
@@ -158,7 +163,7 @@ describe('Create resource', () => {
 
         expect(response.errors).toBeUndefined();
         expect(response.data).toEqual({updatePolicies: {success: true}});
-        expect(bucketContents.current).toEqual({...baseResourceGroup, policies: [policy]});
+        expect(bucketContents.current).toMatchObject({...baseResourceGroup, policies: [policy]});
 
         const compiledFilename = 'namespace-name.wasm';
         const uncompiledPath = path.resolve(tmpPoliciesDir, 'namespace-name.rego');

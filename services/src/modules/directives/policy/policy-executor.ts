@@ -1,7 +1,7 @@
 import {GraphQLResolveInfo} from 'graphql';
 import {RequestContext} from '../../context';
 import {Policy, GraphQLArguments} from './types';
-import {ResourceRepository, Policy as PolicyDefinition, PolicyArgsObject} from '../../resource-repository';
+import {Policy as PolicyDefinition, PolicyArgsObject, PolicyAttachments} from '../../resource-repository';
 import {evaluate as evaluateOpa} from './opa';
 import {injectParameters} from '../../paramInjection';
 
@@ -10,8 +10,8 @@ const typeEvaluators = {
 };
 
 export class PolicyExecutor {
-    static repo: ResourceRepository;
     private policyDefinitions: PolicyDefinition[];
+    private policyAttachments: PolicyAttachments;
 
     constructor(
         protected policies: Policy[],
@@ -21,7 +21,8 @@ export class PolicyExecutor {
         protected info: GraphQLResolveInfo
     ) {
         // TODO: add jwt data
-        this.policyDefinitions = PolicyExecutor.repo.getResourceGroup().policies;
+        this.policyDefinitions = context.policies;
+        this.policyAttachments = context.policyAttachments;
     }
 
     async validatePolicies() {
@@ -37,7 +38,7 @@ export class PolicyExecutor {
         const evaluate = typeEvaluators[policyDefinition.type];
         if (!evaluate) throw new Error(`Unsupported policy type ${policyDefinition.type}`);
 
-        const {done, allow} = await evaluate({...policy, args, repo: PolicyExecutor.repo});
+        const {done, allow} = await evaluate({...policy, args, policyAttachments: this.policyAttachments});
         if (!done) throw new Error('in-line query evaluation not yet supported');
 
         if (!allow) throw new Error(`Unauthorized by policy ${policy.name} in namespace ${policy.namespace}`);
