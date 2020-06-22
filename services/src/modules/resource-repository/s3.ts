@@ -1,9 +1,7 @@
 import * as AWS from 'aws-sdk';
 import * as envVar from 'env-var';
 import pLimit from 'p-limit';
-import * as config from '../config';
-import logger from '../logger';
-import {ResourceRepository, ResourceGroup, FetchLatestResult} from './types';
+import {ResourceRepository, ResourceGroup, FetchLatestResult, PolicyAttachments} from './types';
 
 interface S3ResourceRepositoryConfig {
     s3: AWS.S3;
@@ -15,7 +13,7 @@ type FileDetails = {filename: string; updatedAt: Date};
 
 export class S3ResourceRepository implements ResourceRepository {
     protected current?: {etag?: string; rg: ResourceGroup};
-    protected policyAttachments: {[filename: string]: Buffer} = {};
+    protected policyAttachments: PolicyAttachments = {};
     protected policyAttachmentsRefreshedAt?: Date;
 
     constructor(protected config: S3ResourceRepositoryConfig) {}
@@ -48,14 +46,13 @@ export class S3ResourceRepository implements ResourceRepository {
         const rg = JSON.parse(bodyRaw) as ResourceGroup;
         this.current = {etag: response.ETag, rg};
 
+        await this.refreshPolicyAttachments();
+        rg.policyAttachments = {...this.policyAttachments};
+
         return {
             isNew: true,
             resourceGroup: rg,
         };
-    }
-
-    getResourceGroup(): ResourceGroup {
-        return this.current!.rg;
     }
 
     async update(rg: ResourceGroup): Promise<void> {
@@ -78,30 +75,6 @@ export class S3ResourceRepository implements ResourceRepository {
                 Body: content,
             })
             .promise();
-    }
-
-    public getPolicyAttachment(filename: string): Buffer {
-        return this.policyAttachments[filename];
-    }
-
-    public async initializePolicyAttachments() {
-        try {
-            await this.refreshPolicyAttachments();
-        } catch (err) {
-            logger.fatal({err}, 'Failed fetching s3 policy attachments on startup');
-            throw err;
-        }
-
-        setInterval(async () => {
-            try {
-                await this.refreshPolicyAttachments();
-            } catch (err) {
-                logger.error(
-                    {err},
-                    `Failed refreshing s3 policy attachments, last successful refresh was at ${this.policyAttachmentsRefreshedAt}`
-                );
-            }
-        }, config.resourceUpdateInterval);
     }
 
     private async refreshPolicyAttachments() {
