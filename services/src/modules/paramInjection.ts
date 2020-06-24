@@ -1,6 +1,7 @@
 import {GraphQLResolveInfo} from 'graphql';
 import {decode as decodeJwt} from 'jsonwebtoken';
 import {RequestContext} from './context';
+import * as R from 'ramda';
 
 interface GraphQLArguments {
     [key: string]: any;
@@ -9,27 +10,27 @@ type jwtData = {
     [name: string]: any;
 };
 
-const paramRegex = /{(\w+\.\w+)}/g;
+const paramRegex = /{(source|args|exports)\.(\w+(\.\w+)*)}/g;
 const authzHeaderPrefix = 'Bearer ';
 
 function resolveTemplate(
+    source: string,
     template: string,
     parent: any,
     args: GraphQLArguments,
     context: RequestContext,
     info: GraphQLResolveInfo
 ) {
-    const [sourceName, propName] = template.split('.');
-
-    switch (sourceName.toLowerCase()) {
+    const propPath = template.split('.');
+    switch (source) {
         case 'source':
-            return parent && parent[propName];
+            return parent && R.path(propPath, parent);
         case 'args':
-            return args && args[propName];
+            return args && R.path(propPath, args);
         case 'exports':
-            return context.exports.resolve(info.parentType, parent, propName);
+            return context.exports.resolve(info.parentType, parent, template);
         case 'jwt':
-            return getJwt(context)[propName];
+            return getJwt(context)[template];
         default:
             return null;
     }
@@ -44,13 +45,13 @@ export function injectParameters(
 ) {
     let didFindValues = false;
     let didFindTemplates = false;
-    const value = template.replace(paramRegex, (_, match) => {
-        const resolved = resolveTemplate(match, parent, args, context, info);
+    let value: any = template;
+    const match = paramRegex.exec(template);
+    if (match) {
+        value = resolveTemplate(match[1], match[2], parent, args, context, info);
         didFindTemplates = true;
-        didFindValues = didFindValues || (resolved !== null && typeof resolved !== 'undefined');
-        return resolved;
-    });
-
+        didFindValues = didFindValues || (value !== null && typeof value !== 'undefined');
+    }
     return {value, didFindValues, didFindTemplates};
 }
 
@@ -73,7 +74,7 @@ export function resolveParameters(
             continue;
         }
 
-        parameters[group] = resolveTemplate(group, parent, args, context, info);
+        parameters[group] = resolveTemplate(group, match[2], parent, args, context, info);
     }
 
     return foundMatches ? parameters : null;
