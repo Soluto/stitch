@@ -44,23 +44,16 @@ export interface Policy extends Resource {
     type: PolicyType;
     code: string;
     args?: PolicyArgsObject;
-    queries?: PolicyQuery[];
+    query?: PolicyQuery;
 }
 
 interface PolicyQuery {
-    type: PolicyQueryType;
-    name: string;
-    graphql?: PolicyQueryGraphQL;
-    policy?: PolicyQueryPolicy;
+    source: string;
+    variables?: PolicyQueryGraphqlVariables;
 }
 
-interface PolicyQueryGraphQL {
-    query: string;
-}
-
-interface PolicyQueryPolicy {
-    policyName: string;
-    args: PolicyArgsObject;
+export interface PolicyQueryGraphqlVariables {
+    [key: string]: any;
 }
 
 export interface PolicyArgsObject {
@@ -86,9 +79,4 @@ enum AuthType {
 
 export enum PolicyType {
     opa = 'opa',
-}
-
-export enum PolicyQueryType {
-    graphql = 'graphql',
-    policy = 'policy',
 }

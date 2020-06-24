@@ -12,11 +12,11 @@ export type PolicyExecutionContext = {
     name: string;
     policyAttachments: PolicyAttachments;
     args?: PolicyArgsObject;
-    queries?: QueriesResults;
+    query?: QueryResults;
 };
 
-export type QueriesResults = {
-    [name: string]: string;
+export type QueryResults = {
+    [name: string]: any;
 };
 
 export type PolicyExecutionResult = {

@@ -25,12 +25,12 @@ function getInput(ctx: PolicyExecutionContext): PolicyInput {
     const input: PolicyInput = {};
 
     if (ctx.args) input.args = ctx.args;
-    if (ctx.queries) input.queries = ctx.queries;
+    if (ctx.query) input.query = ctx.query;
 
     return input;
 }
 
 type PolicyInput = {
     args?: PolicyArgsObject;
-    queries?: QueriesResults;
+    query?: QueryResults;
 };

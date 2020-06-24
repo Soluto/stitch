@@ -9,7 +9,7 @@ import {beforeEachDispose} from '../beforeEachDispose';
 import {app, AuthType} from '../../../registry';
 import {mockResourceBucket} from '../resourceBucket';
 import {ResourceGroup} from '../../../modules/resource-repository';
-import {PolicyType, PolicyQueryType} from '../../../modules/resource-repository/types';
+import {PolicyType, Policy} from '../../../modules/resource-repository/types';
 import {tmpPoliciesDir} from '../../../modules/config';
 import mockFsForOpa from '../../helpers/mockFsForOpa';
 
@@ -46,7 +46,7 @@ const upstreamClientCredentials = {
 };
 const upstreamClientCredentialsActiveDirectoryUpdate = {clientSecret: 'myOtherClientSecret'};
 
-const policy = {
+const policy: Policy = {
     metadata: {namespace: 'namespace', name: 'name'},
     type: PolicyType.opa,
     code: `real rego code
@@ -56,14 +56,12 @@ const policy = {
         an: 'arg',
         another: 'one!',
     },
-    queries: [
-        {type: PolicyQueryType.graphql, name: 'someGraphqlQuery', graphql: {query: 'actual gql'}},
-        {
-            type: PolicyQueryType.policy,
-            name: 'somePolicyQuery',
-            policy: {policyName: 'someOtherPolicy', args: {some: 'arg for the other policy'}},
+    query: {
+        source: 'some another gql',
+        variables: {
+            c: 'd',
         },
-    ],
+    },
 };
 const policyUpdate = {code: 'changed code', args: {just: 'one arg'}};
 
