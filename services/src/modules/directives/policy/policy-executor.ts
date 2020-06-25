@@ -1,7 +1,7 @@
-import {GraphQLResolveInfo} from 'graphql';
+import {GraphQLResolveInfo, graphql} from 'graphql';
 import {RequestContext} from '../../context';
 import {Policy, GraphQLArguments} from './types';
-import {Policy as PolicyDefinition, PolicyArgsObject, PolicyAttachments} from '../../resource-repository';
+import {Policy as PolicyDefinition, PolicyArgsObject, PolicyAttachments, PolicyQuery} from '../../resource-repository';
 import {evaluate as evaluateOpa} from './opa';
 import {injectParameters} from '../../paramInjection';
 
@@ -32,7 +32,8 @@ export class PolicyExecutor {
         const policyDefinition = this.getPolicyDefinition(policy.namespace, policy.name);
 
         const args = policyDefinition.args && this.preparePolicyArgs(policyDefinition.args, policy);
-        // TODO: evaluate queries
+
+        const query = policyDefinition.query && (await this.evaluatePolicyQuery(policyDefinition.query, args));
 
         const evaluate = typeEvaluators[policyDefinition.type];
         if (!evaluate) throw new Error(`Unsupported policy type ${policyDefinition.type}`);
@@ -72,5 +73,21 @@ export class PolicyExecutor {
 
         if (!policyDefinition) throw new Error(`The policy ${name} in namespace ${namespace} was not found`);
         return policyDefinition;
+    }
+
+    private async evaluatePolicyQuery(query: PolicyQuery, args: PolicyArgsObject = {}): Promise<any> {
+        let variableValues =
+            query.variables &&
+            Object.entries(query.variables).reduce<{[key: string]: any}>((policyArgs, [varName, varValue]) => {
+                if (typeof varValue === 'string') {
+                    varValue = injectParameters(varValue, this.parent, args, this.context, this.info).value;
+                }
+                policyArgs[varName] = varValue;
+                return policyArgs;
+            }, {});
+
+        // TODO: Run with admin permissions
+        const gqlResult = await graphql(this.info.schema, query.source, undefined, this.context, variableValues);
+        return gqlResult.data;
     }
 }

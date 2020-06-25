@@ -10,7 +10,7 @@ type jwtData = {
     [name: string]: any;
 };
 
-const paramRegex = /{(source|args|exports)\.(\w+(\.\w+)*)}/g;
+const paramRegex = /{(source|args|exports)\.(\w+(\.\w+)*)}/;
 const authzHeaderPrefix = 'Bearer ';
 
 function resolveTemplate(
@@ -46,7 +46,7 @@ export function injectParameters(
     let didFindValues = false;
     let didFindTemplates = false;
     let value: any = template;
-    const match = paramRegex.exec(template);
+    const match = template.match(paramRegex);
     if (match) {
         value = resolveTemplate(match[1], match[2], parent, args, context, info);
         didFindTemplates = true;

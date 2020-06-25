@@ -18,19 +18,19 @@ mutation CreateSchema($schema: SchemaInput!) {
 
 describe('Basic flow', () => {
     test('Default schema works', async () => {
-        const response = await gatewayClient.request(`query {default}`);
+        const response: any = await gatewayClient.request(`query {default}`);
 
         expect(response.default).toBe('default');
     });
 
     test('Gateway updates when updating schema in registry', async () => {
-        const response1 = await registryClient.request(createSchemaMutation, {schema: nonDefaultSchema});
+        const response1: any = await registryClient.request(createSchemaMutation, {schema: nonDefaultSchema});
         expect(response1.updateSchemas.success).toBe(true);
 
         // Wait for gateway to update
         await sleep(500);
 
-        const response2 = await gatewayClient.request(`query {default}`);
+        const response2: any = await gatewayClient.request(`query {default}`);
         expect(response2.default).toBe('NOPE');
     });
 });

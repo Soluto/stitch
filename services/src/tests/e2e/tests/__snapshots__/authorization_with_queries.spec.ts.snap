@@ -1,0 +1,83 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Authorization with queries Query denied employee 1 1`] = `
+Object {
+  "data": Object {
+    "deniedEmployee1": Object {
+      "address": null,
+      "id": "2",
+      "name": "Mark Zuckerberg",
+    },
+  },
+  "errors": Array [
+    Object {
+      "extensions": Object {
+        "code": "INTERNAL_SERVER_ERROR",
+        "exception": Object {
+          "stacktrace": Array [
+            "Error: Unauthorized by policy notClassified in namespace namespace",
+            "    at PolicyExecutor.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:33:19)",
+            "    at async Promise.all (index 0)",
+            "    at async PolicyExecutor.validatePolicies (/service/dist/modules/directives/policy/policy-executor.js:20:9)",
+            "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:13:13)",
+          ],
+        },
+      },
+      "locations": Array [
+        Object {
+          "column": 7,
+          "line": 6,
+        },
+      ],
+      "message": "Unauthorized by policy notClassified in namespace namespace",
+      "path": Array [
+        "deniedEmployee1",
+        "address",
+      ],
+    },
+  ],
+  "extensions": Any<Object>,
+  "status": 200,
+}
+`;
+
+exports[`Authorization with queries Query denied employee 2 1`] = `
+Object {
+  "data": Object {
+    "deniedEmployee2": Object {
+      "address": null,
+      "id": "2",
+      "name": "Tom Baker",
+    },
+  },
+  "errors": Array [
+    Object {
+      "extensions": Object {
+        "code": "INTERNAL_SERVER_ERROR",
+        "exception": Object {
+          "stacktrace": Array [
+            "Error: Unauthorized by policy notClassified in namespace namespace",
+            "    at PolicyExecutor.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:33:19)",
+            "    at async Promise.all (index 0)",
+            "    at async PolicyExecutor.validatePolicies (/service/dist/modules/directives/policy/policy-executor.js:20:9)",
+            "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:13:13)",
+          ],
+        },
+      },
+      "locations": Array [
+        Object {
+          "column": 7,
+          "line": 6,
+        },
+      ],
+      "message": "Unauthorized by policy notClassified in namespace namespace",
+      "path": Array [
+        "deniedEmployee2",
+        "address",
+      ],
+    },
+  ],
+  "extensions": Any<Object>,
+  "status": 200,
+}
+`;

@@ -1,5 +1,5 @@
-import {Unsubscriber, GraphQLServiceConfig, SchemaChangeCallback} from 'apollo-server-core';
-import {parse, execute} from 'graphql';
+import {Unsubscriber, GraphQLServiceConfig, SchemaChangeCallback, gql} from 'apollo-server-core';
+import {parse, execute, DocumentNode} from 'graphql';
 import {Observable, Subscription} from 'rxjs';
 import {shareReplay, map, take, tap, catchError, skip} from 'rxjs/operators';
 
@@ -55,6 +55,23 @@ export function createGraphQLService(config: {resourceGroups: Observable<Resourc
     };
 }
 
+function buildPolicyGqlQuery(policy: Policy): DocumentNode {
+    const argStr = policy.args
+        ? `(${Object.entries(policy.args)
+              .map(([argName, argType]) => `${argName}: ${argType}`)
+              .join(',')})`
+        : '';
+
+    return gql`
+        type PolicyResult {
+            allow: Boolean!
+        }
+
+        type Query {
+            policy___${policy.metadata.namespace}___${policy.metadata.name}${argStr}: PolicyResult! @policyQuery(namespace: "${policy.metadata.namespace}", name: "${policy.metadata.name}")
+        }`;
+}
+
 export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
     const activeDirectoryAuth = new ActiveDirectoryAuth();
     const upstreamsByHost = new Map(rg.upstreams.map(u => [u.host, u]));
@@ -62,6 +79,7 @@ export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
         rg.upstreamClientCredentials.map(u => [u.activeDirectory.authority, u])
     );
     const schemas = rg.schemas.length === 0 ? [defaultSchema] : rg.schemas;
+    const policies = rg.policies ?? [];
 
     const authenticationConfig: AuthenticationConfig = {
         getUpstreamByHost(host: string) {
@@ -73,15 +91,19 @@ export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
         activeDirectoryAuth,
     };
 
+    const schemaTypeDefs = schemas.map(s => [`${s.metadata.namespace}/${s.metadata.name}`, parse(s.schema)]);
+    const policyQueryTypeDefs = policies.map(p => [
+        `policy___${p.metadata.namespace}___${p.metadata.name}`,
+        buildPolicyGqlQuery(p),
+    ]);
     const schema = buildSchemaFromFederatedTypeDefs({
-        typeDefs: Object.fromEntries(schemas.map(s => [`${s.metadata.namespace}/${s.metadata.name}`, parse(s.schema)])),
+        typeDefs: Object.fromEntries([...schemaTypeDefs, ...policyQueryTypeDefs]),
         baseTypeDefs: baseSchema.baseTypeDef,
         directiveTypeDefs: directivesSdl,
         resolvers: baseSchema.resolvers,
         schemaDirectives: directiveMap,
         schemaDirectivesContext: {authenticationConfig},
     });
-
     return {
         schema,
         executor(requestContext) {

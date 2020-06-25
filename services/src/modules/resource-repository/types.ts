@@ -47,7 +47,7 @@ export interface Policy extends Resource {
     query?: PolicyQuery;
 }
 
-interface PolicyQuery {
+export interface PolicyQuery {
     source: string;
     variables?: PolicyQueryGraphqlVariables;
 }

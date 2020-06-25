@@ -28,6 +28,10 @@ export type PolicyExecutionResult = {
     };
 };
 
+export interface PolicyResult {
+    allow: boolean;
+}
+
 export type GraphQLArguments = {
     [name: string]: any;
 };
