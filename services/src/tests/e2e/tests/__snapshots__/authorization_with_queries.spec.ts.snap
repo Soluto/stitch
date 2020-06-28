@@ -1,5 +1,47 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Authorization with queries Query allowed employee 1`] = `
+Object {
+  "data": null,
+  "errors": Array [
+    Object {
+      "extensions": Object {
+        "code": "INTERNAL_SERVER_ERROR",
+        "exception": Object {
+          "stacktrace": Array [
+            "Error: Unauthorized by policy alwaysDenied in namespace namespace",
+            "    at PolicyExecutor.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:37:19)",
+            "    at async Promise.all (index 0)",
+            "    at async PolicyExecutor.validatePolicies (/service/dist/modules/directives/policy/policy-executor.js:20:9)",
+            "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:14:17)",
+          ],
+        },
+      },
+      "locations": Array [
+        Object {
+          "column": 15,
+          "line": 2,
+        },
+      ],
+      "message": "Unauthorized by policy alwaysDenied in namespace namespace",
+      "path": Array [
+        "classifiedDepartments",
+      ],
+    },
+  ],
+  "extensions": Any<Object>,
+  "status": 200,
+}
+`;
+
+exports[`Authorization with queries Query allowed employee 2`] = `
+Object {
+  "address": "Tel Aviv",
+  "id": "1",
+  "name": "John Smith",
+}
+`;
+
 exports[`Authorization with queries Query denied employee 1 1`] = `
 Object {
   "data": Object {
@@ -16,10 +58,10 @@ Object {
         "exception": Object {
           "stacktrace": Array [
             "Error: Unauthorized by policy notClassified in namespace namespace",
-            "    at PolicyExecutor.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:33:19)",
+            "    at PolicyExecutor.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:37:19)",
             "    at async Promise.all (index 0)",
             "    at async PolicyExecutor.validatePolicies (/service/dist/modules/directives/policy/policy-executor.js:20:9)",
-            "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:13:13)",
+            "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:14:17)",
           ],
         },
       },
@@ -57,10 +99,10 @@ Object {
         "exception": Object {
           "stacktrace": Array [
             "Error: Unauthorized by policy notClassified in namespace namespace",
-            "    at PolicyExecutor.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:33:19)",
+            "    at PolicyExecutor.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:37:19)",
             "    at async Promise.all (index 0)",
             "    at async PolicyExecutor.validatePolicies (/service/dist/modules/directives/policy/policy-executor.js:20:9)",
-            "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:13:13)",
+            "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:14:17)",
           ],
         },
       },

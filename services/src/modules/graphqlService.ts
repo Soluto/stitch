@@ -4,7 +4,7 @@ import {Observable, Subscription} from 'rxjs';
 import {shareReplay, map, take, tap, catchError, skip} from 'rxjs/operators';
 
 import {directiveMap} from './directives';
-import {ResourceGroup, Policy, PolicyAttachments} from './resource-repository';
+import {ResourceGroup, Policy, PolicyAttachments, Schema} from './resource-repository';
 import {buildSchemaFromFederatedTypeDefs} from './buildFederatedSchema';
 import * as baseSchema from './baseSchema';
 import {ActiveDirectoryAuth} from './auth/activeDirectoryAuth';
@@ -63,13 +63,10 @@ function buildPolicyGqlQuery(policy: Policy): DocumentNode {
         : '';
 
     return gql`
-        type PolicyResult {
-            allow: Boolean!
+        extend type Policy {
+            ${policy.metadata.namespace}___${policy.metadata.name}${argStr}: PolicyResult! @policyQuery(namespace: "${policy.metadata.namespace}", name: "${policy.metadata.name}")
         }
-
-        type Query {
-            policy___${policy.metadata.namespace}___${policy.metadata.name}${argStr}: PolicyResult! @policyQuery(namespace: "${policy.metadata.namespace}", name: "${policy.metadata.name}")
-        }`;
+        `;
 }
 
 export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
@@ -78,7 +75,7 @@ export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
     const upstreamClientCredentialsByAuthority = new Map(
         rg.upstreamClientCredentials.map(u => [u.activeDirectory.authority, u])
     );
-    const schemas = rg.schemas.length === 0 ? [defaultSchema] : rg.schemas;
+    const schemas = rg.schemas.length === 0 ? [defaultSchema] : [initialSchema, ...rg.schemas];
     const policies = rg.policies ?? [];
 
     const authenticationConfig: AuthenticationConfig = {
@@ -93,7 +90,7 @@ export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
 
     const schemaTypeDefs = schemas.map(s => [`${s.metadata.namespace}/${s.metadata.name}`, parse(s.schema)]);
     const policyQueryTypeDefs = policies.map(p => [
-        `policy___${p.metadata.namespace}___${p.metadata.name}`,
+        `${p.metadata.namespace}___${p.metadata.name}`,
         buildPolicyGqlQuery(p),
     ]);
     const schema = buildSchemaFromFederatedTypeDefs({
@@ -122,9 +119,24 @@ export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
     };
 }
 
-const defaultSchema = {
+const defaultSchema: Schema = {
     metadata: {namespace: '__internal__', name: 'default'},
     schema: 'type Query { default: String! @stub(value: "default") }',
+};
+
+const initialSchema: Schema = {
+    metadata: {
+        namespace: '__internal__',
+        name: '__initial__',
+    },
+    schema: `
+    type Query {
+        policy: Policy! @stub(value: {
+            default: {
+                allow: true
+            }
+        })
+    }`,
 };
 
 declare module './context' {

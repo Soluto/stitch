@@ -15,22 +15,22 @@ const authzHeaderPrefix = 'Bearer ';
 
 function resolveTemplate(
     source: string,
-    template: string,
+    key: string,
     parent: any,
     args: GraphQLArguments,
     context: RequestContext,
     info: GraphQLResolveInfo
 ) {
-    const propPath = template.split('.');
+    const propPath = key.split('.');
     switch (source) {
         case 'source':
             return parent && R.path(propPath, parent);
         case 'args':
             return args && R.path(propPath, args);
         case 'exports':
-            return context.exports.resolve(info.parentType, parent, template);
+            return context.exports.resolve(info.parentType, parent, key);
         case 'jwt':
-            return getJwt(context)[template];
+            return getJwt(context)[key];
         default:
             return null;
     }

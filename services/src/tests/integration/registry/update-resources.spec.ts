@@ -57,7 +57,7 @@ const policy: Policy = {
         another: 'one!',
     },
     query: {
-        source: 'some another gql',
+        gql: 'some another gql',
         variables: {
             c: 'd',
         },

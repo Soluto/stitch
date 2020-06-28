@@ -1,6 +1,6 @@
 import {GraphQLResolveInfo, graphql} from 'graphql';
 import {RequestContext} from '../../context';
-import {Policy, GraphQLArguments} from './types';
+import {Policy, GraphQLArguments, QueryResults} from './types';
 import {Policy as PolicyDefinition, PolicyArgsObject, PolicyAttachments, PolicyQuery} from '../../resource-repository';
 import {evaluate as evaluateOpa} from './opa';
 import {injectParameters} from '../../paramInjection';
@@ -28,7 +28,7 @@ export class PolicyExecutor {
         await Promise.all(this.policies.map(r => this.validatePolicy(r)));
     }
 
-    async validatePolicy(policy: Policy) {
+    async evaluatePolicy(policy: Policy): Promise<boolean> {
         const policyDefinition = this.getPolicyDefinition(policy.namespace, policy.name);
 
         const args = policyDefinition.args && this.preparePolicyArgs(policyDefinition.args, policy);
@@ -44,7 +44,11 @@ export class PolicyExecutor {
             policyAttachments: this.policyAttachments,
         });
         if (!done) throw new Error('in-line query evaluation not yet supported');
+        return allow || false;
+    }
 
+    async validatePolicy(policy: Policy): Promise<void> {
+        const allow = await this.evaluatePolicy(policy);
         if (!allow) throw new Error(`Unauthorized by policy ${policy.name} in namespace ${policy.namespace}`);
     }
 
@@ -75,7 +79,10 @@ export class PolicyExecutor {
         return policyDefinition;
     }
 
-    private async evaluatePolicyQuery(query: PolicyQuery, args: PolicyArgsObject = {}): Promise<any> {
+    private async evaluatePolicyQuery(
+        query: PolicyQuery,
+        args: PolicyArgsObject = {}
+    ): Promise<QueryResults | undefined> {
         let variableValues =
             query.variables &&
             Object.entries(query.variables).reduce<{[key: string]: any}>((policyArgs, [varName, varValue]) => {
@@ -87,7 +94,17 @@ export class PolicyExecutor {
             }, {});
 
         // TODO: Run with admin permissions
-        const gqlResult = await graphql(this.info.schema, query.source, undefined, this.context, variableValues);
-        return gqlResult.data;
+        const context: RequestContext = {...this.context, ignorePolicies: true};
+        const gqlResult = await graphql(this.info.schema, query.gql, undefined, context, variableValues);
+        return gqlResult.data || undefined;
+    }
+}
+
+declare module '../../context' {
+    interface RequestContext {
+        /**
+         * This flag indicates that request should be resolved without invoking authorization policies evaluation
+         */
+        ignorePolicies: boolean;
     }
 }

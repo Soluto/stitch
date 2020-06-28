@@ -48,11 +48,11 @@ export interface Policy extends Resource {
 }
 
 export interface PolicyQuery {
-    source: string;
-    variables?: PolicyQueryGraphqlVariables;
+    gql: string;
+    variables?: PolicyQueryVariables;
 }
 
-export interface PolicyQueryGraphqlVariables {
+export interface PolicyQueryVariables {
     [key: string]: any;
 }
 

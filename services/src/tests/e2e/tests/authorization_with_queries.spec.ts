@@ -6,6 +6,16 @@ import {sleep} from '../../helpers/utility';
 const policies: Policy[] = [
     {
         metadata: {
+            name: 'alwaysDenied',
+            namespace: 'namespace',
+        },
+        type: PolicyType.opa,
+        code: `
+      default allow = false
+        `,
+    },
+    {
+        metadata: {
             name: 'isSenior',
             namespace: 'namespace',
         },
@@ -30,7 +40,7 @@ const policies: Policy[] = [
       default allow = false
       allow {
         input.query.classifiedDepartments[_].id != input.args.departmentId;
-        input.query.policy___namespace___isSenior.allow
+        input.query.policy.namespace___isSenior.allow
       }
     `,
         args: {
@@ -38,13 +48,15 @@ const policies: Policy[] = [
             hireDate: 'Int',
         },
         query: {
-            source: `
+            gql: `
         query($hireDate: Int!) {
           classifiedDepartments {
             id
           },
-          policy___namespace___isSenior(hireDate: $hireDate) {
-            allow
+          policy {
+            namespace___isSenior(hireDate: $hireDate) {
+              allow
+            }
           }
         }
       `,
@@ -114,6 +126,9 @@ const schema: Schema = {
       classifiedDepartments: [Department!]! @stub(value: [{
         id: "D1000"
         name: "VIP"
+      }]) @policy(policies: [{
+        namespace: "namespace",
+        name: "alwaysDenied"
       }])
     }
   `,
@@ -181,8 +196,23 @@ describe('Authorization with queries', () => {
     });
 
     test('Query allowed employee', async () => {
+        // TODO: check classified fails
+        try {
+            await gatewayClient.request(`query {
+              classifiedDepartments {
+                  id
+                  name
+              }
+          }`);
+        } catch (e) {
+            const response = e.response;
+            expect(response).toMatchSnapshot({
+                extensions: expect.any(Object),
+            });
+        }
+
         const response: AllowedEmployeeQueryResponse = await gatewayClient.request(employeeQuery('allowedEmployee'));
-        expect(response.allowedEmployee.address).toBeDefined();
+        expect(response.allowedEmployee).toMatchSnapshot();
     });
 
     test('Query denied employee 1', async () => {
