@@ -20,7 +20,6 @@ export class PolicyExecutor {
         protected context: RequestContext,
         protected info: GraphQLResolveInfo
     ) {
-        // TODO: add jwt data
         this.policyDefinitions = context.policies;
         this.policyAttachments = context.policyAttachments;
     }
@@ -38,7 +37,11 @@ export class PolicyExecutor {
         const evaluate = typeEvaluators[policyDefinition.type];
         if (!evaluate) throw new Error(`Unsupported policy type ${policyDefinition.type}`);
 
-        const {done, allow} = await evaluate({...policy, args, policyAttachments: this.policyAttachments});
+        const {done, allow} = await evaluate({
+            ...policy,
+            args,
+            policyAttachments: this.policyAttachments,
+        });
         if (!done) throw new Error('in-line query evaluation not yet supported');
 
         if (!allow) throw new Error(`Unauthorized by policy ${policy.name} in namespace ${policy.namespace}`);

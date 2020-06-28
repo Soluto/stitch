@@ -15,6 +15,7 @@ class SerialJestRunner extends DefaultJestRunner {
     }
 
     async teardown() {
+        // await dockerCompose.logs(['gateway', 'registry'], {cwd: __dirname, log: true});
         await dockerCompose.down({cwd: __dirname, log: true});
         await Promise.all([waitFor.gatewayStop(10000), waitFor.registryStop(10000)]);
     }

@@ -11,16 +11,11 @@ export type PolicyExecutionContext = {
     namespace: string;
     name: string;
     policyAttachments: PolicyAttachments;
-    jwt?: JwtInput;
     args?: PolicyArgsObject;
     queries?: QueriesResults;
 };
 
 export type QueriesResults = {
-    [name: string]: string;
-};
-
-export type JwtInput = {
     [name: string]: string;
 };
 

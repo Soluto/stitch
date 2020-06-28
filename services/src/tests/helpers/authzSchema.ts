@@ -12,6 +12,21 @@ export const onlyAdminPolicy = () => ({
     },
 });
 
+export const jwtNamePolicy = () => ({
+    metadata: {namespace: 'ns', name: 'jwtName'},
+    type: 'opa',
+    code: `
+  default allow = false
+  allow {
+    input.args.allowedName == input.args.jwtName
+  }
+`,
+    args: {
+        allowedName: 'String',
+        jwtName: 'String',
+    },
+});
+
 export const createPolicyMutation = `
 mutation CreatePolicy($policy: PolicyInput!) {
   updatePolicies(input: [$policy]) {
@@ -29,9 +44,20 @@ export const getSchema = () => ({
       ])
       role: String
     }
+
+    type ArbitraryData {
+      arbitraryField: String @policy(policies: [
+        { namespace: "ns", name: "jwtName", args: {
+          jwtName: "{jwt.name}",
+          allowedName: "Varg"
+        }}
+      ])
+    }
+
     type Query {
       user: User! @stub(value: ${userQueryStub('normal')})
       userAdmin: User! @stub(value: ${userQueryStub('admin')})
+      arbitraryData: ArbitraryData! @stub(value: { arbitraryField: "arbitraryValue" })
     }
   `,
 });
@@ -55,6 +81,14 @@ export const getUserQuery = (queryType: string) => `
       firstName
       lastName
       role
+    }
+  }
+`;
+
+export const getArbitraryDataQuery = () => `
+  query {
+    arbitraryData {
+      arbitraryField
     }
   }
 `;

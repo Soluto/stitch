@@ -37,10 +37,13 @@ metadata:
   name: abc-user
 Spec:
   type: js-expression
-  code: { "result": (data.jwt.issuer === "abc.com") ? "allow" : "deny" }
+  code: { "result": (input.args.issuer === "abc.com") ? "allow" : "deny" }
+  args:
+    issuer: String!
 ```
 
-`jwt` is available on the data object to validate fields from the web token
+The `args` are available to use on the input object.
+`jwt` is available for parameter injection in args using `issuer: "{jwt.issuer}"`
 
 ### Policy that allows access only if the subject matches the provided userId argument:
 
@@ -51,12 +54,11 @@ metadata:
   name: my-user
 Spec:
   type: js-expression
-  code: { "result": (input.jwt.sub === input.args.userId) ? "allow" : "deny"}
+  code: { "result": (input.args.sub === input.args.userId) ? "allow" : "deny"}
   args:
     userId: ID!
+    sub: ID!
 ```
-
-The `args` are available to use on the input object
 
 _Note the js-expression type is an example of a possible type and not planned to be implemented at this time._
 
@@ -104,13 +106,14 @@ metadata:
 Spec:
     type: opa
     code: |
-        query = sprintf(“graphql { user(%s) {family { members { id} } } }”, input.jwt.sub)
+        query = sprintf(“graphql { user(%s) {family { members { id} } } }”, input.args.sub)
         allow = false
         allow = {
           input.args.userId == input.query.family.members[_].id
         }
     args:
         userId: ID!
+        sub: ID!
 ```
 
 This example will always evaluate the graphql query, but generally this approach should be used when conditional side effect evaluation is needed
@@ -149,7 +152,7 @@ type User {
   ID: ID!
   Picture: String @policy-some-ns-public
   Friends: [User] @policy-some-ns-abc-user
-  Email: String @policy-some-ns-my-user(userId: "{source.UserId}")
+  Email: String @policy-some-ns-my-user(userId: "{source.UserId}", sub: "{jwt.sub}")
   NickName: @policy-some-ns-my-user-family(userId: "{source.UserId}")
 }
 ```
@@ -267,11 +270,12 @@ Spec:
     code: |
         allow = false
         allow {
-          input.jwt.claims[input.args.claims[i]] == input.args.values[i]
+          input.args.jwtClaims[input.args.claims[i]] == input.args.values[i]
         }
     args:
         claims: [String]
         values: [String]
+        jwtClaims: JSONObject
 ```
 
 Usage:
@@ -279,6 +283,6 @@ Usage:
 ```
 type User {
   ID: ID!
-  Picture: String @policy-some-ns-has-claims(claims:["issuer", "sub"], values: ["soluto.com", "{source.UserId}"]
+  Picture: String @policy-some-ns-has-claims(claims:["issuer", "sub"], values: ["soluto.com", "{source.UserId}"], jwtClaims: "{jwt.claims}")
 }
 ```

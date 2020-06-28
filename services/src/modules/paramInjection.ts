@@ -1,10 +1,16 @@
 import {GraphQLResolveInfo} from 'graphql';
+import {decode as decodeJwt} from 'jsonwebtoken';
 import {RequestContext} from './context';
 
 interface GraphQLArguments {
     [key: string]: any;
 }
+type jwtData = {
+    [name: string]: any;
+};
+
 const paramRegex = /{(\w+\.\w+)}/g;
+const authzHeaderPrefix = 'Bearer ';
 
 function resolveTemplate(
     template: string,
@@ -22,6 +28,8 @@ function resolveTemplate(
             return args && args[propName];
         case 'exports':
             return context.exports.resolve(info.parentType, parent, propName);
+        case 'jwt':
+            return getJwt(context)[propName];
         default:
             return null;
     }
@@ -95,4 +103,26 @@ export function deepInjectParameters(
 
 function isObject(val: any): val is object {
     return typeof val === 'object' && val !== null;
+}
+
+function getJwt(context: RequestContext): jwtData {
+    if (context.jwt) return context.jwt;
+
+    const authzHeader = context?.request?.headers?.authorization;
+
+    context.jwt = isAuthzHeaderValid(authzHeader)
+        ? (decodeJwt(authzHeader.substr(authzHeaderPrefix.length), {json: true}) as jwtData)
+        : {};
+
+    return context.jwt;
+}
+
+function isAuthzHeaderValid(authzHeader: any): boolean {
+    return authzHeader && authzHeader.startsWith(authzHeaderPrefix);
+}
+
+declare module './context' {
+    interface RequestContext {
+        jwt?: jwtData;
+    }
 }
