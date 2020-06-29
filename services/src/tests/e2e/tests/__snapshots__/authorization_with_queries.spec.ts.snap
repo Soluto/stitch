@@ -10,7 +10,7 @@ Object {
         "exception": Object {
           "stacktrace": Array [
             "Error: Unauthorized by policy alwaysDenied in namespace namespace",
-            "    at PolicyExecutor.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:37:19)",
+            "    at PolicyExecutor.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:42:19)",
             "    at async Promise.all (index 0)",
             "    at async PolicyExecutor.validatePolicies (/service/dist/modules/directives/policy/policy-executor.js:20:9)",
             "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:14:17)",
@@ -58,7 +58,7 @@ Object {
         "exception": Object {
           "stacktrace": Array [
             "Error: Unauthorized by policy notClassified in namespace namespace",
-            "    at PolicyExecutor.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:37:19)",
+            "    at PolicyExecutor.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:42:19)",
             "    at async Promise.all (index 0)",
             "    at async PolicyExecutor.validatePolicies (/service/dist/modules/directives/policy/policy-executor.js:20:9)",
             "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:14:17)",
@@ -99,7 +99,7 @@ Object {
         "exception": Object {
           "stacktrace": Array [
             "Error: Unauthorized by policy notClassified in namespace namespace",
-            "    at PolicyExecutor.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:37:19)",
+            "    at PolicyExecutor.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:42:19)",
             "    at async Promise.all (index 0)",
             "    at async PolicyExecutor.validatePolicies (/service/dist/modules/directives/policy/policy-executor.js:20:9)",
             "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:14:17)",

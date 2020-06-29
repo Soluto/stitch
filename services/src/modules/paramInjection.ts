@@ -10,7 +10,7 @@ type jwtData = {
     [name: string]: any;
 };
 
-const paramRegex = /{(source|args|exports)\.(\w+(\.\w+)*)}/;
+const paramRegex = /{(source|args|jwt|exports)\.(\w+(\.\w+)*)}/;
 const authzHeaderPrefix = 'Bearer ';
 
 function resolveTemplate(
@@ -114,7 +114,6 @@ function getJwt(context: RequestContext): jwtData {
     context.jwt = isAuthzHeaderValid(authzHeader)
         ? (decodeJwt(authzHeader.substr(authzHeaderPrefix.length), {json: true}) as jwtData)
         : {};
-
     return context.jwt;
 }
 

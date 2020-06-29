@@ -41,6 +41,7 @@ export class PolicyExecutor {
         const {done, allow} = await evaluate({
             ...policy,
             args,
+            query,
             policyAttachments: this.policyAttachments,
         });
         if (!done) throw new Error('in-line query evaluation not yet supported');
