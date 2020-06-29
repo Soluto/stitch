@@ -3,7 +3,7 @@ import {RequestContext} from '../../context';
 import {Policy, GraphQLArguments, QueryResults} from './types';
 import {Policy as PolicyDefinition, PolicyArgsObject, PolicyAttachments, PolicyQuery} from '../../resource-repository';
 import {evaluate as evaluateOpa} from './opa';
-import {injectParameters} from '../../paramInjection';
+import {injectParameters, resolveParameters} from '../../paramInjection';
 
 const typeEvaluators = {
     opa: evaluateOpa,
@@ -54,21 +54,42 @@ export class PolicyExecutor {
     }
 
     private preparePolicyArgs(supportedPolicyArgs: PolicyArgsObject, policy: Policy): PolicyArgsObject {
-        return Object.keys(supportedPolicyArgs).reduce<PolicyArgsObject>((policyArgs, policyArgName) => {
-            if (policy?.args?.[policyArgName] === undefined)
-                throw new Error(
-                    `Missing arg ${policyArgName} for policy ${policy.name} in namespace ${policy.namespace}`
-                );
+        return Object.entries(supportedPolicyArgs).reduce<PolicyArgsObject>(
+            (policyArgs, [policyArgName, policyArgType]) => {
+                if (policy?.args?.[policyArgName] === undefined)
+                    throw new Error(
+                        `Missing arg ${policyArgName} for policy ${policy.name} in namespace ${policy.namespace}`
+                    );
 
-            let policyArgValue = policy.args[policyArgName];
-            if (typeof policyArgValue === 'string') {
-                policyArgValue = injectParameters(policyArgValue, this.parent, this.args, this.context, this.info)
-                    .value;
-            }
+                let policyArgValue = policy.args[policyArgName];
+                if (typeof policyArgValue === 'string') {
+                    if (policyArgType === 'String') {
+                        policyArgValue = injectParameters(
+                            policyArgValue,
+                            this.parent,
+                            this.args,
+                            this.context,
+                            this.info
+                        ).value;
+                    } else {
+                        const resolvedArgValue = resolveParameters(
+                            policyArgValue,
+                            this.parent,
+                            this.args,
+                            this.context,
+                            this.info
+                        );
+                        if (resolvedArgValue) {
+                            policyArgValue = resolvedArgValue[policyArgValue];
+                        }
+                    }
+                }
 
-            policyArgs[policyArgName] = policyArgValue;
-            return policyArgs;
-        }, {});
+                policyArgs[policyArgName] = policyArgValue;
+                return policyArgs;
+            },
+            {}
+        );
     }
 
     private getPolicyDefinition(namespace: string, name: string) {
@@ -88,13 +109,15 @@ export class PolicyExecutor {
             query.variables &&
             Object.entries(query.variables).reduce<{[key: string]: any}>((policyArgs, [varName, varValue]) => {
                 if (typeof varValue === 'string') {
-                    varValue = injectParameters(varValue, this.parent, args, this.context, this.info).value;
+                    const resolvedValue = resolveParameters(varValue, this.parent, args, this.context, this.info);
+                    if (resolvedValue) {
+                        varValue = resolvedValue[varValue];
+                    }
                 }
                 policyArgs[varName] = varValue;
                 return policyArgs;
             }, {});
 
-        // TODO: Run with admin permissions
         const context: RequestContext = {...this.context, ignorePolicies: true};
         const gqlResult = await graphql(this.info.schema, query.gql, undefined, context, variableValues);
         return gqlResult.data || undefined;
