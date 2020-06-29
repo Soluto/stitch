@@ -10,7 +10,7 @@ type jwtData = {
     [name: string]: any;
 };
 
-const paramRegex = /{(source|args|jwt|exports)\.(\w+(\.\w+)*)}/;
+const paramRegex = /{(source|args|jwt|exports)\.(\w+(\.\w+)*)}/g;
 const authzHeaderPrefix = 'Bearer ';
 
 function resolveTemplate(
@@ -46,8 +46,8 @@ export function injectParameters(
     let didFindValues = false;
     let didFindTemplates = false;
     let value: any = template;
-    const match = template.match(paramRegex);
-    if (match) {
+    const matches = Array.from(template.matchAll(paramRegex));
+    for (const match of matches) {
         value = resolveTemplate(match[1], match[2], parent, args, context, info);
         didFindTemplates = true;
         didFindValues = didFindValues || (value !== null && typeof value !== 'undefined');
@@ -63,20 +63,19 @@ export function resolveParameters(
     info: GraphQLResolveInfo
 ) {
     let foundMatches = false;
-    const matches = template.matchAll(paramRegex);
+    const matches = Array.from(template.matchAll(paramRegex));
 
     const parameters: {[key: string]: any} = {};
     for (const match of matches) {
         foundMatches = true;
-
-        const group = match[1];
-        if (group in parameters) {
+        const paramTemplate = match[0];
+        const source = match[1];
+        const key = match[2];
+        if (paramTemplate in parameters) {
             continue;
         }
-
-        parameters[group] = resolveTemplate(group, match[2], parent, args, context, info);
+        parameters[paramTemplate] = resolveTemplate(source, key, parent, args, context, info);
     }
-
     return foundMatches ? parameters : null;
 }
 
