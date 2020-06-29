@@ -45,13 +45,12 @@ export function injectParameters(
 ) {
     let didFindValues = false;
     let didFindTemplates = false;
-    let value: any = template;
-    const matches = Array.from(template.matchAll(paramRegex));
-    for (const match of matches) {
-        value = resolveTemplate(match[1], match[2], parent, args, context, info);
+    const value = template.replace(paramRegex, (_, source, key) => {
+        const resolved = resolveTemplate(source, key, parent, args, context, info);
         didFindTemplates = true;
-        didFindValues = didFindValues || (value !== null && typeof value !== 'undefined');
-    }
+        didFindValues = didFindValues || (resolved !== null && typeof resolved !== 'undefined');
+        return resolved;
+    });
     return {value, didFindValues, didFindTemplates};
 }
 
