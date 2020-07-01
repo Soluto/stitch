@@ -13,7 +13,7 @@ export class PolicyExecutor {
     private policyDefinition: PolicyDefinition;
     private policyAttachments: PolicyAttachments;
 
-    constructor(
+    private constructor(
         protected policy: Policy,
         protected parent: any,
         protected args: GraphQLArguments,
@@ -24,7 +24,31 @@ export class PolicyExecutor {
         this.policyAttachments = context.policyAttachments;
     }
 
-    async evaluatePolicy(): Promise<boolean> {
+    static async evaluatePolicy(
+        policy: Policy,
+        parent: any,
+        args: GraphQLArguments,
+        context: RequestContext,
+        info: GraphQLResolveInfo
+    ): Promise<boolean> {
+        const executor = new PolicyExecutor(policy, parent, args, context, info);
+        return executor.evaluatePolicy();
+    }
+
+    static async validatePolicy(
+        policy: Policy,
+        parent: any,
+        args: GraphQLArguments,
+        context: RequestContext,
+        info: GraphQLResolveInfo
+    ): Promise<void> {
+        const executor = new PolicyExecutor(policy, parent, args, context, info);
+        const allow = await executor.evaluatePolicy();
+        if (!allow)
+            throw new Error(`Unauthorized by policy ${executor.policy.name} in namespace ${executor.policy.namespace}`);
+    }
+
+    private async evaluatePolicy(): Promise<boolean> {
         const args = this.preparePolicyArgs();
         const query = await this.evaluatePolicyQuery(args);
 
@@ -39,11 +63,6 @@ export class PolicyExecutor {
         });
         if (!done) throw new Error('in-line query evaluation not yet supported');
         return allow || false;
-    }
-
-    async validatePolicy(): Promise<void> {
-        const allow = await this.evaluatePolicy();
-        if (!allow) throw new Error(`Unauthorized by policy ${this.policy.name} in namespace ${this.policy.namespace}`);
     }
 
     private preparePolicyArgs(): PolicyArgsObject | undefined {
