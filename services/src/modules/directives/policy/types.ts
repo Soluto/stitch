@@ -12,11 +12,11 @@ export type PolicyExecutionContext = {
     name: string;
     policyAttachments: PolicyAttachments;
     args?: PolicyArgsObject;
-    queries?: QueriesResults;
+    query?: QueryResults;
 };
 
-export type QueriesResults = {
-    [name: string]: string;
+export type QueryResults = {
+    [name: string]: any;
 };
 
 export type PolicyExecutionResult = {
@@ -27,6 +27,10 @@ export type PolicyExecutionResult = {
         code: string;
     };
 };
+
+export interface PolicyResult {
+    allow: boolean;
+}
 
 export type GraphQLArguments = {
     [name: string]: any;

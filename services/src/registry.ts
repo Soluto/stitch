@@ -11,7 +11,7 @@ import {createSchemaConfig} from './modules/graphqlService';
 import * as opaHelper from './modules/opaHelper';
 // Importing directly from types because of a typescript or ts-jest bug that re-exported enums cause a runtime error for being undefined
 // https://github.com/kulshekhar/ts-jest/issues/281
-import {PolicyArgsObject, PolicyType, PolicyQueryType} from './modules/resource-repository/types';
+import {PolicyArgsObject, PolicyType, PolicyQueryVariables} from './modules/resource-repository/types';
 
 const typeDefs = gql`
     scalar JSON
@@ -108,29 +108,9 @@ const typeDefs = gql`
         opa
     }
 
-    enum PolicyQueryType {
-        graphql
-        policy
-    }
-
-    input PolicyQueryGraphQLInput {
-        query: String!
-    }
-
-    input PolicyQueryPolicyInput {
-        policyName: String!
-        args: JSONObject
-    }
-
-    """
-    GraphQL doesn't support unions for input types, otherwise this would be a union of different policy query types.
-    Instead, the PolicyQueryType enum indicates which policy query type is needed, and there's a property which corresponds to each policy query type, which we validate in the registry.
-    """
     input PolicyQueryInput {
-        type: PolicyQueryType!
-        name: String!
-        graphql: PolicyQueryGraphQLInput
-        policy: PolicyQueryPolicyInput
+        gql: String!
+        variables: JSONObject
     }
 
     input PolicyInput {
@@ -138,7 +118,7 @@ const typeDefs = gql`
         type: PolicyType!
         code: String!
         args: JSONObject
-        queries: [PolicyQueryInput!]
+        query: PolicyQueryInput
     }
 `;
 
@@ -187,20 +167,9 @@ interface UpstreamClientCredentialsInput {
     };
 }
 
-interface PolicyQueryGraphQLInput {
-    query: string;
-}
-
-interface PolicyQueryPolicyInput {
-    policyName: string;
-    args: PolicyArgsObject;
-}
-
 interface PolicyQueryInput {
-    type: PolicyQueryType;
-    name: string;
-    graphql?: PolicyQueryGraphQLInput;
-    policy?: PolicyQueryPolicyInput;
+    gql: string;
+    variables?: PolicyQueryVariables;
 }
 
 interface PolicyInput {
@@ -208,7 +177,7 @@ interface PolicyInput {
     type: PolicyType;
     code: string;
     args?: PolicyArgsObject;
-    queries?: PolicyQueryInput[];
+    query?: PolicyQueryInput;
 }
 
 const resourceRepository = S3ResourceRepository.fromEnvironment();

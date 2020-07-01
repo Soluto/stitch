@@ -16,7 +16,7 @@
 Create a new object policy that describes an access logic that can be attached to a graphql field.
 Some examples:
 
-### Policy that always allows access:
+### Policy that always allows access
 
 ```yaml
 kind: Policy
@@ -28,7 +28,7 @@ Spec:
     code: {'result': 'allow'}
 ```
 
-### Policy that allows access only if the issuer is "abc.com":
+### Policy that allows access only if the issuer is "abc.com"
 
 ```yaml
 kind: Policy
@@ -62,7 +62,7 @@ Spec:
 
 _Note the js-expression type is an example of a possible type and not planned to be implemented at this time._
 
-### Policy that uses a graphql query to fetch additional data and allows based on the results and an argument:
+### Policy that uses a graphql query to fetch additional data and allows based on the results and an argument
 
 ```yaml
 kind: Policy
@@ -74,29 +74,29 @@ Spec:
     code: |
         allow = false
         allow = {
-          input.args.userId == input.queries.familyQuery.family.members[_].id
+          input.args.userId == input.query.user.family.members[_].id
         }
     args:
         userId: ID!
-    queries:
-        - type: graphql
-          name: familyQuery
-          graphql:
-              query: |
-                  {
-                    user({jwt.sub}) {
-                      family {
-                        members {
-                          id
-                        }
-                      }
-                    }
+        sub: ID!
+    query:
+        gql: |
+            query ($sub: String!) {
+              user(sub: $sub) {
+                family {
+                  members {
+                    id
                   }
+                }
+              }
+            }
+        variables:
+            sub: '{args.sub}'
 ```
 
 Queries support the standard Stitch parameter injection syntax, but only support the `jwt` and `args` objects for injection
 
-### Same as the previous policy, but evaluates the query while opa is running:
+### Same as the previous policy, but evaluates the query while opa is running
 
 ```yaml
 kind: Policy
@@ -118,7 +118,7 @@ Spec:
 
 This example will always evaluate the graphql query, but generally this approach should be used when conditional side effect evaluation is needed
 
-### Policy that uses a policy query and allows based on the results:
+### Policy that uses another policy as query and allows based on the results
 
 ```yaml
 kind: Policy
@@ -130,24 +130,26 @@ Spec:
     code: |
         allow = false
         allow = {
-          input.queries.myUserPolicy == true
+          input.query.myUserPolicy == true
         }
     args:
         userId: ID!
-    queries:
-        - type: policy
-          name: myUserPolicy
-          policy:
-              policyName: my-user
-              args:
-                  userId: '{args.userId}'
+    query:
+        gql: |
+          query(userId: ID!) {
+            policy.my_user(userId: $userId) {
+              allow
+            }
+          }
+      variables:
+        userId: '{args.userId}'
 ```
 
 `args` for query policy can use parameter injection from the `jwt` and `args` objects, similarly to the graphql query
 
 ### Attach policy to fields:
 
-```
+```gql
 type User {
   ID: ID!
   Picture: String @policy-some-ns-public
@@ -163,7 +165,7 @@ Adding args support to policies can ease memoization and remove hidden dependenc
 
 Initially, we will support a single `@policy` directive that gets an array of policy names and their args:
 
-```
+```gql
 type User {
   Picture: String @policy(policies: [
     { namespace: "some-ns", name: “my-user”, args: { userId: “{source.UserId}” } },
@@ -179,13 +181,13 @@ Later on, for convenience and type safety, we will add an alternative syntax or 
 1. Client requests a graphql query that includes a field that has a `@policy` directive.
 2. Server activates the policy resolver and reads the arguments with parameter injection.
 3. The resolver passes the args to a policy executor.
-   The policy executor invokes the right binding (see policy implementation contract) and manages the queries for the policy.
+   The policy executor invokes the right binding (see policy implementation contract) and manages the query for the policy.
 4. The policy executor should return true/false if the user has access or a string describing the failure.
 5. If the user has access, return the field value. Otherwise, return an error.
 
 ## Policy implementation contract
 
-The naive js contract can be implemented with a generator, that has a result of true/false and can yield queries.
+The naive js contract can be implemented with a generator, that has a result of true/false and can yield query.
 All queries and policy evaluation itself are memoized for a request context for same query/policy arguments.
 
 ```typescript
@@ -280,7 +282,7 @@ Spec:
 
 Usage:
 
-```
+```gql
 type User {
   ID: ID!
   Picture: String @policy-some-ns-has-claims(claims:["issuer", "sub"], values: ["soluto.com", "{source.UserId}"], jwtClaims: "{jwt.claims}")

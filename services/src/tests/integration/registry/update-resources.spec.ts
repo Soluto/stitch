@@ -9,7 +9,13 @@ import {beforeEachDispose} from '../beforeEachDispose';
 import {app, AuthType} from '../../../registry';
 import {mockResourceBucket} from '../resourceBucket';
 import {ResourceGroup} from '../../../modules/resource-repository';
-import {PolicyType, PolicyQueryType} from '../../../modules/resource-repository/types';
+import {
+    PolicyType,
+    Policy,
+    Upstream,
+    Schema,
+    UpstreamClientCredentials,
+} from '../../../modules/resource-repository/types';
 import {tmpPoliciesDir} from '../../../modules/config';
 import mockFsForOpa from '../../helpers/mockFsForOpa';
 
@@ -19,13 +25,13 @@ jest.mock('child_process', () => ({
 
 const mockedExec = mocked(exec, true);
 
-const schema = {
+const schema: Schema = {
     metadata: {namespace: 'namespace', name: 'name'},
     schema: 'type Query { something: String! }',
 };
-const schemaUpdate = {schema: 'type Query { somethingElse: String! }'};
+const schemaUpdate: Partial<Schema> = {schema: 'type Query { somethingElse: String! }'};
 
-const upstream = {
+const upstream: Upstream = {
     metadata: {namespace: 'namespace', name: 'name'},
     host: 'test.api',
     auth: {
@@ -33,9 +39,9 @@ const upstream = {
         activeDirectory: {authority: 'https://authority', resource: 'someResource'},
     },
 };
-const upstreamUpdate = {host: 'test2.api'};
+const upstreamUpdate: Partial<Upstream> = {host: 'test2.api'};
 
-const upstreamClientCredentials = {
+const upstreamClientCredentials: UpstreamClientCredentials = {
     metadata: {namespace: 'namespace', name: 'name'},
     authType: AuthType.ActiveDirectory,
     activeDirectory: {
@@ -46,28 +52,26 @@ const upstreamClientCredentials = {
 };
 const upstreamClientCredentialsActiveDirectoryUpdate = {clientSecret: 'myOtherClientSecret'};
 
-const policy = {
+const policy: Policy = {
     metadata: {namespace: 'namespace', name: 'name'},
     type: PolicyType.opa,
     code: `real rego code
            with multiple
            lines`,
     args: {
-        an: 'arg',
-        another: 'one!',
+        an: 'String',
+        another: 'String!',
     },
-    queries: [
-        {type: PolicyQueryType.graphql, name: 'someGraphqlQuery', graphql: {query: 'actual gql'}},
-        {
-            type: PolicyQueryType.policy,
-            name: 'somePolicyQuery',
-            policy: {policyName: 'someOtherPolicy', args: {some: 'arg for the other policy'}},
+    query: {
+        gql: 'some another gql',
+        variables: {
+            c: 'd',
         },
-    ],
+    },
 };
-const policyUpdate = {code: 'changed code', args: {just: 'one arg'}};
+const policyUpdate: Partial<Policy> = {code: 'changed code', args: {just: 'Int'}};
 
-const baseResourceGroup = {
+const baseResourceGroup: ResourceGroup = {
     schemas: [schema],
     upstreams: [upstream],
     upstreamClientCredentials: [upstreamClientCredentials],
