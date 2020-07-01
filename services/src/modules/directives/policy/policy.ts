@@ -4,16 +4,17 @@ import {SchemaDirectiveVisitor} from 'graphql-tools';
 import {GraphQLField, defaultFieldResolver} from 'graphql';
 import {gql} from 'apollo-server-core';
 import {PolicyExecutor} from './policy-executor';
+import {Policy} from './types';
 
 export class PolicyDirective extends SchemaDirectiveVisitor {
     visitFieldDefinition(field: GraphQLField<any, any>) {
         const originalResolve = field.resolve || defaultFieldResolver;
-        const policies = this.args.policies;
+        const policy = this.args as Policy;
 
         field.resolve = async (parent: any, args: any, context: RequestContext, info: GraphQLResolveInfo) => {
             if (!context.ignorePolicies) {
-                const executor = new PolicyExecutor(policies, parent, args, context, info);
-                await executor.validatePolicies();
+                const executor = new PolicyExecutor(policy, parent, args, context, info);
+                await executor.validatePolicy();
             }
 
             return originalResolve.call(field, parent, args, context, info);
@@ -22,11 +23,5 @@ export class PolicyDirective extends SchemaDirectiveVisitor {
 }
 
 export const sdl = gql`
-    input PolicyDirectivePolicy {
-        namespace: String!
-        name: String!
-        args: JSONObject
-    }
-
-    directive @policy(policies: [PolicyDirectivePolicy!]!) on FIELD_DEFINITION
+    directive @policy(namespace: String!, name: String!, args: JSONObject) on FIELD_DEFINITION
 `;
