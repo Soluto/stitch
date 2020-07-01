@@ -82,14 +82,14 @@ const schema: Schema = {
       name: String
       hireDate: Int
       department: Department!
-      address: String @policy(policies: [{
+      address: String @policy(
         namespace: "namespace",
         name: "notClassified",
         args: {
           departmentId: "{source.department.id}",
           hireDate: "{source.hireDate}"
         }
-      }])
+      )
     }
 
     type Query {
@@ -126,10 +126,7 @@ const schema: Schema = {
       classifiedDepartments: [Department!]! @stub(value: [{
         id: "D1000"
         name: "VIP"
-      }]) @policy(policies: [{
-        namespace: "namespace",
-        name: "alwaysDenied"
-      }])
+      }]) @policy(namespace: "namespace", name: "alwaysDenied")
     }
   `,
 };
