@@ -1,7 +1,7 @@
 import {GraphQLResolveInfo, graphql} from 'graphql';
 import {RequestContext} from '../../context';
 import {Policy, GraphQLArguments, QueryResults} from './types';
-import {Policy as PolicyDefinition, PolicyArgsObject, PolicyAttachments, PolicyQuery} from '../../resource-repository';
+import {Policy as PolicyDefinition, PolicyArgsObject, PolicyAttachments} from '../../resource-repository';
 import {evaluate as evaluateOpa} from './opa';
 import {injectParameters, resolveParameters} from '../../paramInjection';
 
@@ -10,36 +10,53 @@ const typeEvaluators = {
 };
 
 export class PolicyExecutor {
-    private policyDefinitions: PolicyDefinition[];
+    private policyDefinition: PolicyDefinition;
     private policyAttachments: PolicyAttachments;
 
-    constructor(
-        protected policies: Policy[],
+    private constructor(
+        protected policy: Policy,
         protected parent: any,
         protected args: GraphQLArguments,
         protected context: RequestContext,
         protected info: GraphQLResolveInfo
     ) {
-        this.policyDefinitions = context.policies;
+        this.policyDefinition = this.getPolicyDefinition(context.policies, this.policy.namespace, this.policy.name);
         this.policyAttachments = context.policyAttachments;
     }
 
-    async validatePolicies() {
-        await Promise.all(this.policies.map(r => this.validatePolicy(r)));
+    static async evaluatePolicy(
+        policy: Policy,
+        parent: any,
+        args: GraphQLArguments,
+        context: RequestContext,
+        info: GraphQLResolveInfo
+    ): Promise<boolean> {
+        const executor = new PolicyExecutor(policy, parent, args, context, info);
+        return executor.evaluatePolicy();
     }
 
-    async evaluatePolicy(policy: Policy): Promise<boolean> {
-        const policyDefinition = this.getPolicyDefinition(policy.namespace, policy.name);
+    static async validatePolicy(
+        policy: Policy,
+        parent: any,
+        args: GraphQLArguments,
+        context: RequestContext,
+        info: GraphQLResolveInfo
+    ): Promise<void> {
+        const executor = new PolicyExecutor(policy, parent, args, context, info);
+        const allow = await executor.evaluatePolicy();
+        if (!allow)
+            throw new Error(`Unauthorized by policy ${executor.policy.name} in namespace ${executor.policy.namespace}`);
+    }
 
-        const args = policyDefinition.args && this.preparePolicyArgs(policyDefinition.args, policy);
+    private async evaluatePolicy(): Promise<boolean> {
+        const args = this.preparePolicyArgs();
+        const query = await this.evaluatePolicyQuery(args);
 
-        const query = policyDefinition.query && (await this.evaluatePolicyQuery(policyDefinition.query, args));
-
-        const evaluate = typeEvaluators[policyDefinition.type];
-        if (!evaluate) throw new Error(`Unsupported policy type ${policyDefinition.type}`);
+        const evaluate = typeEvaluators[this.policyDefinition.type];
+        if (!evaluate) throw new Error(`Unsupported policy type ${this.policyDefinition.type}`);
 
         const {done, allow} = await evaluate({
-            ...policy,
+            ...this.policy,
             args,
             query,
             policyAttachments: this.policyAttachments,
@@ -48,20 +65,18 @@ export class PolicyExecutor {
         return allow || false;
     }
 
-    async validatePolicy(policy: Policy): Promise<void> {
-        const allow = await this.evaluatePolicy(policy);
-        if (!allow) throw new Error(`Unauthorized by policy ${policy.name} in namespace ${policy.namespace}`);
-    }
+    private preparePolicyArgs(): PolicyArgsObject | undefined {
+        const supportedPolicyArgs = this.policyDefinition.args;
+        if (!supportedPolicyArgs) return;
 
-    private preparePolicyArgs(supportedPolicyArgs: PolicyArgsObject, policy: Policy): PolicyArgsObject {
         return Object.entries(supportedPolicyArgs).reduce<PolicyArgsObject>(
             (policyArgs, [policyArgName, policyArgType]) => {
-                if (policy?.args?.[policyArgName] === undefined)
+                if (this.policy?.args?.[policyArgName] === undefined)
                     throw new Error(
-                        `Missing arg ${policyArgName} for policy ${policy.name} in namespace ${policy.namespace}`
+                        `Missing arg ${policyArgName} for policy ${this.policy.name} in namespace ${this.policy.namespace}`
                     );
 
-                let policyArgValue = policy.args[policyArgName];
+                let policyArgValue = this.policy.args[policyArgName];
                 if (typeof policyArgValue === 'string') {
                     if (policyArgType === 'String') {
                         policyArgValue = injectParameters(
@@ -92,8 +107,8 @@ export class PolicyExecutor {
         );
     }
 
-    private getPolicyDefinition(namespace: string, name: string) {
-        const policyDefinition = this.policyDefinitions.find(({metadata}) => {
+    private getPolicyDefinition(policyDefinitions: PolicyDefinition[], namespace: string, name: string) {
+        const policyDefinition = policyDefinitions.find(({metadata}) => {
             return metadata.namespace === namespace && metadata.name === name;
         });
 
@@ -101,10 +116,10 @@ export class PolicyExecutor {
         return policyDefinition;
     }
 
-    private async evaluatePolicyQuery(
-        query: PolicyQuery,
-        args: PolicyArgsObject = {}
-    ): Promise<QueryResults | undefined> {
+    private async evaluatePolicyQuery(args: PolicyArgsObject = {}): Promise<QueryResults | undefined> {
+        const query = this.policyDefinition.query;
+        if (!query) return;
+
         let variableValues =
             query.variables &&
             Object.entries(query.variables).reduce<{[key: string]: any}>((policyArgs, [varName, varValue]) => {

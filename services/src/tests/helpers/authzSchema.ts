@@ -39,19 +39,19 @@ export const getSchema = () => ({
     schema: `
     type User {
       firstName: String
-      lastName: String @policy(policies: [
-        { namespace: "ns", name: "onlyAdmin", args: { role: "{source.role}" } }
-      ])
+      lastName: String @policy(namespace: "ns", name: "onlyAdmin", args: { role: "{source.role}" })
       role: String
     }
 
     type ArbitraryData {
-      arbitraryField: String @policy(policies: [
-        { namespace: "ns", name: "jwtName", args: {
+      arbitraryField: String @policy(
+        namespace: "ns",
+        name: "jwtName",
+        args: {
           jwtName: "{jwt.name}",
           allowedName: "Varg"
-        }}
-      ])
+        }
+      )
     }
 
     type Query {
