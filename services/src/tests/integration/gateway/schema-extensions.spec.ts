@@ -6,6 +6,7 @@ import * as nock from 'nock';
 import {basename} from 'path';
 import {createStitchGateway} from '../../../modules/gateway';
 import {beforeEachDispose} from '../beforeEachDispose';
+import {Schema, ResourceGroup} from '../../../modules/resource-repository';
 
 const organizations = [{name: 'EvilCorp'}, {name: 'GoodCorp'}];
 
@@ -21,7 +22,7 @@ const employees: {[name: string]: any} = {
     ReallyEvilTeam: [{name: 'Alex'}],
 };
 
-const organizationSchema = {
+const organizationSchema: Schema = {
     metadata: {
         namespace: 'namespace',
         name: 'organization',
@@ -37,7 +38,7 @@ const organizationSchema = {
     `),
 };
 
-const teamSchema = {
+const teamSchema: Schema = {
     metadata: {
         namespace: 'namespace',
         name: 'team',
@@ -54,7 +55,7 @@ const teamSchema = {
     `),
 };
 
-const employeeSchema = {
+const employeeSchema: Schema = {
     metadata: {
         namespace: 'namespace',
         name: 'employee',
@@ -71,8 +72,7 @@ const employeeSchema = {
     `),
 };
 
-const resourceGroup = {
-    etag: 'etag',
+const resourceGroup: ResourceGroup = {
     schemas: [organizationSchema, teamSchema, employeeSchema],
     upstreams: [],
     upstreamClientCredentials: [],

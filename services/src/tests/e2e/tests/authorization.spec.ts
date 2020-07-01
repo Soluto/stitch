@@ -16,13 +16,13 @@ const registryClient = createRegistryClient();
 describe('authorization', () => {
     // This is kind of both the "before" section and a test, but it was weird putting a test in an actual before section
     it('creates the policy and schema resources', async () => {
-        const policy1Response = await registryClient.request(createPolicyMutation, {policy: onlyAdminPolicy()});
+        const policy1Response: any = await registryClient.request(createPolicyMutation, {policy: onlyAdminPolicy()});
         expect(policy1Response.updatePolicies.success).toBe(true);
 
-        const policy2Response = await registryClient.request(createPolicyMutation, {policy: jwtNamePolicy()});
+        const policy2Response: any = await registryClient.request(createPolicyMutation, {policy: jwtNamePolicy()});
         expect(policy2Response.updatePolicies.success).toBe(true);
 
-        const schemaResponse = await registryClient.request(createSchemaMutation, {schema: getSchema()});
+        const schemaResponse: any = await registryClient.request(createSchemaMutation, {schema: getSchema()});
         expect(schemaResponse.updateSchemas.success).toBe(true);
 
         // Wait for gateway to update before next tests
@@ -30,7 +30,7 @@ describe('authorization', () => {
     });
 
     it('allows access to a field based on an argument using param injection from source', async () => {
-        const response = await gatewayClient.request(getUserQuery('userAdmin'));
+        const response: any = await gatewayClient.request(getUserQuery('userAdmin'));
         expect(response.userAdmin).toEqual({firstName: 'John', lastName: 'Smith', role: 'admin'});
     });
 
@@ -79,7 +79,7 @@ describe('authorization', () => {
 
     it('allows access to a field based on JWT info', async () => {
         const gatewayClientJwt = createGatewayClient(allowedJwtOptions());
-        const response = await gatewayClientJwt.request(getArbitraryDataQuery());
+        const response: any = await gatewayClientJwt.request(getArbitraryDataQuery());
         expect(response.arbitraryData).toEqual({arbitraryField: 'arbitraryValue'});
     });
 });

@@ -5,6 +5,7 @@ import {print} from 'graphql';
 import * as nock from 'nock';
 import {createStitchGateway} from '../../../modules/gateway';
 import {beforeEachDispose} from '../beforeEachDispose';
+import {Schema, ResourceGroup} from '../../../modules/resource-repository';
 
 const organizations = [
     {
@@ -37,7 +38,7 @@ const organizations = [
     },
 ];
 
-const schema = {
+const schema: Schema = {
     metadata: {
         namespace: 'namespace',
         name: 'name',
@@ -64,8 +65,7 @@ const schema = {
     `),
 };
 
-const resourceGroup = {
-    etag: 'etag',
+const resourceGroup: ResourceGroup = {
     schemas: [schema],
     upstreams: [],
     upstreamClientCredentials: [],

@@ -1,6 +1,7 @@
 import {GraphQLResolveInfo} from 'graphql';
 import {decode as decodeJwt} from 'jsonwebtoken';
 import {RequestContext} from './context';
+import * as R from 'ramda';
 
 interface GraphQLArguments {
     [key: string]: any;
@@ -9,27 +10,27 @@ type jwtData = {
     [name: string]: any;
 };
 
-const paramRegex = /{(\w+\.\w+)}/g;
+const paramRegex = /{(source|args|jwt|exports)\.(\w+(\.\w+)*)}/g;
 const authzHeaderPrefix = 'Bearer ';
 
 function resolveTemplate(
-    template: string,
+    source: string,
+    key: string,
     parent: any,
     args: GraphQLArguments,
     context: RequestContext,
     info: GraphQLResolveInfo
 ) {
-    const [sourceName, propName] = template.split('.');
-
-    switch (sourceName.toLowerCase()) {
+    const propPath = key.split('.');
+    switch (source) {
         case 'source':
-            return parent && parent[propName];
+            return parent && R.path(propPath, parent);
         case 'args':
-            return args && args[propName];
+            return args && R.path(propPath, args);
         case 'exports':
-            return context.exports.resolve(info.parentType, parent, propName);
+            return context.exports.resolve(info.parentType, parent, key);
         case 'jwt':
-            return getJwt(context)[propName];
+            return getJwt(context)[key];
         default:
             return null;
     }
@@ -44,13 +45,12 @@ export function injectParameters(
 ) {
     let didFindValues = false;
     let didFindTemplates = false;
-    const value = template.replace(paramRegex, (_, match) => {
-        const resolved = resolveTemplate(match, parent, args, context, info);
+    const value = template.replace(paramRegex, (_, source, key) => {
+        const resolved = resolveTemplate(source, key, parent, args, context, info);
         didFindTemplates = true;
         didFindValues = didFindValues || (resolved !== null && typeof resolved !== 'undefined');
         return resolved;
     });
-
     return {value, didFindValues, didFindTemplates};
 }
 
@@ -62,20 +62,19 @@ export function resolveParameters(
     info: GraphQLResolveInfo
 ) {
     let foundMatches = false;
-    const matches = template.matchAll(paramRegex);
+    const matches = Array.from(template.matchAll(paramRegex));
 
     const parameters: {[key: string]: any} = {};
     for (const match of matches) {
         foundMatches = true;
-
-        const group = match[1];
-        if (group in parameters) {
+        const paramTemplate = match[0];
+        const source = match[1];
+        const key = match[2];
+        if (paramTemplate in parameters) {
             continue;
         }
-
-        parameters[group] = resolveTemplate(group, parent, args, context, info);
+        parameters[paramTemplate] = resolveTemplate(source, key, parent, args, context, info);
     }
-
     return foundMatches ? parameters : null;
 }
 
@@ -113,7 +112,6 @@ function getJwt(context: RequestContext): jwtData {
     context.jwt = isAuthzHeaderValid(authzHeader)
         ? (decodeJwt(authzHeader.substr(authzHeaderPrefix.length), {json: true}) as jwtData)
         : {};
-
     return context.jwt;
 }
 

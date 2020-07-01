@@ -6,10 +6,16 @@ import {promises as fs} from 'fs';
 import * as path from 'path';
 import * as nock from 'nock';
 import {beforeEachDispose} from '../beforeEachDispose';
-import {app} from '../../../registry';
+import {app, AuthType} from '../../../registry';
 import {mockResourceBucket} from '../resourceBucket';
 import {ResourceGroup} from '../../../modules/resource-repository';
-import {PolicyType, PolicyQueryType} from '../../../modules/resource-repository/types';
+import {
+    PolicyType,
+    Policy,
+    Schema,
+    Upstream,
+    UpstreamClientCredentials,
+} from '../../../modules/resource-repository/types';
 import {tmpPoliciesDir} from '../../../modules/config';
 import mockFsForOpa from '../../helpers/mockFsForOpa';
 
@@ -19,23 +25,23 @@ jest.mock('child_process', () => ({
 
 const mockedExec = mocked(exec, true);
 
-const schema = {
+const schema: Schema = {
     metadata: {namespace: 'namespace', name: 'name'},
     schema: 'type Query { something: String! }',
 };
 
-const upstream = {
+const upstream: Upstream = {
     metadata: {namespace: 'namespace', name: 'name'},
     host: 'test.api',
     auth: {
-        type: 'ActiveDirectory',
+        type: AuthType.ActiveDirectory,
         activeDirectory: {authority: 'https://authority', resource: 'someResource'},
     },
 };
 
-const upstreamClientCredentials = {
+const upstreamClientCredentials: UpstreamClientCredentials = {
     metadata: {namespace: 'namespace', name: 'name'},
-    authType: 'ActiveDirectory',
+    authType: AuthType.ActiveDirectory,
     activeDirectory: {
         authority: 'https://authority',
         clientId: 'myClientId',
@@ -43,28 +49,22 @@ const upstreamClientCredentials = {
     },
 };
 
-const policy = {
+const policy: Policy = {
     metadata: {namespace: 'namespace', name: 'name'},
     type: PolicyType.opa,
     code: `real rego code
            with multiple
            lines`,
     args: {
-        an: 'arg',
-        another: 'one!',
+        an: 'String',
+        another: 'String!',
     },
-    queries: [
-        {
-            type: PolicyQueryType.graphql,
-            name: 'someGraphqlQuery',
-            graphql: {query: 'actual gql'},
+    query: {
+        gql: 'some gql',
+        variables: {
+            a: 'b',
         },
-        {
-            type: PolicyQueryType.policy,
-            name: 'somePolicyQuery',
-            policy: {policyName: 'someOtherPolicy', args: {some: 'arg for the other policy'}},
-        },
-    ],
+    },
 };
 
 const baseResourceGroup = {

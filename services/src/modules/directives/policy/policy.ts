@@ -11,8 +11,10 @@ export class PolicyDirective extends SchemaDirectiveVisitor {
         const policies = this.args.policies;
 
         field.resolve = async (parent: any, args: any, context: RequestContext, info: GraphQLResolveInfo) => {
-            const executor = new PolicyExecutor(policies, parent, args, context, info);
-            await executor.validatePolicies();
+            if (!context.ignorePolicies) {
+                const executor = new PolicyExecutor(policies, parent, args, context, info);
+                await executor.validatePolicies();
+            }
 
             return originalResolve.call(field, parent, args, context, info);
         };
