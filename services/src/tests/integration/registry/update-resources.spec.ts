@@ -17,7 +17,7 @@ import {
   UpstreamClientCredentials,
 } from '../../../modules/resource-repository/types';
 import { tmpPoliciesDir } from '../../../modules/config';
-import mockFsForOpa from '../../helpers/mock-fs-for-opa';
+import * as mockFsForOpa from '../../helpers/mock-fs-for-opa';
 
 jest.mock('child_process', () => ({
   exec: jest.fn((_, cb) => cb()),
