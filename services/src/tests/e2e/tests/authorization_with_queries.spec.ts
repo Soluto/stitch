@@ -1,54 +1,54 @@
-import {GraphQLClient} from 'graphql-request';
-import {createSchemaMutation} from '../../helpers/authzSchema';
-import {Policy, PolicyType, Schema} from '../../../modules/resource-repository/types';
-import {sleep} from '../../helpers/utility';
+import { GraphQLClient } from 'graphql-request';
+import { createSchemaMutation } from '../../helpers/authzSchema';
+import { Policy, PolicyType, Schema } from '../../../modules/resource-repository/types';
+import { sleep } from '../../helpers/utility';
 
 const policies: Policy[] = [
-    {
-        metadata: {
-            name: 'alwaysDenied',
-            namespace: 'namespace',
-        },
-        type: PolicyType.opa,
-        code: `
+  {
+    metadata: {
+      name: 'alwaysDenied',
+      namespace: 'namespace',
+    },
+    type: PolicyType.opa,
+    code: `
       default allow = false
         `,
+  },
+  {
+    metadata: {
+      name: 'isSenior',
+      namespace: 'namespace',
     },
-    {
-        metadata: {
-            name: 'isSenior',
-            namespace: 'namespace',
-        },
-        type: PolicyType.opa,
-        code: `
+    type: PolicyType.opa,
+    code: `
       default allow = false
       allow {
         input.args.hireDate < 2015
       }
     `,
-        args: {
-            hireDate: 'Int',
-        },
+    args: {
+      hireDate: 'Int',
     },
-    {
-        metadata: {
-            name: 'notClassified',
-            namespace: 'namespace',
-        },
-        type: PolicyType.opa,
-        code: `
+  },
+  {
+    metadata: {
+      name: 'notClassified',
+      namespace: 'namespace',
+    },
+    type: PolicyType.opa,
+    code: `
       default allow = false
       allow {
         input.query.classifiedDepartments[_].id != input.args.departmentId;
         input.query.policy.namespace___isSenior.allow
       }
     `,
-        args: {
-            departmentId: 'String',
-            hireDate: 'Int',
-        },
-        query: {
-            gql: `
+    args: {
+      departmentId: 'String',
+      hireDate: 'Int',
+    },
+    query: {
+      gql: `
         query($hireDate: Int!) {
           classifiedDepartments {
             id
@@ -60,19 +60,19 @@ const policies: Policy[] = [
           }
         }
       `,
-            variables: {
-                hireDate: '{args.hireDate}',
-            },
-        },
+      variables: {
+        hireDate: '{args.hireDate}',
+      },
     },
+  },
 ];
 
 const schema: Schema = {
-    metadata: {
-        name: 'EmployeeSchema',
-        namespace: 'namespace',
-    },
-    schema: `
+  metadata: {
+    name: 'EmployeeSchema',
+    namespace: 'namespace',
+  },
+  schema: `
     type Department {
       id: String
       name: String
@@ -149,90 +149,90 @@ const employeeQuery = (query: string) => `
 `;
 
 interface CreatePolicyMutationResponse {
-    updatePolicies: {
-        success: boolean;
-    };
+  updatePolicies: {
+    success: boolean;
+  };
 }
 
 interface UpdateSchemasMutationResponse {
-    updateSchemas: {
-        success: boolean;
-    };
+  updateSchemas: {
+    success: boolean;
+  };
 }
 
 interface AllowedEmployeeQueryResponse {
-    allowedEmployee: {
-        id: string;
-        name: string;
-        address: string;
-    };
+  allowedEmployee: {
+    id: string;
+    name: string;
+    address: string;
+  };
 }
 
 describe('Authorization with queries', () => {
-    let gatewayClient: GraphQLClient;
-    let registryClient: GraphQLClient;
+  let gatewayClient: GraphQLClient;
+  let registryClient: GraphQLClient;
 
-    beforeAll(() => {
-        gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
-        registryClient = new GraphQLClient('http://localhost:8090/graphql');
+  beforeAll(() => {
+    gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
+    registryClient = new GraphQLClient('http://localhost:8090/graphql');
+  });
+
+  test('Setup policies', async () => {
+    const policyResponse: CreatePolicyMutationResponse = await registryClient.request(createPolicyMutation, {
+      policies,
     });
+    expect(policyResponse.updatePolicies.success).toBeTruthy();
 
-    test('Setup policies', async () => {
-        const policyResponse: CreatePolicyMutationResponse = await registryClient.request(createPolicyMutation, {
-            policies,
-        });
-        expect(policyResponse.updatePolicies.success).toBeTruthy();
-
-        const schemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {
-            schema,
-        });
-        expect(schemaResponse.updateSchemas.success).toBeTruthy();
-
-        // Wait for gateway to update before next tests
-        await sleep(500);
+    const schemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {
+      schema,
     });
+    expect(schemaResponse.updateSchemas.success).toBeTruthy();
 
-    test('Query allowed employee', async () => {
-        // TODO: check classified fails
-        try {
-            await gatewayClient.request(`query {
+    // Wait for gateway to update before next tests
+    await sleep(500);
+  });
+
+  test('Query allowed employee', async () => {
+    // TODO: check classified fails
+    try {
+      await gatewayClient.request(`query {
               classifiedDepartments {
                   id
                   name
               }
           }`);
-        } catch (e) {
-            const response = e.response;
-            expect(response).toMatchSnapshot({
-                extensions: expect.any(Object),
-            });
-        }
+    } catch (e) {
+      const response = e.response;
+      expect(response).toMatchSnapshot({
+        extensions: expect.any(Object),
+      });
+    }
 
-        const response: AllowedEmployeeQueryResponse = await gatewayClient.request(employeeQuery('allowedEmployee'));
-        expect(response.allowedEmployee).toMatchSnapshot();
-    });
+    const response: AllowedEmployeeQueryResponse = await gatewayClient.request(employeeQuery('allowedEmployee'));
+    expect(response.allowedEmployee).toMatchSnapshot();
+  });
 
-    test('Query denied employee 1', async () => {
-        try {
-            await gatewayClient.request(employeeQuery('deniedEmployee1'));
-            expect(true).toBeFalsy();
-        } catch (e) {
-            const response = e.response;
-            expect(response).toMatchSnapshot({
-                extensions: expect.any(Object),
-            });
-        }
-    });
+  test('Query denied employee 1', async () => {
+    try {
+      await gatewayClient.request(employeeQuery('deniedEmployee1'));
+      expect(true).toBeFalsy();
+    } catch (e) {
+      const response = e.response;
+      expect(response).toMatchSnapshot({
+        extensions: expect.any(Object),
+      });
+    }
+  });
 
-    test('Query denied employee 2', async () => {
-        try {
-            await gatewayClient.request(employeeQuery('deniedEmployee2'));
-            expect(true).toBeFalsy();
-        } catch (e) {
-            const response = e.response;
-            expect(response).toMatchSnapshot({
-                extensions: expect.any(Object),
-            });
-        }
-    });
+  test('Query denied employee 2', async () => {
+    try {
+      await gatewayClient.request(employeeQuery('deniedEmployee2'));
+      expect(true).toBeFalsy();
+    } catch (e) {
+      const response = e.response;
+      expect(response).toMatchSnapshot({
+        extensions: expect.any(Object),
+      });
+    }
+  });
 });

@@ -4,24 +4,24 @@ import * as process from 'process';
 type DisposeFn = () => Promise<void> | void;
 
 export function handleUncaughtErrors() {
-    process.on('uncaughtException', (error: any) => {
-        console.log('Uncaught exception caught in global handler', error);
-        // logger.fatal({error}, 'Uncaught exception caught in global handler');
-        process.exit(1);
-    });
+  process.on('uncaughtException', (error: any) => {
+    console.log('Uncaught exception caught in global handler', error);
+    // logger.fatal({error}, 'Uncaught exception caught in global handler');
+    process.exit(1);
+  });
 
-    process.on('unhandledRejection', (error: any) => {
-        console.log('Uncaught exception caught in global handler', error);
-        // logger.fatal({error}, 'Unhandled promise rejection caught in global handler');
-        process.exit(1);
-    });
+  process.on('unhandledRejection', (error: any) => {
+    console.log('Uncaught exception caught in global handler', error);
+    // logger.fatal({error}, 'Unhandled promise rejection caught in global handler');
+    process.exit(1);
+  });
 }
 
 export function handleSignals(dispose: DisposeFn) {
-    for (const signal of ['SIGINT', 'SIGTERM'] as NodeJS.Signals[]) {
-        process.on(signal, async () => {
-            await dispose();
-            process.exit();
-        });
-    }
+  for (const signal of ['SIGINT', 'SIGTERM'] as NodeJS.Signals[]) {
+    process.on(signal, async () => {
+      await dispose();
+      process.exit();
+    });
+  }
 }

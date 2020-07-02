@@ -1,19 +1,19 @@
 import * as pino from 'pino';
-import {logLevel, nodeEnv} from './config';
+import { logLevel, nodeEnv } from './config';
 
 const loggerConfig: pino.LoggerOptions = {
-    level: logLevel.toLowerCase(),
-    timestamp: pino.stdTimeFunctions.unixTime,
-    messageKey: 'message',
+  level: logLevel.toLowerCase(),
+  timestamp: pino.stdTimeFunctions.unixTime,
+  messageKey: 'message',
 };
 
 const devLoggerConfig: pino.LoggerOptions = {
-    level: 'debug',
-    prettyPrint: {
-        colorize: true,
-        translateTime: 'HH:MM:ss',
-        ignore: 'pid,hostname',
-    },
+  level: 'debug',
+  prettyPrint: {
+    colorize: true,
+    translateTime: 'HH:MM:ss',
+    ignore: 'pid,hostname',
+  },
 };
 
-export default pino({...loggerConfig, ...(nodeEnv !== 'production' ? devLoggerConfig : {})});
+export default pino({ ...loggerConfig, ...(nodeEnv !== 'production' ? devLoggerConfig : {}) });

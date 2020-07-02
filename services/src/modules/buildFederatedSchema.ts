@@ -3,190 +3,189 @@
 // 1. Non-field directives - we can make it work for them, but will require a bit of work
 
 import {
-    DocumentNode,
-    visit,
-    FieldDefinitionNode,
-    ASTNode,
-    InterfaceTypeDefinitionNode,
-    InterfaceTypeExtensionNode,
-    ObjectTypeExtensionNode,
-    ObjectTypeDefinitionNode,
-    DirectiveNode,
-    printSchema,
-    parse,
-    GraphQLError,
-    concatAST,
+  DocumentNode,
+  visit,
+  FieldDefinitionNode,
+  ASTNode,
+  InterfaceTypeDefinitionNode,
+  InterfaceTypeExtensionNode,
+  ObjectTypeExtensionNode,
+  ObjectTypeDefinitionNode,
+  DirectiveNode,
+  printSchema,
+  parse,
+  GraphQLError,
+  concatAST,
 } from 'graphql';
-import {makeExecutableSchema, SchemaDirectiveVisitor} from 'graphql-tools';
-import {composeAndValidate} from '@apollo/federation';
-import {federationDirectives} from '@apollo/federation/dist/directives';
-import {GraphQLResolverMap} from 'apollo-graphql';
-import {ApolloError} from 'apollo-server-core';
+import { makeExecutableSchema, SchemaDirectiveVisitor } from 'graphql-tools';
+import { composeAndValidate } from '@apollo/federation';
+import { federationDirectives } from '@apollo/federation/dist/directives';
+import { GraphQLResolverMap } from 'apollo-graphql';
+import { ApolloError } from 'apollo-server-core';
 
 interface DirectiveVisitors {
-    [directiveName: string]: typeof SchemaDirectiveVisitor;
+  [directiveName: string]: typeof SchemaDirectiveVisitor;
 }
 
 interface FederatedSchemaBase {
-    typeDefs: {[name: string]: DocumentNode};
-    baseTypeDefs: DocumentNode;
-    directiveTypeDefs: DocumentNode;
-    resolvers: GraphQLResolverMap;
-    schemaDirectives: DirectiveVisitors;
-    schemaDirectivesContext: Record<string, any>;
+  typeDefs: { [name: string]: DocumentNode };
+  baseTypeDefs: DocumentNode;
+  directiveTypeDefs: DocumentNode;
+  resolvers: GraphQLResolverMap;
+  schemaDirectives: DirectiveVisitors;
+  schemaDirectivesContext: Record<string, any>;
 }
 
 type DirectivesUsagesByObjectAndFieldNames = Record<string, Record<string, DirectiveNode[]>>;
 
 export function buildSchemaFromFederatedTypeDefs({
-    typeDefs,
-    resolvers,
-    baseTypeDefs,
-    directiveTypeDefs,
-    schemaDirectives,
-    schemaDirectivesContext,
+  typeDefs,
+  resolvers,
+  baseTypeDefs,
+  directiveTypeDefs,
+  schemaDirectives,
+  schemaDirectivesContext,
 }: FederatedSchemaBase) {
-    // Federation throws away non federation/builtin directives, so we need to do some shenanigans here
+  // Federation throws away non federation/builtin directives, so we need to do some shenanigans here
 
-    // Remove non-federation directives from SDL, save them aside
-    const serviceDefinitions = Object.entries(typeDefs).map(([name, originalTypeDef]) => {
-        const {directivesUsages, typeDef} = collectAndRemoveCustomDirectives(originalTypeDef);
+  // Remove non-federation directives from SDL, save them aside
+  const serviceDefinitions = Object.entries(typeDefs).map(([name, originalTypeDef]) => {
+    const { directivesUsages, typeDef } = collectAndRemoveCustomDirectives(originalTypeDef);
 
-        return {
-            directivesUsages,
-            typeDefs: concatAST([baseTypeDefs, typeDef]),
-            name,
-            url: `https://stitch/${name}`,
-        };
+    return {
+      directivesUsages,
+      typeDefs: concatAST([baseTypeDefs, typeDef]),
+      name,
+      url: `https://stitch/${name}`,
+    };
+  });
+
+  // Compose all SDLs together using federation
+  const compositionResult = composeAndValidate(serviceDefinitions);
+  if (compositionResult.errors.length > 0) {
+    throw new ApolloError('Federation validation failed', 'FEDERATION_VALIDATION_FAILURE', {
+      errors: compositionResult.errors.map((err) =>
+        err instanceof GraphQLError ? err : new GraphQLError(err!.message)
+      ),
     });
+  }
 
-    // Compose all SDLs together using federation
-    const compositionResult = composeAndValidate(serviceDefinitions);
-    if (compositionResult.errors.length > 0) {
-        throw new ApolloError('Federation validation failed', 'FEDERATION_VALIDATION_FAILURE', {
-            errors: compositionResult.errors.map(err =>
-                err instanceof GraphQLError ? err : new GraphQLError(err!.message)
-            ),
-        });
-    }
+  // Add directives back to the SDL
+  const fullTypeDefWithoutDirectives = parse(printSchema(compositionResult.schema));
+  const allDirectivesUsages = mergeDirectivesUsages(serviceDefinitions.map((sd) => sd.directivesUsages));
+  const fullTypeDefWithDirectives = addDirectivesToTypedefs(allDirectivesUsages, fullTypeDefWithoutDirectives);
 
-    // Add directives back to the SDL
-    const fullTypeDefWithoutDirectives = parse(printSchema(compositionResult.schema));
-    const allDirectivesUsages = mergeDirectivesUsages(serviceDefinitions.map(sd => sd.directivesUsages));
-    const fullTypeDefWithDirectives = addDirectivesToTypedefs(allDirectivesUsages, fullTypeDefWithoutDirectives);
+  // Create final schema, re-adding directive definitions and directive implementations
+  const schema = makeExecutableSchema({
+    typeDefs: [directiveTypeDefs, fullTypeDefWithDirectives],
+    resolvers,
+  });
 
-    // Create final schema, re-adding directive definitions and directive implementations
-    const schema = makeExecutableSchema({
-        typeDefs: [directiveTypeDefs, fullTypeDefWithDirectives],
-        resolvers,
-    });
+  SchemaDirectiveVisitor.visitSchemaDirectives(schema, schemaDirectives, schemaDirectivesContext);
 
-    SchemaDirectiveVisitor.visitSchemaDirectives(schema, schemaDirectives, schemaDirectivesContext);
-
-    return schema;
+  return schema;
 }
 
 function addDirectivesToTypedefs(directives: DirectivesUsagesByObjectAndFieldNames, typeDef: DocumentNode) {
-    return visit(typeDef, {
-        FieldDefinition(node, _key, _parent, _path, ancestors) {
-            const objectNode = ancestors[ancestors.length - 1] as ASTNode;
-            if (!isObjectOrInterfaceOrExtensionOfThose(objectNode)) {
-                throw new Error(`Expected {Object,Interface}Type{Definition,Extension}Node, found ${objectNode.kind}`);
-            }
+  return visit(typeDef, {
+    FieldDefinition(node, _key, _parent, _path, ancestors) {
+      const objectNode = ancestors[ancestors.length - 1] as ASTNode;
+      if (!isObjectOrInterfaceOrExtensionOfThose(objectNode)) {
+        throw new Error(`Expected {Object,Interface}Type{Definition,Extension}Node, found ${objectNode.kind}`);
+      }
 
-            const fieldDirectives =
-                directives[objectNode.name.value] && directives[objectNode.name.value][node.name.value];
+      const fieldDirectives = directives[objectNode.name.value] && directives[objectNode.name.value][node.name.value];
 
-            if (!fieldDirectives || fieldDirectives.length === 0) {
-                return;
-            }
+      if (!fieldDirectives || fieldDirectives.length === 0) {
+        return;
+      }
 
-            const existingDirectives = node.directives ?? [];
+      const existingDirectives = node.directives ?? [];
 
-            return {...node, directives: [...existingDirectives, ...fieldDirectives]};
-        },
-    });
+      return { ...node, directives: [...existingDirectives, ...fieldDirectives] };
+    },
+  });
 }
 
 export function collectAndRemoveCustomDirectives(typeDef: DocumentNode) {
-    const directivesUsages: DirectivesUsagesByObjectAndFieldNames = {};
+  const directivesUsages: DirectivesUsagesByObjectAndFieldNames = {};
 
-    const typeDefWithoutDirectives = visit(typeDef, {
-        Directive(node, _key, _parent, _path, ancestors) {
-            if (federationDirectives.some(directive => directive.name === node.name.value)) {
-                return;
-            }
+  const typeDefWithoutDirectives = visit(typeDef, {
+    Directive(node, _key, _parent, _path, ancestors) {
+      if (federationDirectives.some((directive) => directive.name === node.name.value)) {
+        return;
+      }
 
-            const objectNode = ancestors[ancestors.length - 3] as ASTNode;
-            if (!isObjectOrInterfaceOrExtensionOfThose(objectNode)) {
-                throw new Error(`Expected {Object,Interface}Type{Definition,Extension}Node, found ${objectNode.kind}`);
-            }
+      const objectNode = ancestors[ancestors.length - 3] as ASTNode;
+      if (!isObjectOrInterfaceOrExtensionOfThose(objectNode)) {
+        throw new Error(`Expected {Object,Interface}Type{Definition,Extension}Node, found ${objectNode.kind}`);
+      }
 
-            const fieldNode = ancestors[ancestors.length - 1] as ASTNode;
-            if (!isFieldDefinitionNode(fieldNode)) {
-                throw new Error(`Expected FieldDefinitionNode, found ${fieldNode.kind}`);
-            }
+      const fieldNode = ancestors[ancestors.length - 1] as ASTNode;
+      if (!isFieldDefinitionNode(fieldNode)) {
+        throw new Error(`Expected FieldDefinitionNode, found ${fieldNode.kind}`);
+      }
 
-            const objectName = objectNode.name.value;
-            const fieldName = fieldNode.name.value;
+      const objectName = objectNode.name.value;
+      const fieldName = fieldNode.name.value;
 
-            if (!(objectName in directivesUsages)) {
-                directivesUsages[objectName] = {};
-            }
+      if (!(objectName in directivesUsages)) {
+        directivesUsages[objectName] = {};
+      }
 
-            if (!(fieldName in directivesUsages[objectName])) {
-                directivesUsages[objectName][fieldName] = [];
-            }
+      if (!(fieldName in directivesUsages[objectName])) {
+        directivesUsages[objectName][fieldName] = [];
+      }
 
-            directivesUsages[objectName][fieldName].push(node);
+      directivesUsages[objectName][fieldName].push(node);
 
-            return null;
-        },
-    }) as DocumentNode;
+      return null;
+    },
+  }) as DocumentNode;
 
-    return {directivesUsages, typeDef: typeDefWithoutDirectives};
+  return { directivesUsages, typeDef: typeDefWithoutDirectives };
 }
 
 function isFieldDefinitionNode(node: ASTNode): node is FieldDefinitionNode {
-    return node.kind === 'FieldDefinition';
+  return node.kind === 'FieldDefinition';
 }
 
 type ObjectOrInterfaceDefinitionOrExtension =
-    | ObjectTypeDefinitionNode
-    | ObjectTypeExtensionNode
-    | InterfaceTypeDefinitionNode
-    | InterfaceTypeExtensionNode;
+  | ObjectTypeDefinitionNode
+  | ObjectTypeExtensionNode
+  | InterfaceTypeDefinitionNode
+  | InterfaceTypeExtensionNode;
 
 function isObjectOrInterfaceOrExtensionOfThose(node: ASTNode): node is ObjectOrInterfaceDefinitionOrExtension {
-    return (
-        node.kind === 'ObjectTypeDefinition' ||
-        node.kind === 'ObjectTypeExtension' ||
-        node.kind === 'InterfaceTypeDefinition' ||
-        node.kind === 'InterfaceTypeExtension'
-    );
+  return (
+    node.kind === 'ObjectTypeDefinition' ||
+    node.kind === 'ObjectTypeExtension' ||
+    node.kind === 'InterfaceTypeDefinition' ||
+    node.kind === 'InterfaceTypeExtension'
+  );
 }
 
 function mergeDirectivesUsages(dus: DirectivesUsagesByObjectAndFieldNames[]) {
-    const result: DirectivesUsagesByObjectAndFieldNames = {};
+  const result: DirectivesUsagesByObjectAndFieldNames = {};
 
-    for (const du of dus) {
-        for (const objectName in du) {
-            const fields = du[objectName];
-            for (const fieldName in fields) {
-                const usages = fields[fieldName];
+  for (const du of dus) {
+    for (const objectName in du) {
+      const fields = du[objectName];
+      for (const fieldName in fields) {
+        const usages = fields[fieldName];
 
-                if (!(objectName in result)) {
-                    result[objectName] = {};
-                }
-
-                if (!(fieldName in result[objectName])) {
-                    result[objectName][fieldName] = [];
-                }
-
-                result[objectName][fieldName].push(...usages);
-            }
+        if (!(objectName in result)) {
+          result[objectName] = {};
         }
-    }
 
-    return result;
+        if (!(fieldName in result[objectName])) {
+          result[objectName][fieldName] = [];
+        }
+
+        result[objectName][fieldName].push(...usages);
+      }
+    }
+  }
+
+  return result;
 }
