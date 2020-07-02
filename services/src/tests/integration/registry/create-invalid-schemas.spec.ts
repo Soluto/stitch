@@ -60,7 +60,7 @@ describe('Creation of invalid schemas', () => {
       },
     });
 
-    expect(response.errors).toHaveProperty([0, 'message'], 'Syntax Error: Expected Name, found <EOF>');
+    expect(response.errors).toHaveProperty([0, 'message'], 'Syntax Error: Expected Name, found <EOF>.');
     expect(response.errors).toHaveLength(1);
     expect(response.errors).not.toBeUndefined();
   });
