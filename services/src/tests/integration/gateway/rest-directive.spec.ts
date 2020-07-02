@@ -1,4 +1,3 @@
-import { parse as parseUrl } from 'url';
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import * as Rx from 'rxjs';
 import { gql } from 'apollo-server-core';
@@ -77,5 +76,5 @@ function mockRestBackend(host: string) {
     .reply(200, 'world!')
     .get('/hello')
     .query({ name: 'miriam' })
-    .reply(200, (url) => parseUrl(url, true).query.name + '!');
+    .reply(200, (url) => new URL(url, host).searchParams.get('name') + '!');
 }
