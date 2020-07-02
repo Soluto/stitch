@@ -21,7 +21,7 @@
         "apollo-link-http": "^1.5.16",
         "apollo-link-retry": "^2.2.15",
         "apollo-server-core": "^2.10.1",
-        "apollo-server-fastify": "^2.10.1",
+        "apollo-server-fastify": "^2.14.2",
         "aws-sdk": "^2.624.0",
         "env-var": "^6.0.1",
         "fastify": "^2.12.0",
