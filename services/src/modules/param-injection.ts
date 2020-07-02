@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql';
 import { decode as decodeJwt } from 'jsonwebtoken';
-import { RequestContext } from './context';
 import * as R from 'ramda';
+import { RequestContext } from './context';
 
 interface GraphQLArguments {
   [key: string]: any;

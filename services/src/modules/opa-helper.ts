@@ -1,12 +1,12 @@
+import * as path from 'path';
+import { promises as fs } from 'fs';
+import { promisify } from 'util';
+import * as childProcess from 'child_process';
 import { ApolloError } from 'apollo-server-fastify';
 import { GraphQLError } from 'graphql';
 import { ResourceMetadata } from './resource-repository/types';
-import * as path from 'path';
-import { promises as fs } from 'fs';
 import logger from './logger';
 import * as config from './config';
-import { promisify } from 'util';
-import * as childProcess from 'child_process';
 const exec = promisify(childProcess.exec);
 
 const OPA_PACKAGE_NAME = 'policy';

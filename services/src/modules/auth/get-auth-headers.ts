@@ -1,6 +1,6 @@
+import { FastifyRequest } from 'fastify';
 import logger from '../logger';
 import { AuthenticationConfig } from './types';
-import { FastifyRequest } from 'fastify';
 
 export async function getAuthHeaders(
   authConfig: AuthenticationConfig,

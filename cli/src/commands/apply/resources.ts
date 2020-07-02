@@ -1,6 +1,6 @@
-import { Command, flags } from '@oclif/command';
 import { promises as fs } from 'fs';
 import * as path from 'path';
+import { Command, flags } from '@oclif/command';
 import { safeLoadAll } from 'js-yaml';
 import { ResourceGroupInput, uploadResourceGroup } from '../../client';
 

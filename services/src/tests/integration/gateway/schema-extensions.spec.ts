@@ -1,9 +1,9 @@
+import { basename } from 'path';
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import * as Rx from 'rxjs';
 import { gql } from 'apollo-server-core';
 import { print } from 'graphql';
 import * as nock from 'nock';
-import { basename } from 'path';
 import { createStitchGateway } from '../../../modules/gateway';
 import { beforeEachDispose } from '../before-each-dispose';
 import { Schema, ResourceGroup } from '../../../modules/resource-repository';

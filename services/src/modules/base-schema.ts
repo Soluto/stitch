@@ -2,8 +2,8 @@ import { gql } from 'apollo-server-core';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
 import { GraphQLDate, GraphQLDateTime, GraphQLTime } from 'graphql-iso-date';
 import { concatAST } from 'graphql';
-import { sdl as directivesSdl } from './directives';
 import { GraphQLResolverMap } from 'apollo-graphql';
+import { sdl as directivesSdl } from './directives';
 
 export const baseTypeDef = gql`
   scalar JSON

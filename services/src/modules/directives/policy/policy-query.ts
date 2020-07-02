@@ -1,7 +1,7 @@
 import { SchemaDirectiveVisitor } from 'graphql-tools';
 import { GraphQLField, GraphQLResolveInfo } from 'graphql';
-import { RequestContext } from '../../context';
 import { gql } from 'apollo-server-core';
+import { RequestContext } from '../../context';
 import { PolicyResult, Policy } from './types';
 import { PolicyExecutor } from './policy-executor';
 

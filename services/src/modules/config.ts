@@ -1,5 +1,5 @@
-import * as envVar from 'env-var';
 import * as path from 'path';
+import * as envVar from 'env-var';
 
 // General
 export const httpPort = envVar.get('PORT').default('8080').asIntPositive();

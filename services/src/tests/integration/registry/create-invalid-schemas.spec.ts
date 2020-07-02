@@ -1,10 +1,10 @@
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { gql } from 'apollo-server-core';
 import * as nock from 'nock';
+import { print } from 'graphql';
 import { beforeEachDispose } from '../before-each-dispose';
 import { app } from '../../../registry';
 import { mockResourceBucket } from '../resource-bucket';
-import { print } from 'graphql';
 
 const badSdlSchema = {
   metadata: { namespace: 'namespace', name: 'name' },

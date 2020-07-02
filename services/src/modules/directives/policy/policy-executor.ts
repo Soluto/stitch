@@ -1,9 +1,9 @@
 import { GraphQLResolveInfo, graphql } from 'graphql';
 import { RequestContext } from '../../context';
-import { Policy, GraphQLArguments, QueryResults } from './types';
 import { Policy as PolicyDefinition, PolicyArgsObject, PolicyAttachments } from '../../resource-repository';
-import { evaluate as evaluateOpa } from './opa';
 import { injectParameters, resolveParameters } from '../../param-injection';
+import { Policy, GraphQLArguments, QueryResults } from './types';
+import { evaluate as evaluateOpa } from './opa';
 
 const typeEvaluators = {
   opa: evaluateOpa,

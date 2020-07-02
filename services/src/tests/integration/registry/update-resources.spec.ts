@@ -1,9 +1,9 @@
+import { promises as fs } from 'fs';
+import { exec } from 'child_process';
+import * as path from 'path';
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { gql } from 'apollo-server-core';
 import { mocked } from 'ts-jest/utils';
-import { exec } from 'child_process';
-import { promises as fs } from 'fs';
-import * as path from 'path';
 import * as nock from 'nock';
 import { beforeEachDispose } from '../before-each-dispose';
 import { app, AuthType } from '../../../registry';

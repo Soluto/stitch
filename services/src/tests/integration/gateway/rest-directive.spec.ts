@@ -1,8 +1,8 @@
+import { parse as parseUrl } from 'url';
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import * as Rx from 'rxjs';
 import { gql } from 'apollo-server-core';
 import { print } from 'graphql';
-import { parse as parseUrl } from 'url';
 import * as nock from 'nock';
 import { createStitchGateway } from '../../../modules/gateway';
 import { beforeEachDispose } from '../before-each-dispose';

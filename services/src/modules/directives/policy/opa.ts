@@ -1,8 +1,8 @@
 // @ts-ignore opa-wasm already has TS typings merged, but not yet published on npm
 import * as Rego from '@open-policy-agent/opa-wasm';
 import { getCompiledFilename } from '../../opa-helper';
-import { PolicyExecutionContext, PolicyExecutionResult, QueryResults } from './types';
 import { PolicyArgsObject } from '../../resource-repository';
+import { PolicyExecutionContext, PolicyExecutionResult, QueryResults } from './types';
 
 export async function evaluate(ctx: PolicyExecutionContext): Promise<PolicyExecutionResult> {
   const policy = await getWasmPolicy(ctx);

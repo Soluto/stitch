@@ -1,9 +1,9 @@
-import { ResourceGroup, ResourceRepository } from '.';
-import * as envVar from 'env-var';
 import { promises as fs } from 'fs';
 import * as path from 'path';
+import * as envVar from 'env-var';
 import pLimit from 'p-limit';
 import { FetchLatestResult, PolicyAttachments } from './types';
+import { ResourceGroup, ResourceRepository } from '.';
 
 export class FileSystemResourceRepository implements ResourceRepository {
   protected current?: { mtime: number; rg: ResourceGroup };
