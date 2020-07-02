@@ -28,9 +28,9 @@ export class ExportTrackingExtension implements GraphQLExtension<RequestContext>
       // Therefore, we don't need to set it up in the parentMap
       // This means parentMap can also be a weakMap if we want it to be
       if (Array.isArray(result)) {
-        for (let i = 0; i < result.length; i++) {
-          if (isObject(result[i])) {
-            this.objectToParentMap.set(result[i], { parent: source, parentType: info.parentType });
+        for (const element of result) {
+          if (isObject(element)) {
+            this.objectToParentMap.set(element, { parent: source, parentType: info.parentType });
           }
         }
       } else if (isObject(result)) {
