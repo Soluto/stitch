@@ -1,13 +1,31 @@
 {
-    "name": "stitch-package",
-    "version": "1.0.0",
-    "description": "Stitch main workspace package",
-    "devDependencies": {
-        "@types/jest": "^25.2.1",
-        "eslint": "^6.8.0",
-        "husky": "^4.2.1",
-        "prettier": "^1.19.1",
-        "pretty-quick": "^2.0.1"
-    },
-    "license": "MIT"
+  "name": "stitch-package",
+  "version": "1.0.0",
+  "description": "Stitch main workspace package",
+  "repository": {
+    "type": "github",
+    "url": "https://github.com/soluto/stitch"
+  },
+  "scripts": {
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write **/*.ts"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.3",
+    "@typescript-eslint/eslint-plugin": "^3.5.0",
+    "@typescript-eslint/parser": "^3.5.0",
+    "eslint": "^7.3.1",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jest": "^23.17.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-unicorn": "^20.1.0",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.11",
+    "prettier": "^2.0.5",
+    "typescript": "^3.9.5"
+  },
+  "license": "MIT"
 }
