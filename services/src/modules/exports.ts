@@ -2,8 +2,8 @@ import { GraphQLObjectType, GraphQLResolveInfo, GraphQLField, GraphQLInterfaceTy
 import { GraphQLExtension } from 'apollo-server-core';
 import { RequestContext } from './context';
 
-function isObject(val: any): val is object {
-  return Object(val) === val;
+function isObject(val: any): val is Record<string, unknown> {
+  return new Object(val) === val;
 }
 
 export class ExportTrackingExtension implements GraphQLExtension<RequestContext> {

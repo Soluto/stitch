@@ -100,7 +100,7 @@ export function deepInjectParameters(
   return newObj;
 }
 
-function isObject(val: any): val is object {
+function isObject(val: any): val is Record<string, unknown> {
   return typeof val === 'object' && val !== null;
 }
 
