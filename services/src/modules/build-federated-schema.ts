@@ -106,11 +106,11 @@ function addDirectivesToTypedefs(directives: DirectivesUsagesByObjectAndFieldNam
   });
 }
 
+// TODO:Check the list of apollo federation directives when upgrading apollo version
+const federationDirectives = ['key', 'extends', 'external', 'requires', 'provides'];
+
 export function collectAndRemoveCustomDirectives(typeDef: DocumentNode) {
   const directivesUsages: DirectivesUsagesByObjectAndFieldNames = {};
-
-  // TODO:Check the list of apollo federation directives when upgrading apollo version
-  const federationDirectives = ['key', 'extends', 'external', 'requires', 'provides'];
 
   const typeDefWithoutDirectives = visit(typeDef, {
     Directive(node, _key, _parent, _path, ancestors) {
@@ -141,6 +141,7 @@ export function collectAndRemoveCustomDirectives(typeDef: DocumentNode) {
 
       directivesUsages[objectName][fieldName].push(node);
 
+      // eslint-disable-next-line unicorn/no-null
       return null;
     },
   }) as DocumentNode;

@@ -2,7 +2,6 @@ import { Unsubscriber, GraphQLServiceConfig, SchemaChangeCallback, gql } from 'a
 import { parse, execute, DocumentNode } from 'graphql';
 import { Observable, Subscription } from 'rxjs';
 import { shareReplay, map, take, tap, catchError, skip } from 'rxjs/operators';
-
 import type { GraphQLRequestContextExecutionDidStart } from 'apollo-server-types';
 import { directiveMap, sdl as directivesSdl } from './directives';
 import { ResourceGroup, Policy, PolicyAttachments, Schema } from './resource-repository';
@@ -13,7 +12,7 @@ import logger from './logger';
 import { AuthenticationConfig } from './auth/types';
 
 export function createGraphQLService(config: { resourceGroups: Observable<ResourceGroup> }) {
-  let currentSchemaConfig: GraphQLServiceConfig | null = null;
+  let currentSchemaConfig: GraphQLServiceConfig;
 
   const subscription = new Subscription();
   const newSchemaConfigs = config.resourceGroups.pipe(

@@ -30,9 +30,9 @@ function resolveTemplate(
     case 'exports':
       return context.exports.resolve(info.parentType, parent as Record<string, unknown>, key);
     case 'jwt':
-      return getJwt(context)[key];
+      return R.path(propPath, getJwt(context));
     default:
-      return null;
+      return;
   }
 }
 
@@ -75,7 +75,7 @@ export function resolveParameters(
     }
     parameters[paramTemplate] = resolveTemplate(source, key, parent, args, context, info);
   }
-  return foundMatches ? parameters : null;
+  return foundMatches ? parameters : undefined;
 }
 
 export function deepInjectParameters(

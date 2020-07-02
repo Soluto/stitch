@@ -38,5 +38,5 @@ export async function getAuthHeaders(
     };
   }
 
-  return null;
+  return;
 }

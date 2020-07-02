@@ -57,7 +57,7 @@ export class ExportTrackingExtension implements GraphQLExtension<RequestContext>
     const parentDetails = this.objectToParentMap.get(objectValue);
 
     if (typeof parentDetails === 'undefined') {
-      return null;
+      return;
     }
 
     return this.resolve(parentDetails.parentType, parentDetails.parent as Record<string, unknown>, exportKey);
