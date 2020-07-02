@@ -19,7 +19,6 @@ import {
 } from 'graphql';
 import { makeExecutableSchema, SchemaDirectiveVisitor } from 'graphql-tools';
 import { composeAndValidate } from '@apollo/federation';
-import { federationDirectives } from '@apollo/federation/dist/directives';
 import { GraphQLResolverMap } from 'apollo-graphql';
 import { ApolloError } from 'apollo-server-core';
 
@@ -110,9 +109,12 @@ function addDirectivesToTypedefs(directives: DirectivesUsagesByObjectAndFieldNam
 export function collectAndRemoveCustomDirectives(typeDef: DocumentNode) {
   const directivesUsages: DirectivesUsagesByObjectAndFieldNames = {};
 
+  // TODO:Check the list of apollo federation directives when upgrading apollo version
+  const federationDirectives = ['key', 'extends', 'external', 'requires', 'provides'];
+
   const typeDefWithoutDirectives = visit(typeDef, {
     Directive(node, _key, _parent, _path, ancestors) {
-      if (federationDirectives.some((directive) => directive.name === node.name.value)) {
+      if (federationDirectives.some((directive) => directive === node.name.value)) {
         return;
       }
 
