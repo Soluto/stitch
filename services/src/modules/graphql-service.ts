@@ -3,6 +3,7 @@ import { parse, execute, DocumentNode } from 'graphql';
 import { Observable, Subscription } from 'rxjs';
 import { shareReplay, map, take, tap, catchError, skip } from 'rxjs/operators';
 
+import type { GraphQLRequestContextExecutionDidStart } from 'apollo-server-types';
 import { directiveMap, sdl as directivesSdl } from './directives';
 import { ResourceGroup, Policy, PolicyAttachments, Schema } from './resource-repository';
 import { buildSchemaFromFederatedTypeDefs } from './build-federated-schema';
@@ -47,6 +48,9 @@ export function createGraphQLService(config: { resourceGroups: Observable<Resour
       subscription.add(sub);
 
       return sub.unsubscribe.bind(sub);
+    },
+    executor<TContext>(requestContext: GraphQLRequestContextExecutionDidStart<TContext>) {
+      return currentSchemaConfig!.executor(requestContext);
     },
     dispose() {
       subscription.unsubscribe();
