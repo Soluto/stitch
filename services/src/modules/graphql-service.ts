@@ -3,12 +3,11 @@ import { parse, execute, DocumentNode } from 'graphql';
 import { Observable, Subscription } from 'rxjs';
 import { shareReplay, map, take, tap, catchError, skip } from 'rxjs/operators';
 
-import { directiveMap } from './directives';
+import { directiveMap, sdl as directivesSdl } from './directives';
 import { ResourceGroup, Policy, PolicyAttachments, Schema } from './resource-repository';
 import { buildSchemaFromFederatedTypeDefs } from './build-federated-schema';
 import * as baseSchema from './base-schema';
 import { ActiveDirectoryAuth } from './auth/active-directory-auth';
-import { sdl as directivesSdl } from './directives';
 import logger from './logger';
 import { AuthenticationConfig } from './auth/types';
 

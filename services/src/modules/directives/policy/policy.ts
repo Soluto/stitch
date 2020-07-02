@@ -1,6 +1,5 @@
-import { GraphQLResolveInfo } from 'graphql';
+import { GraphQLResolveInfo, GraphQLField, defaultFieldResolver } from 'graphql';
 import { SchemaDirectiveVisitor } from 'graphql-tools';
-import { GraphQLField, defaultFieldResolver } from 'graphql';
 import { gql } from 'apollo-server-core';
 import { RequestContext } from '../../context';
 import { PolicyExecutor } from './policy-executor';
