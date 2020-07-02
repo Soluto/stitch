@@ -5,7 +5,7 @@ import { print } from 'graphql';
 import { parse as parseUrl } from 'url';
 import * as nock from 'nock';
 import { createStitchGateway } from '../../../modules/gateway';
-import { beforeEachDispose } from '../beforeEachDispose';
+import { beforeEachDispose } from '../before-each-dispose';
 
 const schema = {
   metadata: {

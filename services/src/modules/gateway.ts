@@ -1,7 +1,7 @@
 import * as fastify from 'fastify';
 import { ApolloServer, Config } from 'apollo-server-fastify';
 import { Observable } from 'rxjs';
-import { createGraphQLService } from './graphqlService';
+import { createGraphQLService } from './graphql-service';
 import { RESTDirectiveDataSource } from './directives/rest';
 import { ResourceGroup } from './resource-repository';
 import { ExportTrackingExtension } from './exports';

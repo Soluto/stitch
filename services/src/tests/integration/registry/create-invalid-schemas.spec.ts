@@ -1,9 +1,9 @@
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { gql } from 'apollo-server-core';
 import * as nock from 'nock';
-import { beforeEachDispose } from '../beforeEachDispose';
+import { beforeEachDispose } from '../before-each-dispose';
 import { app } from '../../../registry';
-import { mockResourceBucket } from '../resourceBucket';
+import { mockResourceBucket } from '../resource-bucket';
 import { print } from 'graphql';
 
 const badSdlSchema = {

@@ -1,10 +1,10 @@
 import { RESTDataSource } from 'apollo-datasource-rest';
 import { KeyValue, RestParams } from './types';
-import { injectParameters, resolveParameters } from '../../paramInjection';
+import { injectParameters, resolveParameters } from '../../param-injection';
 import { RequestContext } from '../../context';
 import { RequestInit, Headers, Request } from 'apollo-server-env';
 import { GraphQLResolveInfo } from 'graphql';
-import { getAuthHeaders } from '../../auth/getAuthHeaders';
+import { getAuthHeaders } from '../../auth/get-auth-headers';
 
 type GraphQLArguments = { [key: string]: any };
 

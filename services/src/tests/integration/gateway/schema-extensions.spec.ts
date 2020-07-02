@@ -5,7 +5,7 @@ import { print } from 'graphql';
 import * as nock from 'nock';
 import { basename } from 'path';
 import { createStitchGateway } from '../../../modules/gateway';
-import { beforeEachDispose } from '../beforeEachDispose';
+import { beforeEachDispose } from '../before-each-dispose';
 import { Schema, ResourceGroup } from '../../../modules/resource-repository';
 
 const organizations = [{ name: 'EvilCorp' }, { name: 'GoodCorp' }];

@@ -4,7 +4,7 @@ import { gql } from 'apollo-server-core';
 import { print } from 'graphql';
 import * as nock from 'nock';
 import { createStitchGateway } from '../../../modules/gateway';
-import { beforeEachDispose } from '../beforeEachDispose';
+import { beforeEachDispose } from '../before-each-dispose';
 import { Schema, ResourceGroup } from '../../../modules/resource-repository';
 
 const organizations = [

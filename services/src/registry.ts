@@ -6,9 +6,9 @@ import { S3ResourceRepository, ResourceGroup, applyResourceGroupUpdates } from '
 import * as config from './modules/config';
 import { validateResourceGroupOrThrow } from './modules/validation';
 import logger from './modules/logger';
-import { handleSignals, handleUncaughtErrors } from './modules/shutdownHandler';
-import { createSchemaConfig } from './modules/graphqlService';
-import * as opaHelper from './modules/opaHelper';
+import { handleSignals, handleUncaughtErrors } from './modules/shutdown-handler';
+import { createSchemaConfig } from './modules/graphql-service';
+import * as opaHelper from './modules/opa-helper';
 // Importing directly from types because of a typescript or ts-jest bug that re-exported enums cause a runtime error for being undefined
 // https://github.com/kulshekhar/ts-jest/issues/281
 import { PolicyArgsObject, PolicyType, PolicyQueryVariables } from './modules/resource-repository/types';

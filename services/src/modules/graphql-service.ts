@@ -5,9 +5,9 @@ import { shareReplay, map, take, tap, catchError, skip } from 'rxjs/operators';
 
 import { directiveMap } from './directives';
 import { ResourceGroup, Policy, PolicyAttachments, Schema } from './resource-repository';
-import { buildSchemaFromFederatedTypeDefs } from './buildFederatedSchema';
-import * as baseSchema from './baseSchema';
-import { ActiveDirectoryAuth } from './auth/activeDirectoryAuth';
+import { buildSchemaFromFederatedTypeDefs } from './build-federated-schema';
+import * as baseSchema from './base-schema';
+import { ActiveDirectoryAuth } from './auth/active-directory-auth';
 import { sdl as directivesSdl } from './directives';
 import logger from './logger';
 import { AuthenticationConfig } from './auth/types';

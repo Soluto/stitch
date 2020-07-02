@@ -1,10 +1,10 @@
-import { getTmpFilePaths, prepareCompiledRegoFile, normalizeRegoCodePackage } from './opaHelper';
+import { getTmpFilePaths, prepareCompiledRegoFile, normalizeRegoCodePackage } from './opa-helper';
 import { mocked } from 'ts-jest/utils';
 import { promises as fs } from 'fs';
 import { exec } from 'child_process';
 import { tmpPoliciesDir } from './config';
 import * as path from 'path';
-import mockFsForOpa from '../tests/helpers/mockFsForOpa';
+import mockFsForOpa from '../tests/helpers/mock-fs-for-opa';
 
 jest.mock('child_process', () => ({
   exec: jest.fn((_, cb) => cb()),

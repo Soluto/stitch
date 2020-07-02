@@ -8,7 +8,7 @@ import {
   onlyAdminPolicy,
   jwtNamePolicy,
   getArbitraryDataQuery,
-} from '../../helpers/authzSchema';
+} from '../../helpers/authz-schema';
 
 const gatewayClient = createGatewayClient();
 const registryClient = createRegistryClient();

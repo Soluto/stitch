@@ -5,9 +5,9 @@ import { exec } from 'child_process';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import * as nock from 'nock';
-import { beforeEachDispose } from '../beforeEachDispose';
+import { beforeEachDispose } from '../before-each-dispose';
 import { app, AuthType } from '../../../registry';
-import { mockResourceBucket } from '../resourceBucket';
+import { mockResourceBucket } from '../resource-bucket';
 import { ResourceGroup } from '../../../modules/resource-repository';
 import {
   PolicyType,
@@ -17,7 +17,7 @@ import {
   UpstreamClientCredentials,
 } from '../../../modules/resource-repository/types';
 import { tmpPoliciesDir } from '../../../modules/config';
-import mockFsForOpa from '../../helpers/mockFsForOpa';
+import mockFsForOpa from '../../helpers/mock-fs-for-opa';
 
 jest.mock('child_process', () => ({
   exec: jest.fn((_, cb) => cb()),

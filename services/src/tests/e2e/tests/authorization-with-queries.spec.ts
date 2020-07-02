@@ -1,5 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
-import { createSchemaMutation } from '../../helpers/authzSchema';
+import { createSchemaMutation } from '../../helpers/authz-schema';
 import { Policy, PolicyType, Schema } from '../../../modules/resource-repository/types';
 import { sleep } from '../../helpers/utility';
 

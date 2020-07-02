@@ -3,7 +3,7 @@ import { RequestContext } from '../../context';
 import { Policy, GraphQLArguments, QueryResults } from './types';
 import { Policy as PolicyDefinition, PolicyArgsObject, PolicyAttachments } from '../../resource-repository';
 import { evaluate as evaluateOpa } from './opa';
-import { injectParameters, resolveParameters } from '../../paramInjection';
+import { injectParameters, resolveParameters } from '../../param-injection';
 
 const typeEvaluators = {
   opa: evaluateOpa,

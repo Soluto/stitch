@@ -3,7 +3,7 @@ import * as fastifyMetrics from 'fastify-metrics';
 
 import * as config from './modules/config';
 import logger from './modules/logger';
-import { handleSignals, handleUncaughtErrors } from './modules/shutdownHandler';
+import { handleSignals, handleUncaughtErrors } from './modules/shutdown-handler';
 import { createStitchGateway } from './modules/gateway';
 import {
   pollForUpdates,
