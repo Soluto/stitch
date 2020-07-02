@@ -24,7 +24,7 @@ export const baseTypeDef = gql`
 
 export const typeDef = concatAST([baseTypeDef, directivesSdl]);
 
-export const resolvers: GraphQLResolverMap<{}> = {
+export const resolvers: GraphQLResolverMap = {
   JSON: GraphQLJSON,
   JSONObject: GraphQLJSONObject,
   Date: GraphQLDate,
