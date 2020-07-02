@@ -15,7 +15,6 @@ import { RequestContext } from '../context';
 
 export class GqlDirective extends SchemaDirectiveVisitor {
   async createRemoteSchema(url: string, config: AuthenticationConfig) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const httpLink: ApolloLink = new HttpLink({ uri: url, fetch: fetch as any, fetchOptions: { timeout: 10000 } });
     const authLink = setContext(async (_, context) => ({
       headers: await getAuthHeaders(config, new URL(url).host, context?.graphqlContext?.request as FastifyRequest),
@@ -33,7 +32,7 @@ export class GqlDirective extends SchemaDirectiveVisitor {
 
     // Only introspection should retry, because if we don't have the introspection result this entire resolver will fail.
     // Normal gql requests should not retry, at least for now, because that is more complicated than introspection.
-    return await introspectSchema(retryLink).then((schema) => makeRemoteExecutableSchema({ schema, link: authLink }));
+    return await introspectSchema(retryLink).then(schema => makeRemoteExecutableSchema({ schema, link: authLink }));
   }
 
   visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {

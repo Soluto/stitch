@@ -26,11 +26,5 @@ export class PolicyDirective extends SchemaDirectiveVisitor {
 }
 
 export const sdl = gql`
-  input PolicyDirectivePolicy {
-    namespace: String!
-    name: String!
-    args: JSONObject
-  }
-
   directive @policy(namespace: String!, name: String!, args: JSONObject) on FIELD_DEFINITION
 `;

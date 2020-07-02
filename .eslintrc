@@ -32,20 +32,20 @@
     "promise/param-names": "off",
     "unicorn/catch-error-name": "off",
     "unicorn/no-fn-reference-in-iterator": "off",
-    "unicorn/no-null": "warn",
+    "unicorn/no-null": "off",
     "unicorn/no-reduce": "off",
     "unicorn/prefer-spread": "off",
     "unicorn/prefer-string-slice": "off",
     "unicorn/prevent-abbreviations": "off",
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off"
   },
   "overrides": [
     {
       "files": ["*.spec.ts", "services/src/tests/**"],
       "rules": {
-        "unicorn/no-null": "off",
         "@typescript-eslint/ban-types": "off",
         "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-explicit-any": "off",

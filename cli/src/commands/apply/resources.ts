@@ -51,7 +51,7 @@ Uploaded successfully!
     if (fileStats.isDirectory()) {
       const dir = await fs.readdir(filePath);
 
-      const subRgs = await Promise.all(dir.map((subPath) => this.pathToResourceGroup(path.join(filePath, subPath))));
+      const subRgs = await Promise.all(dir.map(subPath => this.pathToResourceGroup(path.join(filePath, subPath))));
       const resultRg = subRgs.reduce(
         (rg, subRg) => ({
           schemas: safeConcat(rg.schemas, subRg.schemas),
@@ -68,7 +68,6 @@ Uploaded successfully!
     return { schemas: [], upstreams: [], upstreamClientCredentials: [] };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   resourcesToResourceGroup(files: { [filepath: string]: any[] }) {
     const rg: ResourceGroupInput = { schemas: [], upstreams: [], upstreamClientCredentials: [] };
 

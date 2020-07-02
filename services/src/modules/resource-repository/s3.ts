@@ -81,13 +81,11 @@ export class S3ResourceRepository implements ResourceRepository {
     const newRefreshedAt = new Date();
 
     const allAttachments = await this.getPolicyAttachmentsList();
-    const attachmentsToRefresh = allAttachments
-      .filter((a) => this.shouldRefreshPolicyAttachment(a))
-      .map((a) => a.filename);
+    const attachmentsToRefresh = allAttachments.filter(a => this.shouldRefreshPolicyAttachment(a)).map(a => a.filename);
 
     if (attachmentsToRefresh.length > 0) {
       const newAttachments = await this.getPolicyAttachments(attachmentsToRefresh);
-      newAttachments.forEach((a) => (this.policyAttachments[a.filename] = a.content));
+      newAttachments.forEach(a => (this.policyAttachments[a.filename] = a.content));
     }
 
     this.policyAttachmentsRefreshedAt = newRefreshedAt;
@@ -115,7 +113,7 @@ export class S3ResourceRepository implements ResourceRepository {
 
       const listResult = await this.config.s3.listObjectsV2(params).promise();
       const keys = listResult.Contents || [];
-      const newAttachments: FileDetails[] = keys.map((k) => ({
+      const newAttachments: FileDetails[] = keys.map(k => ({
         filename: this.getPolicyAttachmentFilenameByKey(k.Key!),
         updatedAt: k.LastModified!,
       }));
@@ -132,7 +130,7 @@ export class S3ResourceRepository implements ResourceRepository {
     const limit = pLimit(10);
 
     return Promise.all(
-      filenames.map((filename) => {
+      filenames.map(filename => {
         return limit(async () => {
           const key = this.getPolicyAttachmentKey(filename);
           const params = { Bucket: this.config.bucketName, Key: key };
@@ -184,7 +182,6 @@ export class S3ResourceRepository implements ResourceRepository {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isAwsError(e: any): e is AWS.AWSError {
   return (
     typeof e.code !== 'undefined' &&

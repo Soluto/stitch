@@ -76,5 +76,5 @@ function mockRestBackend(host: string) {
     .reply(200, 'world!')
     .get('/hello')
     .query({ name: 'miriam' })
-    .reply(200, (url) => new URL(url, host).searchParams.get('name') + '!');
+    .reply(200, url => `${new URL(url, host).searchParams.get('name')}!`);
 }
