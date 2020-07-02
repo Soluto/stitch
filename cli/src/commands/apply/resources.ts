@@ -68,6 +68,7 @@ Uploaded successfully!
     return { schemas: [], upstreams: [], upstreamClientCredentials: [] };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   resourcesToResourceGroup(files: { [filepath: string]: any[] }) {
     const rg: ResourceGroupInput = { schemas: [], upstreams: [], upstreamClientCredentials: [] };
 

@@ -4,10 +4,10 @@ import * as R from 'ramda';
 import { RequestContext } from './context';
 
 interface GraphQLArguments {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 type jwtData = {
-  [name: string]: any;
+  [name: string]: unknown;
 };
 
 const paramRegex = /{(source|args|jwt|exports)\.(\w+(\.\w+)*)}/g;
@@ -16,7 +16,7 @@ const authzHeaderPrefix = 'Bearer ';
 function resolveTemplate(
   source: string,
   key: string,
-  parent: any,
+  parent: unknown,
   args: GraphQLArguments,
   context: RequestContext,
   info: GraphQLResolveInfo
@@ -28,7 +28,7 @@ function resolveTemplate(
     case 'args':
       return args && R.path(propPath, args);
     case 'exports':
-      return context.exports.resolve(info.parentType, parent, key);
+      return context.exports.resolve(info.parentType, parent as Record<string, unknown>, key);
     case 'jwt':
       return getJwt(context)[key];
     default:
@@ -38,7 +38,7 @@ function resolveTemplate(
 
 export function injectParameters(
   template: string,
-  parent: any,
+  parent: unknown,
   args: GraphQLArguments,
   context: RequestContext,
   info: GraphQLResolveInfo
@@ -49,14 +49,14 @@ export function injectParameters(
     const resolved = resolveTemplate(source, key, parent, args, context, info);
     didFindTemplates = true;
     didFindValues = didFindValues || (resolved !== null && typeof resolved !== 'undefined');
-    return resolved;
+    return String(resolved);
   });
   return { value, didFindValues, didFindTemplates };
 }
 
 export function resolveParameters(
   template: string,
-  parent: any,
+  parent: unknown,
   args: GraphQLArguments,
   context: RequestContext,
   info: GraphQLResolveInfo
@@ -64,7 +64,7 @@ export function resolveParameters(
   let foundMatches = false;
   const matches = Array.from(template.matchAll(paramRegex));
 
-  const parameters: { [key: string]: any } = {};
+  const parameters: { [key: string]: unknown } = {};
   for (const match of matches) {
     foundMatches = true;
     const paramTemplate = match[0];
@@ -79,8 +79,8 @@ export function resolveParameters(
 }
 
 export function deepInjectParameters(
-  obj: { [key: string]: any },
-  parent: any,
+  obj: { [key: string]: unknown },
+  parent: unknown,
   args: GraphQLArguments,
   context: RequestContext,
   info: GraphQLResolveInfo
@@ -100,23 +100,18 @@ export function deepInjectParameters(
   return newObj;
 }
 
-function isObject(val: any): val is Record<string, unknown> {
+function isObject(val: unknown): val is Record<string, unknown> {
   return typeof val === 'object' && val !== null;
 }
 
 function getJwt(context: RequestContext): jwtData {
   if (context.jwt) return context.jwt;
 
-  const authzHeader = context?.request?.headers?.authorization;
+  const authzHeader = context?.request?.headers?.authorization as string | undefined;
 
-  context.jwt = isAuthzHeaderValid(authzHeader)
-    ? (decodeJwt(authzHeader.substr(authzHeaderPrefix.length), { json: true }) as jwtData)
-    : {};
+  const jwtStr = authzHeader?.startsWith(authzHeaderPrefix) && authzHeader.substr(authzHeaderPrefix.length);
+  context.jwt = jwtStr ? (decodeJwt(jwtStr, { json: true }) as jwtData) : {};
   return context.jwt;
-}
-
-function isAuthzHeaderValid(authzHeader: any): boolean {
-  return authzHeader && authzHeader.startsWith(authzHeaderPrefix);
 }
 
 declare module './context' {

@@ -32,7 +32,7 @@ interface FederatedSchemaBase {
   directiveTypeDefs: DocumentNode;
   resolvers: GraphQLResolverMap;
   schemaDirectives: DirectiveVisitors;
-  schemaDirectivesContext: Record<string, any>;
+  schemaDirectivesContext: Record<string, unknown>;
 }
 
 type DirectivesUsagesByObjectAndFieldNames = Record<string, Record<string, DirectiveNode[]>>;

@@ -1,9 +1,10 @@
 import { SchemaDirectiveVisitor } from 'graphql-tools';
 import { GraphQLField, defaultFieldResolver } from 'graphql';
 import { gql } from 'apollo-server-core';
+import { RequestContext } from '../context';
 
 export class SelectDirective extends SchemaDirectiveVisitor {
-  visitFieldDefinition(field: GraphQLField<any, any>) {
+  visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
     const { path } = this.args as { path: string[] };
 
     const originalResolve = field.resolve || defaultFieldResolver;

@@ -184,6 +184,7 @@ export class S3ResourceRepository implements ResourceRepository {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isAwsError(e: any): e is AWS.AWSError {
   return (
     typeof e.code !== 'undefined' &&

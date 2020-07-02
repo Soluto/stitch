@@ -2,23 +2,23 @@ import { GraphQLObjectType, GraphQLResolveInfo, GraphQLField, GraphQLInterfaceTy
 import { GraphQLExtension } from 'apollo-server-core';
 import { RequestContext } from './context';
 
-function isObject(val: any): val is Record<string, unknown> {
+function isObject(val: unknown): val is Record<string, unknown> {
   return new Object(val) === val;
 }
 
 export class ExportTrackingExtension implements GraphQLExtension<RequestContext> {
-  objectToParentMap = new Map<any, { parent: any; parentType: GraphQLObjectType | GraphQLInterfaceType }>();
+  objectToParentMap = new Map<unknown, { parent: unknown; parentType: GraphQLObjectType | GraphQLInterfaceType }>();
 
   requestDidStart(options: { context: RequestContext }) {
     options.context.exports = this;
   }
 
   willResolveField(
-    source: any,
-    _args: any,
+    source: unknown,
+    _args: unknown,
     _context: RequestContext,
     info: GraphQLResolveInfo
-  ): ((error: Error | null, result?: any) => void) | void {
+  ): ((error: Error | null, result?: unknown) => void) | void {
     return (error, result) => {
       if (error || result === null || typeof result === 'undefined') {
         return;
@@ -39,7 +39,11 @@ export class ExportTrackingExtension implements GraphQLExtension<RequestContext>
     };
   }
 
-  resolve(objectType: GraphQLObjectType | GraphQLInterfaceType, objectValue: any, exportKey: string): any {
+  resolve(
+    objectType: GraphQLObjectType | GraphQLInterfaceType,
+    objectValue: Record<string, unknown>,
+    exportKey: string
+  ): unknown {
     const parentExportToFieldMap = exportMap.get(objectType);
 
     if (typeof parentExportToFieldMap !== 'undefined') {
@@ -56,14 +60,14 @@ export class ExportTrackingExtension implements GraphQLExtension<RequestContext>
       return null;
     }
 
-    return this.resolve(parentDetails.parentType, parentDetails.parent, exportKey);
+    return this.resolve(parentDetails.parentType, parentDetails.parent as Record<string, unknown>, exportKey);
   }
 }
 
 const exportMap = new WeakMap<GraphQLObjectType | GraphQLInterfaceType, Map<string, string>>();
 export function markExport(
   object: GraphQLObjectType | GraphQLInterfaceType,
-  field: GraphQLField<any, any>,
+  field: GraphQLField<unknown, RequestContext>,
   exportKey: string
 ) {
   let exportToFieldMap = exportMap.get(object);

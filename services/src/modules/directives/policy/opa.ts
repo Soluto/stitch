@@ -1,4 +1,5 @@
-// @ts-ignore opa-wasm already has TS typings merged, but not yet published on npm
+// TODO: remove when type definitions will be included in opa-wasm package
+// @ts-ignore
 import * as Rego from '@open-policy-agent/opa-wasm';
 import { getCompiledFilename } from '../../opa-helper';
 import { PolicyArgsObject } from '../../resource-repository';
@@ -13,6 +14,8 @@ export async function evaluate(ctx: PolicyExecutionContext): Promise<PolicyExecu
   return { done: true, allow: result?.allow };
 }
 
+// TODO: remove any when type definitions will be included in opa-wasm package
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function getWasmPolicy(ctx: PolicyExecutionContext): Promise<any> {
   const filename = getCompiledFilename({ namespace: ctx.namespace, name: ctx.name });
   const wasm = ctx.policyAttachments[filename];

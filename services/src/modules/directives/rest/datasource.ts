@@ -6,21 +6,21 @@ import { RequestContext } from '../../context';
 import { getAuthHeaders } from '../../auth/get-auth-headers';
 import { KeyValue, RestParams } from './types';
 
-type GraphQLArguments = { [key: string]: any };
+type GraphQLArguments = { [key: string]: unknown };
 
 export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
-  async doRequest(params: RestParams, parent: any, args: GraphQLArguments, info: GraphQLResolveInfo) {
+  async doRequest(params: RestParams, parent: unknown, args: GraphQLArguments, info: GraphQLResolveInfo) {
     const headers = this.parseHeaders(params.headers, parent, args, info);
     const requestInit: RequestInit = { headers, timeout: params.timeoutMs ?? 10000, method: params.method };
     const url = new URL(injectParameters(params.url, parent, args, this.context, info).value);
     this.addQueryParams(url.searchParams, params.query, parent, args, info);
 
     const authHeaders = await getAuthHeaders(this.context.authenticationConfig, url.host, this.context.request);
-    if (authHeaders != null) {
+    if (authHeaders != undefined) {
       headers.append('Authorization', authHeaders.Authorization);
     }
 
-    requestInit.body = args[params.bodyArg || 'input'];
+    requestInit.body = args[params.bodyArg || 'input'] as ArrayBuffer | ArrayBufferView | string;
     if (requestInit.body) {
       requestInit.body = JSON.stringify(requestInit.body);
       headers.append('Content-Type', 'application/json');
@@ -33,7 +33,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     return this.didReceiveResponse(response, request);
   }
 
-  parseHeaders(kvs: KeyValue[] | undefined, parent: any, args: GraphQLArguments, info: GraphQLResolveInfo) {
+  parseHeaders(kvs: KeyValue[] | undefined, parent: unknown, args: GraphQLArguments, info: GraphQLResolveInfo) {
     const headers = new Headers();
 
     if (typeof kvs === 'undefined') {
@@ -56,7 +56,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
   addQueryParams(
     params: URLSearchParams,
     kvs: KeyValue[] | undefined,
-    parent: any,
+    parent: unknown,
     args: GraphQLArguments,
     info: GraphQLResolveInfo
   ) {
@@ -79,7 +79,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
             params.append(kv.key, elem);
           }
         } else {
-          params.append(kv.key, paramValue);
+          params.append(kv.key, String(paramValue));
         }
       }
     }

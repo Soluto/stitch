@@ -16,7 +16,7 @@ export type PolicyExecutionContext = {
 };
 
 export type QueryResults = {
-  [name: string]: any;
+  [name: string]: unknown;
 };
 
 export type PolicyExecutionResult = {
@@ -33,5 +33,5 @@ export interface PolicyResult {
 }
 
 export type GraphQLArguments = {
-  [name: string]: any;
+  [name: string]: unknown;
 };

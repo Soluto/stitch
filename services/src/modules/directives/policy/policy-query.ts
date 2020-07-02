@@ -2,14 +2,15 @@ import { SchemaDirectiveVisitor } from 'graphql-tools';
 import { GraphQLField, GraphQLResolveInfo } from 'graphql';
 import { gql } from 'apollo-server-core';
 import { RequestContext } from '../../context';
+import { PolicyArgsObject } from '../../resource-repository';
 import { PolicyResult, Policy } from './types';
 import { PolicyExecutor } from './policy-executor';
 
 export class PolicyQueryDirective extends SchemaDirectiveVisitor {
-  visitFieldDefinition(field: GraphQLField<any, any>) {
+  visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
     field.resolve = async (
-      parent: any,
-      args: any,
+      parent: unknown,
+      args: PolicyArgsObject,
       context: RequestContext,
       info: GraphQLResolveInfo
     ): Promise<PolicyResult> => {

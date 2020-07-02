@@ -6,16 +6,19 @@ import { HttpLink } from 'apollo-link-http';
 import { RetryLink } from 'apollo-link-retry';
 import { setContext } from 'apollo-link-context';
 import fetch from 'node-fetch';
+import { FastifyRequest } from 'fastify';
 import { deepInjectParameters } from '../param-injection';
 import { getAuthHeaders } from '../auth/get-auth-headers';
 import { AuthenticationConfig } from '../auth/types';
 import logger from '../logger';
+import { RequestContext } from '../context';
 
 export class GqlDirective extends SchemaDirectiveVisitor {
   async createRemoteSchema(url: string, config: AuthenticationConfig) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const httpLink: ApolloLink = new HttpLink({ uri: url, fetch: fetch as any, fetchOptions: { timeout: 10000 } });
     const authLink = setContext(async (_, context) => ({
-      headers: await getAuthHeaders(config, new URL(url).host, context?.graphqlContext?.request as any),
+      headers: await getAuthHeaders(config, new URL(url).host, context?.graphqlContext?.request as FastifyRequest),
     })).concat(httpLink);
     const retryLink = new RetryLink({
       delay: { max: 5000 },
@@ -33,7 +36,7 @@ export class GqlDirective extends SchemaDirectiveVisitor {
     return await introspectSchema(retryLink).then((schema) => makeRemoteExecutableSchema({ schema, link: authLink }));
   }
 
-  visitFieldDefinition(field: GraphQLField<any, any>) {
+  visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
     const { url, fieldName, arguments: gqlArgs, operationType: operationTypeParam } = this.args;
     const operationType = operationTypeParam?.toLowerCase() ?? 'query';
     const remoteSchema = this.createRemoteSchema(url, this.context.authenticationConfig);

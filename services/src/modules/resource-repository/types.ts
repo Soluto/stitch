@@ -53,11 +53,11 @@ export interface PolicyQuery {
 }
 
 export interface PolicyQueryVariables {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface PolicyArgsObject {
-  [name: string]: string;
+  [name: string]: unknown;
 }
 
 export interface FetchLatestResult {

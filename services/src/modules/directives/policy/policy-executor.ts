@@ -15,7 +15,7 @@ export class PolicyExecutor {
 
   private constructor(
     protected policy: Policy,
-    protected parent: any,
+    protected parent: unknown,
     protected args: GraphQLArguments,
     protected context: RequestContext,
     protected info: GraphQLResolveInfo
@@ -26,7 +26,7 @@ export class PolicyExecutor {
 
   static async evaluatePolicy(
     policy: Policy,
-    parent: any,
+    parent: unknown,
     args: GraphQLArguments,
     context: RequestContext,
     info: GraphQLResolveInfo
@@ -37,7 +37,7 @@ export class PolicyExecutor {
 
   static async validatePolicy(
     policy: Policy,
-    parent: any,
+    parent: unknown,
     args: GraphQLArguments,
     context: RequestContext,
     info: GraphQLResolveInfo
@@ -110,7 +110,7 @@ export class PolicyExecutor {
 
     const variableValues =
       query.variables &&
-      Object.entries(query.variables).reduce<{ [key: string]: any }>((policyArgs, [varName, varValue]) => {
+      Object.entries(query.variables).reduce<{ [key: string]: unknown }>((policyArgs, [varName, varValue]) => {
         if (typeof varValue === 'string') {
           const resolvedValue = resolveParameters(varValue, this.parent, args, this.context, this.info);
           if (resolvedValue) {

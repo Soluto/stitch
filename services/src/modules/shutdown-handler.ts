@@ -4,14 +4,15 @@ import * as process from 'process';
 type DisposeFn = () => Promise<void> | void;
 
 export function handleUncaughtErrors() {
-  process.on('uncaughtException', (error: any) => {
+  process.on('uncaughtException', (error: Error) => {
     console.log('Uncaught exception caught in global handler', error);
     // logger.fatal({error}, 'Uncaught exception caught in global handler');
     process.exit(1);
   });
 
-  process.on('unhandledRejection', (error: any) => {
-    console.log('Uncaught exception caught in global handler', error);
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  process.on('unhandledRejection', (reason: {} | null | undefined) => {
+    console.log('Uncaught exception caught in global handler', reason);
     // logger.fatal({error}, 'Unhandled promise rejection caught in global handler');
     process.exit(1);
   });
