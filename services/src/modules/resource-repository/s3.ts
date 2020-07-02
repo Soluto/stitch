@@ -40,7 +40,7 @@ export class S3ResourceRepository implements ResourceRepository {
     const bodyRaw = response.Body?.toString();
 
     if (typeof bodyRaw === 'undefined') {
-      throw new Error('ResourceGroup file found without any data');
+      throw new TypeError('ResourceGroup file found without any data');
     }
 
     const rg = JSON.parse(bodyRaw) as ResourceGroup;
