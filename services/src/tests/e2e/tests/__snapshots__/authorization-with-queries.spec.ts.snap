@@ -10,8 +10,8 @@ Object {
         "exception": Object {
           "stacktrace": Array [
             "Error: Unauthorized by policy alwaysDenied in namespace namespace",
-            "    at Function.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:27:19)",
-            "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:13:17)",
+            "    at Function.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:28:19)",
+            "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:14:17)",
           ],
         },
       },
@@ -56,8 +56,8 @@ Object {
         "exception": Object {
           "stacktrace": Array [
             "Error: Unauthorized by policy notClassified in namespace namespace",
-            "    at Function.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:27:19)",
-            "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:13:17)",
+            "    at Function.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:28:19)",
+            "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:14:17)",
           ],
         },
       },
@@ -95,8 +95,8 @@ Object {
         "exception": Object {
           "stacktrace": Array [
             "Error: Unauthorized by policy notClassified in namespace namespace",
-            "    at Function.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:27:19)",
-            "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:13:17)",
+            "    at Function.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:28:19)",
+            "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:14:17)",
           ],
         },
       },
