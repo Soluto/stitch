@@ -108,7 +108,7 @@ export class PolicyExecutor {
     const query = this.policyDefinition.query;
     if (!query) return;
 
-    let variableValues =
+    const variableValues =
       query.variables &&
       Object.entries(query.variables).reduce<{ [key: string]: any }>((policyArgs, [varName, varValue]) => {
         if (typeof varValue === 'string') {
