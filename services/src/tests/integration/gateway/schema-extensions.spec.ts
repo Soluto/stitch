@@ -130,7 +130,7 @@ function mockRestBackend(host: string) {
     .get('/organizations')
     .reply(200, organizations)
     .get(/\/teams\/\w+/)
-    .reply(200, (url) => teams[basename(url)])
+    .reply(200, url => teams[basename(url)])
     .get(/\/employees\/\w+/)
-    .reply(200, (url) => employees[basename(url)]);
+    .reply(200, url => employees[basename(url)]);
 }

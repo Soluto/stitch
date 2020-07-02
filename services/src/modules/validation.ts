@@ -48,7 +48,7 @@ export function validateResourceGroupOrThrow(rg: ResourceGroup) {
 
   if (errors.length > 0) {
     throw new ApolloError('Resource validation failed', 'RESOURCE_VALIDATION_FAILURE', {
-      errors: errors.map((err) => (err instanceof GraphQLError ? err : new GraphQLError(err!.message))),
+      errors: errors.map(err => (err instanceof GraphQLError ? err : new GraphQLError(err!.message))),
     });
   }
 }

@@ -5,7 +5,7 @@ export class CompositeResourceRepository implements ResourceRepository {
   constructor(protected repositories: ResourceRepository[]) {}
 
   async fetchLatest(): Promise<FetchLatestResult> {
-    const results = await Promise.all(this.repositories.map((repo) => repo.fetchLatest()));
+    const results = await Promise.all(this.repositories.map(repo => repo.fetchLatest()));
 
     return results.reduce((res1, res2) => ({
       isNew: res1.isNew || res2.isNew,

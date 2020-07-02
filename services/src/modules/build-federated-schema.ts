@@ -63,15 +63,13 @@ export function buildSchemaFromFederatedTypeDefs({
   const compositionResult = composeAndValidate(serviceDefinitions);
   if (compositionResult.errors.length > 0) {
     throw new ApolloError('Federation validation failed', 'FEDERATION_VALIDATION_FAILURE', {
-      errors: compositionResult.errors.map((err) =>
-        err instanceof GraphQLError ? err : new GraphQLError(err!.message)
-      ),
+      errors: compositionResult.errors.map(err => (err instanceof GraphQLError ? err : new GraphQLError(err!.message))),
     });
   }
 
   // Add directives back to the SDL
   const fullTypeDefWithoutDirectives = parse(printSchema(compositionResult.schema));
-  const allDirectivesUsages = mergeDirectivesUsages(serviceDefinitions.map((sd) => sd.directivesUsages));
+  const allDirectivesUsages = mergeDirectivesUsages(serviceDefinitions.map(sd => sd.directivesUsages));
   const fullTypeDefWithDirectives = addDirectivesToTypedefs(allDirectivesUsages, fullTypeDefWithoutDirectives);
 
   // Create final schema, re-adding directive definitions and directive implementations
@@ -114,7 +112,7 @@ export function collectAndRemoveCustomDirectives(typeDef: DocumentNode) {
 
   const typeDefWithoutDirectives = visit(typeDef, {
     Directive(node, _key, _parent, _path, ancestors) {
-      if (federationDirectives.some((directive) => directive === node.name.value)) {
+      if (federationDirectives.some(directive => directive === node.name.value)) {
         return;
       }
 

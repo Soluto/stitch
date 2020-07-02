@@ -43,7 +43,7 @@ export function createGraphQLService(config: { resourceGroups: Observable<Resour
       };
     },
     onSchemaChange(callback: SchemaChangeCallback): Unsubscriber {
-      const sub = newSchemaConfigs.pipe(map((sc) => sc.schema)).subscribe(callback);
+      const sub = newSchemaConfigs.pipe(map(sc => sc.schema)).subscribe(callback);
       subscription.add(sub);
 
       return sub.unsubscribe.bind(sub);
@@ -73,9 +73,9 @@ function buildPolicyGqlQuery(policy: Policy): DocumentNode {
 
 export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
   const activeDirectoryAuth = new ActiveDirectoryAuth();
-  const upstreamsByHost = new Map(rg.upstreams.map((u) => [u.host, u]));
+  const upstreamsByHost = new Map(rg.upstreams.map(u => [u.host, u]));
   const upstreamClientCredentialsByAuthority = new Map(
-    rg.upstreamClientCredentials.map((u) => [u.activeDirectory.authority, u])
+    rg.upstreamClientCredentials.map(u => [u.activeDirectory.authority, u])
   );
   const schemas = rg.schemas.length === 0 ? [defaultSchema] : [initialSchema, ...rg.schemas];
   const policies = rg.policies ?? [];
@@ -90,8 +90,8 @@ export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
     activeDirectoryAuth,
   };
 
-  const schemaTypeDefs = schemas.map((s) => [`${s.metadata.namespace}/${s.metadata.name}`, parse(s.schema)]);
-  const policyQueryTypeDefs = policies.map((p) => [
+  const schemaTypeDefs = schemas.map(s => [`${s.metadata.namespace}/${s.metadata.name}`, parse(s.schema)]);
+  const policyQueryTypeDefs = policies.map(p => [
     `${p.metadata.namespace}___${p.metadata.name}`,
     buildPolicyGqlQuery(p),
   ]);

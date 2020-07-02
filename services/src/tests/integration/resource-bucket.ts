@@ -22,7 +22,7 @@ export function mockResourceBucket(initialValue: ResourceGroup, initialPolicyFil
     })
     .get(new RegExp(`/${bucketName!}${queryParamsSeparatorRegex}${policiesPrefixQueryParamRegex}`))
     .reply(200, () => {
-      const filenames = Object.keys(value.policyFiles).map((filename) => ({
+      const filenames = Object.keys(value.policyFiles).map(filename => ({
         Key: filename,
         LastModified: new Date(),
       }));
@@ -30,7 +30,7 @@ export function mockResourceBucket(initialValue: ResourceGroup, initialPolicyFil
       return xmlBuilder.buildObject({ Contents: filenames, IsTruncated: false });
     })
     .get(new RegExp(`/${bucketName!}/${policiesKeyPrefix}.+`))
-    .reply(200, (uri) => {
+    .reply(200, uri => {
       const filename = getFilenameFromUri(uri);
       return { Body: value.policyFiles[filename] };
     })

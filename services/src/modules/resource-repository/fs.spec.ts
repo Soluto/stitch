@@ -81,14 +81,14 @@ describe('refreshPolicyAttachments', () => {
       [newFilePath]: { mtime: minutesAgo(3) },
     };
     const statMock = mockFsFunction('stat');
-    statMock.mockImplementation((filePath) => Promise.resolve(statParamBasedReturnValues[filePath]));
+    statMock.mockImplementation(filePath => Promise.resolve(statParamBasedReturnValues[filePath]));
 
     const readFileParamBasedReturnValues = {
       [needsUpdatingPath]: Buffer.from('needs updating - updated'),
       [newFilePath]: Buffer.from('new file'),
     };
     const readFileMock = mockFsFunction('readFile');
-    readFileMock.mockImplementation((filePath) => Promise.resolve(readFileParamBasedReturnValues[filePath]));
+    readFileMock.mockImplementation(filePath => Promise.resolve(readFileParamBasedReturnValues[filePath]));
 
     await refreshPolicyAttachments();
 

@@ -45,13 +45,11 @@ export class FileSystemResourceRepository implements ResourceRepository {
     const newRefreshedAt = new Date();
 
     const allAttachments = await this.getPolicyAttachmentsList();
-    const attachmentsToRefresh = allAttachments
-      .filter((a) => this.shouldRefreshPolicyAttachment(a))
-      .map((a) => a.filename);
+    const attachmentsToRefresh = allAttachments.filter(a => this.shouldRefreshPolicyAttachment(a)).map(a => a.filename);
 
     if (attachmentsToRefresh.length > 0) {
       const newAttachments = await this.getPolicyAttachments(attachmentsToRefresh);
-      newAttachments.forEach((a) => (this.policyAttachments[a.filename] = a.content));
+      newAttachments.forEach(a => (this.policyAttachments[a.filename] = a.content));
     }
 
     this.policyAttachmentsRefreshedAt = newRefreshedAt;
@@ -69,7 +67,7 @@ export class FileSystemResourceRepository implements ResourceRepository {
     const limit = pLimit(10);
 
     return Promise.all(
-      filenames.map((filename) => {
+      filenames.map(filename => {
         return limit(async () => {
           const filePath = path.resolve(this.policyAttachmentsFolderPath, filename);
           const stats = await fs.stat(filePath);
@@ -85,7 +83,7 @@ export class FileSystemResourceRepository implements ResourceRepository {
     const limit = pLimit(10);
 
     return Promise.all(
-      filenames.map((filename) => {
+      filenames.map(filename => {
         return limit(async () => {
           const filePath = path.resolve(this.policyAttachmentsFolderPath, filename);
           const content = await fs.readFile(filePath);

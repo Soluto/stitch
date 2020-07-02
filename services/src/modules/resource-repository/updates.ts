@@ -12,7 +12,7 @@ export function applyResourceUpdates<TResource extends Resource>(
 
   for (const resourceUpdate of updates) {
     const existingResourceIndex = newResources.findIndex(
-      (existing) =>
+      existing =>
         existing.metadata.name === resourceUpdate.metadata.name &&
         existing.metadata.namespace === resourceUpdate.metadata.namespace
     );
