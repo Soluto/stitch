@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 
-export function mock() {
+function mock() {
   const realWriteFile = fs.writeFile;
   const realUnlink = fs.unlink;
   const realReadFile = fs.readFile;
@@ -18,7 +18,7 @@ export function mock() {
   fs.readFile = readFileMock;
 }
 
-export function restore() {
+function restore() {
   (fs.writeFile as any).__restore();
   (fs.unlink as any).__restore();
   (fs.readFile as any).__restore();
