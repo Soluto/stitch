@@ -3,22 +3,22 @@
 export type Maybe<T> = T | null;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-    ID: string;
-    String: string;
-    Boolean: boolean;
-    Int: number;
-    Float: number;
+  ID: string;
+  String: string;
+  Boolean: boolean;
+  Int: number;
+  Float: number;
 };
 
 export type ActiveDirectoryAuth = {
-    authority: Scalars['String'];
-    resource: Scalars['String'];
+  authority: Scalars['String'];
+  resource: Scalars['String'];
 };
 
 export type ActiveDirectoryCredentials = {
-    authority: Scalars['String'];
-    clientId: Scalars['String'];
-    clientSecret: Scalars['String'];
+  authority: Scalars['String'];
+  clientId: Scalars['String'];
+  clientSecret: Scalars['String'];
 };
 
 /**
@@ -27,81 +27,81 @@ export type ActiveDirectoryCredentials = {
  * property which corresponds to each auth type, which we validate in the registry.
  */
 export type Auth = {
-    type: AuthType;
-    activeDirectory: ActiveDirectoryAuth;
+  type: AuthType;
+  activeDirectory: ActiveDirectoryAuth;
 };
 
 export enum AuthType {
-    ActiveDirectory = 'ActiveDirectory',
+  ActiveDirectory = 'ActiveDirectory',
 }
 
 export type Mutation = {
-    __typename?: 'Mutation';
-    updateResourceGroup?: Maybe<Result>;
-    updateSchemas?: Maybe<Result>;
-    updateUpstreams?: Maybe<Result>;
-    updateUpstreamClientCredentials?: Maybe<Result>;
+  __typename?: 'Mutation';
+  updateResourceGroup?: Maybe<Result>;
+  updateSchemas?: Maybe<Result>;
+  updateUpstreams?: Maybe<Result>;
+  updateUpstreamClientCredentials?: Maybe<Result>;
 };
 
 export type MutationUpdateResourceGroupArgs = {
-    input: ResourceGroupInput;
+  input: ResourceGroupInput;
 };
 
 export type MutationUpdateSchemasArgs = {
-    input: Array<SchemaInput>;
+  input: Array<SchemaInput>;
 };
 
 export type MutationUpdateUpstreamsArgs = {
-    input: Array<UpstreamInput>;
+  input: Array<UpstreamInput>;
 };
 
 export type MutationUpdateUpstreamClientCredentialsArgs = {
-    input: Array<UpstreamClientCredentialsInput>;
+  input: Array<UpstreamClientCredentialsInput>;
 };
 
 export type Query = {
-    __typename?: 'Query';
-    validateResourceGroup?: Maybe<Result>;
-    validateSchemas?: Maybe<Result>;
-    validateUpstreams?: Maybe<Result>;
-    validateUpstreamClientCredentials?: Maybe<Result>;
+  __typename?: 'Query';
+  validateResourceGroup?: Maybe<Result>;
+  validateSchemas?: Maybe<Result>;
+  validateUpstreams?: Maybe<Result>;
+  validateUpstreamClientCredentials?: Maybe<Result>;
 };
 
 export type QueryValidateResourceGroupArgs = {
-    input: ResourceGroupInput;
+  input: ResourceGroupInput;
 };
 
 export type QueryValidateSchemasArgs = {
-    input: Array<SchemaInput>;
+  input: Array<SchemaInput>;
 };
 
 export type QueryValidateUpstreamsArgs = {
-    input: Array<UpstreamInput>;
+  input: Array<UpstreamInput>;
 };
 
 export type QueryValidateUpstreamClientCredentialsArgs = {
-    input: Array<UpstreamClientCredentialsInput>;
+  input: Array<UpstreamClientCredentialsInput>;
 };
 
 export type ResourceGroupInput = {
-    schemas?: Maybe<Array<SchemaInput>>;
-    upstreams?: Maybe<Array<UpstreamInput>>;
-    upstreamClientCredentials?: Maybe<Array<UpstreamClientCredentialsInput>>;
+  schemas?: Maybe<Array<SchemaInput>>;
+  upstreams?: Maybe<Array<UpstreamInput>>;
+  upstreamClientCredentials?: Maybe<Array<UpstreamClientCredentialsInput>>;
 };
 
 export type ResourceMetadata = {
-    namespace: Scalars['String'];
-    name: Scalars['String'];
+  namespace: Scalars['String'];
+  name: Scalars['String'];
 };
 
 export type Result = {
-    __typename?: 'Result';
-    success: Scalars['Boolean'];
+  __typename?: 'Result';
+  success: Scalars['Boolean'];
 };
 
 export type SchemaInput = {
-    metadata: ResourceMetadata;
-    schema: Scalars['String'];
+  metadata: ResourceMetadata;
+  schema: Scalars['String'];
 };
 
 /**
@@ -110,13 +110,13 @@ export type SchemaInput = {
  * property which corresponds to each auth type, which we validate in the registry.
  */
 export type UpstreamClientCredentialsInput = {
-    metadata: ResourceMetadata;
-    authType: AuthType;
-    activeDirectory: ActiveDirectoryCredentials;
+  metadata: ResourceMetadata;
+  authType: AuthType;
+  activeDirectory: ActiveDirectoryCredentials;
 };
 
 export type UpstreamInput = {
-    metadata: ResourceMetadata;
-    host: Scalars['String'];
-    auth: Auth;
+  metadata: ResourceMetadata;
+  host: Scalars['String'];
+  auth: Auth;
 };

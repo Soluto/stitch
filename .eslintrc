@@ -1,0 +1,71 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2019,
+    "project": ["./tsconfig.json"]
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "unicorn",
+    "promise",
+    "prettier",
+    "jest"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:node/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "plugin:unicorn/recommended",
+    "plugin:prettier/recommended",
+    "plugin:promise/recommended",
+    "plugin:jest/style"
+  ],
+  "rules": {
+    "no-process-exit": "off",
+    "import/order": "error",
+    "node/no-unpublished-import": "off",
+    "node/no-unsupported-features/es-syntax": "off",
+    "promise/param-names": "off",
+    "unicorn/catch-error-name": "off",
+    "unicorn/no-fn-reference-in-iterator": "off",
+    "unicorn/no-null": "off",
+    "unicorn/no-reduce": "off",
+    "unicorn/prefer-spread": "off",
+    "unicorn/prefer-string-slice": "off",
+    "unicorn/prevent-abbreviations": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-non-null-assertion": "off"
+  },
+  "overrides": [
+    {
+      "files": ["*.spec.ts", "services/src/tests/**"],
+      "rules": {
+        "@typescript-eslint/ban-types": "off",
+        "@typescript-eslint/no-empty-function": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+      }
+    }
+  ],
+  "settings": {
+    "node": {
+      "allowModules": [
+        "graphql",
+        "js-yaml",
+        "node-fetch",
+        "p-limit",
+        "ramda",
+        "ts-jest",
+        "xml2js",
+        "@oclif",
+        "@jest/types"
+      ],
+      "tryExtensions": [".ts", ".json", ".node"]
+    }
+  }
+}

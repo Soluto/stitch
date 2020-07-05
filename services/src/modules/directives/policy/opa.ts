@@ -1,36 +1,37 @@
-// @ts-ignore opa-wasm already has TS typings merged, but not yet published on npm
+// @ts-ignore TODO: remove when type definitions will be included in opa-wasm package
 import * as Rego from '@open-policy-agent/opa-wasm';
-import {getCompiledFilename} from '../../opaHelper';
-import {PolicyExecutionContext, PolicyExecutionResult, QueryResults} from './types';
-import {PolicyArgsObject} from '../../resource-repository';
+import { getCompiledFilename } from '../../opa-helper';
+import { PolicyArgsObject } from '../../resource-repository';
+import { PolicyExecutionContext, PolicyExecutionResult, QueryResults } from './types';
 
 export async function evaluate(ctx: PolicyExecutionContext): Promise<PolicyExecutionResult> {
-    const policy = await getWasmPolicy(ctx);
-    const input = getInput(ctx);
+  const policy = await getWasmPolicy(ctx);
+  const input = getInput(ctx);
 
-    const result = policy.evaluate(input)?.[0]?.result;
+  const result = policy.evaluate(input)?.[0]?.result;
 
-    return {done: true, allow: result?.allow};
+  return { done: true, allow: result?.allow };
 }
 
+// TODO: remove any when type definitions will be included in opa-wasm package
 async function getWasmPolicy(ctx: PolicyExecutionContext): Promise<any> {
-    const filename = getCompiledFilename({namespace: ctx.namespace, name: ctx.name});
-    const wasm = ctx.policyAttachments[filename];
+  const filename = getCompiledFilename({ namespace: ctx.namespace, name: ctx.name });
+  const wasm = ctx.policyAttachments[filename];
 
-    const rego = new Rego();
-    return rego.load_policy(wasm);
+  const rego = new Rego();
+  return rego.load_policy(wasm);
 }
 
 function getInput(ctx: PolicyExecutionContext): PolicyOpaInput {
-    const input: PolicyOpaInput = {};
+  const input: PolicyOpaInput = {};
 
-    if (ctx.args) input.args = ctx.args;
-    if (ctx.query) input.query = ctx.query;
+  if (ctx.args) input.args = ctx.args;
+  if (ctx.query) input.query = ctx.query;
 
-    return input;
+  return input;
 }
 
 type PolicyOpaInput = {
-    args?: PolicyArgsObject;
-    query?: QueryResults;
+  args?: PolicyArgsObject;
+  query?: QueryResults;
 };
