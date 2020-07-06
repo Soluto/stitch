@@ -5,6 +5,7 @@ import { createGraphQLService } from './graphql-service';
 import { RESTDirectiveDataSource } from './directives/rest';
 import { ResourceGroup } from './resource-repository';
 import { ExportTrackingExtension } from './exports';
+import { getJwt } from './arguments-injection';
 
 export interface GatewayConfig extends Config {
   resourceGroups: Observable<ResourceGroup>;
@@ -19,7 +20,11 @@ export function createStitchGateway(config: GatewayConfig) {
     extensions: [() => new ExportTrackingExtension()],
     subscriptions: false,
     context(request: fastify.FastifyRequest) {
-      return { request };
+      const ctx = {
+        request,
+        jwt: getJwt(request),
+      };
+      return ctx;
     },
     dataSources() {
       return {

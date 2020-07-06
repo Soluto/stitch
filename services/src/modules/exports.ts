@@ -84,3 +84,30 @@ declare module './context' {
     exports: Pick<ExportTrackingExtension, 'resolve'>;
   }
 }
+
+type ExportProxyTarget = {
+  exports: ExportTrackingExtension;
+  objectType: GraphQLObjectType | GraphQLInterfaceType;
+  objectValue: Record<string, unknown>;
+};
+
+const handler = {
+  get: (target: ExportProxyTarget, property: string) => {
+    const result = target.exports.resolve(target.objectType, target.objectValue, property);
+    return result;
+  },
+};
+
+export function getExportProxy(
+  exports: Pick<ExportTrackingExtension, 'resolve'>,
+  objectType: GraphQLObjectType | GraphQLInterfaceType,
+  objectValue: Record<string, unknown>
+) {
+  const target = {
+    exports,
+    objectType,
+    objectValue,
+  };
+
+  return new Proxy(target, handler);
+}
