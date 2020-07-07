@@ -4,7 +4,6 @@ import { gql } from 'apollo-server-core';
 import { RequestContext } from '../../context';
 import { PolicyArgsObject } from '../../resource-repository';
 import { PolicyResult, Policy } from './types';
-import { PolicyExecutor } from './policy-executor';
 
 export class PolicyQueryDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
@@ -20,7 +19,7 @@ export class PolicyQueryDirective extends SchemaDirectiveVisitor {
         args: args,
       };
 
-      const allow = await PolicyExecutor.evaluatePolicy(policy, parent, args, context, info);
+      const allow = await context.policyExecutor.evaluatePolicy(policy, parent, args, context, info);
       return { allow };
     };
   }

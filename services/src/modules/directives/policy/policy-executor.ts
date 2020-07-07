@@ -1,8 +1,8 @@
 import { GraphQLResolveInfo, graphql } from 'graphql';
 import { RequestContext } from '../../context';
-import { Policy as PolicyDefinition, PolicyArgsObject, PolicyAttachments } from '../../resource-repository';
+import { Policy as PolicyDefinition, PolicyArgsObject } from '../../resource-repository';
 import { inject, injectArgs } from '../../arguments-injection';
-import { Policy, GraphQLArguments, QueryResults } from './types';
+import { Policy, PolicyDirectiveExecutionContext, GraphQLArguments, QueryResults } from './types';
 import { evaluate as evaluateOpa } from './opa';
 
 const typeEvaluators = {
@@ -10,74 +10,61 @@ const typeEvaluators = {
 };
 
 export class PolicyExecutor {
-  private policyDefinition: PolicyDefinition;
-  private policyAttachments: PolicyAttachments;
-
-  private constructor(
-    protected policy: Policy,
-    protected parent: unknown,
-    protected args: GraphQLArguments,
-    protected context: RequestContext,
-    protected info: GraphQLResolveInfo
-  ) {
-    this.policyDefinition = this.getPolicyDefinition(context.policies, this.policy.namespace, this.policy.name);
-    this.policyAttachments = context.policyAttachments;
-  }
-
-  static async evaluatePolicy(
+  async evaluatePolicy(
     policy: Policy,
     parent: unknown,
-    args: GraphQLArguments,
-    context: RequestContext,
+    gqlArgs: GraphQLArguments,
+    requestContext: RequestContext,
     info: GraphQLResolveInfo
   ): Promise<boolean> {
-    const executor = new PolicyExecutor(policy, parent, args, context, info);
-    return executor.evaluatePolicy();
+    const policyDefinition = this.getPolicyDefinition(requestContext.policies, policy.namespace, policy.name);
+    return this._evaluatePolicy({ policy, parent, gqlArgs, requestContext, info, policyDefinition });
   }
 
-  static async validatePolicy(
+  async validatePolicy(
     policy: Policy,
     parent: unknown,
-    args: GraphQLArguments,
-    context: RequestContext,
+    gqlArgs: GraphQLArguments,
+    requestContext: RequestContext,
     info: GraphQLResolveInfo
   ): Promise<void> {
-    const executor = new PolicyExecutor(policy, parent, args, context, info);
-    const allow = await executor.evaluatePolicy();
-    if (!allow)
-      throw new Error(`Unauthorized by policy ${executor.policy.name} in namespace ${executor.policy.namespace}`);
+    const allow = await this.evaluatePolicy(policy, parent, gqlArgs, requestContext, info);
+    if (!allow) {
+      throw new Error(`Unauthorized by policy ${policy.name} in namespace ${policy.namespace}`);
+    }
   }
 
-  private async evaluatePolicy(): Promise<boolean> {
-    const args = this.preparePolicyArgs();
-    const query = await this.evaluatePolicyQuery(args);
+  private async _evaluatePolicy(ctx: PolicyDirectiveExecutionContext): Promise<boolean> {
+    const args = this.preparePolicyArgs(ctx);
+    const query = await this.evaluatePolicyQuery(ctx, args);
 
-    const evaluate = typeEvaluators[this.policyDefinition.type];
-    if (!evaluate) throw new Error(`Unsupported policy type ${this.policyDefinition.type}`);
+    const evaluate = typeEvaluators[ctx.policyDefinition.type];
+    if (!evaluate) throw new Error(`Unsupported policy type ${ctx.policyDefinition.type}`);
 
     const { done, allow } = await evaluate({
-      ...this.policy,
+      ...ctx.policy,
       args,
       query,
-      policyAttachments: this.policyAttachments,
+      policyAttachments: ctx.requestContext.policyAttachments,
     });
     if (!done) throw new Error('in-line query evaluation not yet supported');
     return allow || false;
   }
 
-  private preparePolicyArgs(): PolicyArgsObject | undefined {
-    const supportedPolicyArgs = this.policyDefinition.args;
+  private preparePolicyArgs(ctx: PolicyDirectiveExecutionContext): PolicyArgsObject | undefined {
+    const supportedPolicyArgs = ctx.policyDefinition.args;
     if (!supportedPolicyArgs) return;
 
     return Object.keys(supportedPolicyArgs).reduce<PolicyArgsObject>((policyArgs, policyArgName) => {
-      if (this.policy?.args?.[policyArgName] === undefined)
+      if (ctx.policy?.args?.[policyArgName] === undefined) {
         throw new Error(
-          `Missing arg ${policyArgName} for policy ${this.policy.name} in namespace ${this.policy.namespace}`
+          `Missing arg ${policyArgName} for policy ${ctx.policy.name} in namespace ${ctx.policy.namespace}`
         );
+      }
 
-      let policyArgValue = this.policy.args[policyArgName];
+      let policyArgValue = ctx.policy.args[policyArgName];
       if (typeof policyArgValue === 'string') {
-        policyArgValue = inject(policyArgValue, this.parent, this.args, this.context, this.info);
+        policyArgValue = inject(policyArgValue, ctx.parent, ctx.gqlArgs, ctx.requestContext, ctx.info);
       }
 
       policyArgs[policyArgName] = policyArgValue;
@@ -94,8 +81,11 @@ export class PolicyExecutor {
     return policyDefinition;
   }
 
-  private async evaluatePolicyQuery(args: PolicyArgsObject = {}): Promise<QueryResults | undefined> {
-    const query = this.policyDefinition.query;
+  private async evaluatePolicyQuery(
+    ctx: PolicyDirectiveExecutionContext,
+    args: PolicyArgsObject = {}
+  ): Promise<QueryResults | undefined> {
+    const query = ctx.policyDefinition.query;
     if (!query) return;
 
     const variableValues =
@@ -108,14 +98,15 @@ export class PolicyExecutor {
         return policyArgs;
       }, {});
 
-    const context: RequestContext = { ...this.context, ignorePolicies: true };
-    const gqlResult = await graphql(this.info.schema, query.gql, undefined, context, variableValues);
+    const requestContext: RequestContext = { ...ctx.requestContext, ignorePolicies: true };
+    const gqlResult = await graphql(ctx.info.schema, query.gql, undefined, requestContext, variableValues);
     return gqlResult.data || undefined;
   }
 }
 
 declare module '../../context' {
   interface RequestContext {
+    policyExecutor: PolicyExecutor;
     /**
      * This flag indicates that request should be resolved without invoking authorization policies evaluation
      */

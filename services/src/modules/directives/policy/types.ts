@@ -1,4 +1,6 @@
-import { PolicyArgsObject, PolicyAttachments } from '../../resource-repository/types';
+import { GraphQLResolveInfo } from 'graphql';
+import { Policy as PolicyDefinition, PolicyArgsObject, PolicyAttachments } from '../../resource-repository/types';
+import { RequestContext } from '../../context';
 
 export type Policy = {
   namespace: string;
@@ -7,7 +9,7 @@ export type Policy = {
 };
 
 // args here contain the final values after param injection
-export type PolicyExecutionContext = {
+export type PolicyEvaluationContext = {
   namespace: string;
   name: string;
   policyAttachments: PolicyAttachments;
@@ -19,7 +21,7 @@ export type QueryResults = {
   [name: string]: unknown;
 };
 
-export type PolicyExecutionResult = {
+export type PolicyEvaluationResult = {
   done: boolean;
   allow?: boolean;
   query?: {
@@ -34,4 +36,13 @@ export interface PolicyResult {
 
 export type GraphQLArguments = {
   [name: string]: unknown;
+};
+
+export type PolicyDirectiveExecutionContext = {
+  policy: Policy;
+  parent: unknown;
+  gqlArgs: GraphQLArguments;
+  requestContext: RequestContext;
+  info: GraphQLResolveInfo;
+  policyDefinition: PolicyDefinition;
 };
