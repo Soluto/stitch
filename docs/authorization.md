@@ -30,9 +30,9 @@ code: |
     input.query.someQuery.someData = input.args.someArg
   }
 args:
-  argForQuery: '{source.someField[jwt.someClaim]}'
-  argForAnotherPolicy: '{args.someArgFromAttachedField}'
-  someArg: '{exports.someExportedKey}'
+  argForQuery: JSON!
+  argForAnotherPolicy: String!
+  someArg: Int!
 query:
   gql: |
     query($varForAnotherPolicy: String!, $varForQuery: String) {
