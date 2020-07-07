@@ -98,7 +98,7 @@ const handler = {
   },
 };
 
-export function getExportProxy(
+export function getExportsProxy(
   exports: Pick<ExportTrackingExtension, 'resolve'>,
   objectType: GraphQLObjectType | GraphQLInterfaceType,
   objectValue: Record<string, unknown>

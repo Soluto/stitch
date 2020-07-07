@@ -1,4 +1,3 @@
-// import { GraphQLResolveInfo } from 'graphql';
 import getJwt from './request-context-jwt';
 import { inject, deepInject } from './arguments-injection';
 

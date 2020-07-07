@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo } from 'graphql';
 import { GraphQLArguments } from '../directives/policy/types';
 import { RequestContext } from '../context';
-import { getExportProxy } from '../exports';
+import { getExportsProxy } from '../exports';
 import evaluate from './arguments-evaluation';
 
 export function inject<T = unknown>(
@@ -15,7 +15,7 @@ export function inject<T = unknown>(
     source,
     args,
     jwt: context?.jwt,
-    exports: info && context && getExportProxy(context.exports, info?.parentType, source as Record<string, unknown>),
+    exports: info && context && getExportsProxy(context.exports, info?.parentType, source as Record<string, unknown>),
     vars: info?.variableValues,
   };
 
