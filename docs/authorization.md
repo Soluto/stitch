@@ -106,7 +106,7 @@ type: opa
 code: |
   default allow = false
   allow {
-    input.args.roles[_] == "admin"
+    input.query.user.roles[_] == "admin"
     input.query.policy.another_ns___userIsActive.allow
   }
 args:
@@ -138,12 +138,16 @@ So if in type `User` there is field `phone` that should be accessible for user w
 type User {
   id: ID!
   name: String!
-  phone: String @policy(namespace: "admin_ns", name: "admin_only", args: { roles: "{jwt.roles}" })
+  phone: String @policy(namespace: "billing", name: "adminOnly", args: { userRoles: "{jwt.roles}" })
 }
 ```
 
-And the policy is defined as in example 1 (See above).
+The policy is defined as in example 1 (See above).
 
 In the example above, the `roles` argument value is received by using the Argument Injection mechanism. In this example, it is received from the `roles` claim in the request's JWT.
 
 > Note: See [Arguments Injection](./arguments_injection.md) for more information about configuration of policy arguments.
+
+## Directives order
+
+**_Important!_** The [order of directives](https://github.com/graphql/graphql-spec/blob/master/spec/Section%202%20--%20Language.md#directives) does matter! In the most cases the `@policy` directive should be **the last** directive attached to the field definition.

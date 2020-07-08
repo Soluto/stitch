@@ -1,4 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
+import { sign as signJwt } from 'jsonwebtoken';
 import { sleep } from '../../helpers/utility';
 import {
   getSchema,
@@ -85,16 +86,23 @@ describe('authorization', () => {
 });
 
 function allowedJwtOptions() {
-  // Claims: { "name": "Varg", "sub": "1234567890", "iat": 1516239022 }
-  const encodedJwt =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlZhcmciLCJpYXQiOjE1MTYyMzkwMjJ9.MEXFHfBaci44tuGREvCK1vZ-KqYL7L-TYqO7v0jfsYM';
+  const payload = {
+    sub: '1234567890',
+    name: 'Varg',
+    iat: 1516239022,
+  };
+
+  const encodedJwt = signJwt(JSON.stringify(payload), 'e2e-key');
   return { headers: { authorization: `Bearer ${encodedJwt}` } };
 }
 
 function disallowedJwtOptions() {
-  // Claims: { "name": "Orm", "sub": "1234567890", "iat": 1516239022 }
-  const encodedJwt =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ik9ybSIsImlhdCI6MTUxNjIzOTAyMn0.ZQ__h2OJR8A7uSKTZ3QC0jP5P3U3a1JuMU9xVnzWTIM';
+  const payload = {
+    name: 'Orm',
+    sub: '1234567890',
+    iat: 1516239022,
+  };
+  const encodedJwt = signJwt(JSON.stringify(payload), 'e2e-key');
   return { headers: { authorization: `Bearer ${encodedJwt}` } };
 }
 
