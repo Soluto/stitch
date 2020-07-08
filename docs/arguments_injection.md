@@ -14,7 +14,7 @@ The argument expression can be dependent on several sources:
 - Field arguments
 - Parent fields
 - Ancestor's fields exported higher in query result tree
-- _? GraphQL query variables ?_
+- GraphQL query variables
 
 ### Syntax
 
@@ -61,3 +61,125 @@ type Query {
 #### Escape Character
 
 Escape characters aren't supported currently. So argument string shouldn't contain `{` and `}` characters when not as part of JS expression boundaries.
+
+### Examples
+
+Here there are some examples to for injection of different sources
+
+#### Static value
+
+```graphql
+# Schema
+type Query {
+  foo: String! @stub(value: "bar")
+}
+
+#Query
+query {
+  foo
+}
+```
+
+> Result: `{ foo: 'bar' }`
+
+#### Argument
+
+```graphql
+# Schema
+type Query {
+  foo(arg1: String): String! @stub(value: "{args.arg1}")
+}
+
+#Query
+query {
+  foo(arg1: "bar")
+}
+```
+
+> Result: `{ foo: 'bar' }`
+
+#### Source
+
+```graphql
+# Schema
+type Query {
+  foo: String! @stub(value: "{source.bar}")
+}
+
+#Query
+query {
+  foo
+}
+```
+
+> rootValue: `{ bar: 'bar' }`
+> Result: `{ foo: 'bar' }`
+
+#### Variable
+
+```graphql
+# Schema
+type Query {
+  foo: String! @stub(value: "{vars.var1}")
+}
+
+#Query
+query($var1: String!) {
+  foo @keepStringVariable(var: $var1)
+}
+```
+
+> variables: `{ var1: 'bar' }`
+> Result: `{ foo: 'bar' }`
+
+#### Export
+
+```graphql
+# Schema
+type Country {
+  name: String!
+  code: String! @export(key: "countryCode")
+  regions: [Regions!]
+}
+
+type Region {
+  name: String!
+  cities: [City!]
+}
+
+type City {
+  name: String!
+  countryCode: String! @stub(value: "{exports.countryCode}")
+}
+
+type Query {
+  country(id: ID!): Country!
+}
+
+#Query
+query {
+  country {
+    code
+    regions {
+      cities {
+        name
+        countryCode
+      }
+    }
+  }
+}
+```
+
+#### JWT
+
+```graphql
+# Schema
+type Query {
+  foo: String! @stub(value: "{jwt.roles}") # foo field will be resolved to roles claim of the request JWT.
+}
+
+#Query
+query {
+  foo
+}
+```
