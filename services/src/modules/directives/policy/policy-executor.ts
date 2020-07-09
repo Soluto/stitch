@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo, graphql } from 'graphql';
 import { RequestContext } from '../../context';
 import { Policy as PolicyDefinition, PolicyArgsObject, PolicyAttachments } from '../../resource-repository';
-import { injectParameters, resolveParameters } from '../../param-injection';
+import { inject } from '../../arguments-injection';
 import { Policy, GraphQLArguments, QueryResults } from './types';
 import { evaluate as evaluateOpa } from './opa';
 
@@ -69,30 +69,20 @@ export class PolicyExecutor {
     const supportedPolicyArgs = this.policyDefinition.args;
     if (!supportedPolicyArgs) return;
 
-    return Object.entries(supportedPolicyArgs).reduce<PolicyArgsObject>(
-      (policyArgs, [policyArgName, policyArgType]) => {
-        if (this.policy?.args?.[policyArgName] === undefined)
-          throw new Error(
-            `Missing arg ${policyArgName} for policy ${this.policy.name} in namespace ${this.policy.namespace}`
-          );
+    return Object.keys(supportedPolicyArgs).reduce<PolicyArgsObject>((policyArgs, policyArgName) => {
+      if (this.policy?.args?.[policyArgName] === undefined)
+        throw new Error(
+          `Missing arg ${policyArgName} for policy ${this.policy.name} in namespace ${this.policy.namespace}`
+        );
 
-        let policyArgValue = this.policy.args[policyArgName];
-        if (typeof policyArgValue === 'string') {
-          if (policyArgType === 'String') {
-            policyArgValue = injectParameters(policyArgValue, this.parent, this.args, this.context, this.info).value;
-          } else {
-            const resolvedArgValue = resolveParameters(policyArgValue, this.parent, this.args, this.context, this.info);
-            if (resolvedArgValue) {
-              policyArgValue = resolvedArgValue[policyArgValue];
-            }
-          }
-        }
+      let policyArgValue = this.policy.args[policyArgName];
+      if (typeof policyArgValue === 'string') {
+        policyArgValue = inject(policyArgValue, this.parent, this.args, this.context, this.info);
+      }
 
-        policyArgs[policyArgName] = policyArgValue;
-        return policyArgs;
-      },
-      {}
-    );
+      policyArgs[policyArgName] = policyArgValue;
+      return policyArgs;
+    }, {});
   }
 
   private getPolicyDefinition(policyDefinitions: PolicyDefinition[], namespace: string, name: string) {
@@ -112,10 +102,8 @@ export class PolicyExecutor {
       query.variables &&
       Object.entries(query.variables).reduce<{ [key: string]: unknown }>((policyArgs, [varName, varValue]) => {
         if (typeof varValue === 'string') {
-          const resolvedValue = resolveParameters(varValue, this.parent, args, this.context, this.info);
-          if (resolvedValue) {
-            varValue = resolvedValue[varValue];
-          }
+          // TODO: Currently only "{args.xxx} can be used for variables so other parameters are useless
+          varValue = inject(varValue, this.parent, args, this.context, this.info);
         }
         policyArgs[varName] = varValue;
         return policyArgs;

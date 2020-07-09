@@ -1,7 +1,7 @@
 import { RESTDataSource } from 'apollo-datasource-rest';
 import { RequestInit, Headers, Request } from 'apollo-server-env';
 import { GraphQLResolveInfo } from 'graphql';
-import { injectParameters, resolveParameters } from '../../param-injection';
+import { inject } from '../../arguments-injection';
 import { RequestContext } from '../../context';
 import { getAuthHeaders } from '../../auth/get-auth-headers';
 import { KeyValue, RestParams } from './types';
@@ -12,7 +12,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
   async doRequest(params: RestParams, parent: unknown, args: GraphQLArguments, info: GraphQLResolveInfo) {
     const headers = this.parseHeaders(params.headers, parent, args, info);
     const requestInit: RequestInit = { headers, timeout: params.timeoutMs ?? 10000, method: params.method };
-    const url = new URL(injectParameters(params.url, parent, args, this.context, info).value);
+    const url = new URL(inject(params.url, parent, args, this.context, info));
     this.addQueryParams(url.searchParams, params.query, parent, args, info);
 
     const authHeaders = await getAuthHeaders(this.context.authenticationConfig, url.host, this.context.request);
@@ -41,13 +41,8 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     }
 
     for (const kv of kvs) {
-      const { value, didFindTemplates, didFindValues } = injectParameters(kv.value, parent, args, this.context, info);
-
-      if (didFindTemplates && didFindValues) {
-        headers.append(kv.key, value);
-      } else if (!didFindTemplates && !didFindValues) {
-        headers.append(kv.key, kv.value);
-      }
+      const value = inject(kv.value, parent, args, this.context, info) as string;
+      headers.append(kv.key, value);
     }
 
     return headers;
@@ -63,24 +58,16 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     if (!kvs || kvs.length == 0) return;
 
     for (const kv of kvs) {
-      const parameters = resolveParameters(kv.value, parent, args, this.context, info);
-      if (!parameters) {
-        params.append(kv.key, kv.value);
+      const value = inject(kv.value, parent, args, this.context, info);
+      if (!value) {
         continue;
       }
-
-      for (const originalValue in parameters) {
-        const paramValue = parameters[originalValue];
-
-        if (typeof paramValue === 'undefined') {
-          continue;
-        } else if (Array.isArray(paramValue)) {
-          for (const elem of paramValue) {
-            params.append(kv.key, elem);
-          }
-        } else {
-          params.append(kv.key, String(paramValue));
+      if (Array.isArray(value)) {
+        for (const elem of value) {
+          params.append(kv.key, elem);
         }
+      } else {
+        params.append(kv.key, String(value));
       }
     }
   }

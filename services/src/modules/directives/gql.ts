@@ -7,7 +7,7 @@ import { RetryLink } from 'apollo-link-retry';
 import { setContext } from 'apollo-link-context';
 import fetch from 'node-fetch';
 import { FastifyRequest } from 'fastify';
-import { deepInjectParameters } from '../param-injection';
+import { deepInject } from '../arguments-injection';
 import { getAuthHeaders } from '../auth/get-auth-headers';
 import { AuthenticationConfig } from '../auth/types';
 import logger from '../logger';
@@ -45,7 +45,7 @@ export class GqlDirective extends SchemaDirectiveVisitor {
         schema: await remoteSchema,
         operation: operationType,
         fieldName,
-        args: deepInjectParameters(gqlArgs, parent, args, context, info),
+        args: deepInject(gqlArgs, parent, args, context, info),
         context,
         info,
       });

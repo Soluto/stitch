@@ -5,7 +5,7 @@ import { AuthenticationConfig } from './types';
 export async function getAuthHeaders(
   authConfig: AuthenticationConfig,
   targetHost: string,
-  originalRequest?: FastifyRequest
+  originalRequest?: Pick<FastifyRequest, 'headers'>
 ) {
   // Try AD auth
   const upstream = authConfig.getUpstreamByHost(targetHost);
