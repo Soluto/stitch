@@ -41,9 +41,3 @@ export function createStitchGateway(config: GatewayConfig) {
     },
   };
 }
-
-declare module './context' {
-  interface RequestContext {
-    request: fastify.FastifyRequest;
-  }
-}

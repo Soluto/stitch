@@ -103,7 +103,7 @@ export class PolicyExecutor {
       Object.entries(query.variables).reduce<{ [key: string]: unknown }>((policyArgs, [varName, varValue]) => {
         if (typeof varValue === 'string') {
           // TODO: Currently only "{args.xxx} can be used for variables so other parameters are useless
-          varValue = inject(varValue as string, this.parent, args, this.context, this.info);
+          varValue = inject(varValue, this.parent, args, this.context, this.info);
         }
         policyArgs[varName] = varValue;
         return policyArgs;

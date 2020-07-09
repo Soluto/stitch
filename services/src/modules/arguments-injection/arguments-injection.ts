@@ -8,7 +8,7 @@ export function inject<T = unknown>(
   template: string,
   source: unknown | undefined,
   args: Record<string, unknown> | undefined,
-  context: RequestContext | undefined,
+  context: Pick<RequestContext, 'jwt' | 'exports'> | undefined,
   info?: GraphQLResolveInfo
 ): T {
   const data = {
