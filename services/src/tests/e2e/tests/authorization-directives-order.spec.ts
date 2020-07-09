@@ -2,6 +2,7 @@ import { GraphQLClient } from 'graphql-request';
 import { createSchemaMutation } from '../../helpers/authz-schema';
 import { Policy, PolicyType, Schema } from '../../../modules/resource-repository/types';
 import { sleep } from '../../helpers/utility';
+import GraphQLErrorSerializer from '../utils/graphql-error-serializer';
 
 const policies: Policy[] = [
   {
@@ -54,6 +55,8 @@ describe('Authorization - Policy directive order', () => {
   beforeAll(() => {
     gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
     registryClient = new GraphQLClient('http://localhost:8090/graphql');
+
+    expect.addSnapshotSerializer(GraphQLErrorSerializer);
   });
 
   test('Setup policies', async () => {
@@ -82,9 +85,7 @@ describe('Authorization - Policy directive order', () => {
     } catch (e) {
       const response = e.response;
       expect(response).toBeDefined();
-      expect(response).toMatchSnapshot({
-        extensions: expect.any(Object),
-      });
+      expect(response).toMatchSnapshot();
     }
   });
 });

@@ -2,6 +2,7 @@ import { GraphQLClient } from 'graphql-request';
 import { createSchemaMutation } from '../../helpers/authz-schema';
 import { Policy, PolicyType, Schema } from '../../../modules/resource-repository/types';
 import { sleep } from '../../helpers/utility';
+import GraphQLErrorSerializer from '../utils/graphql-error-serializer';
 
 const policies: Policy[] = [
   {
@@ -175,6 +176,7 @@ describe('Authorization with queries', () => {
   beforeAll(() => {
     gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
     registryClient = new GraphQLClient('http://localhost:8090/graphql');
+    expect.addSnapshotSerializer(GraphQLErrorSerializer);
   });
 
   test('Setup policies', async () => {
@@ -203,9 +205,7 @@ describe('Authorization with queries', () => {
           }`);
     } catch (e) {
       const response = e.response;
-      expect(response).toMatchSnapshot({
-        extensions: expect.any(Object),
-      });
+      expect(response).toMatchSnapshot();
     }
 
     const response: AllowedEmployeeQueryResponse = await gatewayClient.request(employeeQuery('allowedEmployee'));
@@ -218,9 +218,7 @@ describe('Authorization with queries', () => {
       expect(true).toBeFalsy();
     } catch (e) {
       const response = e.response;
-      expect(response).toMatchSnapshot({
-        extensions: expect.any(Object),
-      });
+      expect(response).toMatchSnapshot();
     }
   });
 
@@ -230,9 +228,7 @@ describe('Authorization with queries', () => {
       expect(true).toBeFalsy();
     } catch (e) {
       const response = e.response;
-      expect(response).toMatchSnapshot({
-        extensions: expect.any(Object),
-      });
+      expect(response).toMatchSnapshot();
     }
   });
 });
