@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Authorization - Policy directive on Object Error for query field with deny policy of object with allowed policy 1`] = `
+[
+  {
+    "message": "Unauthorized by policy alwaysDeny in namespace my_ns",
+    "exception": {
+      "code": "INTERNAL_SERVER_ERROR"
+    }
+  }
+]
+`;
+
+exports[`Authorization - Policy directive on Object Error for query field without policy of object with deny policy 1`] = `
+[
+  {
+    "message": "Unauthorized by policy alwaysDeny in namespace my_ns",
+    "exception": {
+      "code": "INTERNAL_SERVER_ERROR"
+    }
+  }
+]
+`;
+
+exports[`Authorization - Policy directive on Object OK for query field without policy of object with allowed policy 1`] = `
+Object {
+  "foo": Object {
+    "bar": "BAR",
+  },
+}
+`;
