@@ -1,5 +1,10 @@
 import { GraphQLResolveInfo } from 'graphql';
-import { Policy as PolicyDefinition, PolicyArgsObject, PolicyAttachments } from '../../resource-repository/types';
+import {
+  Policy as PolicyDefinition,
+  PolicyArgsObject,
+  PolicyAttachments,
+  ResourceMetadata,
+} from '../../resource-repository/types';
 import { RequestContext } from '../../context';
 
 export type Policy = {
@@ -17,9 +22,7 @@ export type PolicyEvaluationContext = {
   query?: QueryResults;
 };
 
-export type QueryResults = {
-  [name: string]: unknown;
-};
+export type QueryResults = { [name: string]: unknown } | undefined;
 
 export type PolicyEvaluationResult = {
   done: boolean;
@@ -45,4 +48,9 @@ export type PolicyDirectiveExecutionContext = {
   requestContext: RequestContext;
   info: GraphQLResolveInfo;
   policyDefinition: PolicyDefinition;
+};
+
+export type PolicyCacheKey = {
+  metadata: ResourceMetadata;
+  args?: PolicyArgsObject;
 };

@@ -40,7 +40,7 @@ import {
 import { SchemaDirectiveVisitor } from 'graphql-tools';
 import { gql } from 'apollo-server-core';
 import { RequestContext } from '../../context';
-import { PolicyExecutor } from './policy-executor';
+import PolicyExecutor from './policy-executor';
 import { GraphQLArguments, Policy } from './types';
 
 type ResolveFunction = GraphQLFieldResolver<unknown, RequestContext, { [k: string]: unknown }>;

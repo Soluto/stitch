@@ -1,15 +1,17 @@
-import { GraphQLResolveInfo, graphql } from 'graphql';
+import { GraphQLResolveInfo } from 'graphql';
 import { RequestContext } from '../../context';
 import { Policy as PolicyDefinition, PolicyArgsObject } from '../../resource-repository';
-import { inject, injectArgs } from '../../arguments-injection';
-import { Policy, PolicyDirectiveExecutionContext, GraphQLArguments, QueryResults } from './types';
+import { inject } from '../../arguments-injection';
+import { Policy, PolicyDirectiveExecutionContext, GraphQLArguments, PolicyCacheKey } from './types';
 import { evaluate as evaluateOpa } from './opa';
+import { getQueryResult } from './policy-query-helper';
+import CachedOperation from './cached-operation';
 
 const typeEvaluators = {
   opa: evaluateOpa,
 };
 
-export class PolicyExecutor {
+export default class PolicyExecutor extends CachedOperation<PolicyCacheKey, boolean> {
   async evaluatePolicy(
     policy: Policy,
     parent: unknown,
@@ -18,7 +20,7 @@ export class PolicyExecutor {
     info: GraphQLResolveInfo
   ): Promise<boolean> {
     const policyDefinition = this.getPolicyDefinition(requestContext.policies, policy.namespace, policy.name);
-    return this._evaluatePolicy({ policy, parent, gqlArgs, requestContext, info, policyDefinition });
+    return this.getPolicyResult({ policy, parent, gqlArgs, requestContext, info, policyDefinition });
   }
 
   async validatePolicy(
@@ -34,9 +36,16 @@ export class PolicyExecutor {
     }
   }
 
-  private async _evaluatePolicy(ctx: PolicyDirectiveExecutionContext): Promise<boolean> {
+  private async getPolicyResult(ctx: PolicyDirectiveExecutionContext): Promise<boolean> {
     const args = this.preparePolicyArgs(ctx);
-    const query = await this.evaluatePolicyQuery(ctx, args);
+    const cacheKey = { args, metadata: ctx.policyDefinition.metadata };
+    const executionFunction = () => this._evaluatePolicy(ctx, args);
+
+    return this.getOperationResult(cacheKey, executionFunction);
+  }
+
+  private async _evaluatePolicy(ctx: PolicyDirectiveExecutionContext, args: PolicyArgsObject = {}): Promise<boolean> {
+    const query = await getQueryResult(ctx, args);
 
     const evaluate = typeEvaluators[ctx.policyDefinition.type];
     if (!evaluate) throw new Error(`Unsupported policy type ${ctx.policyDefinition.type}`);
@@ -80,36 +89,10 @@ export class PolicyExecutor {
     if (!policyDefinition) throw new Error(`The policy ${name} in namespace ${namespace} was not found`);
     return policyDefinition;
   }
-
-  private async evaluatePolicyQuery(
-    ctx: PolicyDirectiveExecutionContext,
-    args: PolicyArgsObject = {}
-  ): Promise<QueryResults | undefined> {
-    const query = ctx.policyDefinition.query;
-    if (!query) return;
-
-    const variableValues =
-      query.variables &&
-      Object.entries(query.variables).reduce<{ [key: string]: unknown }>((policyArgs, [varName, varValue]) => {
-        if (typeof varValue === 'string') {
-          varValue = injectArgs(varValue, args);
-        }
-        policyArgs[varName] = varValue;
-        return policyArgs;
-      }, {});
-
-    const requestContext: RequestContext = { ...ctx.requestContext, ignorePolicies: true };
-    const gqlResult = await graphql(ctx.info.schema, query.gql, undefined, requestContext, variableValues);
-    return gqlResult.data || undefined;
-  }
 }
 
 declare module '../../context' {
   interface RequestContext {
     policyExecutor: PolicyExecutor;
-    /**
-     * This flag indicates that request should be resolved without invoking authorization policies evaluation
-     */
-    ignorePolicies: boolean;
   }
 }
