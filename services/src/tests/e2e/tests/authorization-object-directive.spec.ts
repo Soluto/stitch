@@ -2,7 +2,7 @@ import { GraphQLClient } from 'graphql-request';
 import { createSchemaMutation } from '../../helpers/authz-schema';
 import { Policy, PolicyType, Schema } from '../../../modules/resource-repository/types';
 import { sleep } from '../../helpers/utility';
-import GraphQLErrorSerializer from '../utils/graphql-error-serializer';
+import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 
 const policies: Policy[] = [
   {

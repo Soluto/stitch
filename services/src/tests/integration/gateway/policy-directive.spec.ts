@@ -8,7 +8,7 @@ import { sdl as policySdl, PolicyDirective } from '../../../modules/directives/p
 import { sdl as stubSdl, StubDirective } from '../../../modules/directives/stub';
 import { sdl as lowerCaseSdl, LowerCaseDirective } from '../utils/lower-case-directive';
 import { baseTypeDef, resolvers as baseResolvers } from '../../../modules/base-schema';
-import GraphQLErrorSerializer from '../../e2e/utils/graphql-error-serializer';
+import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import * as policyExecutor from '../../../modules/directives/policy/policy-executor';
 
 interface TestCase {
