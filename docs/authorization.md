@@ -152,5 +152,5 @@ In the example above, the `roles` argument value is received by using the Argume
 
 **_Important!_** The [order of directives](https://github.com/graphql/graphql-spec/blob/master/spec/Section%202%20--%20Language.md#directives) does matter! The directives are applied in order they appear in schema. Object type directives are applied before field definition directives.
 
-The `@policy` directive (that can be set either on object type or field definition) is implemented so that the policy check will run after all other directive resolvers.
+The `@policy` directive (that can be set either on object type or field definition) is implemented so that the policy requirements are tested before all other directive resolvers, regardless of the order of directives.
 It's recommended to set the `@policy` directive the last one for readability reasons.
