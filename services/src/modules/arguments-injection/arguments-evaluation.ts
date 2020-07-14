@@ -1,17 +1,16 @@
+import { VM } from 'vm2';
+
 const exprStart = /{/g;
 const fullCapture = /^{[^{]+}$/g;
 
-function evaluateArgument<T>(expression: string, data: Record<string, unknown> = {}): T {
-  return new Function(...Object.keys(data), `return ${expression};`)(...Object.values(data));
-}
-
 function evaluate<T>(template: string, data?: Record<string, unknown>): T {
+  const vm = new VM().setGlobals(data);
   if (template.match(fullCapture)) {
-    return evaluateArgument(template.slice(1, -1), data);
+    return vm.run(template.slice(1, -1));
   }
 
   const expression = template.replace(exprStart, '${');
-  return evaluateArgument(`\`${expression}\``, data);
+  return vm.run(`\`${expression}\``);
 }
 
 export default evaluate;
