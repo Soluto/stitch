@@ -1,35 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Authorization with queries Query allowed employee 1`] = `
-Object {
-  "data": null,
-  "errors": Array [
-    Object {
-      "extensions": Object {
-        "code": "INTERNAL_SERVER_ERROR",
-        "exception": Object {
-          "stacktrace": Array [
-            "Error: Unauthorized by policy alwaysDenied in namespace namespace",
-            "    at Function.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:28:19)",
-            "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:14:17)",
-          ],
-        },
-      },
-      "locations": Array [
-        Object {
-          "column": 15,
-          "line": 2,
-        },
-      ],
-      "message": "Unauthorized by policy alwaysDenied in namespace namespace",
-      "path": Array [
-        "classifiedDepartments",
-      ],
-    },
-  ],
-  "extensions": Any<Object>,
-  "status": 200,
-}
+[
+  {
+    "message": "Unauthorized by policy alwaysDenied in namespace namespace",
+    "exception": {
+      "code": "INTERNAL_SERVER_ERROR"
+    }
+  }
+]
 `;
 
 exports[`Authorization with queries Query allowed employee 2`] = `
@@ -41,79 +20,23 @@ Object {
 `;
 
 exports[`Authorization with queries Query denied employee 1 1`] = `
-Object {
-  "data": Object {
-    "deniedEmployee1": Object {
-      "address": null,
-      "id": "2",
-      "name": "Mark Zuckerberg",
-    },
-  },
-  "errors": Array [
-    Object {
-      "extensions": Object {
-        "code": "INTERNAL_SERVER_ERROR",
-        "exception": Object {
-          "stacktrace": Array [
-            "Error: Unauthorized by policy notClassified in namespace namespace",
-            "    at Function.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:28:19)",
-            "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:14:17)",
-          ],
-        },
-      },
-      "locations": Array [
-        Object {
-          "column": 7,
-          "line": 6,
-        },
-      ],
-      "message": "Unauthorized by policy notClassified in namespace namespace",
-      "path": Array [
-        "deniedEmployee1",
-        "address",
-      ],
-    },
-  ],
-  "extensions": Any<Object>,
-  "status": 200,
-}
+[
+  {
+    "message": "Unauthorized by policy notClassified in namespace namespace",
+    "exception": {
+      "code": "INTERNAL_SERVER_ERROR"
+    }
+  }
+]
 `;
 
 exports[`Authorization with queries Query denied employee 2 1`] = `
-Object {
-  "data": Object {
-    "deniedEmployee2": Object {
-      "address": null,
-      "id": "2",
-      "name": "Tom Baker",
-    },
-  },
-  "errors": Array [
-    Object {
-      "extensions": Object {
-        "code": "INTERNAL_SERVER_ERROR",
-        "exception": Object {
-          "stacktrace": Array [
-            "Error: Unauthorized by policy notClassified in namespace namespace",
-            "    at Function.validatePolicy (/service/dist/modules/directives/policy/policy-executor.js:28:19)",
-            "    at async field.resolve (/service/dist/modules/directives/policy/policy.js:14:17)",
-          ],
-        },
-      },
-      "locations": Array [
-        Object {
-          "column": 7,
-          "line": 6,
-        },
-      ],
-      "message": "Unauthorized by policy notClassified in namespace namespace",
-      "path": Array [
-        "deniedEmployee2",
-        "address",
-      ],
-    },
-  ],
-  "extensions": Any<Object>,
-  "status": 200,
-}
+[
+  {
+    "message": "Unauthorized by policy notClassified in namespace namespace",
+    "exception": {
+      "code": "INTERNAL_SERVER_ERROR"
+    }
+  }
+]
 `;

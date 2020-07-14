@@ -35,6 +35,7 @@ interface FederatedSchemaBase {
   schemaDirectivesContext: Record<string, unknown>;
 }
 
+type DirectivesUsagesByObjectName = Record<string, DirectiveNode[]>;
 type DirectivesUsagesByObjectAndFieldNames = Record<string, Record<string, DirectiveNode[]>>;
 
 export function buildSchemaFromFederatedTypeDefs({
@@ -49,10 +50,13 @@ export function buildSchemaFromFederatedTypeDefs({
 
   // Remove non-federation directives from SDL, save them aside
   const serviceDefinitions = Object.entries(typeDefs).map(([name, originalTypeDef]) => {
-    const { directivesUsages, typeDef } = collectAndRemoveCustomDirectives(originalTypeDef);
+    const { objectTypeDirectivesUsages, fieldDefinitionDirectivesUsages, typeDef } = collectAndRemoveCustomDirectives(
+      originalTypeDef
+    );
 
     return {
-      directivesUsages,
+      objectTypeDirectivesUsages,
+      fieldDefinitionDirectivesUsages,
       typeDefs: concatAST([baseTypeDefs, typeDef]),
       name,
       url: `https://stitch/${name}`,
@@ -69,8 +73,17 @@ export function buildSchemaFromFederatedTypeDefs({
 
   // Add directives back to the SDL
   const fullTypeDefWithoutDirectives = parse(printSchema(compositionResult.schema));
-  const allDirectivesUsages = mergeDirectivesUsages(serviceDefinitions.map(sd => sd.directivesUsages));
-  const fullTypeDefWithDirectives = addDirectivesToTypedefs(allDirectivesUsages, fullTypeDefWithoutDirectives);
+  const objectTypeDirectives = mergeObjectTypeDirectivesUsages(
+    serviceDefinitions.map(sd => sd.objectTypeDirectivesUsages)
+  );
+  const fieldDefinitionDirectivesUsages = mergeFieldDefinitionDirectivesUsages(
+    serviceDefinitions.map(sd => sd.fieldDefinitionDirectivesUsages)
+  );
+  const fullTypeDefWithDirectives = addDirectivesToTypeDefs(
+    objectTypeDirectives,
+    fieldDefinitionDirectivesUsages,
+    fullTypeDefWithoutDirectives
+  );
 
   // Create final schema, re-adding directive definitions and directive implementations
   const schema = makeExecutableSchema({
@@ -83,22 +96,38 @@ export function buildSchemaFromFederatedTypeDefs({
   return schema;
 }
 
-function addDirectivesToTypedefs(directives: DirectivesUsagesByObjectAndFieldNames, typeDef: DocumentNode) {
+function addDirectivesToTypeDefs(
+  objectTypeDirectives: DirectivesUsagesByObjectName,
+  fieldDefinitionDirectives: DirectivesUsagesByObjectAndFieldNames,
+  typeDef: DocumentNode
+) {
   return visit(typeDef, {
+    ObjectTypeDefinition(node) {
+      const objectDirectives = objectTypeDirectives[node.name.value];
+
+      if (!objectDirectives || objectDirectives.length === 0) {
+        return;
+      }
+
+      const existingDirectives = node.directives ?? [];
+      return { ...node, directives: [...existingDirectives, ...objectDirectives] };
+    },
+
     FieldDefinition(node, _key, _parent, _path, ancestors) {
       const objectNode = ancestors[ancestors.length - 1] as ASTNode;
       if (!isObjectOrInterfaceOrExtensionOfThose(objectNode)) {
         throw new Error(`Expected {Object,Interface}Type{Definition,Extension}Node, found ${objectNode.kind}`);
       }
 
-      const fieldDirectives = directives[objectNode.name.value] && directives[objectNode.name.value][node.name.value];
+      const fieldDirectives =
+        fieldDefinitionDirectives[objectNode.name.value] &&
+        fieldDefinitionDirectives[objectNode.name.value][node.name.value];
 
       if (!fieldDirectives || fieldDirectives.length === 0) {
         return;
       }
 
       const existingDirectives = node.directives ?? [];
-
       return { ...node, directives: [...existingDirectives, ...fieldDirectives] };
     },
   });
@@ -108,7 +137,8 @@ function addDirectivesToTypedefs(directives: DirectivesUsagesByObjectAndFieldNam
 const federationDirectives = ['key', 'extends', 'external', 'requires', 'provides'];
 
 export function collectAndRemoveCustomDirectives(typeDef: DocumentNode) {
-  const directivesUsages: DirectivesUsagesByObjectAndFieldNames = {};
+  const objectTypeDirectivesUsages: DirectivesUsagesByObjectName = {};
+  const fieldDefinitionDirectivesUsages: DirectivesUsagesByObjectAndFieldNames = {};
 
   const typeDefWithoutDirectives = visit(typeDef, {
     Directive(node, _key, _parent, _path, ancestors) {
@@ -116,35 +146,45 @@ export function collectAndRemoveCustomDirectives(typeDef: DocumentNode) {
         return;
       }
 
-      const objectNode = ancestors[ancestors.length - 3] as ASTNode;
-      if (!isObjectOrInterfaceOrExtensionOfThose(objectNode)) {
-        throw new Error(`Expected {Object,Interface}Type{Definition,Extension}Node, found ${objectNode.kind}`);
+      let objectNode = ancestors[ancestors.length - 1] as ASTNode;
+      if (isObjectOrInterfaceOrExtensionOfThose(objectNode)) {
+        const objectName = objectNode.name.value;
+
+        if (!(objectName in objectTypeDirectivesUsages)) {
+          objectTypeDirectivesUsages[objectName] = [];
+        }
+        objectTypeDirectivesUsages[objectName].push(node);
+
+        return null;
       }
 
-      const fieldNode = ancestors[ancestors.length - 1] as ASTNode;
-      if (!isFieldDefinitionNode(fieldNode)) {
-        throw new Error(`Expected FieldDefinitionNode, found ${fieldNode.kind}`);
+      objectNode = ancestors[ancestors.length - 3] as ASTNode;
+      if (isObjectOrInterfaceOrExtensionOfThose(objectNode)) {
+        const fieldNode = ancestors[ancestors.length - 1] as ASTNode;
+        if (!isFieldDefinitionNode(fieldNode)) {
+          throw new Error(`Expected FieldDefinitionNode, found ${fieldNode.kind}`);
+        }
+
+        const objectName = objectNode.name.value;
+        const fieldName = fieldNode.name.value;
+
+        if (!(objectName in fieldDefinitionDirectivesUsages)) {
+          fieldDefinitionDirectivesUsages[objectName] = {};
+        }
+
+        if (!(fieldName in fieldDefinitionDirectivesUsages[objectName])) {
+          fieldDefinitionDirectivesUsages[objectName][fieldName] = [];
+        }
+
+        fieldDefinitionDirectivesUsages[objectName][fieldName].push(node);
+
+        return null;
       }
-
-      const objectName = objectNode.name.value;
-      const fieldName = fieldNode.name.value;
-
-      if (!(objectName in directivesUsages)) {
-        directivesUsages[objectName] = {};
-      }
-
-      if (!(fieldName in directivesUsages[objectName])) {
-        directivesUsages[objectName][fieldName] = [];
-      }
-
-      directivesUsages[objectName][fieldName].push(node);
-
-      // eslint-disable-next-line unicorn/no-null
-      return null;
+      throw new Error(`Expected {Object,Interface}Type{Definition,Extension}Node, found ${objectNode.kind}`);
     },
   }) as DocumentNode;
 
-  return { directivesUsages, typeDef: typeDefWithoutDirectives };
+  return { objectTypeDirectivesUsages, fieldDefinitionDirectivesUsages, typeDef: typeDefWithoutDirectives };
 }
 
 function isFieldDefinitionNode(node: ASTNode): node is FieldDefinitionNode {
@@ -166,7 +206,25 @@ function isObjectOrInterfaceOrExtensionOfThose(node: ASTNode): node is ObjectOrI
   );
 }
 
-function mergeDirectivesUsages(dus: DirectivesUsagesByObjectAndFieldNames[]) {
+function mergeObjectTypeDirectivesUsages(dus: DirectivesUsagesByObjectName[]) {
+  const result: DirectivesUsagesByObjectName = {};
+
+  for (const du of dus) {
+    for (const objectName in du) {
+      const usages = du[objectName];
+
+      if (!(objectName in result)) {
+        result[objectName] = [];
+      }
+
+      result[objectName].push(...usages);
+    }
+  }
+
+  return result;
+}
+
+function mergeFieldDefinitionDirectivesUsages(dus: DirectivesUsagesByObjectAndFieldNames[]) {
   const result: DirectivesUsagesByObjectAndFieldNames = {};
 
   for (const du of dus) {

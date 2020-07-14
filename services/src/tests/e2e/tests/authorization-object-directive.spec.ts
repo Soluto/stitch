@@ -7,6 +7,16 @@ import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 const policies: Policy[] = [
   {
     metadata: {
+      name: 'alwaysAllow',
+      namespace: 'my_ns',
+    },
+    type: PolicyType.opa,
+    code: `
+      default allow = true
+    `,
+  },
+  {
+    metadata: {
       name: 'alwaysDeny',
       namespace: 'my_ns',
     },
@@ -23,8 +33,18 @@ const schema: Schema = {
     namespace: 'my_ns',
   },
   schema: `
+    type Foo @policy(namespace: "my_ns", name: "alwaysAllow") {
+      bar: String! @stub(value: "BAR")
+      baz: String! @stub(value: "BAZ") @policy(namespace: "my_ns", name: "alwaysDeny")
+    }
+
+    type Foo2 @policy(namespace: "my_ns", name: "alwaysDeny") {
+      bar2: String! @stub(value: "BAR")
+    }
+
     type Query {
-      foo: String! @stub(value: "bar") @policy(namespace: "my_ns", name: "alwaysDeny")
+      foo: Foo! @stub(value: {})
+      foo2: Foo2! @stub(value: {})
     }
   `,
 };
@@ -48,7 +68,7 @@ interface UpdateSchemasMutationResponse {
   };
 }
 
-describe('Authorization - Policy directive order', () => {
+describe('Authorization - Policy directive on Object', () => {
   let gatewayClient: GraphQLClient;
   let registryClient: GraphQLClient;
 
@@ -74,11 +94,41 @@ describe('Authorization - Policy directive order', () => {
     await sleep(500);
   });
 
-  test('Query should return error', async () => {
+  test('OK for query field without policy of object with allowed policy', async () => {
+    const response = await gatewayClient.request(`
+        query {
+          foo {
+            bar
+          }
+        }
+      `);
+    expect(response).toMatchSnapshot();
+  });
+
+  test('Error for query field with deny policy of object with allowed policy', async () => {
     try {
       await gatewayClient.request(`
         query {
-          foo
+          foo {
+            baz
+          }
+        }
+      `);
+      expect(false).toBeTruthy();
+    } catch (e) {
+      const response = e.response;
+      expect(response).toBeDefined();
+      expect(response).toMatchSnapshot();
+    }
+  });
+
+  test('Error for query field without policy of object with deny policy', async () => {
+    try {
+      await gatewayClient.request(`
+        query {
+          foo2 {
+            bar2
+          }
         }
       `);
       expect(false).toBeTruthy();
