@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Authorization with queries Query allowed employee 1`] = `
+{
+  "errors": [
+    {
+      "message": "Unauthorized by policy alwaysDenied in namespace namespace",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {}
+}
+`;
+
+exports[`Authorization with queries Query allowed employee 2`] = `
+Object {
+  "address": "Tel Aviv",
+  "id": "1",
+  "name": "John Smith",
+}
+`;
+
+exports[`Authorization with queries Query denied employee 1 1`] = `
+{
+  "errors": [
+    {
+      "message": "Unauthorized by policy notClassified in namespace namespace",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "deniedEmployee1": {
+      "id": "2",
+      "name": "Mark Zuckerberg",
+      "address": null
+    }
+  }
+}
+`;
+
+exports[`Authorization with queries Query denied employee 2 1`] = `
+{
+  "errors": [
+    {
+      "message": "Unauthorized by policy notClassified in namespace namespace",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "deniedEmployee2": {
+      "id": "2",
+      "name": "Tom Baker",
+      "address": null
+    }
+  }
+}
+`;

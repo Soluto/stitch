@@ -1,29 +1,23 @@
 import { GraphQLClient } from 'graphql-request';
 import { sign as signJwt } from 'jsonwebtoken';
-import { sleep } from '../../helpers/utility';
-import {
-  getSchema,
-  getUserQuery,
-  createSchemaMutation,
-  createPolicyMutation,
-  onlyAdminPolicy,
-  jwtNamePolicy,
-  getArbitraryDataQuery,
-} from '../../helpers/authz-schema';
+import { sleep } from '../../../helpers/utility';
+import { createSchemaMutation, createPolicyMutation } from '../../../helpers/registry-request-builder';
+import GraphQLErrorSerializer from '../../../utils/graphql-error-serializer';
+import { schema, policies, getUserQuery, arbitraryDataQuery } from './auth-jwt.schema';
 
 const gatewayClient = createGatewayClient();
 const registryClient = createRegistryClient();
 
 describe('authorization', () => {
+  beforeAll(() => {
+    expect.addSnapshotSerializer(GraphQLErrorSerializer);
+  });
   // This is kind of both the "before" section and a test, but it was weird putting a test in an actual before section
   it('creates the policy and schema resources', async () => {
-    const policy1Response: any = await registryClient.request(createPolicyMutation, { policy: onlyAdminPolicy() });
-    expect(policy1Response.updatePolicies.success).toBe(true);
+    const policiesResponse: any = await registryClient.request(createPolicyMutation, { policies });
+    expect(policiesResponse.updatePolicies.success).toBe(true);
 
-    const policy2Response: any = await registryClient.request(createPolicyMutation, { policy: jwtNamePolicy() });
-    expect(policy2Response.updatePolicies.success).toBe(true);
-
-    const schemaResponse: any = await registryClient.request(createSchemaMutation, { schema: getSchema() });
+    const schemaResponse: any = await registryClient.request(createSchemaMutation, { schema });
     expect(schemaResponse.updateSchemas.success).toBe(true);
 
     // Wait for gateway to update before next tests
@@ -42,46 +36,34 @@ describe('authorization', () => {
     } catch (err) {
       response = err.response;
     }
-
-    expect(response.errors).toHaveLength(1);
-    expect(response.errors[0].message).toBe('Unauthorized by policy onlyAdmin in namespace ns');
-    expect(response.errors[0].path).toEqual(['user', 'lastName']);
-    expect(response.data.user).toEqual({ firstName: 'John', lastName: null, role: 'normal' });
+    expect(response).toMatchSnapshot();
   });
 
   it('rejects access to a field based on JWT info when no JWT is sent', async () => {
     let response;
     try {
-      await gatewayClient.request(getArbitraryDataQuery());
+      await gatewayClient.request(arbitraryDataQuery);
     } catch (err) {
       response = err.response;
     }
-
-    expect(response.errors).toHaveLength(1);
-    expect(response.errors[0].message).toBe('Unauthorized by policy jwtName in namespace ns');
-    expect(response.errors[0].path).toEqual(['arbitraryData', 'arbitraryField']);
-    expect(response.data.arbitraryData).toEqual({ arbitraryField: null });
+    expect(response).toMatchSnapshot();
   });
 
   it('rejects access to a field based on JWT info', async () => {
     const gatewayClientJwt = createGatewayClient(disallowedJwtOptions());
     let response;
     try {
-      await gatewayClientJwt.request(getArbitraryDataQuery());
+      await gatewayClientJwt.request(arbitraryDataQuery);
     } catch (err) {
       response = err.response;
     }
-
-    expect(response.errors).toHaveLength(1);
-    expect(response.errors[0].message).toBe('Unauthorized by policy jwtName in namespace ns');
-    expect(response.errors[0].path).toEqual(['arbitraryData', 'arbitraryField']);
-    expect(response.data.arbitraryData).toEqual({ arbitraryField: null });
+    expect(response).toMatchSnapshot();
   });
 
   it('allows access to a field based on JWT info', async () => {
     const gatewayClientJwt = createGatewayClient(allowedJwtOptions());
-    const response: any = await gatewayClientJwt.request(getArbitraryDataQuery());
-    expect(response.arbitraryData).toEqual({ arbitraryField: 'arbitraryValue' });
+    const response: any = await gatewayClientJwt.request(arbitraryDataQuery);
+    expect(response).toMatchSnapshot();
   });
 });
 
