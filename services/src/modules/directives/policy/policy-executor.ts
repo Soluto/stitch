@@ -1,7 +1,7 @@
 import { GraphQLResolveInfo, graphql } from 'graphql';
 import { RequestContext } from '../../context';
 import { Policy as PolicyDefinition, PolicyArgsObject, PolicyAttachments } from '../../resource-repository';
-import { inject } from '../../arguments-injection';
+import { inject, injectArgs } from '../../arguments-injection';
 import { Policy, GraphQLArguments, QueryResults } from './types';
 import { evaluate as evaluateOpa } from './opa';
 
@@ -102,8 +102,7 @@ export class PolicyExecutor {
       query.variables &&
       Object.entries(query.variables).reduce<{ [key: string]: unknown }>((policyArgs, [varName, varValue]) => {
         if (typeof varValue === 'string') {
-          // TODO: Currently only "{args.xxx} can be used for variables so other parameters are useless
-          varValue = inject(varValue, this.parent, args, this.context, this.info);
+          varValue = injectArgs(varValue, args);
         }
         policyArgs[varName] = varValue;
         return policyArgs;

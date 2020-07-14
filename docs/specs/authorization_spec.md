@@ -91,7 +91,7 @@ Spec:
         }
       }
     variables:
-      sub: '{args.sub}'
+      sub: '{sub}'
 ```
 
 Queries support the standard Stitch parameter injection syntax, but only support the `jwt` and `args` objects for injection
@@ -142,7 +142,7 @@ Spec:
             }
           }
       variables:
-        userId: '{args.userId}'
+        userId: '{userId}'
 ```
 
 `args` for query policy can use parameter injection from the `jwt` and `args` objects, similarly to the graphql query

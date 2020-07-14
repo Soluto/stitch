@@ -8,13 +8,13 @@ Policy is Stitch a resource like schema. It can be created, altered or removed b
 
 The policy object has the following properties:
 
-| property | description                                                                                                                                                                                                                 | mandatory |
-| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| metadata | Contains two fields name and namespace.</br> Namespace is a logical group of policies.</br> Namespace and name pair is the policy's unique identifier                                                                       | true      |
-| type     | Policy type.</br> Currently only [OPA](https://www.openpolicyagent.org) policies are supported                                                                                                                              | true      |
-| code     | Policy body, with syntax based on the chosen Policy type.</br>For OPA, [Rego](https://www.openpolicyagent.org/docs/latest/policy-language) language is supported.</br>                                                      | true      |
-| args     | Argument definitions.</br> These arguments are available in the policy code and query.</br> They support the Stitch [Parameter Injection](https://github.com/Soluto/stitch/blob/master/docs/arguments_injection.md) syntax. | false     |
-| query    | Graphql query to provide additional data to policy.</br> The results are available in the policy code.                                                                                                                      | false     |
+| property | description                                                                                                                                                                                                                                                                             | mandatory |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| metadata | Contains two fields name and namespace.</br> Namespace is a logical group of policies.</br> Namespace and name pair is the policy's unique identifier                                                                                                                                   | true      |
+| type     | Policy type.</br> Currently only [OPA](https://www.openpolicyagent.org) policies are supported                                                                                                                                                                                          | true      |
+| code     | Policy body, with syntax based on the chosen Policy type.</br>For OPA, [Rego](https://www.openpolicyagent.org/docs/latest/policy-language) language is supported.</br>                                                                                                                  | true      |
+| args     | Argument definitions.</br> These arguments are available in the policy code and query.</br> They support the Stitch [Parameter Injection](https://github.com/Soluto/stitch/blob/master/docs/arguments_injection.md) syntax.                                                             | false     |
+| query    | Graphql query to provide additional data to policy.</br> The results are available in the policy code.</br> `query` has two properties: `gql` that defines the graphql query and `variables` for the query. `variables` can be the constant values or expressions using policy `args` . | false     |
 
 ### Examples
 
@@ -71,13 +71,13 @@ query:
       }
     }
   variables:
-    id: '{args.userId}'
+    id: '{userId}'
 ```
 
 - **_query_**: Graphql query definition. It has 2 properties:
 
   - `gql`: the [query](https://graphql.org/learn/queries) itself.
-  - `variables`: [variables](https://graphql.org/learn/queries/#variables) that are injected to the Graphql request. The values of variables can be either hardcoded or derived from `args`. In the last case the syntax is `"{args.userId}"` (See example above)
+  - `variables`: [variables](https://graphql.org/learn/queries/#variables) that are injected to the Graphql request. The values of variables can be either hardcoded or derived from policy `args` property. In the last case the syntax is `"{userId}"` (See example above)
 
 ---
 
@@ -124,7 +124,7 @@ query:
       }
     }
   variables:
-    id: '{args.userId}'
+    id: '{userId}'
 ```
 
 ---
@@ -150,4 +150,7 @@ In the example above, the `roles` argument value is received by using the Argume
 
 ## Directives order
 
-**_Important!_** The [order of directives](https://github.com/graphql/graphql-spec/blob/master/spec/Section%202%20--%20Language.md#directives) does matter! In the most cases the `@policy` directive should be **the last** directive attached to the field definition.
+**_Important!_** The [order of directives](https://github.com/graphql/graphql-spec/blob/master/spec/Section%202%20--%20Language.md#directives) does matter! The directives are applied in order they appear in schema. Object type directives are applied before field definition directives.
+
+The `@policy` directive (that can be set either on object type or field definition) is implemented so that the policy requirements are tested before all other directive resolvers, regardless of the order of directives.
+It's recommended to set the `@policy` directive the last one for readability reasons.
