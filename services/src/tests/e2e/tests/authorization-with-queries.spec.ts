@@ -61,7 +61,7 @@ const policies: Policy[] = [
         }
       `,
       variables: {
-        hireDate: '{args.hireDate}',
+        hireDate: '{hireDate}',
       },
     },
   },
