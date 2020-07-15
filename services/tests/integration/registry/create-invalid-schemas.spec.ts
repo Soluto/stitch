@@ -3,7 +3,7 @@ import { gql } from 'apollo-server-core';
 import * as nock from 'nock';
 import { print } from 'graphql';
 import { beforeEachDispose } from '../before-each-dispose';
-import { app } from '../../../registry';
+import { app } from '../../../src/registry';
 import { mockResourceBucket } from '../resource-bucket';
 
 const badSdlSchema = {

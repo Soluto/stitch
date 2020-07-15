@@ -5,10 +5,10 @@ module.exports = {
       preset: 'ts-jest',
       rootDir: '.',
       testTimeout: 60000,
-      testEnvironment: '<rootDir>/src/tests/e2e/jest-e2e-environment.js',
-      testMatch: ['<rootDir>/src/tests/e2e/**/*.spec.ts'],
+      testEnvironment: '<rootDir>/tests/e2e/jest-e2e-environment.js',
+      testMatch: ['<rootDir>/tests/e2e/**/*.spec.ts'],
       testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/'],
-      runner: '<rootDir>/src/tests/e2e/jest-e2e-runner.js',
+      runner: '<rootDir>/tests/e2e/jest-e2e-runner.js',
     },
   ],
 };

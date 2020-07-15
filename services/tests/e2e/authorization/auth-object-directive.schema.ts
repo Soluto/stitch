@@ -1,6 +1,6 @@
 import { print } from 'graphql';
 import { gql } from 'apollo-server-core';
-import { Policy, PolicyType, Schema } from '../../../modules/resource-repository/types';
+import { Policy, PolicyType, Schema } from '../../../src/modules/resource-repository/types';
 
 export const policies: Policy[] = [
   {

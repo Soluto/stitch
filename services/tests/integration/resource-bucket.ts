@@ -1,6 +1,6 @@
 import * as nock from 'nock';
 import * as xml2js from 'xml2js';
-import { ResourceGroup } from '../../modules/resource-repository';
+import { ResourceGroup } from '../../src/modules/resource-repository';
 
 export function mockResourceBucket(initialValue: ResourceGroup, initialPolicyFiles: MockPolicyFiles = {}) {
   const s3endpoint = process.env.S3_ENDPOINT;

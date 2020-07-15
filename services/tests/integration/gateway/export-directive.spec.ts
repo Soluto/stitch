@@ -3,9 +3,9 @@ import * as Rx from 'rxjs';
 import { gql } from 'apollo-server-core';
 import { print } from 'graphql';
 import * as nock from 'nock';
-import { createStitchGateway } from '../../../modules/gateway';
+import { createStitchGateway } from '../../../src/modules/gateway';
 import { beforeEachDispose } from '../before-each-dispose';
-import { Schema, ResourceGroup } from '../../../modules/resource-repository';
+import { Schema, ResourceGroup } from '../../../src/modules/resource-repository';
 
 const organizations = [
   {
