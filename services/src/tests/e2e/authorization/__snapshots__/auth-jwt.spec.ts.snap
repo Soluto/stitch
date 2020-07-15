@@ -1,0 +1,65 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`authorization allows access to a field based on JWT info 1`] = `
+Object {
+  "arbitraryData": Object {
+    "arbitraryField": "arbitraryValue",
+  },
+}
+`;
+
+exports[`authorization rejects access to a field based on JWT info 1`] = `
+{
+  "errors": [
+    {
+      "message": "Unauthorized by policy jwtName in namespace ns",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "arbitraryData": {
+      "arbitraryField": null
+    }
+  }
+}
+`;
+
+exports[`authorization rejects access to a field based on JWT info when no JWT is sent 1`] = `
+{
+  "errors": [
+    {
+      "message": "Unauthorized by policy jwtName in namespace ns",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "arbitraryData": {
+      "arbitraryField": null
+    }
+  }
+}
+`;
+
+exports[`authorization rejects access to a field when policy test fails, but still returns the other fields 1`] = `
+{
+  "errors": [
+    {
+      "message": "Unauthorized by policy onlyAdmin in namespace ns",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "user": {
+      "firstName": "John",
+      "lastName": null,
+      "role": "normal"
+    }
+  }
+}
+`;

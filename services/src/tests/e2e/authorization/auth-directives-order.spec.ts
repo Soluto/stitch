@@ -1,52 +1,15 @@
+import { print } from 'graphql';
 import { GraphQLClient } from 'graphql-request';
-import { createSchemaMutation } from '../../helpers/authz-schema';
-import { Policy, PolicyType, Schema } from '../../../modules/resource-repository/types';
+import { gql } from 'apollo-server-core';
+import {
+  createSchemaMutation,
+  CreatePolicyMutationResponse,
+  createPolicyMutation,
+  UpdateSchemasMutationResponse,
+} from '../../helpers/registry-request-builder';
 import { sleep } from '../../helpers/utility';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
-
-const policies: Policy[] = [
-  {
-    metadata: {
-      name: 'alwaysDeny',
-      namespace: 'my_ns',
-    },
-    type: PolicyType.opa,
-    code: `
-      default allow = false
-    `,
-  },
-];
-
-const schema: Schema = {
-  metadata: {
-    name: 'Schema',
-    namespace: 'my_ns',
-  },
-  schema: `
-    type Query {
-      foo: String! @stub(value: "bar") @policy(namespace: "my_ns", name: "alwaysDeny")
-    }
-  `,
-};
-
-const createPolicyMutation = `
-  mutation CreatePolicy($policies: [PolicyInput!]!) {
-    updatePolicies(input: $policies) {
-      success
-    }
-  }`;
-
-interface CreatePolicyMutationResponse {
-  updatePolicies: {
-    success: boolean;
-  };
-}
-
-interface UpdateSchemasMutationResponse {
-  updateSchemas: {
-    success: boolean;
-  };
-}
+import { schema, policies } from './auth-directives-order.schema';
 
 describe('Authorization - Policy directive order', () => {
   let gatewayClient: GraphQLClient;
@@ -75,17 +38,18 @@ describe('Authorization - Policy directive order', () => {
   });
 
   test('Query should return error', async () => {
+    let response;
     try {
-      await gatewayClient.request(`
-        query {
-          foo
-        }
-      `);
-      expect(false).toBeTruthy();
+      response = await gatewayClient.request(
+        print(gql`
+          query {
+            foo
+          }
+        `)
+      );
     } catch (e) {
-      const response = e.response;
-      expect(response).toBeDefined();
-      expect(response).toMatchSnapshot();
+      response = e.response;
     }
+    expect(response).toMatchSnapshot();
   });
 });
