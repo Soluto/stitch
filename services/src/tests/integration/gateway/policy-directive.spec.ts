@@ -1,15 +1,21 @@
 import { ApolloServerTestClient, createTestClient } from 'apollo-server-testing';
 import { ApolloServerBase, gql } from 'apollo-server-core';
 import { ApolloServer, IResolvers } from 'apollo-server-fastify';
+import { when } from 'jest-when';
 import { concatAST, DocumentNode } from 'graphql';
-import { ImportMock } from 'ts-mock-imports';
-import { SinonStub } from 'sinon';
 import { sdl as policySdl, PolicyDirective } from '../../../modules/directives/policy/policy';
 import { sdl as stubSdl, StubDirective } from '../../../modules/directives/stub';
 import { sdl as lowerCaseSdl, LowerCaseDirective } from '../utils/lower-case-directive';
 import { baseTypeDef, resolvers as baseResolvers } from '../../../modules/base-schema';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
-import * as policyExecutor from '../../../modules/directives/policy/policy-executor';
+
+const mockValidatePolicy = jest.fn();
+// eslint-disable-next-line unicorn/no-useless-undefined
+when(mockValidatePolicy).calledWith({ namespace: 'ns', name: 'alwaysAllow' }).mockResolvedValue(undefined);
+when(mockValidatePolicy).calledWith({ namespace: 'ns', name: 'alwaysDeny' }).mockRejectedValue(new Error('Error'));
+jest.mock('../../../modules/directives/policy/policy-executor', () => ({
+  default: jest.fn().mockImplementation(() => ({ validatePolicy: mockValidatePolicy })),
+}));
 
 interface TestCase {
   typeDefs: DocumentNode;
@@ -327,13 +333,7 @@ describe.each(testCases)('Policy Directive Tests', (testName, { typeDefs, resolv
     }
   `;
 
-  let policyExecutorStub: SinonStub;
-
   beforeAll(() => {
-    policyExecutorStub = ImportMock.mockFunction(policyExecutor.PolicyExecutor, 'validatePolicy');
-    policyExecutorStub.withArgs({ namespace: 'ns', name: 'alwaysAllow' }).resolves();
-    policyExecutorStub.withArgs({ namespace: 'ns', name: 'alwaysDeny' }).rejects();
-
     server = new ApolloServer({
       typeDefs: concatAST([baseTypeDef, typeDefs, stubSdl, policySdl, lowerCaseSdl]),
       resolvers: [resolvers ?? {}, baseResolvers],
@@ -346,10 +346,6 @@ describe.each(testCases)('Policy Directive Tests', (testName, { typeDefs, resolv
     client = createTestClient(server);
 
     expect.addSnapshotSerializer(GraphQLErrorSerializer);
-  });
-
-  afterAll(() => {
-    ImportMock.restore();
   });
 
   test(testName, async () => {

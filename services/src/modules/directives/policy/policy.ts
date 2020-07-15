@@ -40,7 +40,7 @@ import {
 import { SchemaDirectiveVisitor } from 'graphql-tools';
 import { gql } from 'apollo-server-core';
 import { RequestContext } from '../../context';
-import { PolicyExecutor } from './policy-executor';
+import PolicyExecutor from './policy-executor';
 import { GraphQLArguments, Policy } from './types';
 
 type ResolveFunction = GraphQLFieldResolver<unknown, RequestContext, { [k: string]: unknown }>;
@@ -58,8 +58,10 @@ const createProxyHandler = (policy: Policy): ProxyHandler<ResolveFunction> => ({
     const context: RequestContext = argumentsList[2] as RequestContext;
     const info: GraphQLResolveInfo = argumentsList[3] as GraphQLResolveInfo;
 
+    if (!context.policyExecutor) context.policyExecutor = new PolicyExecutor();
+
     if (!context.ignorePolicies) {
-      await PolicyExecutor.validatePolicy(policy, parent, args, context, info);
+      await context.policyExecutor.validatePolicy(policy, parent, args, context, info);
     }
 
     return target(parent, args, context, info);
