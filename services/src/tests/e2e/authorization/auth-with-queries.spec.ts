@@ -6,19 +6,18 @@ import {
   CreatePolicyMutationResponse,
   createPolicyMutation,
   UpdateSchemasMutationResponse,
-} from '../../../helpers/registry-request-builder';
-import { sleep } from '../../../helpers/utility';
-import GraphQLErrorSerializer from '../../../utils/graphql-error-serializer';
-import { policies, schema } from './auth-object-directive.schema';
+} from '../../helpers/registry-request-builder';
+import { sleep } from '../../helpers/utility';
+import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
+import { schema, policies, AllowedEmployeeQueryResponse, employeeQuery } from './auth-with-queries.schema';
 
-describe('Authorization - Policy directive on Object', () => {
+describe('Authorization with queries', () => {
   let gatewayClient: GraphQLClient;
   let registryClient: GraphQLClient;
 
   beforeAll(() => {
     gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
     registryClient = new GraphQLClient('http://localhost:8090/graphql');
-
     expect.addSnapshotSerializer(GraphQLErrorSerializer);
   });
 
@@ -37,49 +36,41 @@ describe('Authorization - Policy directive on Object', () => {
     await sleep(500);
   });
 
-  test('OK for query field without policy of object with allowed policy', async () => {
-    const response = await gatewayClient.request(
-      print(gql`
-        query {
-          foo {
-            bar
-          }
-        }
-      `)
-    );
-    expect(response).toMatchSnapshot();
-  });
-
-  test('Error for query field with deny policy of object with allowed policy', async () => {
-    let response;
+  test('Query allowed employee', async () => {
     try {
-      response = await gatewayClient.request(
+      await gatewayClient.request(
         print(gql`
           query {
-            foo {
-              baz
+            classifiedDepartments {
+              id
+              name
             }
           }
         `)
       );
+    } catch (e) {
+      const response = e.response;
+      expect(response).toMatchSnapshot();
+    }
+
+    const response: AllowedEmployeeQueryResponse = await gatewayClient.request(employeeQuery('allowedEmployee'));
+    expect(response.allowedEmployee).toMatchSnapshot();
+  });
+
+  test('Query denied employee 1', async () => {
+    let response;
+    try {
+      response = await gatewayClient.request(employeeQuery('deniedEmployee1'));
     } catch (e) {
       response = e.response;
     }
     expect(response).toMatchSnapshot();
   });
 
-  test('Error for query field without policy of object with deny policy', async () => {
+  test('Query denied employee 2', async () => {
     let response;
     try {
-      response = await gatewayClient.request(
-        print(gql`
-          query {
-            foo2 {
-              bar2
-            }
-          }
-        `)
-      );
+      response = await gatewayClient.request(employeeQuery('deniedEmployee2'));
     } catch (e) {
       response = e.response;
     }

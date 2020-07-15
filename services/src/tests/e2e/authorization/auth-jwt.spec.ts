@@ -1,8 +1,8 @@
 import { GraphQLClient } from 'graphql-request';
 import { sign as signJwt } from 'jsonwebtoken';
-import { sleep } from '../../../helpers/utility';
-import { createSchemaMutation, createPolicyMutation } from '../../../helpers/registry-request-builder';
-import GraphQLErrorSerializer from '../../../utils/graphql-error-serializer';
+import { sleep } from '../../helpers/utility';
+import { createSchemaMutation, createPolicyMutation } from '../../helpers/registry-request-builder';
+import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { schema, policies, getUserQuery, arbitraryDataQuery } from './auth-jwt.schema';
 
 const gatewayClient = createGatewayClient();

@@ -6,12 +6,12 @@ import {
   CreatePolicyMutationResponse,
   createPolicyMutation,
   UpdateSchemasMutationResponse,
-} from '../../../helpers/registry-request-builder';
-import { sleep } from '../../../helpers/utility';
-import GraphQLErrorSerializer from '../../../utils/graphql-error-serializer';
-import { schema, policies } from './auth-directives-order.schema';
+} from '../../helpers/registry-request-builder';
+import { sleep } from '../../helpers/utility';
+import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
+import { policies, schema } from './auth-object-directive.schema';
 
-describe('Authorization - Policy directive order', () => {
+describe('Authorization - Policy directive on Object', () => {
   let gatewayClient: GraphQLClient;
   let registryClient: GraphQLClient;
 
@@ -37,13 +37,46 @@ describe('Authorization - Policy directive order', () => {
     await sleep(500);
   });
 
-  test('Query should return error', async () => {
+  test('OK for query field without policy of object with allowed policy', async () => {
+    const response = await gatewayClient.request(
+      print(gql`
+        query {
+          foo {
+            bar
+          }
+        }
+      `)
+    );
+    expect(response).toMatchSnapshot();
+  });
+
+  test('Error for query field with deny policy of object with allowed policy', async () => {
     let response;
     try {
       response = await gatewayClient.request(
         print(gql`
           query {
-            foo
+            foo {
+              baz
+            }
+          }
+        `)
+      );
+    } catch (e) {
+      response = e.response;
+    }
+    expect(response).toMatchSnapshot();
+  });
+
+  test('Error for query field without policy of object with deny policy', async () => {
+    let response;
+    try {
+      response = await gatewayClient.request(
+        print(gql`
+          query {
+            foo2 {
+              bar2
+            }
           }
         `)
       );
