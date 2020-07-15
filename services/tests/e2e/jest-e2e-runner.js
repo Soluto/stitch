@@ -22,13 +22,13 @@ class SerialJestRunner extends DefaultJestRunner {
     await dockerCompose.buildAll(options);
     await dockerCompose.upAll(options);
 
-    await Promise.all([waitFor.gatewayStart(30000), waitFor.registryStart(30000)]);
+    await waitFor.start(30000);
   }
 
   async teardown() {
     // await dockerCompose.logs(['gateway', 'registry'], options);
     await dockerCompose.down(options);
-    await Promise.all([waitFor.gatewayStop(10000), waitFor.registryStop(10000)]);
+    await waitFor.stop(30000);
   }
 
   async runTests(tests, watcher, onStart, onResult, onFailure, options) {

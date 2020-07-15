@@ -3,7 +3,7 @@ import { print } from 'graphql';
 
 export const policies = [
   {
-    metadata: { namespace: 'ns', name: 'onlyAdmin' },
+    metadata: { namespace: 'auth_jwt', name: 'onlyAdmin' },
     type: 'opa',
     code: `
       default allow = false
@@ -16,7 +16,7 @@ export const policies = [
     },
   },
   {
-    metadata: { namespace: 'ns', name: 'jwtName' },
+    metadata: { namespace: 'auth_jwt', name: 'jwtName' },
     type: 'opa',
     code: `
       default allow = false
@@ -38,17 +38,17 @@ const userQueryStub = (userRole: string) => `{
 }`;
 
 export const schema = {
-  metadata: { namespace: 'ns', name: 'user' },
+  metadata: { namespace: 'auth_jwt', name: 'user' },
   schema: print(gql`
     type User {
       firstName: String
-      lastName: String @policy(namespace: "ns", name: "onlyAdmin", args: { role: "{source.role}" })
+      lastName: String @policy(namespace: "auth_jwt", name: "onlyAdmin", args: { role: "{source.role}" })
       role: String
     }
 
     type ArbitraryData {
       arbitraryField: String @policy(
-        namespace: "ns",
+        namespace: "auth_jwt",
         name: "jwtName",
         args: {
           jwtName: "{jwt.name}",

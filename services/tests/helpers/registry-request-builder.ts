@@ -1,5 +1,6 @@
 import { gql } from 'apollo-server-core';
 import { print } from 'graphql';
+import { Schema } from '../../src/modules/resource-repository';
 
 export const createPolicyMutation = print(gql`
   mutation CreatePolicy($policies: [PolicyInput!]!) {
@@ -16,6 +17,11 @@ export const createSchemaMutation = print(gql`
     }
   }
 `);
+
+export const emptySchema = (schema: Schema): Schema => ({
+  metadata: schema.metadata,
+  schema: '',
+});
 
 export interface CreatePolicyMutationResponse {
   updatePolicies: {

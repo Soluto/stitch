@@ -1,20 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Authorization with queries Query allowed employee 1`] = `
-{
-  "errors": [
-    {
-      "message": "Unauthorized by policy alwaysDenied in namespace namespace",
-      "exception": {
-        "code": "INTERNAL_SERVER_ERROR"
-      }
-    }
-  ],
-  "data": {}
-}
-`;
-
-exports[`Authorization with queries Query allowed employee 2`] = `
 Object {
   "address": "Tel Aviv",
   "id": "1",
@@ -22,11 +8,31 @@ Object {
 }
 `;
 
+exports[`Authorization with queries Query alwaysAllow policy 1`] = `
+Object {
+  "policy": Object {
+    "auth_with_query___alwaysAllow": Object {
+      "allow": true,
+    },
+  },
+}
+`;
+
+exports[`Authorization with queries Query alwaysDeny policy 1`] = `
+Object {
+  "policy": Object {
+    "auth_with_query___alwaysAllow": Object {
+      "allow": true,
+    },
+  },
+}
+`;
+
 exports[`Authorization with queries Query denied employee 1 1`] = `
 {
   "errors": [
     {
-      "message": "Unauthorized by policy notClassified in namespace namespace",
+      "message": "Unauthorized by policy notClassified in namespace auth_with_query",
       "exception": {
         "code": "INTERNAL_SERVER_ERROR"
       }
@@ -46,7 +52,7 @@ exports[`Authorization with queries Query denied employee 2 1`] = `
 {
   "errors": [
     {
-      "message": "Unauthorized by policy notClassified in namespace namespace",
+      "message": "Unauthorized by policy notClassified in namespace auth_with_query",
       "exception": {
         "code": "INTERNAL_SERVER_ERROR"
       }
@@ -59,5 +65,19 @@ exports[`Authorization with queries Query denied employee 2 1`] = `
       "address": null
     }
   }
+}
+`;
+
+exports[`Authorization with queries Query protected field 1`] = `
+{
+  "errors": [
+    {
+      "message": "Unauthorized by policy alwaysDenied in namespace auth_with_query",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {}
 }
 `;

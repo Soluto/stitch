@@ -6,7 +6,7 @@ export const policies: Policy[] = [
   {
     metadata: {
       name: 'alwaysDenied',
-      namespace: 'namespace',
+      namespace: 'auth_with_query',
     },
     type: PolicyType.opa,
     code: `
@@ -15,8 +15,18 @@ export const policies: Policy[] = [
   },
   {
     metadata: {
+      name: 'alwaysAllow',
+      namespace: 'auth_with_query',
+    },
+    type: PolicyType.opa,
+    code: `
+      default allow = true
+    `,
+  },
+  {
+    metadata: {
       name: 'isSenior',
-      namespace: 'namespace',
+      namespace: 'auth_with_query',
     },
     type: PolicyType.opa,
     code: `
@@ -32,14 +42,14 @@ export const policies: Policy[] = [
   {
     metadata: {
       name: 'notClassified',
-      namespace: 'namespace',
+      namespace: 'auth_with_query',
     },
     type: PolicyType.opa,
     code: `
       default allow = false
       allow {
         input.query.classifiedDepartments[_].id != input.args.departmentId;
-        input.query.policy.namespace___isSenior.allow
+        input.query.policy.auth_with_query___isSenior.allow
       }
     `,
     args: {
@@ -53,7 +63,7 @@ export const policies: Policy[] = [
             id
           }
           policy {
-            namespace___isSenior(hireDate: $hireDate) {
+            auth_with_query___isSenior(hireDate: $hireDate) {
               allow
             }
           }
@@ -69,7 +79,7 @@ export const policies: Policy[] = [
 export const schema: Schema = {
   metadata: {
     name: 'EmployeeSchema',
-    namespace: 'namespace',
+    namespace: 'auth_with_query',
   },
   schema: print(gql`
     type Department {
@@ -83,7 +93,7 @@ export const schema: Schema = {
       department: Department!
       address: String
         @policy(
-          namespace: "namespace"
+          namespace: "auth_with_query"
           name: "notClassified"
           args: { departmentId: "{source.department.id}", hireDate: "{source.hireDate}" }
         )
@@ -122,7 +132,7 @@ export const schema: Schema = {
         )
       classifiedDepartments: [Department!]!
         @stub(value: [{ id: "D1000", name: "VIP" }])
-        @policy(namespace: "namespace", name: "alwaysDenied")
+        @policy(namespace: "auth_with_query", name: "alwaysDenied")
     }
   `),
 };

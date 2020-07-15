@@ -1,7 +1,12 @@
 import { GraphQLClient } from 'graphql-request';
 import { sign as signJwt } from 'jsonwebtoken';
 import { sleep } from '../../helpers/utility';
-import { createSchemaMutation, createPolicyMutation } from '../../helpers/registry-request-builder';
+import {
+  createSchemaMutation,
+  createPolicyMutation,
+  emptySchema,
+  UpdateSchemasMutationResponse,
+} from '../../helpers/registry-request-builder';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { schema, policies, getUserQuery, arbitraryDataQuery } from './auth-jwt.schema';
 
@@ -15,10 +20,20 @@ describe('authorization', () => {
   // This is kind of both the "before" section and a test, but it was weird putting a test in an actual before section
   it('creates the policy and schema resources', async () => {
     const policiesResponse: any = await registryClient.request(createPolicyMutation, { policies });
-    expect(policiesResponse.updatePolicies.success).toBe(true);
+    expect(policiesResponse.updatePolicies.success).toBeTruthy();
 
     const schemaResponse: any = await registryClient.request(createSchemaMutation, { schema });
-    expect(schemaResponse.updateSchemas.success).toBe(true);
+    expect(schemaResponse.updateSchemas.success).toBeTruthy();
+
+    // Wait for gateway to update before next tests
+    await sleep(500);
+  });
+
+  afterAll(async () => {
+    const schemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {
+      schema: emptySchema(schema),
+    });
+    expect(schemaResponse.updateSchemas.success).toBeTruthy();
 
     // Wait for gateway to update before next tests
     await sleep(500);

@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Basic flow Gateway updates when updating schema in registry 1`] = `
+Object {
+  "foo": "BAZ",
+}
+`;
+
+exports[`Basic flow Setup schema 1`] = `
+Object {
+  "foo": "BAR",
+}
+`;

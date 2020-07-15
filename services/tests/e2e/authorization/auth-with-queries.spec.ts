@@ -6,6 +6,7 @@ import {
   CreatePolicyMutationResponse,
   createPolicyMutation,
   UpdateSchemasMutationResponse,
+  emptySchema,
 } from '../../helpers/registry-request-builder';
 import { sleep } from '../../helpers/utility';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
@@ -19,6 +20,16 @@ describe('Authorization with queries', () => {
     gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
     registryClient = new GraphQLClient('http://localhost:8090/graphql');
     expect.addSnapshotSerializer(GraphQLErrorSerializer);
+  });
+
+  afterAll(async () => {
+    const schemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {
+      schema: emptySchema(schema),
+    });
+    expect(schemaResponse.updateSchemas.success).toBeTruthy();
+
+    // Wait for gateway to update before next tests
+    await sleep(500);
   });
 
   test('Setup policies', async () => {
@@ -36,9 +47,45 @@ describe('Authorization with queries', () => {
     await sleep(500);
   });
 
-  test('Query allowed employee', async () => {
+  test('Query alwaysAllow policy', async () => {
+    const response = await gatewayClient.request(
+      print(gql`
+        query {
+          policy {
+            auth_with_query___alwaysAllow {
+              allow
+            }
+          }
+        }
+      `)
+    );
+    expect(response).toMatchSnapshot();
+  });
+
+  test('Query alwaysDeny policy', async () => {
+    let response;
     try {
-      await gatewayClient.request(
+      response = await gatewayClient.request(
+        print(gql`
+          query {
+            policy {
+              auth_with_query___alwaysAllow {
+                allow
+              }
+            }
+          }
+        `)
+      );
+    } catch (e) {
+      response = e.response;
+    }
+    expect(response).toMatchSnapshot();
+  });
+
+  test('Query protected field', async () => {
+    let response;
+    try {
+      response = await gatewayClient.request(
         print(gql`
           query {
             classifiedDepartments {
@@ -49,10 +96,12 @@ describe('Authorization with queries', () => {
         `)
       );
     } catch (e) {
-      const response = e.response;
-      expect(response).toMatchSnapshot();
+      response = e.response;
     }
+    expect(response).toMatchSnapshot();
+  });
 
+  test('Query allowed employee', async () => {
     const response: AllowedEmployeeQueryResponse = await gatewayClient.request(employeeQuery('allowedEmployee'));
     expect(response.allowedEmployee).toMatchSnapshot();
   });
