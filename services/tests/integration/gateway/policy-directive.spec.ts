@@ -3,17 +3,17 @@ import { ApolloServerBase, gql } from 'apollo-server-core';
 import { ApolloServer, IResolvers } from 'apollo-server-fastify';
 import { when } from 'jest-when';
 import { concatAST, DocumentNode } from 'graphql';
-import { sdl as policySdl, PolicyDirective } from '../../../modules/directives/policy/policy';
-import { sdl as stubSdl, StubDirective } from '../../../modules/directives/stub';
+import { sdl as policySdl, PolicyDirective } from '../../../src/modules/directives/policy/policy';
+import { sdl as stubSdl, StubDirective } from '../../../src/modules/directives/stub';
 import { sdl as lowerCaseSdl, LowerCaseDirective } from '../utils/lower-case-directive';
-import { baseTypeDef, resolvers as baseResolvers } from '../../../modules/base-schema';
+import { baseTypeDef, resolvers as baseResolvers } from '../../../src/modules/base-schema';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 
 const mockValidatePolicy = jest.fn();
 // eslint-disable-next-line unicorn/no-useless-undefined
 when(mockValidatePolicy).calledWith({ namespace: 'ns', name: 'alwaysAllow' }).mockResolvedValue(undefined);
 when(mockValidatePolicy).calledWith({ namespace: 'ns', name: 'alwaysDeny' }).mockRejectedValue(new Error('Error'));
-jest.mock('../../../modules/directives/policy/policy-executor', () => ({
+jest.mock('../../../src/modules/directives/policy/policy-executor', () => ({
   default: jest.fn().mockImplementation(() => ({ validatePolicy: mockValidatePolicy })),
 }));
 

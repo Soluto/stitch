@@ -2,7 +2,7 @@ import { promises as fs } from 'fs';
 import { exec } from 'child_process';
 import * as path from 'path';
 import { mocked } from 'ts-jest/utils';
-import mockFsForOpa from '../tests/helpers/mock-fs-for-opa';
+import mockFsForOpa from '../../tests/helpers/mock-fs-for-opa';
 import { tmpPoliciesDir } from './config';
 import { getTmpFilePaths, prepareCompiledRegoFile, normalizeRegoCodePackage } from './opa-helper';
 

@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 async function waitForIt(url, timeoutMs = 10000) {
   let timedOut = false;

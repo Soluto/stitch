@@ -2,13 +2,13 @@ import { gql } from 'apollo-server-core';
 import { print } from 'graphql';
 import * as Rx from 'rxjs';
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
-import { Schema, ResourceGroup } from '../../../modules/resource-repository';
-import { Policy, PolicyType } from '../../../modules/resource-repository/types';
-import { createStitchGateway } from '../../../modules/gateway';
-import PolicyExecutor from '../../../modules/directives/policy/policy-executor';
+import { Schema, ResourceGroup } from '../../../src/modules/resource-repository';
+import { Policy, PolicyType } from '../../../src/modules/resource-repository/types';
+import { createStitchGateway } from '../../../src/modules/gateway';
+import PolicyExecutor from '../../../src/modules/directives/policy/policy-executor';
 import { beforeEachDispose } from '../before-each-dispose';
 
-jest.mock('../../../modules/directives/policy/opa', () => ({
+jest.mock('../../../src/modules/directives/policy/opa', () => ({
   evaluate: jest.fn(() => Promise.resolve({ done: true, allow: true })),
 }));
 
