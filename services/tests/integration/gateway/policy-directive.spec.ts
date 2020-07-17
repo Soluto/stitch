@@ -13,9 +13,9 @@ const mockValidatePolicy = jest.fn();
 // eslint-disable-next-line unicorn/no-useless-undefined
 when(mockValidatePolicy).calledWith({ namespace: 'ns', name: 'alwaysAllow' }).mockResolvedValue(undefined);
 when(mockValidatePolicy).calledWith({ namespace: 'ns', name: 'alwaysDeny' }).mockRejectedValue(new Error('Error'));
-jest.mock('../../../src/modules/directives/policy/policy-executor', () => ({
-  default: jest.fn().mockImplementation(() => ({ validatePolicy: mockValidatePolicy })),
-}));
+const policyExecutor = {
+  validatePolicy: mockValidatePolicy,
+};
 
 interface TestCase {
   typeDefs: DocumentNode;
@@ -341,6 +341,9 @@ describe.each(testCases)('Policy Directive Tests', (testName, { typeDefs, resolv
         stub: StubDirective,
         policy: PolicyDirective,
         lowerCase: LowerCaseDirective,
+      },
+      context: {
+        policyExecutor,
       },
     });
     client = createTestClient(server);
