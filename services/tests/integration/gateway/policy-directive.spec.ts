@@ -6,6 +6,7 @@ import { concatAST, DocumentNode } from 'graphql';
 import { sdl as policySdl, PolicyDirective } from '../../../src/modules/directives/policy/policy';
 import { sdl as stubSdl, StubDirective } from '../../../src/modules/directives/stub';
 import { sdl as lowerCaseSdl, LowerCaseDirective } from '../utils/lower-case-directive';
+import { sdl as mockSdl, MockDirective } from '../utils/mock-directive';
 import { baseTypeDef, resolvers as baseResolvers } from '../../../src/modules/base-schema';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import PolicyExecutor from '../../../src/modules/directives/policy/policy-executor';
@@ -113,6 +114,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
+    // This is incorrect order of directives so the policy doesn't work
     'Policy, stub on field (ALLOW)',
     {
       typeDefs: gql`
@@ -126,6 +128,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
+    // This is incorrect order of directives so the policy doesn't work
     'Policy, stub on field (DENY)',
     {
       typeDefs: gql`
@@ -219,6 +222,7 @@ const testCases: [string, TestCase][] = [
   [
     'Stub, policy, lowerCase on field (ALLOW)',
     {
+      // This is incorrect order of directives but it still does work by chance.
       typeDefs: gql`
         type Foo {
           bar: String! @stub(value: "BAR") @policy(namespace: "ns", name: "alwaysAllow") @lowerCase
@@ -230,6 +234,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
+    // This is incorrect order of directives but it still does work by chance.
     'Stub, policy, lowerCase on field (DENY)',
     {
       typeDefs: gql`
@@ -295,6 +300,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
+    // This is incorrect order of directives so the policy doesn't work
     'Policy, lowerCase on object, stub on parent query (ALLOW)',
     {
       typeDefs: gql`
@@ -308,6 +314,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
+    // This is incorrect order of directives so the policy doesn't work
     'Policy, lowerCase on object, stub on parent query (DENY)',
     {
       typeDefs: gql`
@@ -316,6 +323,32 @@ const testCases: [string, TestCase][] = [
         }
         type Query {
           foo: Foo! @stub(value: { bar: "BAR" })
+        }
+      `,
+    },
+  ],
+  [
+    'Mock, policy on object, stub on parent query (ALLOW)',
+    {
+      typeDefs: gql`
+        type Foo @mock @policy(namespace: "ns", name: "alwaysAllow") {
+          bar: String!
+        }
+        type Query {
+          foo: Foo! @stub(value: { id: "1" })
+        }
+      `,
+    },
+  ],
+  [
+    'Mock, policy on object, stub on parent query (DENY)',
+    {
+      typeDefs: gql`
+        type Foo @mock @policy(namespace: "ns", name: "alwaysDeny") {
+          bar: String!
+        }
+        type Query {
+          foo: Foo! @stub(value: { id: "1" })
         }
       `,
     },
@@ -336,12 +369,13 @@ describe.each(testCases)('Policy Directive Tests', (testName, { typeDefs, resolv
 
   beforeAll(() => {
     server = new ApolloServer({
-      typeDefs: concatAST([baseTypeDef, typeDefs, stubSdl, policySdl, lowerCaseSdl]),
+      typeDefs: concatAST([baseTypeDef, typeDefs, stubSdl, policySdl, lowerCaseSdl, mockSdl]),
       resolvers: [resolvers ?? {}, baseResolvers],
       schemaDirectives: {
         stub: StubDirective,
         policy: PolicyDirective,
         lowerCase: LowerCaseDirective,
+        mock: MockDirective,
       },
       context: {
         policyExecutor: new PolicyExecutor(),
