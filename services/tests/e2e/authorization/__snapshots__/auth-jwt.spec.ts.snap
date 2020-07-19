@@ -12,7 +12,7 @@ exports[`authorization rejects access to a field based on JWT info 1`] = `
 {
   "errors": [
     {
-      "message": "Unauthorized by policy jwtName in namespace ns",
+      "message": "Unauthorized by policy jwtName in namespace auth_jwt",
       "exception": {
         "code": "INTERNAL_SERVER_ERROR"
       }
@@ -30,7 +30,7 @@ exports[`authorization rejects access to a field based on JWT info when no JWT i
 {
   "errors": [
     {
-      "message": "Unauthorized by policy jwtName in namespace ns",
+      "message": "Unauthorized by policy jwtName in namespace auth_jwt",
       "exception": {
         "code": "INTERNAL_SERVER_ERROR"
       }
@@ -48,7 +48,7 @@ exports[`authorization rejects access to a field when policy test fails, but sti
 {
   "errors": [
     {
-      "message": "Unauthorized by policy onlyAdmin in namespace ns",
+      "message": "Unauthorized by policy onlyAdmin in namespace auth_jwt",
       "exception": {
         "code": "INTERNAL_SERVER_ERROR"
       }

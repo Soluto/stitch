@@ -6,7 +6,7 @@ export const policies: Policy[] = [
   {
     metadata: {
       name: 'alwaysDeny',
-      namespace: 'my_ns',
+      namespace: 'auth_directives_order',
     },
     type: PolicyType.opa,
     code: `
@@ -18,11 +18,11 @@ export const policies: Policy[] = [
 export const schema: Schema = {
   metadata: {
     name: 'Schema',
-    namespace: 'my_ns',
+    namespace: 'auth_directives_order',
   },
   schema: print(gql`
     type Query {
-      foo: String! @stub(value: "bar") @policy(namespace: "my_ns", name: "alwaysDeny")
+      ado_foo: String! @stub(value: "bar") @policy(namespace: "auth_directives_order", name: "alwaysDeny")
     }
   `),
 };

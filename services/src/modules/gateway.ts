@@ -6,6 +6,7 @@ import { RESTDirectiveDataSource } from './directives/rest';
 import { ResourceGroup } from './resource-repository';
 import { ExportTrackingExtension } from './exports';
 import { getJwt } from './arguments-injection';
+import PolicyExecutor from './directives/policy/policy-executor';
 
 export interface GatewayConfig extends Config {
   resourceGroups: Observable<ResourceGroup>;
@@ -23,6 +24,7 @@ export function createStitchGateway(config: GatewayConfig) {
       const ctx = {
         request,
         jwt: getJwt(request),
+        policyExecutor: new PolicyExecutor(),
       };
       return ctx;
     },

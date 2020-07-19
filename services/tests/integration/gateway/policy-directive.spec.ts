@@ -8,6 +8,7 @@ import { sdl as stubSdl, StubDirective } from '../../../src/modules/directives/s
 import { sdl as lowerCaseSdl, LowerCaseDirective } from '../utils/lower-case-directive';
 import { baseTypeDef, resolvers as baseResolvers } from '../../../src/modules/base-schema';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
+import PolicyExecutor from '../../../src/modules/directives/policy/policy-executor';
 
 const mockValidatePolicy = jest.fn();
 // eslint-disable-next-line unicorn/no-useless-undefined
@@ -341,6 +342,9 @@ describe.each(testCases)('Policy Directive Tests', (testName, { typeDefs, resolv
         stub: StubDirective,
         policy: PolicyDirective,
         lowerCase: LowerCaseDirective,
+      },
+      context: {
+        policyExecutor: new PolicyExecutor(),
       },
     });
     client = createTestClient(server);

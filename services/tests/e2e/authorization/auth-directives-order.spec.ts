@@ -2,6 +2,7 @@ import { print } from 'graphql';
 import { GraphQLClient } from 'graphql-request';
 import { gql } from 'apollo-server-core';
 import {
+  emptySchema,
   createSchemaMutation,
   CreatePolicyMutationResponse,
   createPolicyMutation,
@@ -20,6 +21,16 @@ describe('Authorization - Policy directive order', () => {
     registryClient = new GraphQLClient('http://localhost:8090/graphql');
 
     expect.addSnapshotSerializer(GraphQLErrorSerializer);
+  });
+
+  afterAll(async () => {
+    const schemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {
+      schema: emptySchema(schema),
+    });
+    expect(schemaResponse.updateSchemas.success).toBeTruthy();
+
+    // Wait for gateway to update before next tests
+    await sleep(500);
   });
 
   test('Setup policies', async () => {
@@ -43,7 +54,7 @@ describe('Authorization - Policy directive order', () => {
       response = await gatewayClient.request(
         print(gql`
           query {
-            foo
+            ado_foo
           }
         `)
       );

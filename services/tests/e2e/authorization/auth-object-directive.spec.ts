@@ -6,6 +6,7 @@ import {
   CreatePolicyMutationResponse,
   createPolicyMutation,
   UpdateSchemasMutationResponse,
+  emptySchema,
 } from '../../helpers/registry-request-builder';
 import { sleep } from '../../helpers/utility';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
@@ -20,6 +21,16 @@ describe('Authorization - Policy directive on Object', () => {
     registryClient = new GraphQLClient('http://localhost:8090/graphql');
 
     expect.addSnapshotSerializer(GraphQLErrorSerializer);
+  });
+
+  afterAll(async () => {
+    const schemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {
+      schema: emptySchema(schema),
+    });
+    expect(schemaResponse.updateSchemas.success).toBeTruthy();
+
+    // Wait for gateway to update before next tests
+    await sleep(500);
   });
 
   test('Setup policies', async () => {
@@ -41,7 +52,7 @@ describe('Authorization - Policy directive on Object', () => {
     const response = await gatewayClient.request(
       print(gql`
         query {
-          foo {
+          aod_foo {
             bar
           }
         }
@@ -56,7 +67,7 @@ describe('Authorization - Policy directive on Object', () => {
       response = await gatewayClient.request(
         print(gql`
           query {
-            foo {
+            aod_foo {
               baz
             }
           }
@@ -74,7 +85,7 @@ describe('Authorization - Policy directive on Object', () => {
       response = await gatewayClient.request(
         print(gql`
           query {
-            foo2 {
+            aod_foo2 {
               bar2
             }
           }

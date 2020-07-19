@@ -4,7 +4,7 @@ exports[`Authorization - Policy directive on Object Error for query field with d
 {
   "errors": [
     {
-      "message": "Unauthorized by policy alwaysDeny in namespace my_ns",
+      "message": "Unauthorized by policy alwaysDeny in namespace auth_object_directive",
       "exception": {
         "code": "INTERNAL_SERVER_ERROR"
       }
@@ -18,7 +18,7 @@ exports[`Authorization - Policy directive on Object Error for query field withou
 {
   "errors": [
     {
-      "message": "Unauthorized by policy alwaysDeny in namespace my_ns",
+      "message": "Unauthorized by policy alwaysDeny in namespace auth_object_directive",
       "exception": {
         "code": "INTERNAL_SERVER_ERROR"
       }
@@ -30,7 +30,7 @@ exports[`Authorization - Policy directive on Object Error for query field withou
 
 exports[`Authorization - Policy directive on Object OK for query field without policy of object with allowed policy 1`] = `
 Object {
-  "foo": Object {
+  "aod_foo": Object {
     "bar": "BAR",
   },
 }
