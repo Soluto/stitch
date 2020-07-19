@@ -8,14 +8,15 @@ import { sdl as stubSdl, StubDirective } from '../../../src/modules/directives/s
 import { sdl as lowerCaseSdl, LowerCaseDirective } from '../utils/lower-case-directive';
 import { baseTypeDef, resolvers as baseResolvers } from '../../../src/modules/base-schema';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
+import PolicyExecutor from '../../../src/modules/directives/policy/policy-executor';
 
 const mockValidatePolicy = jest.fn();
 // eslint-disable-next-line unicorn/no-useless-undefined
 when(mockValidatePolicy).calledWith({ namespace: 'ns', name: 'alwaysAllow' }).mockResolvedValue(undefined);
 when(mockValidatePolicy).calledWith({ namespace: 'ns', name: 'alwaysDeny' }).mockRejectedValue(new Error('Error'));
-const policyExecutor = {
-  validatePolicy: mockValidatePolicy,
-};
+jest.mock('../../../src/modules/directives/policy/policy-executor', () => ({
+  default: jest.fn().mockImplementation(() => ({ validatePolicy: mockValidatePolicy })),
+}));
 
 interface TestCase {
   typeDefs: DocumentNode;
@@ -343,7 +344,7 @@ describe.each(testCases)('Policy Directive Tests', (testName, { typeDefs, resolv
         lowerCase: LowerCaseDirective,
       },
       context: {
-        policyExecutor,
+        policyExecutor: new PolicyExecutor(),
       },
     });
     client = createTestClient(server);
