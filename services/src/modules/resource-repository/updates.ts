@@ -49,5 +49,9 @@ export function applyResourceGroupUpdates(rg: ResourceGroup, update: Partial<Res
     newRg.policies = applyResourceUpdates(newRg.policies, update.policies);
   }
 
+  if (typeof update.basePolicy !== 'undefined') {
+    newRg.basePolicy = update.basePolicy;
+  }
+
   return newRg;
 }

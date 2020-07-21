@@ -6,7 +6,7 @@ import { RESTDirectiveDataSource } from './directives/rest';
 import { ResourceGroup } from './resource-repository';
 import { ExportTrackingExtension } from './exports';
 import { getJwt } from './arguments-injection';
-import PolicyExecutor from './directives/policy/policy-executor';
+import { createBasicPolicyPlugin } from './plugins/base-policy';
 
 export interface GatewayConfig extends Config {
   resourceGroups: Observable<ResourceGroup>;
@@ -19,12 +19,12 @@ export function createStitchGateway(config: GatewayConfig) {
     ...apolloConfig,
     gateway,
     extensions: [() => new ExportTrackingExtension()],
+    plugins: [createBasicPolicyPlugin],
     subscriptions: false,
     context(request: fastify.FastifyRequest) {
       const ctx = {
         request,
         jwt: getJwt(request),
-        policyExecutor: new PolicyExecutor(),
       };
       return ctx;
     },

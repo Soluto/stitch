@@ -3,13 +3,12 @@ import { ApolloServerBase, gql } from 'apollo-server-core';
 import { ApolloServer, IResolvers } from 'apollo-server-fastify';
 import { when } from 'jest-when';
 import { concatAST, DocumentNode } from 'graphql';
-import { sdl as policySdl, PolicyDirective } from '../../../src/modules/directives/policy/policy';
+import { policySdl, PolicyDirective, PolicyExecutor } from '../../../src/modules/directives/policy';
 import { sdl as stubSdl, StubDirective } from '../../../src/modules/directives/stub';
 import { sdl as lowerCaseSdl, LowerCaseDirective } from '../utils/lower-case-directive';
 import { sdl as mockSdl, MockDirective } from '../utils/mock-directive';
 import { baseTypeDef, resolvers as baseResolvers } from '../../../src/modules/base-schema';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
-import PolicyExecutor from '../../../src/modules/directives/policy/policy-executor';
 
 const mockValidatePolicy = jest.fn();
 // eslint-disable-next-line unicorn/no-useless-undefined
@@ -378,7 +377,9 @@ describe.each(testCases)('Policy Directive Tests', (testName, { typeDefs, resolv
         mock: MockDirective,
       },
       context: {
-        policyExecutor: new PolicyExecutor(),
+        authorizationConfig: {
+          policyExecutor: new PolicyExecutor(),
+        },
       },
     });
     client = createTestClient(server);

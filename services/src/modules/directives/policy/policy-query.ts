@@ -2,14 +2,13 @@ import { SchemaDirectiveVisitor } from 'graphql-tools';
 import { GraphQLField, GraphQLResolveInfo } from 'graphql';
 import { gql } from 'apollo-server-core';
 import { RequestContext } from '../../context';
-import { PolicyArgsObject } from '../../resource-repository';
 import { PolicyResult, Policy } from './types';
 
 export class PolicyQueryDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
     field.resolve = async (
       parent: unknown,
-      args: PolicyArgsObject,
+      args: Record<string, unknown>,
       context: RequestContext,
       info: GraphQLResolveInfo
     ): Promise<PolicyResult> => {
@@ -19,7 +18,13 @@ export class PolicyQueryDirective extends SchemaDirectiveVisitor {
         args: args,
       };
 
-      const allow = await context.policyExecutor.evaluatePolicy(policy, parent, args, context, info);
+      const allow = await context.authorizationConfig.policyExecutor.evaluatePolicy(
+        policy,
+        parent,
+        args,
+        context,
+        info
+      );
       return { allow };
     };
   }

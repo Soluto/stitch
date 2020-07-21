@@ -1,0 +1,78 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Base Policy Tests Allow on base policy, allow on field definition 1`] = `
+Object {
+  "data": Object {
+    "bar": "BAR",
+    "foo": "FOO",
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Base Policy Tests Allow on base policy, deny on field definition 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Unauthorized by policy field_policy in namespace ns",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "foo": null,
+    "bar": "BAR"
+  }
+}
+`;
+
+exports[`Base Policy Tests Deny on base policy, allow on field definition 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Unauthorized by policy base_policy in namespace internal",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    },
+    {
+      "name": "GraphQLError",
+      "message": "Unauthorized by policy base_policy in namespace internal",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "foo": null,
+    "bar": null
+  }
+}
+`;
+
+exports[`Base Policy Tests Deny on base policy, allow on field definition with overrideBasePolicy 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Unauthorized by policy base_policy in namespace internal",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "foo": "FOO",
+    "bar": null
+  }
+}
+`;

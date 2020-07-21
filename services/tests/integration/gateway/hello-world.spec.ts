@@ -5,6 +5,7 @@ import { gql } from 'apollo-server-core';
 import { print } from 'graphql';
 import { createStitchGateway } from '../../../src/modules/gateway';
 import { beforeEachDispose } from '../before-each-dispose';
+import { ResourceGroup } from '../../../src/modules/resource-repository';
 
 const schema = {
   metadata: {
@@ -18,7 +19,7 @@ const schema = {
   `),
 };
 
-const resourceGroup = {
+const resourceGroup: ResourceGroup & { etag: string } = {
   etag: 'etag',
   schemas: [schema],
   upstreams: [],

@@ -29,7 +29,7 @@ describe('Authorization with queries', () => {
     expect(schemaResponse.updateSchemas.success).toBeTruthy();
 
     // Wait for gateway to update before next tests
-    await sleep(500);
+    await sleep(1500);
   });
 
   test('Setup policies', async () => {
@@ -44,7 +44,7 @@ describe('Authorization with queries', () => {
     expect(schemaResponse.updateSchemas.success).toBeTruthy();
 
     // Wait for gateway to update before next tests
-    await sleep(500);
+    await sleep(1500);
   });
 
   test('Query alwaysAllow policy', async () => {

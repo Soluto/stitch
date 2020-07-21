@@ -11,7 +11,7 @@ import { createSchemaConfig } from './modules/graphql-service';
 import * as opaHelper from './modules/opa-helper';
 // Importing directly from types because of a typescript or ts-jest bug that re-exported enums cause a runtime error for being undefined
 // https://github.com/kulshekhar/ts-jest/issues/281
-import { PolicyArgsObject, PolicyType, PolicyQueryVariables } from './modules/resource-repository/types';
+import { PolicyType } from './modules/resource-repository/types';
 
 const typeDefs = gql`
   scalar JSON
@@ -49,6 +49,7 @@ const typeDefs = gql`
     updateUpstreams(input: [UpstreamInput!]!): Result
     updateUpstreamClientCredentials(input: [UpstreamClientCredentialsInput!]!): Result
     updatePolicies(input: [PolicyInput!]!): Result
+    updateBasePolicy(input: BasePolicyInput!): Result
   }
 
   # Schemas
@@ -116,9 +117,16 @@ const typeDefs = gql`
   input PolicyInput {
     metadata: ResourceMetadataInput!
     type: PolicyType!
+    shouldOverrideBasePolicy: Boolean
     code: String!
     args: JSONObject
     query: PolicyQueryInput
+  }
+
+  input BasePolicyInput {
+    namespace: String!
+    name: String!
+    args: JSONObject
   }
 `;
 
@@ -169,15 +177,22 @@ interface UpstreamClientCredentialsInput {
 
 interface PolicyQueryInput {
   gql: string;
-  variables?: PolicyQueryVariables;
+  variables?: Record<string, unknown>;
 }
 
 interface PolicyInput {
   metadata: ResourceMetadataInput;
   type: PolicyType;
+  shouldOverrideBasePolicy?: boolean;
   code: string;
-  args?: PolicyArgsObject;
+  args?: Record<string, unknown>;
   query?: PolicyQueryInput;
+}
+
+interface BasePolicyInput {
+  namespace: string;
+  name: string;
+  args?: Record<string, unknown>;
 }
 
 const resourceRepository = S3ResourceRepository.fromEnvironment({ isRegistry: true });
@@ -320,6 +335,14 @@ const resolvers: IResolvers = {
             await policyAttachmentStrategies[attachment.type].cleanup(attachment);
           }
         }
+
+        return { success: true };
+      });
+    },
+    updateBasePolicy(_, args: { input: BasePolicyInput }) {
+      return singleton(async () => {
+        const rg = await fetchAndValidate({ basePolicy: args.input });
+        await resourceRepository.update(rg);
 
         return { success: true };
       });

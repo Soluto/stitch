@@ -3,10 +3,11 @@ import { print } from 'graphql';
 import * as Rx from 'rxjs';
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { Schema, ResourceGroup } from '../../../src/modules/resource-repository';
-import { Policy, PolicyType } from '../../../src/modules/resource-repository/types';
+import { PolicyDefinition, PolicyType } from '../../../src/modules/resource-repository/types';
 import { createStitchGateway } from '../../../src/modules/gateway';
-import PolicyExecutor from '../../../src/modules/directives/policy/policy-executor';
+import { PolicyExecutor } from '../../../src/modules/directives/policy';
 import { beforeEachDispose } from '../before-each-dispose';
+import { getCompiledFilename } from '../../../src/modules/opa-helper';
 
 jest.mock('../../../src/modules/directives/policy/opa', () => ({
   evaluate: jest.fn(() => ({ done: true, allow: true })),
@@ -42,7 +43,7 @@ const userRolesSchema: Schema = {
   `),
 };
 
-const policy: Policy = {
+const policy: PolicyDefinition = {
   metadata: { namespace: 'ns', name: 'onlyAdmin' },
   type: PolicyType.opa,
   code: `legit rego code`,
@@ -50,13 +51,13 @@ const policy: Policy = {
     userId: 'String',
   },
   query: {
-    gql: `
+    gql: print(gql`
       query($userId: ID!) {
         userRole(userId: $userId) {
           role
         }
       }
-    `,
+    `),
     variables: {
       userId: '{userId}',
     },
@@ -68,6 +69,9 @@ const resourceGroup: ResourceGroup = {
   upstreams: [],
   upstreamClientCredentials: [],
   policies: [policy],
+  policyAttachments: {
+    [getCompiledFilename(policy.metadata)]: { evaluate: () => [{ result: { allow: true } }] },
+  },
 };
 
 describe('Policy Caching', () => {
