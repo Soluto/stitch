@@ -11,6 +11,7 @@ import {
   FileSystemResourceRepository,
   ResourceRepository,
   CompositeResourceRepository,
+  IResourceRepository,
 } from './modules/resource-repository';
 
 async function run() {
@@ -33,7 +34,7 @@ async function run() {
   handleUncaughtErrors();
 }
 
-function getResourceRepository() {
+function getResourceRepository(): IResourceRepository {
   const repositories: ResourceRepository[] = [];
 
   if (config.useS3ResourceRepository) {
@@ -44,11 +45,11 @@ function getResourceRepository() {
     repositories.push(FileSystemResourceRepository.fromEnvironment());
   }
 
-  switch (true) {
-    case repositories.length === 0:
+  switch (repositories.length) {
+    case 0:
       logger.fatal('Must enable at least one resource repository');
       throw new Error('Must enable at least one resource repository');
-    case repositories.length === 1:
+    case 1:
       return repositories[0];
     default:
       return new CompositeResourceRepository(repositories);

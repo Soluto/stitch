@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "test": "jest --config jest.config.js",
-    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand --config jest.config.js",
+    "test:debug": "node --inspect node_modules/.bin/jest --runInBand --config jest.config.js",
     "test:e2e": "jest --runInBand --config jest.config.e2e.js",
     "test:full": "jest --config jest.config.full.js",
     "build": "tsc",
@@ -29,7 +29,7 @@
     "apollo-server-env": "^2.4.5",
     "apollo-server-fastify": "^2.15.1",
     "apollo-server-types": "^0.5.1",
-    "aws-sdk": "^2.708.0",
+    "aws-sdk": "^2.715.0",
     "env-var": "^6.2.0",
     "fastify": "^2.15.1",
     "fastify-metrics": "^5.0.1",
