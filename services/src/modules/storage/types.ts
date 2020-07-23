@@ -4,7 +4,7 @@ export interface Storage {
   listFiles(folderPath: string): Promise<listFilesItem[]>;
 
   readFile(filePath: string): Promise<{ content: Buffer }>;
-  readFile(filePath: string, options: { asString?: false }): Promise<{ content: Buffer }>;
+  readFile(filePath: string, options: { [k in any]: never }): Promise<{ content: Buffer }>;
   readFile(filePath: string, options: { asString?: true }): Promise<{ content: string }>;
   readFile(filePath: string, options?: { asString?: boolean }): Promise<{ content: Buffer | string }>;
 }

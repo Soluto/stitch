@@ -11,7 +11,7 @@ export class FileSystemStorage implements Storage {
   }
 
   async readFile(filePath: string): Promise<{ content: Buffer }>;
-  async readFile(filePath: string, options: { asString?: false }): Promise<{ content: Buffer }>;
+  async readFile(filePath: string, options: { [k in any]: never }): Promise<{ content: Buffer }>;
   async readFile(filePath: string, options: { asString?: true }): Promise<{ content: string }>;
   async readFile(filePath: string, options: { asString?: boolean } = {}): Promise<{ content: Buffer | string }> {
     if (options.asString) return { content: await fs.readFile(filePath, 'utf8') };
