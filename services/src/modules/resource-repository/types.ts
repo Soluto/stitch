@@ -67,7 +67,7 @@ export interface FetchLatestResult {
 
 export type PolicyAttachments = { [filename: string]: Buffer };
 
-export interface ResourceRepository {
+export interface IResourceRepository {
   fetchLatest(): Promise<FetchLatestResult>;
   update(rg: ResourceGroup): Promise<void>;
   writePolicyAttachment(filename: string, content: Buffer): Promise<void>;

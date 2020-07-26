@@ -9,7 +9,6 @@ export function mockResourceBucket(initialValue: ResourceGroup, initialPolicyFil
   const policiesKeyPrefix = process.env.S3_POLICY_ATTACHMENTS_KEY_PREFIX;
   const policiesPrefixQueryParamRegex = `prefix=${encodeURIComponent(policiesKeyPrefix!)}.*`;
   const queryParamsSeparatorRegex = '?.*';
-
   const value = { current: initialValue, policyFiles: initialPolicyFiles };
 
   nock(s3endpoint!)
@@ -23,7 +22,7 @@ export function mockResourceBucket(initialValue: ResourceGroup, initialPolicyFil
     .get(new RegExp(`/${bucketName!}${queryParamsSeparatorRegex}${policiesPrefixQueryParamRegex}`))
     .reply(200, () => {
       const filenames = Object.keys(value.policyFiles).map(filename => ({
-        Key: filename,
+        Key: `${policiesKeyPrefix}${filename}`,
         LastModified: new Date(),
       }));
       const xmlBuilder = new xml2js.Builder();

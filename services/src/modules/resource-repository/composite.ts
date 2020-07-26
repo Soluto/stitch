@@ -1,7 +1,6 @@
-import { ResourceRepository, FetchLatestResult } from './types';
-import { applyResourceGroupUpdates } from './updates';
+import { FetchLatestResult, IResourceRepository, applyResourceGroupUpdates, ResourceRepository } from '.';
 
-export class CompositeResourceRepository implements ResourceRepository {
+export class CompositeResourceRepository implements IResourceRepository {
   constructor(protected repositories: ResourceRepository[]) {}
 
   async fetchLatest(): Promise<FetchLatestResult> {
