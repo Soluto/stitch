@@ -8,9 +8,10 @@ export class FileSystemResourceRepository extends ResourceRepository {
   constructor(
     protected storage: FileSystemStorage,
     protected resourceFilePath: string,
-    protected policyAttachmentsFolderPath: string
+    protected policyAttachmentsFolderPath: string,
+    protected isRegistry = false
   ) {
-    super(storage, resourceFilePath, policyAttachmentsFolderPath);
+    super(storage, resourceFilePath, policyAttachmentsFolderPath, isRegistry);
   }
 
   async writePolicyAttachment(filename: string, content: Buffer): Promise<void> {
@@ -25,7 +26,7 @@ export class FileSystemResourceRepository extends ResourceRepository {
     this.policyAttachmentsFolderInitialized = true;
   }
 
-  static fromEnvironment() {
+  static fromEnvironment(options: { isRegistry: boolean } = { isRegistry: false }) {
     const resourceFilePath = envVar.get('FS_RESOURCE_REPOSITORY_PATH').required().asString();
     const policyAttachmentsFolderPath = envVar
       .get('FS_REPOSITORY_POLICY_ATTACHMENTS_FOLDER_PATH')
@@ -33,6 +34,11 @@ export class FileSystemResourceRepository extends ResourceRepository {
       .asString();
 
     const fsStorage = new FileSystemStorage();
-    return new FileSystemResourceRepository(fsStorage, resourceFilePath, policyAttachmentsFolderPath);
+    return new FileSystemResourceRepository(
+      fsStorage,
+      resourceFilePath,
+      policyAttachmentsFolderPath,
+      options.isRegistry
+    );
   }
 }

@@ -8,9 +8,10 @@ export class S3ResourceRepository extends ResourceRepository {
   constructor(
     protected storage: S3Storage,
     protected resourceFilePath: string,
-    protected policyAttachmentsFolderPath: string
+    protected policyAttachmentsFolderPath: string,
+    protected isRegistry = false
   ) {
-    super(storage, resourceFilePath, policyAttachmentsFolderPath);
+    super(storage, resourceFilePath, policyAttachmentsFolderPath, isRegistry);
   }
 
   async fetchLatest(): Promise<FetchLatestResult> {
@@ -41,7 +42,7 @@ export class S3ResourceRepository extends ResourceRepository {
     return { isNew: true, resourceGroup: resources };
   }
 
-  static fromEnvironment() {
+  static fromEnvironment(options: { isRegistry: boolean } = { isRegistry: false }) {
     const s3endpoint = envVar.get('S3_ENDPOINT').required().asString();
     const bucketName = envVar.get('S3_RESOURCE_BUCKET_NAME').required().asString();
     const resourceFilePath = envVar.get('S3_RESOURCE_OBJECT_KEY').default('resources.json').asString();
@@ -53,7 +54,7 @@ export class S3ResourceRepository extends ResourceRepository {
     const awsSecretAccessKey = envVar.get('S3_AWS_SECRET_ACCESS_KEY').asString();
 
     const s3Storage = new S3Storage(bucketName, s3endpoint, awsAccessKeyId, awsSecretAccessKey);
-    return new S3ResourceRepository(s3Storage, resourceFilePath, policyAttachmentsFolderPath);
+    return new S3ResourceRepository(s3Storage, resourceFilePath, policyAttachmentsFolderPath, options.isRegistry);
   }
 }
 

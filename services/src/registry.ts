@@ -180,7 +180,7 @@ interface PolicyInput {
   query?: PolicyQueryInput;
 }
 
-const resourceRepository = S3ResourceRepository.fromEnvironment();
+const resourceRepository = S3ResourceRepository.fromEnvironment({ isRegistry: true });
 
 async function fetchAndValidate(updates: Partial<ResourceGroup>): Promise<ResourceGroup> {
   const { resourceGroup } = await resourceRepository.fetchLatest();
