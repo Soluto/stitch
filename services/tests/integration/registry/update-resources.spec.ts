@@ -89,7 +89,7 @@ describe('Update resource', () => {
     return () => nock.cleanAll();
   });
 
-  it('Schema', async () => {
+  it('updates a Schema', async () => {
     const newSchema = { ...schema, ...schemaUpdate };
     const response = await client.mutate({
       mutation: gql`
@@ -106,6 +106,26 @@ describe('Update resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateSchemas: { success: true } });
+    expect(bucketContents.current).toMatchObject({ ...baseResourceGroup, schemas: [newSchema] });
+  });
+
+  it('updates a Schema using updateResourceGroup', async () => {
+    const newSchema = { ...schema, ...schemaUpdate };
+    const response = await client.mutate({
+      mutation: gql`
+        mutation UploadResources($resourceGroup: ResourceGroupInput!) {
+          updateResourceGroup(input: $resourceGroup) {
+            success
+          }
+        }
+      `,
+      variables: {
+        resourceGroup: { schemas: [newSchema] },
+      },
+    });
+
+    expect(response.errors).toBeUndefined();
+    expect(response.data).toEqual({ updateResourceGroup: { success: true } });
     expect(bucketContents.current).toMatchObject({ ...baseResourceGroup, schemas: [newSchema] });
   });
 
@@ -178,6 +198,43 @@ describe('Update resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updatePolicies: { success: true } });
+    expect(bucketContents.current).toMatchObject({ ...baseResourceGroup, policies: [newPolicy] });
+
+    const compiledFilename = 'namespace-name.wasm';
+    const uncompiledPath = path.resolve(tmpPoliciesDir, 'namespace-name.rego');
+    const compiledPath = path.resolve(tmpPoliciesDir, compiledFilename);
+    const regoCode = `package policy\n${newPolicy.code}`;
+    expect(fs.writeFile).toHaveBeenCalledWith(uncompiledPath, regoCode);
+    expect(fs.unlink).toHaveBeenCalledWith(uncompiledPath);
+    expect(fs.unlink).toHaveBeenCalledWith(compiledPath);
+    expect(fs.readFile).toHaveBeenCalledWith(compiledPath);
+    expect(bucketContents.policyFiles).toEqual({ [compiledFilename]: 'compiled rego code' });
+
+    const expectedCommand = `opa build -d ${uncompiledPath} -o ${compiledPath} 'data.policy = result'`;
+    expect(mockedExec.mock.calls[0][0]).toBe(expectedCommand);
+
+    mockFsForOpa.restore();
+  });
+
+  it('updates an opa type policy using updateResourceGroup', async () => {
+    mockFsForOpa.mock();
+
+    const newPolicy = { ...policy, ...policyUpdate };
+    const response = await client.mutate({
+      mutation: gql`
+        mutation UploadResources($resourceGroup: ResourceGroupInput!) {
+          updateResourceGroup(input: $resourceGroup) {
+            success
+          }
+        }
+      `,
+      variables: {
+        resourceGroup: { policies: [newPolicy] },
+      },
+    });
+
+    expect(response.errors).toBeUndefined();
+    expect(response.data).toEqual({ updateResourceGroup: { success: true } });
     expect(bucketContents.current).toMatchObject({ ...baseResourceGroup, policies: [newPolicy] });
 
     const compiledFilename = 'namespace-name.wasm';

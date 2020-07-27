@@ -6,9 +6,10 @@ import { S3ResourceRepository, ResourceGroup, applyResourceGroupUpdates } from '
 import * as config from './modules/config';
 import { validateResourceGroupOrThrow } from './modules/validation';
 import logger from './modules/logger';
+import * as opaHelper from './modules/opa-helper';
+import PolicyAttachmentsGenerator from './modules/policy-attachments-generator';
 import { handleSignals, handleUncaughtErrors } from './modules/shutdown-handler';
 import { createSchemaConfig } from './modules/graphql-service';
-import * as opaHelper from './modules/opa-helper';
 // Importing directly from types because of a typescript or ts-jest bug that re-exported enums cause a runtime error for being undefined
 // https://github.com/kulshekhar/ts-jest/issues/281
 import { PolicyType, PolicyQueryVariables, PolicyArgsObject } from './modules/resource-repository/types';
@@ -130,7 +131,7 @@ const typeDefs = gql`
   }
 `;
 
-interface ResourceMetadataInput {
+export interface ResourceMetadataInput {
   namespace: string;
   name: string;
 }
@@ -180,7 +181,7 @@ interface PolicyQueryInput {
   variables?: PolicyQueryVariables;
 }
 
-interface PolicyInput {
+export interface PolicyInput {
   metadata: ResourceMetadataInput;
   type: PolicyType;
   shouldOverrideBasePolicy?: boolean;
@@ -206,39 +207,20 @@ async function fetchAndValidate(updates: Partial<ResourceGroup>): Promise<Resour
   return newRg;
 }
 
-type TempLocalPolicyAttachment = { metadata: ResourceMetadataInput; path: string; type: PolicyType };
-
-const policyAttachmentStrategies = {
-  [PolicyType.opa]: {
-    generate: async (input: PolicyInput) => {
-      const path = await opaHelper.prepareCompiledRegoFile(input.metadata, input.code);
-      return { path, metadata: input.metadata, type: PolicyType.opa };
-    },
-    cleanup: async (attachment: TempLocalPolicyAttachment) => {
-      try {
-        await opaHelper.deleteLocalRegoFile(attachment.path);
-      } catch (err) {
-        logger.warn(
-          { err, attachment },
-          'Failed cleanup of compiled rego file, this did not affect the request outcome'
-        );
-      }
-    },
-    writeToRepo: async (attachment: TempLocalPolicyAttachment) => {
-      const compiledRego = await opaHelper.readLocalRegoFile(attachment.path);
-      const filename = opaHelper.getCompiledFilename(attachment.metadata);
-      await resourceRepository.writePolicyAttachment(filename, compiledRego);
-    },
-  },
-};
-
 const singleton = pLimit(1);
 const resolvers: IResolvers = {
   JSON: GraphQLJSON,
   JSONObject: GraphQLJSONObject,
   Query: {
     async validateResourceGroup(_, args: { input: ResourceGroupInput }) {
-      await fetchAndValidate(args.input);
+      const policyAttachments = new PolicyAttachmentsGenerator(resourceRepository);
+      await policyAttachments.generate(args?.input?.policies ?? []);
+
+      try {
+        await fetchAndValidate(args.input);
+      } finally {
+        await policyAttachments.cleanup();
+      }
 
       return { success: true };
     },
@@ -258,21 +240,13 @@ const resolvers: IResolvers = {
       return { success: true };
     },
     async validatePolicies(_, args: { input: PolicyInput[] }) {
-      const policyAttachments: TempLocalPolicyAttachment[] = [];
-
-      for (const input of args.input) {
-        if (!policyAttachmentStrategies[input.type]) continue;
-
-        const attachment = await policyAttachmentStrategies[input.type].generate(input);
-        policyAttachments.push(attachment);
-      }
+      const policyAttachments = new PolicyAttachmentsGenerator(resourceRepository);
+      await policyAttachments.generate(args.input);
 
       try {
         await fetchAndValidate({ policies: args.input });
       } finally {
-        for (const attachment of policyAttachments) {
-          await policyAttachmentStrategies[attachment.type].cleanup(attachment);
-        }
+        await policyAttachments.cleanup();
       }
 
       return { success: true };
@@ -281,8 +255,17 @@ const resolvers: IResolvers = {
   Mutation: {
     updateResourceGroup(_, args: { input: ResourceGroupInput }) {
       return singleton(async () => {
-        const rg = await fetchAndValidate(args.input);
-        await resourceRepository.update(rg);
+        const policyAttachments = new PolicyAttachmentsGenerator(resourceRepository);
+        await policyAttachments.generate(args?.input?.policies ?? []);
+
+        try {
+          const rg = await fetchAndValidate(args.input);
+
+          await policyAttachments.writeToRepo();
+          await resourceRepository.update(rg);
+        } finally {
+          await policyAttachments.cleanup();
+        }
 
         return { success: true };
       });
@@ -313,27 +296,16 @@ const resolvers: IResolvers = {
     },
     updatePolicies(_, args: { input: PolicyInput[] }) {
       return singleton(async () => {
-        const policyAttachments: TempLocalPolicyAttachment[] = [];
-
-        for (const input of args.input) {
-          if (!policyAttachmentStrategies[input.type]) continue;
-
-          const attachment = await policyAttachmentStrategies[input.type].generate(input);
-          policyAttachments.push(attachment);
-        }
+        const policyAttachments = new PolicyAttachmentsGenerator(resourceRepository);
+        await policyAttachments.generate(args.input);
 
         try {
           const rg = await fetchAndValidate({ policies: args.input });
 
-          for (const attachment of policyAttachments) {
-            await policyAttachmentStrategies[attachment.type].writeToRepo(attachment);
-          }
-
+          await policyAttachments.writeToRepo();
           await resourceRepository.update(rg);
         } finally {
-          for (const attachment of policyAttachments) {
-            await policyAttachmentStrategies[attachment.type].cleanup(attachment);
-          }
+          await policyAttachments.cleanup();
         }
 
         return { success: true };
