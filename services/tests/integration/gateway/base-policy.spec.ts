@@ -6,8 +6,7 @@ import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { createStitchGateway } from '../../../src/modules/gateway';
 import { ResourceGroup, PolicyDefinition, PolicyType } from '../../../src/modules/resource-repository';
 import { beforeEachDispose } from '../before-each-dispose';
-import { LoadedPolicy } from '../../../src/modules/directives/policy/opa';
-import { Policy } from '../../../src/modules/directives/policy/types';
+import { Policy, LoadedPolicy } from '../../../src/modules/directives/policy/types';
 
 const createPolicyAttachment = (allow: boolean): LoadedPolicy => ({ evaluate: () => [{ result: { allow } }] });
 
