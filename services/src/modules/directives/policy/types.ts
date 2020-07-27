@@ -57,5 +57,5 @@ export type PolicyCacheKey = {
 
 // Temporary until opa-wasm package adds types
 export interface LoadedPolicy {
-  evaluate: (input: { [key: string]: any }) => any[];
+  evaluate: (input: Record<string, unknown>) => any[];
 }
