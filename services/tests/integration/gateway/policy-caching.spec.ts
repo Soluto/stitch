@@ -9,7 +9,7 @@ import PolicyExecutor from '../../../src/modules/directives/policy/policy-execut
 import { beforeEachDispose } from '../before-each-dispose';
 
 jest.mock('../../../src/modules/directives/policy/opa', () => ({
-  evaluate: jest.fn(() => Promise.resolve({ done: true, allow: true })),
+  evaluate: jest.fn(() => ({ done: true, allow: true })),
 }));
 
 const userSchema: Schema = {

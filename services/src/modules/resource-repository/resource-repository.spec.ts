@@ -1,5 +1,6 @@
 import * as path from 'path';
 import { Storage } from '../storage';
+import { getWasmPolicy } from '../directives/policy/opa';
 import { minutesAgo } from '../../../tests/helpers/utility';
 import { ResourceRepository } from '.';
 
@@ -7,6 +8,10 @@ let repo: ResourceRepository;
 let storage: Storage;
 const resourceFilePath = '/var/stitch/resources.json';
 const policyAttachmentsFolderPath = '/var/stitch/policy-attachments';
+
+jest.mock('../directives/policy/opa', () => ({
+  getWasmPolicy: jest.fn(),
+}));
 
 beforeEach(() => {
   storage = new MockStorage();
@@ -28,14 +33,14 @@ describe('shouldRefreshPolicyAttachment', () => {
   });
 
   it('returns true if this is the first refresh for this process', () => {
-    repo['policyAttachments'].attachments['file'] = Buffer.from('content');
+    repo['policyAttachments'].attachments['file'] = { evaluate: () => [] };
 
     const result = shouldRefreshPolicyAttachment({ filePath: 'file', lastModified: minutesAgo(5) });
     expect(result).toBe(true);
   });
 
   it('returns true if the attachment was last updated after the last refresh', () => {
-    repo['policyAttachments'].attachments['file'] = Buffer.from('content');
+    repo['policyAttachments'].attachments['file'] = { evaluate: () => [] };
     repo['policyAttachments'].refreshedAt = minutesAgo(5);
 
     const result = shouldRefreshPolicyAttachment({ filePath: 'file', lastModified: new Date() });
@@ -43,7 +48,7 @@ describe('shouldRefreshPolicyAttachment', () => {
   });
 
   it('returns false if the attachment was last updated before the last refresh', () => {
-    repo['policyAttachments'].attachments['file'] = Buffer.from('content');
+    repo['policyAttachments'].attachments['file'] = { evaluate: () => [] };
     repo['policyAttachments'].refreshedAt = new Date();
 
     const result = shouldRefreshPolicyAttachment({ filePath: 'file', lastModified: minutesAgo(5) });
@@ -59,11 +64,16 @@ describe('refreshPolicyAttachments', () => {
   });
 
   it('refreshes the local copy of all policy attachments that should be refreshed', async () => {
+    const upToDateAttachment = { evaluate: () => [] };
+    const needsUpdatingAttachmentOld = { evaluate: () => [] };
+    const needsUpdatingAttachmentUpdated = { evaluate: () => [] };
+    const newFileAttachment = { evaluate: () => [] };
+
     repo['policyAttachments'] = {
       refreshedAt: minutesAgo(5),
       attachments: {
-        upToDateFile: Buffer.from('up to date'),
-        needsUpdating: Buffer.from('needs updating'),
+        upToDateFile: upToDateAttachment,
+        needsUpdating: needsUpdatingAttachmentOld,
       },
     };
 
@@ -87,12 +97,21 @@ describe('refreshPolicyAttachments', () => {
     const readFileMock = storage.readFile as jest.Mock;
     readFileMock.mockImplementation(filePath => Promise.resolve({ content: readFileParamBasedReturnValues[filePath] }));
 
+    const getWasmPolicyParamBasedReturnValues: any = {
+      'needs updating - updated': needsUpdatingAttachmentUpdated,
+      'new file': newFileAttachment,
+    };
+    const getWasmPolicyMock = getWasmPolicy as jest.Mock;
+    getWasmPolicyMock.mockImplementation((buffer: Buffer) => {
+      return Promise.resolve(getWasmPolicyParamBasedReturnValues[buffer.toString()]);
+    });
+
     await refreshPolicyAttachments();
 
     expect(repo['policyAttachments'].attachments).toMatchObject({
-      upToDateFile: Buffer.from('up to date'),
-      needsUpdating: Buffer.from('needs updating - updated'),
-      newFile: Buffer.from('new file'),
+      upToDateFile: upToDateAttachment,
+      needsUpdating: needsUpdatingAttachmentUpdated,
+      newFile: newFileAttachment,
     });
     expect(repo['policyAttachments'].refreshedAt?.getTime()).toBeGreaterThan(minutesAgo(1).getTime());
 
@@ -102,6 +121,10 @@ describe('refreshPolicyAttachments', () => {
     expect(readFileMock).toHaveBeenCalledTimes(2);
     expect(readFileMock).toHaveBeenCalledWith(needsUpdatingPath);
     expect(readFileMock).toHaveBeenCalledWith(newFilePath);
+
+    expect(getWasmPolicyMock).toHaveBeenCalledTimes(2);
+    expect(getWasmPolicyMock).toHaveBeenCalledWith(Buffer.from('needs updating - updated'));
+    expect(getWasmPolicyMock).toHaveBeenCalledWith(Buffer.from('new file'));
   });
 });
 

@@ -1,3 +1,5 @@
+import { LoadedPolicy } from '../directives/policy/types';
+
 export interface ResourceGroup {
   schemas: Schema[];
   upstreams: Upstream[];
@@ -65,7 +67,9 @@ export interface FetchLatestResult {
   resourceGroup: ResourceGroup;
 }
 
-export type PolicyAttachments = { [filename: string]: Buffer };
+export type PolicyAttachments = {
+  [filename: string]: LoadedPolicy;
+};
 
 export interface IResourceRepository {
   fetchLatest(): Promise<FetchLatestResult>;

@@ -50,7 +50,7 @@ export default class PolicyExecutor extends CachedOperation<PolicyCacheKey, bool
     const evaluate = typeEvaluators[ctx.policyDefinition.type];
     if (!evaluate) throw new Error(`Unsupported policy type ${ctx.policyDefinition.type}`);
 
-    const { done, allow } = await evaluate({
+    const { done, allow } = evaluate({
       ...ctx.policy,
       args,
       query,

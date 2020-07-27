@@ -54,3 +54,8 @@ export type PolicyCacheKey = {
   metadata: ResourceMetadata;
   args?: PolicyArgsObject;
 };
+
+// Temporary until opa-wasm package adds types
+export interface LoadedPolicy {
+  evaluate: (input: { [key: string]: any }) => any[];
+}

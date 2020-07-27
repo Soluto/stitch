@@ -1,6 +1,7 @@
 import * as path from 'path';
 import pLimit from 'p-limit';
 import { Storage, listFilesItem } from '../storage';
+import { getWasmPolicy } from '../directives/policy/opa';
 import { FetchLatestResult, ResourceGroup, PolicyAttachments, IResourceRepository } from '.';
 
 export class ResourceRepository implements IResourceRepository {
@@ -10,7 +11,8 @@ export class ResourceRepository implements IResourceRepository {
   constructor(
     protected storage: Storage,
     protected resourceFilePath: string,
-    protected policyAttachmentsFolderPath: string
+    protected policyAttachmentsFolderPath: string,
+    protected isRegistry = false
   ) {}
 
   async fetchLatest(): Promise<FetchLatestResult> {
@@ -43,6 +45,7 @@ export class ResourceRepository implements IResourceRepository {
   }
 
   protected async refreshPolicyAttachments() {
+    if (this.isRegistry) return;
     const newRefreshedAt = new Date();
 
     const allAttachments = await this.storage.listFiles(this.policyAttachmentsFolderPath);
@@ -50,7 +53,10 @@ export class ResourceRepository implements IResourceRepository {
 
     if (attachmentsToRefresh.length > 0) {
       const newAttachments = await this.getPolicyAttachments(attachmentsToRefresh);
-      newAttachments.forEach(a => (this.policyAttachments.attachments[a.filename] = a.content));
+
+      for (const { filename, content } of newAttachments) {
+        this.policyAttachments.attachments[filename] = await getWasmPolicy(content);
+      }
     }
 
     this.policyAttachments.refreshedAt = newRefreshedAt;
