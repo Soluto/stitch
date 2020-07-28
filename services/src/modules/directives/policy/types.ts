@@ -1,20 +1,27 @@
 import { GraphQLResolveInfo } from 'graphql';
-import { PolicyDefinition, ResourceMetadata } from '../../resource-repository/types';
+import {
+  PolicyDefinition,
+  ResourceMetadata,
+  PolicyAttachments,
+  PolicyArgsObject,
+} from '../../resource-repository/types';
 import { RequestContext } from '../../context';
+
+export type QueryResults = Record<string, unknown> | undefined;
 
 export type Policy = {
   namespace: string;
   name: string;
-  args?: Record<string, unknown>;
+  args?: PolicyArgsObject;
 };
 
 // args here contain the final values after param injection
 export type PolicyEvaluationContext = {
   namespace: string;
   name: string;
-  policyAttachments: Record<string, LoadedPolicy>;
-  args?: Record<string, unknown>;
-  query?: Record<string, unknown>;
+  policyAttachments: PolicyAttachments;
+  args?: PolicyArgsObject;
+  query?: QueryResults;
 };
 
 export type PolicyEvaluationResult = {
@@ -45,7 +52,7 @@ export type PolicyDirectiveExecutionContext = {
 
 export type PolicyCacheKey = {
   metadata: ResourceMetadata;
-  args?: Record<string, unknown>;
+  args?: PolicyArgsObject;
 };
 
 // Temporary until opa-wasm package adds types

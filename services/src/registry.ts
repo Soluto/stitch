@@ -11,7 +11,7 @@ import { createSchemaConfig } from './modules/graphql-service';
 import * as opaHelper from './modules/opa-helper';
 // Importing directly from types because of a typescript or ts-jest bug that re-exported enums cause a runtime error for being undefined
 // https://github.com/kulshekhar/ts-jest/issues/281
-import { PolicyType } from './modules/resource-repository/types';
+import { PolicyType, PolicyQueryVariables, PolicyArgsObject } from './modules/resource-repository/types';
 
 const typeDefs = gql`
   scalar JSON
@@ -177,7 +177,7 @@ interface UpstreamClientCredentialsInput {
 
 interface PolicyQueryInput {
   gql: string;
-  variables?: Record<string, unknown>;
+  variables?: PolicyQueryVariables;
 }
 
 interface PolicyInput {
@@ -185,14 +185,14 @@ interface PolicyInput {
   type: PolicyType;
   shouldOverrideBasePolicy?: boolean;
   code: string;
-  args?: Record<string, unknown>;
+  args?: PolicyArgsObject;
   query?: PolicyQueryInput;
 }
 
 interface BasePolicyInput {
   namespace: string;
   name: string;
-  args?: Record<string, unknown>;
+  args?: PolicyArgsObject;
 }
 
 const resourceRepository = S3ResourceRepository.fromEnvironment({ isRegistry: true });

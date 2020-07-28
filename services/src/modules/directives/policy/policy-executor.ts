@@ -1,8 +1,8 @@
 import { GraphQLResolveInfo } from 'graphql';
 import { RequestContext } from '../../context';
-import { PolicyDefinition } from '../../resource-repository';
+import { PolicyDefinition, PolicyArgsObject } from '../../resource-repository';
 import { inject } from '../../arguments-injection';
-import { Policy, PolicyDirectiveExecutionContext, GraphQLArguments, PolicyCacheKey } from './types';
+import { Policy, PolicyDirectiveExecutionContext, GraphQLArguments, PolicyCacheKey, QueryResults } from './types';
 import { evaluate as evaluateOpa } from './opa';
 import { getQueryResult } from './policy-query-helper';
 import CachedOperation from './cached-operation';
@@ -93,18 +93,15 @@ export default class PolicyExecutor {
     return this.syncCache.getOperationResult(cacheKey, executionFunction);
   }
 
-  private async _evaluatePolicy(
-    ctx: PolicyDirectiveExecutionContext,
-    args: Record<string, unknown> = {}
-  ): Promise<boolean> {
+  private async _evaluatePolicy(ctx: PolicyDirectiveExecutionContext, args: PolicyArgsObject = {}): Promise<boolean> {
     const query = await getQueryResult(ctx, args);
     return this._evaluatePolicySync(ctx, args, query);
   }
 
   private _evaluatePolicySync(
     ctx: PolicyDirectiveExecutionContext,
-    args: Record<string, unknown> = {},
-    query?: Record<string, unknown>
+    args: PolicyArgsObject = {},
+    query?: QueryResults
   ): boolean {
     const evaluate = typeEvaluators[ctx.policyDefinition.type];
     if (!evaluate) throw new Error(`Unsupported policy type ${ctx.policyDefinition.type}`);
@@ -119,11 +116,11 @@ export default class PolicyExecutor {
     return allow || false;
   }
 
-  static preparePolicyArgs(ctx: PolicyDirectiveExecutionContext): Record<string, unknown> | undefined {
+  static preparePolicyArgs(ctx: PolicyDirectiveExecutionContext): PolicyArgsObject | undefined {
     const supportedPolicyArgs = ctx.policyDefinition.args;
     if (!supportedPolicyArgs) return;
 
-    return Object.keys(supportedPolicyArgs).reduce<Record<string, unknown>>((policyArgs, policyArgName) => {
+    return Object.keys(supportedPolicyArgs).reduce<PolicyArgsObject>((policyArgs, policyArgName) => {
       if (ctx.policy?.args?.[policyArgName] === undefined) {
         throw new Error(
           `Missing arg ${policyArgName} for policy ${ctx.policy.name} in namespace ${ctx.policy.namespace}`

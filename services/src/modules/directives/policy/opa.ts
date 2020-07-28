@@ -1,7 +1,8 @@
 // @ts-ignore TODO: remove when type definitions will be included in opa-wasm package
 import * as Rego from '@open-policy-agent/opa-wasm';
 import { getCompiledFilename } from '../../opa-helper';
-import { PolicyEvaluationContext, PolicyEvaluationResult, LoadedPolicy } from './types';
+import { PolicyArgsObject } from '../../resource-repository';
+import { PolicyEvaluationContext, PolicyEvaluationResult, LoadedPolicy, QueryResults } from './types';
 
 export function evaluate(ctx: PolicyEvaluationContext): PolicyEvaluationResult {
   const filename = getCompiledFilename({ namespace: ctx.namespace, name: ctx.name });
@@ -28,6 +29,6 @@ function getInput(ctx: PolicyEvaluationContext): PolicyOpaInput {
 }
 
 type PolicyOpaInput = {
-  args?: Record<string, unknown>;
-  query?: Record<string, unknown>;
+  args?: PolicyArgsObject;
+  query?: QueryResults;
 };

@@ -1,5 +1,8 @@
-import { LoadedPolicy } from '../directives/policy/types';
-import { Policy } from '../directives/policy/types';
+import { Policy, LoadedPolicy } from '../directives/policy/types';
+
+export type PolicyAttachments = Record<string, LoadedPolicy>;
+export type PolicyQueryVariables = Record<string, unknown>;
+export type PolicyArgsObject = Record<string, unknown>;
 
 export interface ResourceGroup {
   schemas: Schema[];
@@ -7,7 +10,7 @@ export interface ResourceGroup {
   upstreamClientCredentials: UpstreamClientCredentials[];
   policies: PolicyDefinition[];
   // policyAttachments are compiled from the Rego code in opa policies, they are not directly modified by users
-  policyAttachments?: Record<string, LoadedPolicy>;
+  policyAttachments?: PolicyAttachments;
   basePolicy?: Policy;
 }
 
@@ -47,14 +50,14 @@ export interface UpstreamClientCredentials extends Resource {
 export interface PolicyDefinition extends Resource {
   type: PolicyType;
   code: string;
-  args?: Record<string, unknown>;
+  args?: PolicyArgsObject;
   query?: PolicyQuery;
   shouldOverrideBasePolicy?: boolean;
 }
 
 export interface PolicyQuery {
   gql: string;
-  variables?: Record<string, unknown>;
+  variables?: PolicyQueryVariables;
 }
 
 export interface FetchLatestResult {

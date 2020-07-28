@@ -1,12 +1,13 @@
 import { graphql } from 'graphql';
 import { injectArgs } from '../../arguments-injection';
 import { RequestContext } from '../../context';
-import { PolicyDirectiveExecutionContext } from './types';
+import { PolicyQueryVariables, PolicyArgsObject } from '../../resource-repository';
+import { PolicyDirectiveExecutionContext, QueryResults } from './types';
 
 export async function getQueryResult(
   ctx: PolicyDirectiveExecutionContext,
-  args: Record<string, unknown> = {}
-): Promise<Record<string, unknown> | undefined> {
+  args: PolicyArgsObject = {}
+): Promise<QueryResults> {
   const query = ctx.policyDefinition.query;
   if (!query) return;
 
@@ -15,12 +16,12 @@ export async function getQueryResult(
 }
 
 function prepareVariables(
-  args: Record<string, unknown> = {},
-  variables?: Record<string, unknown>
-): Record<string, unknown> | undefined {
+  args: PolicyArgsObject = {},
+  variables?: PolicyQueryVariables
+): PolicyQueryVariables | undefined {
   if (!variables) return;
 
-  return Object.entries(variables).reduce<Record<string, unknown>>((policyArgs, [varName, varValue]) => {
+  return Object.entries(variables).reduce<PolicyQueryVariables>((policyArgs, [varName, varValue]) => {
     if (typeof varValue === 'string') {
       varValue = injectArgs(varValue, args);
     }
@@ -31,8 +32,8 @@ function prepareVariables(
 
 async function executeQuery(
   ctx: PolicyDirectiveExecutionContext,
-  variables?: Record<string, unknown>
-): Promise<Record<string, unknown> | undefined> {
+  variables?: PolicyQueryVariables
+): Promise<QueryResults> {
   const requestContext: RequestContext = { ...ctx.requestContext, ignorePolicies: true };
   const gql = ctx.policyDefinition.query!.gql;
 
