@@ -3,6 +3,7 @@ import { ApolloServerPlugin } from 'apollo-server-plugin-base';
 import { GraphQLFieldResolverParams } from 'apollo-server-types';
 import { RequestContext } from '../context';
 import { Policy } from '../directives/policy/types';
+import { getPolicyDefinition } from '../directives/policy/policy-executor';
 
 export function createBasicPolicyPlugin(): ApolloServerPlugin {
   return {
@@ -24,11 +25,7 @@ export function createBasicPolicyPlugin(): ApolloServerPlugin {
               (acc, an) => ({ ...acc, [an.name.value]: valueFromASTUntyped(an.value) }),
               {}
             ) as Policy;
-            const policyDefinition = authConfig.policyExecutor.getPolicyDefinition(
-              authConfig.policies,
-              args.namespace,
-              args.name
-            );
+            const policyDefinition = getPolicyDefinition(authConfig.policies, args.namespace, args.name);
             return policyDefinition.shouldOverrideBasePolicy ?? false;
           });
 

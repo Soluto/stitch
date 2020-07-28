@@ -2,23 +2,26 @@ import { GraphQLResolveInfo } from 'graphql';
 import { RequestContext } from '../../context';
 import { PolicyDefinition, PolicyArgsObject } from '../../resource-repository';
 import { inject } from '../../arguments-injection';
-import { Policy, PolicyDirectiveExecutionContext, GraphQLArguments, PolicyCacheKey, QueryResults } from './types';
+import {
+  Policy,
+  PolicyDirectiveExecutionContext,
+  GraphQLArguments,
+  PolicyCacheKey,
+  QueryResults,
+  PolicyEvaluationContext,
+  PolicyEvaluationResult,
+} from './types';
 import { evaluate as evaluateOpa } from './opa';
 import { getQueryResult } from './policy-query-helper';
 import CachedOperation from './cached-operation';
 
-const typeEvaluators = {
+const typeEvaluators: Record<string, (ctx: PolicyEvaluationContext) => PolicyEvaluationResult> = {
   opa: evaluateOpa,
 };
 
 export default class PolicyExecutor {
-  private asyncCache: CachedOperation<PolicyCacheKey, Promise<boolean>>;
-  private syncCache: CachedOperation<PolicyCacheKey, boolean>;
-
-  constructor() {
-    this.asyncCache = new CachedOperation<PolicyCacheKey, Promise<boolean>>();
-    this.syncCache = new CachedOperation<PolicyCacheKey, boolean>();
-  }
+  private readonly asyncCache = new CachedOperation<PolicyCacheKey, Promise<boolean>>();
+  private readonly syncCache = new CachedOperation<PolicyCacheKey, boolean>();
 
   async evaluatePolicy(
     policy: Policy,
@@ -27,7 +30,7 @@ export default class PolicyExecutor {
     requestContext: RequestContext,
     info: GraphQLResolveInfo
   ): Promise<boolean> {
-    const policyDefinition = this.getPolicyDefinition(
+    const policyDefinition = getPolicyDefinition(
       requestContext.authorizationConfig.policies,
       policy.namespace,
       policy.name
@@ -42,13 +45,12 @@ export default class PolicyExecutor {
     requestContext: RequestContext,
     info: GraphQLResolveInfo
   ): boolean {
-    const policyDefinition = this.getPolicyDefinition(
+    const policyDefinition = getPolicyDefinition(
       requestContext.authorizationConfig.policies,
       policy.namespace,
       policy.name
     );
-    const result = this.getPolicyResultSync({ policy, parent, gqlArgs, requestContext, info, policyDefinition });
-    return result;
+    return this.getPolicyResultSync({ policy, parent, gqlArgs, requestContext, info, policyDefinition });
   }
 
   async validatePolicy(
@@ -78,27 +80,25 @@ export default class PolicyExecutor {
   }
 
   private async getPolicyResult(ctx: PolicyDirectiveExecutionContext): Promise<boolean> {
-    const args = PolicyExecutor.preparePolicyArgs(ctx);
+    const args = this.preparePolicyArgs(ctx);
     const cacheKey = { args, metadata: ctx.policyDefinition.metadata };
-    const executionFunction = () => this._evaluatePolicy(ctx, args);
+    const executionFunction = async () => {
+      const query = await getQueryResult(ctx, args);
+      return this._evaluatePolicy(ctx, args, query);
+    };
 
     return this.asyncCache.getOperationResult(cacheKey, executionFunction);
   }
 
   private getPolicyResultSync(ctx: PolicyDirectiveExecutionContext): boolean {
-    const args = PolicyExecutor.preparePolicyArgs(ctx);
+    const args = this.preparePolicyArgs(ctx);
     const cacheKey = { args, metadata: ctx.policyDefinition.metadata };
-    const executionFunction = () => this._evaluatePolicySync(ctx, args);
+    const executionFunction = () => this._evaluatePolicy(ctx, args);
 
     return this.syncCache.getOperationResult(cacheKey, executionFunction);
   }
 
-  private async _evaluatePolicy(ctx: PolicyDirectiveExecutionContext, args: PolicyArgsObject = {}): Promise<boolean> {
-    const query = await getQueryResult(ctx, args);
-    return this._evaluatePolicySync(ctx, args, query);
-  }
-
-  private _evaluatePolicySync(
+  private _evaluatePolicy(
     ctx: PolicyDirectiveExecutionContext,
     args: PolicyArgsObject = {},
     query?: QueryResults
@@ -116,7 +116,7 @@ export default class PolicyExecutor {
     return allow || false;
   }
 
-  static preparePolicyArgs(ctx: PolicyDirectiveExecutionContext): PolicyArgsObject | undefined {
+  private preparePolicyArgs(ctx: PolicyDirectiveExecutionContext): PolicyArgsObject | undefined {
     const supportedPolicyArgs = ctx.policyDefinition.args;
     if (!supportedPolicyArgs) return;
 
@@ -136,13 +136,13 @@ export default class PolicyExecutor {
       return policyArgs;
     }, {});
   }
+}
 
-  getPolicyDefinition(policyDefinitions: PolicyDefinition[], namespace: string, name: string) {
-    const policyDefinition = policyDefinitions.find(({ metadata }) => {
-      return metadata.namespace === namespace && metadata.name === name;
-    });
+export function getPolicyDefinition(policyDefinitions: PolicyDefinition[], namespace: string, name: string) {
+  const policyDefinition = policyDefinitions.find(({ metadata }) => {
+    return metadata.namespace === namespace && metadata.name === name;
+  });
 
-    if (!policyDefinition) throw new Error(`The policy ${name} in namespace ${namespace} was not found`);
-    return policyDefinition;
-  }
+  if (!policyDefinition) throw new Error(`The policy ${name} in namespace ${namespace} was not found`);
+  return policyDefinition;
 }

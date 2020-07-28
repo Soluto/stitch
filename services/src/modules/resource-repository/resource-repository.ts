@@ -2,12 +2,11 @@ import * as path from 'path';
 import pLimit from 'p-limit';
 import { Storage, listFilesItem } from '../storage';
 import { getWasmPolicy } from '../directives/policy/opa';
-import { LoadedPolicy } from '../directives/policy/types';
-import { FetchLatestResult, ResourceGroup, IResourceRepository } from '.';
+import { FetchLatestResult, ResourceGroup, IResourceRepository, PolicyAttachments } from '.';
 
 export class ResourceRepository implements IResourceRepository {
   protected resourceGroup?: { lastModified?: Date; resources: ResourceGroup };
-  protected policyAttachments: { attachments: Record<string, LoadedPolicy>; refreshedAt?: Date } = { attachments: {} };
+  protected policyAttachments: { attachments: PolicyAttachments; refreshedAt?: Date } = { attachments: {} };
 
   constructor(
     protected storage: Storage,

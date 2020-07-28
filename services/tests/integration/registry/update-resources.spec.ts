@@ -23,10 +23,6 @@ jest.mock('child_process', () => ({
   exec: jest.fn((_, cb) => cb()),
 }));
 
-jest.mock('../../../src/modules/directives/policy/opa.ts', () => ({
-  createLoadedPolicy: () => ({ evaluate: () => [{ result: { allow: true } }] }),
-}));
-
 const mockedExec = mocked(exec, true);
 
 const schema: Schema = {
