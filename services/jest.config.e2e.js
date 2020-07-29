@@ -4,6 +4,7 @@ module.exports = {
       displayName: 'End-to-End Tests',
       preset: 'ts-jest',
       rootDir: '.',
+      setupFiles: ['<rootDir>/tests/e2e/setup.js'],
       testTimeout: 60000,
       testMatch: ['<rootDir>/tests/e2e/**/*.spec.ts'],
       testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/'],

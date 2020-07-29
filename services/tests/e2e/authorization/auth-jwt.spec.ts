@@ -26,7 +26,7 @@ describe('authorization', () => {
     expect(schemaResponse.updateSchemas.success).toBeTruthy();
 
     // Wait for gateway to update before next tests
-    await sleep(1500);
+    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
   });
 
   afterAll(async () => {
@@ -36,7 +36,7 @@ describe('authorization', () => {
     expect(schemaResponse.updateSchemas.success).toBeTruthy();
 
     // Wait for gateway to update before next tests
-    await sleep(1500);
+    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
   });
 
   it('allows access to a field based on an argument using param injection from source', async () => {

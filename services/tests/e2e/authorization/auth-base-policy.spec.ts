@@ -109,7 +109,7 @@ describe('Authorization - Base policy', () => {
     expect(basePolicyResponse.updateBasePolicy.success).toBeTruthy();
 
     // Wait for gateway to update before next tests
-    await sleep(1500);
+    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
   });
 
   afterAll(async () => {
@@ -120,7 +120,7 @@ describe('Authorization - Base policy', () => {
     expect(basePolicyResponse.updateBasePolicy.success).toBeTruthy();
 
     // Wait for gateway to update before next tests
-    await sleep(1500);
+    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
   });
 
   test.each(testCases)('%s', async (_, payload) => {
