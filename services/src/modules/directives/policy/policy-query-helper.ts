@@ -1,7 +1,7 @@
 import { graphql } from 'graphql';
-import { PolicyArgsObject, PolicyQueryVariables } from '../../resource-repository';
 import { injectArgs } from '../../arguments-injection';
 import { RequestContext } from '../../context';
+import { PolicyQueryVariables, PolicyArgsObject } from '../../resource-repository';
 import { PolicyDirectiveExecutionContext, QueryResults } from './types';
 
 export async function getQueryResult(

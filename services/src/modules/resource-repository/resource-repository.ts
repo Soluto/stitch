@@ -2,7 +2,7 @@ import * as path from 'path';
 import pLimit from 'p-limit';
 import { Storage, listFilesItem } from '../storage';
 import { getWasmPolicy } from '../directives/policy/opa';
-import { FetchLatestResult, ResourceGroup, PolicyAttachments, IResourceRepository } from '.';
+import { FetchLatestResult, ResourceGroup, IResourceRepository, PolicyAttachments } from '.';
 
 export class ResourceRepository implements IResourceRepository {
   protected resourceGroup?: { lastModified?: Date; resources: ResourceGroup };
@@ -30,7 +30,7 @@ export class ResourceRepository implements IResourceRepository {
     this.resourceGroup = { lastModified: stats.lastModified, resources };
 
     await this.refreshPolicyAttachments();
-    resources.policyAttachments = { ...this.policyAttachments.attachments };
+    this.resourceGroup.resources.policyAttachments = { ...this.policyAttachments.attachments };
 
     return { isNew: true, resourceGroup: resources };
   }

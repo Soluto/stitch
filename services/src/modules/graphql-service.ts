@@ -4,12 +4,13 @@ import { Observable, Subscription } from 'rxjs';
 import { shareReplay, map, take, tap, catchError, skip } from 'rxjs/operators';
 import type { GraphQLRequestContextExecutionDidStart } from 'apollo-server-types';
 import { directiveMap, sdl as directivesSdl } from './directives';
-import { ResourceGroup, Policy, PolicyAttachments, Schema } from './resource-repository';
+import { ResourceGroup, PolicyDefinition, Schema } from './resource-repository';
 import { buildSchemaFromFederatedTypeDefs } from './build-federated-schema';
 import * as baseSchema from './base-schema';
 import { ActiveDirectoryAuth } from './auth/active-directory-auth';
 import logger from './logger';
 import { AuthenticationConfig } from './auth/types';
+import { AuthorizationConfig, PolicyExecutor } from './directives/policy';
 
 export function createGraphQLService(config: { resourceGroups: Observable<ResourceGroup> }) {
   let currentSchemaConfig: GraphQLServiceConfig;
@@ -57,7 +58,7 @@ export function createGraphQLService(config: { resourceGroups: Observable<Resour
   };
 }
 
-function buildPolicyGqlQuery(policy: Policy): DocumentNode {
+function buildPolicyGqlQuery(policy: PolicyDefinition): DocumentNode {
   const argStr = policy.args
     ? `(${Object.entries(policy.args)
         .map(([argName, argType]) => `${argName}: ${argType}`)
@@ -90,6 +91,13 @@ export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
     activeDirectoryAuth,
   };
 
+  const authorizationConfig: AuthorizationConfig = {
+    policies: rg.policies,
+    policyAttachments: rg.policyAttachments,
+    policyExecutor: new PolicyExecutor(),
+    basePolicy: rg.basePolicy,
+  };
+
   const schemaTypeDefs = schemas.map(s => [`${s.metadata.namespace}/${s.metadata.name}`, parse(s.schema)]);
   const policyQueryTypeDefs = policies.map(p => [
     `${p.metadata.namespace}___${p.metadata.name}`,
@@ -101,14 +109,14 @@ export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
     directiveTypeDefs: directivesSdl,
     resolvers: baseSchema.resolvers,
     schemaDirectives: directiveMap,
-    schemaDirectivesContext: { authenticationConfig },
+    schemaDirectivesContext: { authenticationConfig, authorizationConfig },
   });
+
   return {
     schema,
     executor(requestContext) {
       requestContext.context.authenticationConfig = authenticationConfig;
-      requestContext.context.policies = rg.policies;
-      requestContext.context.policyAttachments = rg.policyAttachments;
+      requestContext.context.authorizationConfig = authorizationConfig;
 
       return execute({
         document: requestContext.document,
@@ -122,13 +130,13 @@ export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
 }
 
 const defaultSchema: Schema = {
-  metadata: { namespace: '__internal__', name: 'default' },
+  metadata: { namespace: 'internal', name: 'default' },
   schema: 'type Query { default: String! @stub(value: "default") }',
 };
 
 const initialSchema: Schema = {
   metadata: {
-    namespace: '__internal__',
+    namespace: 'internal',
     name: '__initial__',
   },
   schema: `
@@ -144,7 +152,6 @@ const initialSchema: Schema = {
 declare module './context' {
   interface RequestContext {
     authenticationConfig: AuthenticationConfig;
-    policies: Policy[];
-    policyAttachments: PolicyAttachments;
+    authorizationConfig: AuthorizationConfig;
   }
 }

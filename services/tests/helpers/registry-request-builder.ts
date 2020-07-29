@@ -18,6 +18,14 @@ export const createSchemaMutation = print(gql`
   }
 `);
 
+export const createBasePolicyMutation = print(gql`
+  mutation UpdateBasePolicy($basePolicy: BasePolicyInput!) {
+    updateBasePolicy(input: $basePolicy) {
+      success
+    }
+  }
+`);
+
 export const emptySchema = (schema: Schema): Schema => ({
   metadata: schema.metadata,
   schema: '',
@@ -31,6 +39,12 @@ export interface CreatePolicyMutationResponse {
 
 export interface UpdateSchemasMutationResponse {
   updateSchemas: {
+    success: boolean;
+  };
+}
+
+export interface UpdateBasePolicyMutationResponse {
+  updateBasePolicy: {
     success: boolean;
   };
 }

@@ -1,5 +1,4 @@
 import { GraphQLResolveInfo } from 'graphql';
-import { GraphQLArguments } from '../directives/policy/types';
 import { RequestContext } from '../context';
 import { getExportsProxy } from '../exports';
 import evaluate from './arguments-evaluation';
@@ -25,7 +24,7 @@ export function inject<T = unknown>(
 export function deepInject(
   obj: { [key: string]: unknown },
   parent: unknown,
-  args: GraphQLArguments,
+  args: Record<string, unknown>,
   context: RequestContext,
   info: GraphQLResolveInfo
 ) {

@@ -1,55 +1,55 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Gateway",
-            "program": "${workspaceFolder}/services/dist/gateway.js",
-            "preLaunchTask": "tsc: build - services/tsconfig.json",
-            "outFiles": ["${workspaceFolder}/services/dist/**/*.js"],
-            "skipFiles": ["<node_internals>/**/*.js"],
-            "env": {
-                "RESOURCE_BUCKET_NAME": "stitch-resources",
-                "S3_ENDPOINT": "http://localhost:9000",
-                "AWS_ACCESS_KEY_ID": "stitch_key_id",
-                "AWS_SECRET_ACCESS_KEY": "stitch_secret_key",
-                "PORT": "8080"
-            }
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Registry",
-            "program": "${workspaceFolder}/services/dist/registry.js",
-            "preLaunchTask": "tsc: build - services/tsconfig.json",
-            "outFiles": ["${workspaceFolder}/services/dist/**/*.js"],
-            "skipFiles": ["<node_internals>/**/*.js"],
-            "env": {
-                "RESOURCE_BUCKET_NAME": "stitch-resources",
-                "S3_ENDPOINT": "http://localhost:9000",
-                "AWS_ACCESS_KEY_ID": "stitch_key_id",
-                "AWS_SECRET_ACCESS_KEY": "stitch_secret_key",
-                "PORT": "8090"
-            }
-        },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Debug Jest Tests",
-            "cwd": "${workspaceFolder}/services",
-            "args": [
-                "--inspect-brk",
-                "${workspaceRoot}/node_modules/.bin/jest",
-                "--runInBand",
-                "--config",
-                "${workspaceRoot}/jest.config.js"
-            ],
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen"
-        }
-    ]
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Gateway",
+      "program": "${workspaceFolder}/services/dist/gateway.js",
+      "preLaunchTask": "tsc: build - services/tsconfig.json",
+      "outFiles": ["${workspaceFolder}/services/dist/**/*.js"],
+      "skipFiles": ["<node_internals>/**/*.js"],
+      "env": {
+        "RESOURCE_BUCKET_NAME": "stitch-resources",
+        "S3_ENDPOINT": "http://localhost:9000",
+        "AWS_ACCESS_KEY_ID": "stitch_key_id",
+        "AWS_SECRET_ACCESS_KEY": "stitch_secret_key",
+        "PORT": "8080"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Registry",
+      "program": "${workspaceFolder}/services/dist/registry.js",
+      "preLaunchTask": "tsc: build - services/tsconfig.json",
+      "outFiles": ["${workspaceFolder}/services/dist/**/*.js"],
+      "skipFiles": ["<node_internals>/**/*.js"],
+      "env": {
+        "RESOURCE_BUCKET_NAME": "stitch-resources",
+        "S3_ENDPOINT": "http://localhost:9000",
+        "AWS_ACCESS_KEY_ID": "stitch_key_id",
+        "AWS_SECRET_ACCESS_KEY": "stitch_secret_key",
+        "PORT": "8090"
+      }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Jest Tests",
+      "cwd": "${workspaceFolder}/services",
+      "args": [
+        "--inspect-brk",
+        "${workspaceFolder}/services/node_modules/.bin/jest",
+        "--runInBand",
+        "--config",
+        "${workspaceFolder}/services/jest.config.js"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    }
+  ]
 }

@@ -28,6 +28,7 @@
     "apollo-server-core": "2.15.1",
     "apollo-server-env": "^2.4.5",
     "apollo-server-fastify": "^2.15.1",
+    "apollo-server-plugin-base": "^0.9.1",
     "apollo-server-types": "^0.5.1",
     "aws-sdk": "^2.715.0",
     "env-var": "^6.2.0",

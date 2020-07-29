@@ -30,7 +30,7 @@ describe('Authorization - Policy directive order', () => {
     expect(schemaResponse.updateSchemas.success).toBeTruthy();
 
     // Wait for gateway to update before next tests
-    await sleep(500);
+    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
   });
 
   test('Setup policies', async () => {
@@ -45,7 +45,7 @@ describe('Authorization - Policy directive order', () => {
     expect(schemaResponse.updateSchemas.success).toBeTruthy();
 
     // Wait for gateway to update before next tests
-    await sleep(500);
+    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
   });
 
   test('Query should return error', async () => {

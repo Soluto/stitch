@@ -1,11 +1,13 @@
 import { GraphQLResolveInfo } from 'graphql';
 import {
-  Policy as PolicyDefinition,
-  PolicyArgsObject,
-  PolicyAttachments,
+  PolicyDefinition,
   ResourceMetadata,
+  PolicyAttachments,
+  PolicyArgsObject,
 } from '../../resource-repository/types';
 import { RequestContext } from '../../context';
+
+export type QueryResults = Record<string, unknown> | undefined;
 
 export type Policy = {
   namespace: string;
@@ -21,8 +23,6 @@ export type PolicyEvaluationContext = {
   args?: PolicyArgsObject;
   query?: QueryResults;
 };
-
-export type QueryResults = { [name: string]: unknown } | undefined;
 
 export type PolicyEvaluationResult = {
   done: boolean;

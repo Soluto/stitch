@@ -1,8 +1,8 @@
 import { gql } from 'apollo-server-core';
 import { print } from 'graphql';
-import { PolicyType, Policy, Schema } from '../../../src/modules/resource-repository';
+import { PolicyType, PolicyDefinition, Schema } from '../../../src/modules/resource-repository';
 
-export const policies: Policy[] = [
+export const policies: PolicyDefinition[] = [
   {
     metadata: {
       name: 'alwaysDeny',

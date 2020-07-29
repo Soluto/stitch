@@ -5,8 +5,7 @@ import { sdl as restSdl, RestDirective } from './rest';
 import { sdl as gqlSdl, GqlDirective } from './gql';
 import { sdl as exportSdl, ExportDirective } from './export';
 import { sdl as selectSdl, SelectDirective } from './select';
-import { sdl as policySdl, PolicyDirective } from './policy/policy';
-import { sdl as policyQuerySdl, PolicyQueryDirective } from './policy/policy-query';
+import { policySdl, policyQuerySdl, PolicyDirective, PolicyQueryDirective } from './policy';
 
 export const directiveMap: { [visitorName: string]: typeof SchemaDirectiveVisitor } = {
   stub: StubDirective,

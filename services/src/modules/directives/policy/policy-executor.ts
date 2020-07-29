@@ -1,17 +1,28 @@
 import { GraphQLResolveInfo } from 'graphql';
 import { RequestContext } from '../../context';
-import { Policy as PolicyDefinition, PolicyArgsObject } from '../../resource-repository';
+import { PolicyDefinition, PolicyArgsObject } from '../../resource-repository';
 import { inject } from '../../arguments-injection';
-import { Policy, PolicyDirectiveExecutionContext, GraphQLArguments, PolicyCacheKey } from './types';
+import {
+  Policy,
+  PolicyDirectiveExecutionContext,
+  GraphQLArguments,
+  PolicyCacheKey,
+  QueryResults,
+  PolicyEvaluationContext,
+  PolicyEvaluationResult,
+} from './types';
 import { evaluate as evaluateOpa } from './opa';
 import { getQueryResult } from './policy-query-helper';
 import CachedOperation from './cached-operation';
 
-const typeEvaluators = {
+const typeEvaluators: Record<string, (ctx: PolicyEvaluationContext) => PolicyEvaluationResult> = {
   opa: evaluateOpa,
 };
 
-export default class PolicyExecutor extends CachedOperation<PolicyCacheKey, boolean> {
+export default class PolicyExecutor {
+  private readonly asyncCache = new CachedOperation<PolicyCacheKey, Promise<boolean>>();
+  private readonly syncCache = new CachedOperation<PolicyCacheKey, boolean>();
+
   async evaluatePolicy(
     policy: Policy,
     parent: unknown,
@@ -19,8 +30,27 @@ export default class PolicyExecutor extends CachedOperation<PolicyCacheKey, bool
     requestContext: RequestContext,
     info: GraphQLResolveInfo
   ): Promise<boolean> {
-    const policyDefinition = this.getPolicyDefinition(requestContext.policies, policy.namespace, policy.name);
+    const policyDefinition = getPolicyDefinition(
+      requestContext.authorizationConfig.policies,
+      policy.namespace,
+      policy.name
+    );
     return this.getPolicyResult({ policy, parent, gqlArgs, requestContext, info, policyDefinition });
+  }
+
+  evaluatePolicySync(
+    policy: Policy,
+    parent: unknown,
+    gqlArgs: GraphQLArguments,
+    requestContext: RequestContext,
+    info: GraphQLResolveInfo
+  ): boolean {
+    const policyDefinition = getPolicyDefinition(
+      requestContext.authorizationConfig.policies,
+      policy.namespace,
+      policy.name
+    );
+    return this.getPolicyResultSync({ policy, parent, gqlArgs, requestContext, info, policyDefinition });
   }
 
   async validatePolicy(
@@ -36,17 +66,43 @@ export default class PolicyExecutor extends CachedOperation<PolicyCacheKey, bool
     }
   }
 
+  validatePolicySync(
+    policy: Policy,
+    parent: unknown,
+    gqlArgs: GraphQLArguments,
+    requestContext: RequestContext,
+    info: GraphQLResolveInfo
+  ): void {
+    const allow = this.evaluatePolicySync(policy, parent, gqlArgs, requestContext, info);
+    if (!allow) {
+      throw new Error(`Unauthorized by policy ${policy.name} in namespace ${policy.namespace}`);
+    }
+  }
+
   private async getPolicyResult(ctx: PolicyDirectiveExecutionContext): Promise<boolean> {
+    const args = this.preparePolicyArgs(ctx);
+    const cacheKey = { args, metadata: ctx.policyDefinition.metadata };
+    const executionFunction = async () => {
+      const query = await getQueryResult(ctx, args);
+      return this._evaluatePolicy(ctx, args, query);
+    };
+
+    return this.asyncCache.getOperationResult(cacheKey, executionFunction);
+  }
+
+  private getPolicyResultSync(ctx: PolicyDirectiveExecutionContext): boolean {
     const args = this.preparePolicyArgs(ctx);
     const cacheKey = { args, metadata: ctx.policyDefinition.metadata };
     const executionFunction = () => this._evaluatePolicy(ctx, args);
 
-    return this.getOperationResult(cacheKey, executionFunction);
+    return this.syncCache.getOperationResult(cacheKey, executionFunction);
   }
 
-  private async _evaluatePolicy(ctx: PolicyDirectiveExecutionContext, args: PolicyArgsObject = {}): Promise<boolean> {
-    const query = await getQueryResult(ctx, args);
-
+  private _evaluatePolicy(
+    ctx: PolicyDirectiveExecutionContext,
+    args: PolicyArgsObject = {},
+    query?: QueryResults
+  ): boolean {
     const evaluate = typeEvaluators[ctx.policyDefinition.type];
     if (!evaluate) throw new Error(`Unsupported policy type ${ctx.policyDefinition.type}`);
 
@@ -54,7 +110,7 @@ export default class PolicyExecutor extends CachedOperation<PolicyCacheKey, bool
       ...ctx.policy,
       args,
       query,
-      policyAttachments: ctx.requestContext.policyAttachments,
+      policyAttachments: ctx.requestContext.authorizationConfig.policyAttachments!,
     });
     if (!done) throw new Error('in-line query evaluation not yet supported');
     return allow || false;
@@ -80,19 +136,13 @@ export default class PolicyExecutor extends CachedOperation<PolicyCacheKey, bool
       return policyArgs;
     }, {});
   }
-
-  private getPolicyDefinition(policyDefinitions: PolicyDefinition[], namespace: string, name: string) {
-    const policyDefinition = policyDefinitions.find(({ metadata }) => {
-      return metadata.namespace === namespace && metadata.name === name;
-    });
-
-    if (!policyDefinition) throw new Error(`The policy ${name} in namespace ${namespace} was not found`);
-    return policyDefinition;
-  }
 }
 
-declare module '../../context' {
-  interface RequestContext {
-    policyExecutor: PolicyExecutor;
-  }
+export function getPolicyDefinition(policyDefinitions: PolicyDefinition[], namespace: string, name: string) {
+  const policyDefinition = policyDefinitions.find(({ metadata }) => {
+    return metadata.namespace === namespace && metadata.name === name;
+  });
+
+  if (!policyDefinition) throw new Error(`The policy ${name} in namespace ${namespace} was not found`);
+  return policyDefinition;
 }

@@ -26,7 +26,7 @@ describe('Basic flow', () => {
     expect(schemaResponse.updateSchemas.success).toBeTruthy();
 
     // Wait for gateway to update before next tests
-    await sleep(500);
+    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
   });
 
   test('Setup schema', async () => {
@@ -36,7 +36,7 @@ describe('Basic flow', () => {
     expect(response1.updateSchemas.success).toBeTruthy();
 
     // Wait for gateway to update
-    await sleep(500);
+    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
 
     const response = await gatewayClient.request(query);
     expect(response).toMatchSnapshot();
@@ -49,7 +49,7 @@ describe('Basic flow', () => {
     expect(response1.updateSchemas.success).toBeTruthy();
 
     // Wait for gateway to update
-    await sleep(500);
+    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
 
     const response = await gatewayClient.request(query);
     expect(response).toMatchSnapshot();

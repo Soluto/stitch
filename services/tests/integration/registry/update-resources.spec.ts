@@ -11,7 +11,7 @@ import { mockResourceBucket } from '../resource-bucket';
 import { ResourceGroup } from '../../../src/modules/resource-repository';
 import {
   PolicyType,
-  Policy,
+  PolicyDefinition,
   Upstream,
   Schema,
   UpstreamClientCredentials,
@@ -52,7 +52,7 @@ const upstreamClientCredentials: UpstreamClientCredentials = {
 };
 const upstreamClientCredentialsActiveDirectoryUpdate = { clientSecret: 'myOtherClientSecret' };
 
-const policy: Policy = {
+const policy: PolicyDefinition = {
   metadata: { namespace: 'namespace', name: 'name' },
   type: PolicyType.opa,
   code: `real rego code
@@ -69,7 +69,7 @@ const policy: Policy = {
     },
   },
 };
-const policyUpdate: Partial<Policy> = { code: 'changed code', args: { just: 'Int' } };
+const policyUpdate: Partial<PolicyDefinition> = { code: 'changed code', args: { just: 'Int' } };
 
 const baseResourceGroup: ResourceGroup = {
   schemas: [schema],

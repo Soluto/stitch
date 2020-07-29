@@ -1,12 +1,17 @@
-import { LoadedPolicy } from '../directives/policy/types';
+import { Policy, LoadedPolicy } from '../directives/policy/types';
+
+export type PolicyAttachments = Record<string, LoadedPolicy>;
+export type PolicyQueryVariables = Record<string, unknown>;
+export type PolicyArgsObject = Record<string, unknown>;
 
 export interface ResourceGroup {
   schemas: Schema[];
   upstreams: Upstream[];
   upstreamClientCredentials: UpstreamClientCredentials[];
-  policies: Policy[];
+  policies: PolicyDefinition[];
   // policyAttachments are compiled from the Rego code in opa policies, they are not directly modified by users
   policyAttachments?: PolicyAttachments;
+  basePolicy?: Policy;
 }
 
 export interface Resource {
@@ -42,11 +47,12 @@ export interface UpstreamClientCredentials extends Resource {
   };
 }
 
-export interface Policy extends Resource {
+export interface PolicyDefinition extends Resource {
   type: PolicyType;
   code: string;
   args?: PolicyArgsObject;
   query?: PolicyQuery;
+  shouldOverrideBasePolicy?: boolean;
 }
 
 export interface PolicyQuery {
@@ -54,22 +60,10 @@ export interface PolicyQuery {
   variables?: PolicyQueryVariables;
 }
 
-export interface PolicyQueryVariables {
-  [key: string]: unknown;
-}
-
-export interface PolicyArgsObject {
-  [name: string]: unknown;
-}
-
 export interface FetchLatestResult {
   isNew: boolean;
   resourceGroup: ResourceGroup;
 }
-
-export type PolicyAttachments = {
-  [filename: string]: LoadedPolicy;
-};
 
 export interface IResourceRepository {
   fetchLatest(): Promise<FetchLatestResult>;

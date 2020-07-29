@@ -1,0 +1,159 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Authorization - Base policy JWT pass all policies 1`] = `
+Object {
+  "bp_bar": "BAR",
+  "bp_baz": "BAZ",
+  "bp_foo": "FOO",
+}
+`;
+
+exports[`Authorization - Base policy JWT pass base and regular policy 1`] = `
+{
+  "errors": [
+    {
+      "message": "Unauthorized by policy override_base_policy in namespace auth_bp",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "bp_foo": "FOO",
+    "bp_bar": "BAR",
+    "bp_baz": null
+  }
+}
+`;
+
+exports[`Authorization - Base policy JWT pass none of policies 1`] = `
+{
+  "errors": [
+    {
+      "message": "Unauthorized by policy base_policy in namespace internal",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    },
+    {
+      "message": "Unauthorized by policy base_policy in namespace internal",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    },
+    {
+      "message": "Unauthorized by policy override_base_policy in namespace auth_bp",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "bp_foo": null,
+    "bp_bar": null,
+    "bp_baz": null
+  }
+}
+`;
+
+exports[`Authorization - Base policy JWT pass only base policy 1`] = `
+{
+  "errors": [
+    {
+      "message": "Unauthorized by policy regular_policy in namespace auth_bp",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    },
+    {
+      "message": "Unauthorized by policy override_base_policy in namespace auth_bp",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "bp_foo": "FOO",
+    "bp_bar": null,
+    "bp_baz": null
+  }
+}
+`;
+
+exports[`Authorization - Base policy JWT pass only override policy 1`] = `
+{
+  "errors": [
+    {
+      "message": "Unauthorized by policy base_policy in namespace internal",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    },
+    {
+      "message": "Unauthorized by policy base_policy in namespace internal",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "bp_foo": null,
+    "bp_bar": null,
+    "bp_baz": "BAZ"
+  }
+}
+`;
+
+exports[`Authorization - Base policy JWT pass only regular policy 1`] = `
+{
+  "errors": [
+    {
+      "message": "Unauthorized by policy base_policy in namespace internal",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    },
+    {
+      "message": "Unauthorized by policy base_policy in namespace internal",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    },
+    {
+      "message": "Unauthorized by policy override_base_policy in namespace auth_bp",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "bp_foo": null,
+    "bp_bar": null,
+    "bp_baz": null
+  }
+}
+`;
+
+exports[`Authorization - Base policy JWT pass regular and override policy 1`] = `
+{
+  "errors": [
+    {
+      "message": "Unauthorized by policy base_policy in namespace internal",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    },
+    {
+      "message": "Unauthorized by policy base_policy in namespace internal",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "bp_foo": null,
+    "bp_bar": null,
+    "bp_baz": "BAZ"
+  }
+}
+`;

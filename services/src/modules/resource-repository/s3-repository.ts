@@ -37,7 +37,7 @@ export class S3ResourceRepository extends ResourceRepository {
     this.resourceGroup = { etag, resources };
 
     await this.refreshPolicyAttachments();
-    resources.policyAttachments = { ...this.policyAttachments.attachments };
+    this.resourceGroup.resources.policyAttachments = { ...this.policyAttachments.attachments };
 
     return { isNew: true, resourceGroup: resources };
   }
