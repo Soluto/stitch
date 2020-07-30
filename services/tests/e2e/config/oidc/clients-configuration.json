@@ -1,0 +1,11 @@
+[
+  {
+    "ClientId": "gateway-client-id",
+    "ClientSecrets": ["gateway-client-secret"],
+    "Description": "Stitch gateway calling API",
+    "AllowedGrantTypes": ["client_credentials"],
+    "AllowedScopes": ["stitch-gateway"],
+    "ClientClaimsPrefix": "",
+    "Claims": []
+  }
+]
