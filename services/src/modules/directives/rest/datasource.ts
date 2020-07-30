@@ -3,7 +3,7 @@ import { RequestInit, Headers, Request } from 'apollo-server-env';
 import { GraphQLResolveInfo } from 'graphql';
 import { inject } from '../../arguments-injection';
 import { RequestContext } from '../../context';
-import { getAuthHeaders } from '../../auth/get-auth-headers';
+import { getAuthHeaders } from '../../upstream-authentication';
 import { KeyValue, RestParams } from './types';
 
 type GraphQLArguments = { [key: string]: unknown };
