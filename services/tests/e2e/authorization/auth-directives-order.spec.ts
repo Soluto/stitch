@@ -10,15 +10,19 @@ import {
 } from '../../helpers/registry-request-builder';
 import { sleep } from '../../helpers/utility';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
+import { getToken } from '../../helpers/get-token';
 import { schema, policies } from './auth-directives-order.schema';
 
 describe('Authorization - Policy directive order', () => {
   let gatewayClient: GraphQLClient;
   let registryClient: GraphQLClient;
 
-  beforeAll(() => {
+  beforeAll(async () => {
     gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
     registryClient = new GraphQLClient('http://localhost:8090/graphql');
+
+    const accessToken = await getToken();
+    gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
 
     expect.addSnapshotSerializer(GraphQLErrorSerializer);
   });

@@ -7,6 +7,7 @@ import {
   UpdateSchemasMutationResponse,
   emptySchema,
 } from '../../helpers/registry-request-builder';
+import { getToken } from '../../helpers/get-token';
 import { schema1, schema2 } from './hello-world.schema';
 
 const gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
@@ -18,6 +19,11 @@ describe('Basic flow', () => {
       foo
     }
   `);
+
+  beforeAll(async () => {
+    const accessToken = await getToken();
+    gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
+  });
 
   afterAll(async () => {
     const schemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {

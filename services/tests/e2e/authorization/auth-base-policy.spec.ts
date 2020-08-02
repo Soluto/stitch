@@ -1,5 +1,4 @@
 import { GraphQLClient } from 'graphql-request';
-import { sign as signJwt } from 'jsonwebtoken';
 import { sleep } from '../../helpers/utility';
 import {
   createSchemaMutation,
@@ -11,69 +10,16 @@ import {
 } from '../../helpers/registry-request-builder';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { Policy } from '../../../src/modules/directives/policy/types';
+import * as oidcClients from '../config/oidc/clients-configuration.json';
+import { getToken } from '../../helpers/get-token';
 import { schema, policies, query } from './auth-base-policy.schema';
 
-let gatewayClient: GraphQLClient;
+const gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
 const registryClient = new GraphQLClient('http://localhost:8090/graphql');
 
-const testCases = [
-  [
-    'JWT pass none of policies',
-    {
-      role: 'manager',
-      isActive: false,
-      isGuest: false,
-    },
-  ],
-  [
-    'JWT pass all policies',
-    {
-      role: 'admin',
-      isActive: true,
-      isGuest: true,
-    },
-  ],
-  [
-    'JWT pass only base policy',
-    {
-      role: 'admin',
-      isActive: false,
-      isGuest: false,
-    },
-  ],
-  [
-    'JWT pass only regular policy',
-    {
-      role: 'manager',
-      isActive: true,
-      isGuest: false,
-    },
-  ],
-  [
-    'JWT pass only override policy',
-    {
-      role: 'manager',
-      isActive: false,
-      isGuest: true,
-    },
-  ],
-  [
-    'JWT pass base and regular policy',
-    {
-      role: 'admin',
-      isActive: true,
-      isGuest: false,
-    },
-  ],
-  [
-    'JWT pass regular and override policy',
-    {
-      role: 'manager',
-      isActive: true,
-      isGuest: true,
-    },
-  ],
-];
+const testCases: [string, { ClientId: string }][] = oidcClients
+  .filter(c => c.ClientId.startsWith('e2e-base-policy'))
+  .map(c => [c.Description, c]);
 
 describe('Authorization - Base policy', () => {
   const basePolicy: Policy = {
@@ -123,10 +69,9 @@ describe('Authorization - Base policy', () => {
     await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
   });
 
-  test.each(testCases)('%s', async (_, payload) => {
-    const encodedJwt = signJwt(JSON.stringify(payload), 'e2e-key');
-    const options = { headers: { authorization: `Bearer ${encodedJwt}` } };
-    gatewayClient = new GraphQLClient('http://localhost:8080/graphql', options);
+  test.each(testCases)('%s', async (_, clientConfig) => {
+    const accessToken = await getToken(clientConfig.ClientId);
+    gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
     const result = await gatewayClient.request(query).catch(err => err.response);
     expect(result).toMatchSnapshot();
   });

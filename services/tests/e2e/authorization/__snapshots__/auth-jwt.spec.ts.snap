@@ -8,6 +8,16 @@ Object {
 }
 `;
 
+exports[`authorization allows access to a field based on an argument using param injection from source 1`] = `
+Object {
+  "userAdmin": Object {
+    "firstName": "John",
+    "lastName": "Smith",
+    "role": "admin",
+  },
+}
+`;
+
 exports[`authorization rejects access to a field based on JWT info 1`] = `
 {
   "errors": [

@@ -1,10 +1,12 @@
 import * as querystring from 'querystring';
+import * as jwtUtil from 'jsonwebtoken';
+import * as NodeRSA from 'node-rsa';
 
-export default async function getToken(
-  tokenEndpoint: string,
-  clientId: string,
-  clientSecret: string,
-  scope: string
+export async function getToken(
+  clientId = 'gateway-client-id',
+  clientSecret = 'gateway-client-secret',
+  scope = 'stitch-gateway',
+  tokenEndpoint = 'http://localhost:8070/connect/token'
 ): Promise<string> {
   const response = await fetch(tokenEndpoint, {
     method: 'POST',
@@ -21,4 +23,20 @@ export default async function getToken(
   });
   const responseBody = await response.json();
   return responseBody.access_token as string;
+}
+
+export async function getInvalidToken(
+  clientId = 'gateway-client-id',
+  scope = ['stitch-gateway'],
+  issuer = 'http://localhost:8070'
+): Promise<string> {
+  const secret = new NodeRSA({ b: 2048 }).exportKey('private');
+  const accessToken = jwtUtil.sign({ client_id: clientId, scope }, secret, {
+    algorithm: 'RS256',
+    issuer,
+    keyid: 'C1B59DF60057CFB292C4E36CCE329615',
+    audience: 'Stitch Gateway',
+    jwtid: '248A293C7FA8D9C3BDB021F963344E94',
+  });
+  return accessToken;
 }

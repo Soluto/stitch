@@ -26,7 +26,7 @@ class SerialJestRunner extends DefaultJestRunner {
   }
 
   async teardown() {
-    // await dockerCompose.logs(['gateway', 'registry'], options);
+    // await dockerCompose.logs(['gateway', 'registry', 'oidc-server-mock'], options);
     await dockerCompose.down(options);
     await waitFor.stop(30000);
   }
