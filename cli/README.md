@@ -7,46 +7,61 @@ Commands like `apply:resources` expect resources in YAML files in a specific for
 ```yaml
 kind: Schema
 metadata:
-    name: users-api
-    namespace: users
+  name: usersApi
+  namespace: users
 schema: |
-    type Query {
-        getUser(id: ID!): String
-            @rest(url: "http://users-service/users/{args.id}")
-    }
+  type Query {
+      getUser(id: ID!): String
+          @rest(url: "http://users-service/users/{args.id}")
+  }
 ```
 
 ```yaml
 kind: Upstream
 metadata:
-    name: users-api
-    namespace: users
+  name: usersApi
+  namespace: users
 host: 'users-service'
 auth:
-    type: ActiveDirectory
-    activeDirectory:
-        authority: https://login.microsoftonline.com/<TENANT_ID>
-        resource: http://user-service-ad-resource
+  type: ActiveDirectory
+  activeDirectory:
+    authority: https://login.microsoftonline.com/<TENANT_ID>
+    resource: http://user-service-ad-resource
 ```
 
 ```yaml
 kind: UpstreamClientCredentials
 metadata:
-    name: activedirectory-tenant
-    namespace: users
+  name: activedirectoryTenant
+  namespace: users
 authType: ActiveDirectory
 activeDirectory:
-    authority: https://login.microsoftonline.com/<TENANT_ID>
-    clientId: myAdClientId
-    clientSecret: myAdClientSecret
+  authority: https://login.microsoftonline.com/<TENANT_ID>
+  clientId: myAdClientId
+  clientSecret: myAdClientSecret
+```
+
+```yaml
+kind: Policy
+metadata:
+  name: usersPolicy
+  namespace: users
+type: opa
+code: |
+  default allow = false
+  allow {
+      input.args.role == "admin"
+  }
+args:
+  role: String
 ```
 
 # Commands
 
 <!-- commands -->
 
--   [`stitch apply:resources RESOURCESPATH`](#stitch-applyresources-resourcespath)
--   [`stitch help [COMMAND]`](#stitch-help-command)
+- [`stitch apply:resources RESOURCESPATH`](#stitch-applyresources-resourcespath)
+- [`stitch help [COMMAND]`](#stitch-help-command)
 
 ## `stitch apply:resources RESOURCESPATH`
 
@@ -66,7 +81,7 @@ EXAMPLE
   Uploaded successfully!
 ```
 
-_See code: [src/commands/apply/resources.ts](https://github.com/Soluto/agogos/blob/master/src/commands/apply/resources.ts)_
+_See code: [src/commands/apply/resources.ts](https://github.com/Soluto/stitch/blob/v0.0.6/src/commands/apply/resources.ts)_
 
 ## `stitch help [COMMAND]`
 
@@ -82,5 +97,7 @@ ARGUMENTS
 OPTIONS
   --all  see all commands in CLI
 ```
+
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.3/src/commands/help.ts)_
 
 <!-- commandsstop -->
