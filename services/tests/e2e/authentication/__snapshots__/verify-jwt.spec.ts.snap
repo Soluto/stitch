@@ -2,8 +2,10 @@
 
 exports[`Authentication - Verify JWT Invalid JWT token 1`] = `
 Object {
-  "error": "",
+  "error": "Unauthorized",
+  "message": "Unauthorized",
   "status": 401,
+  "statusCode": 401,
 }
 `;
 

@@ -1,6 +1,7 @@
 import * as fastify from 'fastify';
 import * as fastifyMetrics from 'fastify-metrics';
-
+import * as jwtPlugin from 'fastify-jwt';
+import * as authPlugin from 'fastify-auth';
 import * as config from './modules/config';
 import logger from './modules/logger';
 import { handleSignals, handleUncaughtErrors } from './modules/shutdown-handler';
@@ -13,6 +14,7 @@ import {
   CompositeResourceRepository,
   IResourceRepository,
 } from './modules/resource-repository';
+import { getSecret, jwtAuthStrategy, anonymousAuthStrategy } from './modules/authentication';
 
 async function run() {
   logger.info('Stitch gateway booting up...');
@@ -24,9 +26,20 @@ async function run() {
     introspection: config.enableGraphQLIntrospection,
   });
 
-  const app = fastify();
-  app.register(fastifyMetrics, { endpoint: '/metrics' });
-  app.register(server.createHandler({ path: '/graphql' }));
+  const app = fastify()
+    .register(authPlugin)
+    .register(jwtPlugin, {
+      secret: getSecret as any,
+      verify: {
+        algorithms: ['RS256'],
+      },
+    })
+    .register(fastifyMetrics, { endpoint: '/metrics' })
+    .register(server.createHandler({ path: '/graphql' }));
+  app.after(() => {
+    app.addHook('onRequest', app.auth([jwtAuthStrategy, anonymousAuthStrategy]));
+  });
+
   const address = await app.listen(config.httpPort, '0.0.0.0');
   logger.info({ address }, 'Stitch gateway started');
 
