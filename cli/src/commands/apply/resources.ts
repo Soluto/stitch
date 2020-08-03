@@ -57,19 +57,20 @@ Uploaded successfully!
           schemas: safeConcat(rg.schemas, subRg.schemas),
           upstreams: safeConcat(rg.upstreams, subRg.upstreams),
           upstreamClientCredentials: safeConcat(rg.upstreamClientCredentials, subRg.upstreamClientCredentials),
+          policies: safeConcat(rg.policies, subRg.policies),
         }),
-        { schemas: [], upstreams: [], upstreamClientCredentials: [] }
+        { schemas: [], upstreams: [], upstreamClientCredentials: [], policies: [] }
       );
 
       return resultRg;
     }
 
     // This should only happen with weird symlinks etc
-    return { schemas: [], upstreams: [], upstreamClientCredentials: [] };
+    return { schemas: [], upstreams: [], upstreamClientCredentials: [], policies: [] };
   }
 
   resourcesToResourceGroup(files: { [filepath: string]: any[] }) {
-    const rg: ResourceGroupInput = { schemas: [], upstreams: [], upstreamClientCredentials: [] };
+    const rg: ResourceGroupInput = { schemas: [], upstreams: [], upstreamClientCredentials: [], policies: [] };
 
     for (const filepath in files) {
       const resources = files[filepath];
@@ -86,6 +87,9 @@ Uploaded successfully!
             continue;
           case 'UpstreamClientCredentials':
             rg.upstreamClientCredentials!.push(resource);
+            continue;
+          case 'Policy':
+            rg.policies!.push(resource);
             continue;
           default:
             this.log('Unknown resource kind', filepath);

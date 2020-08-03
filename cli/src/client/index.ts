@@ -31,8 +31,8 @@ export async function uploadResourceGroup(
   const query = options.dryRun ? ValidateResourceGroupQuery : UploadResourceGroupMutation;
 
   try {
-    const data = await registryClient.request(query, { resourceGroup: rg });
-    console.log(data?.result);
+    const data = await registryClient.request<{ result: boolean }>(query, { resourceGroup: rg });
+    console.log(data.result);
   } catch (err) {
     console.log('FAILURE');
     throw err;
