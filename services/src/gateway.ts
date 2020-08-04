@@ -29,7 +29,7 @@ async function run() {
   const app = fastify()
     .register(authPlugin)
     .register(jwtPlugin, {
-      secret: getSecret as any,
+      secret: getSecret,
       verify: {
         algorithms: ['RS256'],
       },
