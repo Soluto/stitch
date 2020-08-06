@@ -14,12 +14,18 @@ const gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
 const registryClient = new GraphQLClient('http://localhost:8090/graphql');
 
 describe('authorization', () => {
+  let defaultAccessToken: string;
+
   beforeAll(async () => {
     expect.addSnapshotSerializer(GraphQLErrorSerializer);
 
-    const accessToken = await getToken();
-    gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
+    defaultAccessToken = await getToken();
   });
+
+  beforeEach(() => {
+    gatewayClient.setHeader('Authorization', `Bearer ${defaultAccessToken}`);
+  });
+
   // This is kind of both the "before" section and a test, but it was weird putting a test in an actual before section
   it('creates the policy and schema resources', async () => {
     const policiesResponse: any = await registryClient.request(createPolicyMutation, { policies });

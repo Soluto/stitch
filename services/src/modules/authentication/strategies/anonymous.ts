@@ -7,7 +7,7 @@ export default function (
   done: (error?: Error) => void
 ) {
   const anonymousPaths = authenticationConfig?.anonymous?.paths;
-  if (anonymousPaths && anonymousPaths.some(ap => request.raw.url?.endsWith(ap))) {
+  if (anonymousPaths?.some(ap => request.raw.url?.endsWith(ap))) {
     done();
     return;
   }

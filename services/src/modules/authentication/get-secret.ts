@@ -7,7 +7,7 @@ import { decode } from 'jsonwebtoken';
 import logger from '../logger';
 import { authenticationConfig } from '../config';
 
-type DecodeJWT = {
+type DecodedJWT = {
   header: Record<string, unknown>;
   payload: Record<string, unknown>;
   signature: string;
@@ -22,7 +22,7 @@ export default function getSecret(
 ): void {
   const authHeader: string = request.headers.authorization;
   const token = authHeader.split(' ')[1];
-  const decodedToken = decode(token, { complete: true, json: true }) as DecodeJWT;
+  const decodedToken = decode(token, { complete: true, json: true }) as DecodedJWT;
   const kid = decodedToken?.header.kid as string;
   const issuer = decodedToken?.payload.iss as string;
 

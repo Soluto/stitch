@@ -1,7 +1,6 @@
 import * as path from 'path';
 import * as envVar from 'env-var';
 import { AuthenticationConfig } from './authentication/types';
-// import { AuthenticationConfig } from './authentication/types';
 
 // General
 export const httpPort = envVar.get('PORT').default('8080').asIntPositive();
@@ -27,4 +26,10 @@ export const tmpPoliciesDir = envVar
   .asString();
 
 // Authentication
-export const authenticationConfig = envVar.get('AUTHENTICATION_CONFIGURATION').asJsonObject() as AuthenticationConfig;
+const defaultAuthenticationConfig: AuthenticationConfig = {
+  anonymous: {
+    paths: ['/metrics', '/.well-known/apollo/server-health', '/graphql'],
+  },
+};
+export const authenticationConfig =
+  (envVar.get('AUTHENTICATION_CONFIGURATION').asJsonObject() as AuthenticationConfig) ?? defaultAuthenticationConfig;
