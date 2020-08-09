@@ -6,7 +6,7 @@ import evaluate from './arguments-evaluation';
 
 declare module '../context' {
   interface RequestContext {
-    request: Pick<FastifyRequest, 'headers' | 'decodedJWT'>;
+    request: Pick<FastifyRequest, 'headers' | 'decodeJWT'>;
   }
 }
 
@@ -20,7 +20,7 @@ export function inject<T = unknown>(
   const data = {
     source,
     args,
-    jwt: context?.request?.decodedJWT?.payload,
+    jwt: context?.request?.decodeJWT?.()?.payload,
     exports: info && context && getExportsProxy(context.exports, info?.parentType, source as Record<string, unknown>),
     vars: info?.variableValues,
   };

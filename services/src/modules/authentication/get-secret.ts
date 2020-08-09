@@ -13,8 +13,9 @@ export default function getSecret(
   _reply: fastify.FastifyReply<unknown>,
   cb: (e: Error | null, secret: string | undefined) => void
 ): void {
-  const kid = request.decodedJWT?.header.kid as string;
-  const issuer = request.decodedJWT?.payload.iss as string;
+  const decodedJWT = request.decodeJWT();
+  const kid = decodedJWT?.header.kid as string;
+  const issuer = decodedJWT?.payload.iss as string;
 
   const issuerConfig = authenticationConfig?.jwt?.[issuer];
   if (!issuerConfig) {

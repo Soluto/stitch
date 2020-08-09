@@ -33,10 +33,12 @@ const testCases: [string, TestCase][] = [
       context: {
         request: {
           headers: {},
-          decodedJWT: {
-            header: {},
-            payload: { email: 'something@domain.com' },
-            signature: '',
+          decodeJWT() {
+            return {
+              header: {},
+              payload: { email: 'something@domain.com' },
+              signature: '',
+            };
           },
         },
         exports: { resolve: () => ({}) },

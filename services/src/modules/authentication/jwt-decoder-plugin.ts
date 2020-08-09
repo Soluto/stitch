@@ -18,26 +18,29 @@ declare module 'fastify' {
     Headers = DefaultHeaders,
     Body = DefaultBody
   > {
-    decodeJWT(): Promise<void>;
-    decodedJWT?: DecodedJWT | null;
+    decodeJWT(): DecodedJWT | undefined;
+    _decodedJWT?: DecodedJWT | null;
   }
 }
 
-async function decodeRequestJwt(this: FastifyRequest) {
+function decodeRequestJwt(this: FastifyRequest) {
+  if (this._decodedJWT) return this._decodedJWT;
   try {
     const authHeader = this.headers.authorization;
     if (!authHeader) return;
     const authToken = String(authHeader).split(' ')[1];
-    const maybeDecodedJWT = (await decode(authToken, { complete: true, json: true })) as DecodedJWT | null;
+    const maybeDecodedJWT = decode(authToken, { complete: true, json: true }) as DecodedJWT | null;
     if (maybeDecodedJWT) {
-      this.decodedJWT = maybeDecodedJWT;
+      this._decodedJWT = maybeDecodedJWT;
+      return this._decodedJWT;
     }
+    return;
   } catch (e) {
     logger.warn(e, 'Fail to extract and decode JWT from request');
+    return;
   }
 }
 
 export default fp(async function (instance: FastifyInstance) {
-  console.log('===== PLUGIN ENABLED =====');
   instance.decorateRequest('decodeJWT', decodeRequestJwt);
 });
