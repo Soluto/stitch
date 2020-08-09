@@ -5,7 +5,6 @@ import { createGraphQLService } from './graphql-service';
 import { RESTDirectiveDataSource } from './directives/rest';
 import { ResourceGroup } from './resource-repository';
 import { ExportTrackingExtension } from './exports';
-import { getJwt } from './arguments-injection';
 import { createBasicPolicyPlugin } from './plugins/base-policy';
 
 export interface GatewayConfig extends Config {
@@ -24,7 +23,6 @@ export function createStitchGateway(config: GatewayConfig) {
     context(request: fastify.FastifyRequest) {
       const ctx = {
         request,
-        jwt: getJwt(request),
       };
       return ctx;
     },

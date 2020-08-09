@@ -1,30 +1,11 @@
-import { sign as signJwt } from 'jsonwebtoken';
-import { FastifyRequest } from 'fastify';
 import { RequestContext } from '../context';
 import { inject } from './arguments-injection';
-import getJwt from './request-context-jwt';
-
-function createJwt(claims: { [k: string]: unknown }) {
-  const request = {
-    headers: {
-      authorization: `Bearer ${signJwt(claims, 'secret')}`,
-    },
-  };
-  return getJwt(request);
-}
-
-declare module '../context' {
-  interface RequestContext {
-    request: Pick<FastifyRequest, 'headers'>;
-    jwt?: Record<string, unknown>;
-  }
-}
 
 interface TestCase {
   template: string;
   source?: unknown;
   args?: Record<string, unknown>;
-  context?: Pick<RequestContext, 'exports' | 'jwt'>;
+  context?: Pick<RequestContext, 'request' | 'exports'>;
   expected: unknown;
 }
 
@@ -50,7 +31,14 @@ const testCases: [string, TestCase][] = [
     {
       template: '{jwt.email}',
       context: {
-        jwt: createJwt({ email: 'something@domain.com' }),
+        request: {
+          headers: {},
+          decodedJWT: {
+            header: {},
+            payload: { email: 'something@domain.com' },
+            signature: '',
+          },
+        },
         exports: { resolve: () => ({}) },
       },
       expected: 'something@domain.com',
