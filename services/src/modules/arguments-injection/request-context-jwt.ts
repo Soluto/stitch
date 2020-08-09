@@ -1,5 +1,5 @@
 import { decode as decodeJwt } from 'jsonwebtoken';
-import fastify, { FastifyRequest } from 'fastify';
+import { FastifyRequest } from 'fastify';
 
 type jwtData = {
   [name: string]: unknown;
@@ -7,7 +7,7 @@ type jwtData = {
 
 declare module '../context' {
   interface RequestContext {
-    request: Pick<fastify.FastifyRequest, 'headers'>;
+    request: Pick<FastifyRequest, 'headers'>;
     jwt?: jwtData;
   }
 }
@@ -15,7 +15,7 @@ const authzHeaderPrefix = 'Bearer ';
 
 interface JwtProxy {
   _jwt?: jwtData;
-  request: Pick<fastify.FastifyRequest, 'headers'>;
+  request: Pick<FastifyRequest, 'headers'>;
 }
 
 function getJwtClaim(target: JwtProxy, property: string): unknown {

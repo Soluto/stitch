@@ -15,6 +15,7 @@ import {
   IResourceRepository,
 } from './modules/resource-repository';
 import { getSecret, jwtAuthStrategy, anonymousAuthStrategy } from './modules/authentication';
+import jwtDecoderPlugin from './modules/authentication/jwt-decoder-plugin';
 
 async function run() {
   logger.info('Stitch gateway booting up...');
@@ -34,6 +35,7 @@ async function run() {
         algorithms: ['RS256'],
       },
     })
+    .register(jwtDecoderPlugin)
     .register(fastifyMetrics, { endpoint: '/metrics' })
     .register(server.createHandler({ path: '/graphql' }));
   app.after(() => {

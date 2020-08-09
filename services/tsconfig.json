@@ -8,7 +8,6 @@
     "rootDir": "src",
     "outDir": "dist",
     "removeComments": true,
-    "allowSyntheticDefaultImports": true,
     "importHelpers": true,
     "strict": true,
     "sourceMap": true,

@@ -1,17 +1,10 @@
-import fastify from 'fastify';
+import * as fastify from 'fastify';
 
 // There is problem with typings in the module: https://github.com/auth0/node-jwks-rsa/issues/78
 import * as jwks from 'jwks-rsa';
 import { ClientOptions, JwksClient } from 'jwks-rsa';
-import { decode } from 'jsonwebtoken';
 import logger from '../logger';
 import { authenticationConfig } from '../config';
-
-type DecodedJWT = {
-  header: Record<string, unknown>;
-  payload: Record<string, unknown>;
-  signature: string;
-};
 
 const createClient = (jwks as unknown) as (options: ClientOptions) => JwksClient;
 
@@ -20,11 +13,8 @@ export default function getSecret(
   _reply: fastify.FastifyReply<unknown>,
   cb: (e: Error | null, secret: string | undefined) => void
 ): void {
-  const authHeader: string = request.headers.authorization;
-  const token = authHeader.split(' ')[1];
-  const decodedToken = decode(token, { complete: true, json: true }) as DecodedJWT;
-  const kid = decodedToken?.header.kid as string;
-  const issuer = decodedToken?.payload.iss as string;
+  const kid = request.decodedJWT?.header.kid as string;
+  const issuer = request.decodedJWT?.payload.iss as string;
 
   const issuerConfig = authenticationConfig?.jwt?.[issuer];
   if (!issuerConfig) {
