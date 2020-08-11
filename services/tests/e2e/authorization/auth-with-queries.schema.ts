@@ -5,8 +5,8 @@ import { PolicyDefinition, PolicyType, Schema } from '../../../src/modules/resou
 export const policies: PolicyDefinition[] = [
   {
     metadata: {
-      name: 'alwaysDenied',
-      namespace: 'auth_with_query',
+      name: 'always-denied',
+      namespace: 'auth-with-query',
     },
     type: PolicyType.opa,
     code: `
@@ -15,8 +15,8 @@ export const policies: PolicyDefinition[] = [
   },
   {
     metadata: {
-      name: 'alwaysAllow',
-      namespace: 'auth_with_query',
+      name: 'always-allow',
+      namespace: 'auth-with-query',
     },
     type: PolicyType.opa,
     code: `
@@ -25,8 +25,8 @@ export const policies: PolicyDefinition[] = [
   },
   {
     metadata: {
-      name: 'isSenior',
-      namespace: 'auth_with_query',
+      name: 'is-senior',
+      namespace: 'auth-with-query',
     },
     type: PolicyType.opa,
     code: `
@@ -42,14 +42,14 @@ export const policies: PolicyDefinition[] = [
   {
     metadata: {
       name: 'notClassified',
-      namespace: 'auth_with_query',
+      namespace: 'auth-with-query',
     },
     type: PolicyType.opa,
     code: `
       default allow = false
       allow {
         input.query.classifiedDepartments[_].id != input.args.departmentId;
-        input.query.policy.auth_with_query___isSenior.allow
+        input.query.policy.auth_with_query___is_senior.allow
       }
     `,
     args: {
@@ -63,7 +63,7 @@ export const policies: PolicyDefinition[] = [
             id
           }
           policy {
-            auth_with_query___isSenior(hireDate: $hireDate) {
+            auth_with_query___is_senior(hireDate: $hireDate) {
               allow
             }
           }
@@ -79,7 +79,7 @@ export const policies: PolicyDefinition[] = [
 export const schema: Schema = {
   metadata: {
     name: 'EmployeeSchema',
-    namespace: 'auth_with_query',
+    namespace: 'auth-with-query',
   },
   schema: print(gql`
     type Department {
@@ -93,7 +93,7 @@ export const schema: Schema = {
       department: Department!
       address: String
         @policy(
-          namespace: "auth_with_query"
+          namespace: "auth-with-query"
           name: "notClassified"
           args: { departmentId: "{source.department.id}", hireDate: "{source.hireDate}" }
         )
@@ -132,7 +132,7 @@ export const schema: Schema = {
         )
       classifiedDepartments: [Department!]!
         @stub(value: [{ id: "D1000", name: "VIP" }])
-        @policy(namespace: "auth_with_query", name: "alwaysDenied")
+        @policy(namespace: "auth-with-query", name: "always-denied")
     }
   `),
 };

@@ -51,12 +51,12 @@ describe('Authorization with queries', () => {
     await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
   });
 
-  test('Query alwaysAllow policy', async () => {
+  test('Query always-allow policy', async () => {
     const response = await gatewayClient.request(
       print(gql`
         query {
           policy {
-            auth_with_query___alwaysAllow {
+            auth_with_query___always_allow {
               allow
             }
           }
@@ -73,7 +73,7 @@ describe('Authorization with queries', () => {
         print(gql`
           query {
             policy {
-              auth_with_query___alwaysAllow {
+              auth_with_query___always_allow {
                 allow
               }
             }

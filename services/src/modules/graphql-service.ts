@@ -4,7 +4,7 @@ import { Observable, Subscription } from 'rxjs';
 import { shareReplay, map, take, tap, catchError, skip } from 'rxjs/operators';
 import type { GraphQLRequestContextExecutionDidStart } from 'apollo-server-types';
 import { directiveMap, sdl as directivesSdl } from './directives';
-import { ResourceGroup, PolicyDefinition, Schema } from './resource-repository';
+import { ResourceGroup, PolicyDefinition, Schema, ResourceMetadata } from './resource-repository';
 import { buildSchemaFromFederatedTypeDefs } from './build-federated-schema';
 import * as baseSchema from './base-schema';
 import { ActiveDirectoryAuth, AuthenticationConfig } from './upstream-authentication';
@@ -66,7 +66,8 @@ function buildPolicyGqlQuery(policy: PolicyDefinition): DocumentNode {
 
   return gql`
         extend type Policy {
-            ${policy.metadata.namespace}___${policy.metadata.name}${argStr}: PolicyResult! @policyQuery(namespace: "${policy.metadata.namespace}", name: "${policy.metadata.name}")
+            ${getPolicyQueryName(policy.metadata)}${argStr}: PolicyResult!
+              @policyQuery(namespace: "${policy.metadata.namespace}", name: "${policy.metadata.name}")
         }
         `;
 }
@@ -98,10 +99,7 @@ export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
   };
 
   const schemaTypeDefs = schemas.map(s => [`${s.metadata.namespace}/${s.metadata.name}`, parse(s.schema)]);
-  const policyQueryTypeDefs = policies.map(p => [
-    `${p.metadata.namespace}___${p.metadata.name}`,
-    buildPolicyGqlQuery(p),
-  ]);
+  const policyQueryTypeDefs = policies.map(p => [getPolicyQueryName(p.metadata), buildPolicyGqlQuery(p)]);
   const schema = buildSchemaFromFederatedTypeDefs({
     typeDefs: Object.fromEntries([...schemaTypeDefs, ...policyQueryTypeDefs]),
     baseTypeDefs: baseSchema.baseTypeDef,
@@ -126,6 +124,10 @@ export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
       });
     },
   };
+}
+
+function getPolicyQueryName({ namespace, name }: ResourceMetadata) {
+  return `${namespace}___${name}`.replace(/-/g, '_');
 }
 
 const defaultSchema: Schema = {

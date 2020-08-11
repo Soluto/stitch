@@ -8,10 +8,10 @@ Object {
 }
 `;
 
-exports[`Authorization with queries Query alwaysAllow policy 1`] = `
+exports[`Authorization with queries Query always-allow policy 1`] = `
 Object {
   "policy": Object {
-    "auth_with_query___alwaysAllow": Object {
+    "auth_with_query___always_allow": Object {
       "allow": true,
     },
   },
@@ -21,7 +21,7 @@ Object {
 exports[`Authorization with queries Query alwaysDeny policy 1`] = `
 Object {
   "policy": Object {
-    "auth_with_query___alwaysAllow": Object {
+    "auth_with_query___always_allow": Object {
       "allow": true,
     },
   },
@@ -32,7 +32,7 @@ exports[`Authorization with queries Query denied employee 1 1`] = `
 {
   "errors": [
     {
-      "message": "Unauthorized by policy notClassified in namespace auth_with_query",
+      "message": "Unauthorized by policy notClassified in namespace auth-with-query",
       "exception": {
         "code": "INTERNAL_SERVER_ERROR"
       }
@@ -52,7 +52,7 @@ exports[`Authorization with queries Query denied employee 2 1`] = `
 {
   "errors": [
     {
-      "message": "Unauthorized by policy notClassified in namespace auth_with_query",
+      "message": "Unauthorized by policy notClassified in namespace auth-with-query",
       "exception": {
         "code": "INTERNAL_SERVER_ERROR"
       }
@@ -72,7 +72,7 @@ exports[`Authorization with queries Query protected field 1`] = `
 {
   "errors": [
     {
-      "message": "Unauthorized by policy alwaysDenied in namespace auth_with_query",
+      "message": "Unauthorized by policy always-denied in namespace auth-with-query",
       "exception": {
         "code": "INTERNAL_SERVER_ERROR"
       }
