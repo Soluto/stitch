@@ -6,6 +6,7 @@ export interface KeyValue {
 export interface RestParams {
   url: string;
   method?: string;
+  body?: string;
   bodyArg?: string;
   query?: KeyValue[];
   headers?: KeyValue[];

@@ -54,6 +54,22 @@ const testCases: [string, TestCase][] = [
       expected: '1 + 2',
     },
   ],
+  [
+    'Object builder',
+    {
+      template: '{{ foo, bar }}',
+      data: { foo: 'Foo', bar: 'Bar' },
+      expected: { foo: 'Foo', bar: 'Bar' },
+    },
+  ],
+  [
+    'Object with serialized object as property',
+    {
+      template: '{{ foo, bar, baz: "{ \\"foo\\": \\"FOO\\", \\"bar\\": { \\"baz\\": \\"BAZ\\" } }" }}',
+      data: { foo: 'Foo', bar: 'Bar' },
+      expected: { foo: 'Foo', bar: 'Bar', baz: '{ "foo": "FOO", "bar": { "baz": "BAZ" } }' },
+    },
+  ],
 ];
 
 describe('Argument Injection Tests - Evaluation', () => {

@@ -9,7 +9,13 @@ import { KeyValue, RestParams } from './types';
 type GraphQLArguments = { [key: string]: unknown };
 
 export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
-  async doRequest(params: RestParams, parent: unknown, args: GraphQLArguments, info: GraphQLResolveInfo) {
+  async doRequest(
+    params: RestParams,
+    parent: unknown,
+    args: GraphQLArguments,
+    context: RequestContext,
+    info: GraphQLResolveInfo
+  ) {
     const headers = this.parseHeaders(params.headers, parent, args, info);
     const requestInit: RequestInit = { headers, timeout: params.timeoutMs ?? 10000, method: params.method };
     const url = new URL(inject(params.url, parent, args, this.context, info));
@@ -20,9 +26,9 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
       headers.append('Authorization', authHeaders.Authorization);
     }
 
-    requestInit.body = args[params.bodyArg || 'input'] as ArrayBuffer | ArrayBufferView | string;
-    if (requestInit.body) {
-      requestInit.body = JSON.stringify(requestInit.body);
+    const body = this.getBody(params, parent, args, context, info);
+    if (body) {
+      requestInit.body = JSON.stringify(body);
       headers.append('Content-Type', 'application/json');
     }
 
@@ -31,6 +37,23 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     const response = await this.httpCache.fetch(request, { cacheKey });
 
     return this.didReceiveResponse(response, request);
+  }
+
+  getBody(
+    params: RestParams,
+    parent: unknown,
+    args: Record<string, unknown>,
+    context: RequestContext,
+    info: GraphQLResolveInfo
+  ) {
+    const { body, bodyArg } = params;
+    if (body && bodyArg) {
+      throw new Error('Set either "body" or "bodyArg" argument but not both');
+    }
+    if (body) {
+      return inject(body, parent, args, context, info);
+    }
+    return args[params.bodyArg || 'input'] as ArrayBuffer | ArrayBufferView | string;
   }
 
   parseHeaders(kvs: KeyValue[] | undefined, parent: unknown, args: GraphQLArguments, info: GraphQLResolveInfo) {

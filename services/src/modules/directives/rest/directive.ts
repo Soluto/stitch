@@ -6,8 +6,8 @@ import { RestParams } from './types';
 
 export class RestDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
-    field.resolve = (parent, args, { dataSources: { rest } }, info) =>
-      rest.doRequest(this.args as RestParams, parent, args, info);
+    field.resolve = (parent, args, context, info) =>
+      context.dataSources.rest.doRequest(this.args as RestParams, parent, args, context, info);
   }
 }
 
@@ -20,6 +20,7 @@ export const sdl = gql`
   directive @rest(
     url: String!
     method: String
+    body: String
     bodyArg: String
     query: [KeyValue!]
     headers: [KeyValue!]
