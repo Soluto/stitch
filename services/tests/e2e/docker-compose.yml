@@ -15,6 +15,18 @@ services:
     env_file: .env
     environment:
       PORT: 80
+      AUTHENTICATION_CONFIGURATION: |
+        {
+          "jwt": {
+            "http://localhost:8070": {
+              "jwkUrl": "http://oidc-server-mock/.well-known/openid-configuration/jwks",
+              "authenticatedPaths": ["/graphql"]
+            }
+          },
+          "anonymous": {
+            "paths": ["/metrics", "/.well-known/apollo/server-health"]
+          }
+        }
 
   registry:
     build:
@@ -46,3 +58,18 @@ services:
       minio server /var/minio
       "
     env_file: .env
+
+  oidc-server-mock:
+    container_name: oidc-server-mock
+    image: soluto/oidc-server-mock:0.2.2
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      SERVER_OPTIONS_PATH: /config/server-options.json
+      API_SCOPES_PATH: /config/api-scopes.json
+      API_RESOURCES_PATH: /config/api-resources.json
+      USERS_CONFIGURATION_PATH: /config/user-configuration.json
+      CLIENTS_CONFIGURATION_PATH: /config/clients-configuration.json
+    volumes:
+      - ./config/oidc:/config:ro
+    ports:
+      - 8070:80

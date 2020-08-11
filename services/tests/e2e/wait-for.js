@@ -13,6 +13,7 @@ async function waitForIt(resources, reverse = false, timeout = 10000) {
 const serviceUrls = [
   'http-get://localhost:8080/.well-known/apollo/server-health',
   'http-get://localhost:8090/.well-known/apollo/server-health',
+  'http-get://localhost:8070/.well-known/openid-configuration',
 ];
 
 module.exports.start = waitForIt.bind(undefined, serviceUrls, false);

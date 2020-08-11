@@ -8,8 +8,7 @@ import { setContext } from 'apollo-link-context';
 import fetch from 'node-fetch';
 import { FastifyRequest } from 'fastify';
 import { deepInject } from '../arguments-injection';
-import { getAuthHeaders } from '../auth/get-auth-headers';
-import { AuthenticationConfig } from '../auth/types';
+import { getAuthHeaders, AuthenticationConfig } from '../upstream-authentication';
 import logger from '../logger';
 import { RequestContext } from '../context';
 

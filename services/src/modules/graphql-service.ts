@@ -7,9 +7,8 @@ import { directiveMap, sdl as directivesSdl } from './directives';
 import { ResourceGroup, PolicyDefinition, Schema } from './resource-repository';
 import { buildSchemaFromFederatedTypeDefs } from './build-federated-schema';
 import * as baseSchema from './base-schema';
-import { ActiveDirectoryAuth } from './auth/active-directory-auth';
+import { ActiveDirectoryAuth, AuthenticationConfig } from './upstream-authentication';
 import logger from './logger';
-import { AuthenticationConfig } from './auth/types';
 import { AuthorizationConfig, PolicyExecutor } from './directives/policy';
 
 export function createGraphQLService(config: { resourceGroups: Observable<ResourceGroup> }) {

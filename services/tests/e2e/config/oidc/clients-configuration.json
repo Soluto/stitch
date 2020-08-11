@@ -1,0 +1,128 @@
+[
+  {
+    "ClientId": "gateway-client-id",
+    "ClientSecrets": ["gateway-client-secret"],
+    "Description": "Stitch gateway calling API",
+    "AllowedGrantTypes": ["client_credentials"],
+    "AllowedScopes": ["stitch-gateway"],
+    "ClientClaimsPrefix": "",
+    "Claims": []
+  },
+  {
+    "Description": "JWT pass none of policies",
+    "ClientId": "e2e-base-policy-1-client-id",
+    "ClientSecrets": ["gateway-client-secret"],
+    "AllowedGrantTypes": ["client_credentials"],
+    "AllowedScopes": ["stitch-gateway"],
+    "ClientClaimsPrefix": "",
+    "Claims": [
+      { "Type": "role", "Value": "manager" },
+      { "Type": "isActive", "Value": "false", "ValueType": "http://www.w3.org/2001/XMLSchema#boolean" },
+      { "Type": "isGuest", "Value": "false", "ValueType": "http://www.w3.org/2001/XMLSchema#boolean" }
+    ]
+  },
+  {
+    "Description": "JWT pass all policies",
+    "ClientId": "e2e-base-policy-2-client-id",
+    "ClientSecrets": ["gateway-client-secret"],
+    "AllowedGrantTypes": ["client_credentials"],
+    "AllowedScopes": ["stitch-gateway"],
+    "ClientClaimsPrefix": "",
+    "Claims": [
+      { "Type": "role", "Value": "admin" },
+      { "Type": "isActive", "Value": "true", "ValueType": "http://www.w3.org/2001/XMLSchema#boolean" },
+      { "Type": "isGuest", "Value": "true", "ValueType": "http://www.w3.org/2001/XMLSchema#boolean" }
+    ]
+  },
+  {
+    "Description": "JWT pass only base policy",
+    "ClientId": "e2e-base-policy-3-client-id",
+    "ClientSecrets": ["gateway-client-secret"],
+    "AllowedGrantTypes": ["client_credentials"],
+    "AllowedScopes": ["stitch-gateway"],
+    "ClientClaimsPrefix": "",
+    "Claims": [
+      { "Type": "role", "Value": "admin" },
+      { "Type": "isActive", "Value": "false", "ValueType": "http://www.w3.org/2001/XMLSchema#boolean" },
+      { "Type": "isGuest", "Value": "false", "ValueType": "http://www.w3.org/2001/XMLSchema#boolean" }
+    ]
+  },
+  {
+    "Description": "JWT pass only regular policy",
+    "ClientId": "e2e-base-policy-4-client-id",
+    "ClientSecrets": ["gateway-client-secret"],
+    "AllowedGrantTypes": ["client_credentials"],
+    "AllowedScopes": ["stitch-gateway"],
+    "ClientClaimsPrefix": "",
+    "Claims": [
+      { "Type": "role", "Value": "manager" },
+      { "Type": "isActive", "Value": "true", "ValueType": "http://www.w3.org/2001/XMLSchema#boolean" },
+      { "Type": "isGuest", "Value": "false", "ValueType": "http://www.w3.org/2001/XMLSchema#boolean" }
+    ]
+  },
+  {
+    "Description": "JWT pass only override policy",
+    "ClientId": "e2e-base-policy-5-client-id",
+    "ClientSecrets": ["gateway-client-secret"],
+    "AllowedGrantTypes": ["client_credentials"],
+    "AllowedScopes": ["stitch-gateway"],
+    "ClientClaimsPrefix": "",
+    "Claims": [
+      { "Type": "role", "Value": "manager" },
+      { "Type": "isActive", "Value": "false", "ValueType": "http://www.w3.org/2001/XMLSchema#boolean" },
+      { "Type": "isGuest", "Value": "true", "ValueType": "http://www.w3.org/2001/XMLSchema#boolean" }
+    ]
+  },
+  {
+    "Description": "JWT pass base and regular policy",
+    "ClientId": "e2e-base-policy-6-client-id",
+    "ClientSecrets": ["gateway-client-secret"],
+    "AllowedGrantTypes": ["client_credentials"],
+    "AllowedScopes": ["stitch-gateway"],
+    "ClientClaimsPrefix": "",
+    "Claims": [
+      { "Type": "role", "Value": "admin" },
+      { "Type": "isActive", "Value": "true", "ValueType": "http://www.w3.org/2001/XMLSchema#boolean" },
+      { "Type": "isGuest", "Value": "false", "ValueType": "http://www.w3.org/2001/XMLSchema#boolean" }
+    ]
+  },
+  {
+    "Description": "JWT pass regular and override policy",
+    "ClientId": "e2e-base-policy-7-client-id",
+    "ClientSecrets": ["gateway-client-secret"],
+    "AllowedGrantTypes": ["client_credentials"],
+    "AllowedScopes": ["stitch-gateway"],
+    "ClientClaimsPrefix": "",
+    "Claims": [
+      { "Type": "role", "Value": "manager" },
+      { "Type": "isActive", "Value": "true", "ValueType": "http://www.w3.org/2001/XMLSchema#boolean" },
+      { "Type": "isGuest", "Value": "true", "ValueType": "http://www.w3.org/2001/XMLSchema#boolean" }
+    ]
+  },
+  {
+    "Description": "Allows access to a field based on JWT info",
+    "ClientId": "e2e-jwt-allowed-client-id",
+    "ClientSecrets": ["gateway-client-secret"],
+    "AllowedGrantTypes": ["client_credentials"],
+    "AllowedScopes": ["stitch-gateway"],
+    "ClientClaimsPrefix": "",
+    "Claims": [
+      { "Type": "sub", "Value": "1234567890" },
+      { "Type": "name", "Value": "Varg" },
+      { "Type": "iat", "Value": "1516239022", "ValueType": "int" }
+    ]
+  },
+  {
+    "Description": "Rejects access to a field based on JWT info",
+    "ClientId": "e2e-jwt-disallowed-client-id",
+    "ClientSecrets": ["gateway-client-secret"],
+    "AllowedGrantTypes": ["client_credentials"],
+    "AllowedScopes": ["stitch-gateway"],
+    "ClientClaimsPrefix": "",
+    "Claims": [
+      { "Type": "sub", "Value": "1234567890" },
+      { "Type": "name", "Value": "Orm" },
+      { "Type": "iat", "Value": "1516239022", "ValueType": "int" }
+    ]
+  }
+]
