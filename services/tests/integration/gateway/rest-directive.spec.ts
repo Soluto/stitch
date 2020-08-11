@@ -14,7 +14,15 @@ const schema = {
   schema: print(gql`
     type Query {
       hello: String! @rest(url: "http://test.api/hello")
+
       helloByName(name: String!): String! @rest(url: "http://test.api/hello?name={args.name}")
+
+      helloPost(name: String!): String!
+        @rest(url: "http://test.api/hello", method: "POST", body: "{{ name: args.name }}")
+
+      helloPostBody(input: JSONObject!): String! @rest(url: "http://test.api/hello", method: "POST")
+
+      helloPostBodyArg(body: JSONObject!): String! @rest(url: "http://test.api/hello", method: "POST", bodyArg: "body")
     }
   `),
 };
@@ -68,6 +76,48 @@ describe('Rest Directive', () => {
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ helloByName: 'miriam!' });
   });
+
+  it('Post method with argument injection to predefined body', async () => {
+    const response = await client.query({
+      query: gql`
+        query HelloPost($name: String!) {
+          helloPost(name: $name)
+        }
+      `,
+      variables: { name: 'joseph' },
+    });
+
+    expect(response.errors).toBeUndefined();
+    expect(response.data).toEqual({ helloPost: 'world' });
+  });
+
+  it('Post method with body as query argument', async () => {
+    const response = await client.query({
+      query: gql`
+        query HelloPostBody($input: JSONObject!) {
+          helloPostBody(input: $input)
+        }
+      `,
+      variables: { input: { name: 'joseph' } },
+    });
+
+    expect(response.errors).toBeUndefined();
+    expect(response.data).toEqual({ helloPostBody: 'world' });
+  });
+
+  it('Post method with body as query argument', async () => {
+    const response = await client.query({
+      query: gql`
+        query HelloPostBodyArg($body: JSONObject!) {
+          helloPostBodyArg(body: $body)
+        }
+      `,
+      variables: { body: { name: 'joseph' } },
+    });
+
+    expect(response.errors).toBeUndefined();
+    expect(response.data).toEqual({ helloPostBodyArg: 'world' });
+  });
 });
 
 function mockRestBackend(host: string) {
@@ -76,5 +126,7 @@ function mockRestBackend(host: string) {
     .reply(200, 'world!')
     .get('/hello')
     .query({ name: 'miriam' })
-    .reply(200, url => `${new URL(url, host).searchParams.get('name')}!`);
+    .reply(200, url => `${new URL(url, host).searchParams.get('name')}!`)
+    .post('/hello', JSON.stringify({ name: 'joseph' }))
+    .reply(200, 'world');
 }
