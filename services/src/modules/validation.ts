@@ -6,6 +6,7 @@ import { ResourceGroup, Upstream, Resource } from './resource-repository';
 const validNameRegex = /^[A-Z_a-z-][\w-]*$/;
 
 const resourceTypesWithMetadata = new Set(['schemas', 'upstreams', 'upstreamClientCredentials', 'policies']);
+type ResourceTypeWithMetadata = 'schemas' | 'upstreams' | 'upstreamClientCredentials' | 'policies';
 
 function validateUpstreams(upstreams: Upstream[]) {
   const errors: GraphQLError[] = [];
@@ -44,7 +45,7 @@ function validateUpstreams(upstreams: Upstream[]) {
   return errors;
 }
 
-function validateNamespaceAndPolicyNames(rg: ResourceGroup) {
+function validateMetadataCharacters(rg: ResourceGroup) {
   const errors: GraphQLError[] = [];
 
   for (const [resourceType, resources] of Object.entries(rg) as [string, Resource[]][]) {
@@ -56,17 +57,17 @@ function validateNamespaceAndPolicyNames(rg: ResourceGroup) {
       if (!validNameRegex.test(namespace)) {
         errors.push(
           new ApolloError(
-            `Invalid characters found in namespace name ${namespace}, allowed characters are /${validNameRegex.source}/`,
+            `Invalid characters found in namespace name ${namespace} of resource type ${resourceType}, allowed characters are /${validNameRegex.source}/`,
             'INVALID_CHARACTERS_IN_NAME',
             { resource: { type: resourceType, namespace, name } }
           )
         );
       }
 
-      if (resourceType === 'policies' && !validNameRegex.test(name)) {
+      if (!validNameRegex.test(name)) {
         errors.push(
           new ApolloError(
-            `Invalid characters found in policy name ${name}, allowed characters are /${validNameRegex.source}/`,
+            `Invalid characters found in resource name ${name} of resource type ${resourceType}, allowed characters are /${validNameRegex.source}/`,
             'INVALID_CHARACTERS_IN_NAME',
             { resource: { type: resourceType, namespace, name } }
           )
@@ -78,12 +79,17 @@ function validateNamespaceAndPolicyNames(rg: ResourceGroup) {
   return errors;
 }
 
-// Verifies namespace names and policy names to not have two similar ones differing only between
+// Verifies namespaces and names to not have two similar ones differing only between
 // underscores and dashes (e.g. 'some-ns' and 'some_ns' would return a conflict error)
-function validateNamespaceAndPolicyNameConflicts(rg: ResourceGroup) {
+function validateMetadataNameConflicts(rg: ResourceGroup) {
   const errors: GraphQLError[] = [];
   const existingNamespaces = new Map<string, string>();
-  const existingPolicyNames = new Map<string, string>();
+  const existingNamesByNamespaceAndResource = {
+    schemas: new Map<string, Map<string, string>>(),
+    upstreams: new Map<string, Map<string, string>>(),
+    upstreamClientCredentials: new Map<string, Map<string, string>>(),
+    policies: new Map<string, Map<string, string>>(),
+  };
 
   for (const [resourceType, resources] of Object.entries(rg) as [string, Resource[]][]) {
     if (!resourceTypesWithMetadata.has(resourceType)) continue;
@@ -107,21 +113,26 @@ function validateNamespaceAndPolicyNameConflicts(rg: ResourceGroup) {
         }
       }
 
-      if (resourceType === 'policies') {
-        const nameWithUnderscores = name.replace(/-/g, '_');
-        const existingName = existingPolicyNames.get(nameWithUnderscores);
-        if (!existingName) {
-          existingPolicyNames.set(nameWithUnderscores, name);
-        } else {
-          if (existingName !== name) {
-            errors.push(
-              new ApolloError(
-                `Policy name conflict found between ${existingName} and ${name}, they have to either match exactly or have a difference in non-special characters`,
-                'NAME_CONFLICT',
-                { resource: { type: resourceType, namespace, name } }
-              )
-            );
-          }
+      const nameWithUnderscores = name.replace(/-/g, '_');
+      const existingNamesByNamespace = existingNamesByNamespaceAndResource[resourceType as ResourceTypeWithMetadata];
+      let existingNames = existingNamesByNamespace.get(namespace);
+      if (!existingNames) {
+        existingNames = new Map<string, string>();
+        existingNamesByNamespace.set(namespace, existingNames);
+      }
+
+      const existingName = existingNames.get(nameWithUnderscores);
+      if (!existingName) {
+        existingNames.set(nameWithUnderscores, name);
+      } else {
+        if (existingName !== name) {
+          errors.push(
+            new ApolloError(
+              `Resource name conflict found between ${existingName} and ${name} of resource type ${resourceType} in namespace ${namespace}, they have to either match exactly or have a difference in non-special characters`,
+              'NAME_CONFLICT',
+              { resource: { type: resourceType, namespace, name } }
+            )
+          );
         }
       }
     }
@@ -137,8 +148,8 @@ export function validateResourceGroupOrThrow(rg: ResourceGroup) {
     errors.push(...validateUpstreams(rg.upstreams));
   }
 
-  errors.push(...validateNamespaceAndPolicyNames(rg));
-  errors.push(...validateNamespaceAndPolicyNameConflicts(rg));
+  errors.push(...validateMetadataCharacters(rg));
+  errors.push(...validateMetadataNameConflicts(rg));
 
   if (errors.length > 0) {
     throw new ApolloError('Resource validation failed', 'RESOURCE_VALIDATION_FAILURE', {

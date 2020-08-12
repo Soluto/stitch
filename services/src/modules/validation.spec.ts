@@ -1,12 +1,17 @@
+import GraphQLErrorSerializer from '../../tests/utils/graphql-error-serializer';
 import { validateResourceGroupOrThrow } from './validation';
 import { ResourceGroup, PolicyType } from './resource-repository';
 
-describe('validateNamespaceAndPolicyNames - Validation that namespace and policy names contain only valid gql chars and dashes', () => {
+beforeAll(() => {
+  expect.addSnapshotSerializer(GraphQLErrorSerializer);
+});
+
+describe('validateMetadataCharacters - Validation that namespaces and names contain only valid gql chars and dashes', () => {
   let rg: ResourceGroup;
 
   beforeEach(() => {
     rg = {
-      schemas: [{ metadata: { namespace: 'some-ns', name: 'special_allowed_here_@@' }, schema: 'schema' }],
+      schemas: [{ metadata: { namespace: 'some-ns', name: 'special_not_allowed_here' }, schema: 'schema' }],
       upstreams: [],
       upstreamClientCredentials: [],
       policies: [{ metadata: { namespace: 'other-ns', name: 'valid-chars_only' }, type: PolicyType.opa, code: 'code' }],
@@ -24,32 +29,31 @@ describe('validateNamespaceAndPolicyNames - Validation that namespace and policy
     try {
       validateResourceGroupOrThrow(rg);
     } catch (err) {
-      expect(err.errors?.[0]?.message).toEqual(
-        'Invalid characters found in namespace name special_not_allowed_@@, allowed characters are /^[A-Z_a-z-][\\w-]*$/'
-      );
+      expect(err).toMatchSnapshot();
     }
   });
 
-  it('throws when policy names contain invalid chars', () => {
+  it('throws when resource names contain invalid chars', () => {
     rg.policies[0].metadata.name = 'special_not_allowed_$$';
     expect.assertions(1);
 
     try {
       validateResourceGroupOrThrow(rg);
     } catch (err) {
-      expect(err.errors?.[0]?.message).toEqual(
-        'Invalid characters found in policy name special_not_allowed_$$, allowed characters are /^[A-Z_a-z-][\\w-]*$/'
-      );
+      expect(err).toMatchSnapshot();
     }
   });
 });
 
-describe('validateNamespaceAndPolicyNameConflicts', () => {
+describe('validateMetadataNameConflicts', () => {
   let rg: ResourceGroup;
 
   beforeEach(() => {
     rg = {
-      schemas: [{ metadata: { namespace: 'some-ns', name: 'schema-name' }, schema: 'schema' }],
+      schemas: [
+        { metadata: { namespace: 'some-ns', name: 'schema-name-1' }, schema: 'schema' },
+        { metadata: { namespace: 'some-ns', name: 'schema-name-2' }, schema: 'schema' },
+      ],
       upstreams: [],
       upstreamClientCredentials: [],
       policies: [
@@ -64,26 +68,34 @@ describe('validateNamespaceAndPolicyNameConflicts', () => {
   });
 
   it('throws when two namespace names are similar, differing only between underscores and dashes', () => {
-    rg.schemas[0].metadata.namespace = 'some_ns';
+    rg.policies[1].metadata.namespace = 'some_ns';
+    expect.assertions(1);
 
     try {
       validateResourceGroupOrThrow(rg);
     } catch (err) {
-      expect(err.errors?.[0]?.message).toEqual(
-        'Namespace name conflict found between some_ns and some-ns, they have to either match exactly or have a difference in non-special characters'
-      );
+      expect(err).toMatchSnapshot();
     }
   });
 
-  it('throws when two policy names are similar, differing only between underscores and dashes', () => {
+  it('throws when two resource names from the same namespace and resource type are similar, differing only between underscores and dashes', () => {
     rg.policies[1].metadata.name = 'policy_1';
+    expect.assertions(1);
 
     try {
       validateResourceGroupOrThrow(rg);
     } catch (err) {
-      expect(err.errors?.[0]?.message).toEqual(
-        'Policy name conflict found between policy-1 and policy_1, they have to either match exactly or have a difference in non-special characters'
-      );
+      expect(err).toMatchSnapshot();
     }
+  });
+
+  it("doesn't throw when two resource names from the same namespace and different resource types are similar, differing only between underscores and dashes", () => {
+    rg.schemas[1].metadata.name = 'policy_1';
+    expect(() => validateResourceGroupOrThrow(rg)).not.toThrow();
+  });
+
+  it("doesn't throw when two resource names from the same resource type and different namespaces are similar, differing only between underscores and dashes", () => {
+    rg.policies[1].metadata = { namespace: 'other-ns', name: 'policy_1' };
+    expect(() => validateResourceGroupOrThrow(rg)).not.toThrow();
   });
 });
