@@ -214,10 +214,10 @@ const resolvers: IResolvers = {
   Query: {
     async validateResourceGroup(_, args: { input: ResourceGroupInput }) {
       const policyAttachments = new PolicyAttachmentsGenerator(resourceRepository);
-      await policyAttachments.generate(args?.input?.policies ?? []);
 
       try {
         await fetchAndValidate(args.input);
+        await policyAttachments.generate(args?.input?.policies ?? []);
       } finally {
         await policyAttachments.cleanup();
       }
@@ -241,10 +241,10 @@ const resolvers: IResolvers = {
     },
     async validatePolicies(_, args: { input: PolicyInput[] }) {
       const policyAttachments = new PolicyAttachmentsGenerator(resourceRepository);
-      await policyAttachments.generate(args.input);
 
       try {
         await fetchAndValidate({ policies: args.input });
+        await policyAttachments.generate(args.input);
       } finally {
         await policyAttachments.cleanup();
       }
@@ -256,10 +256,10 @@ const resolvers: IResolvers = {
     updateResourceGroup(_, args: { input: ResourceGroupInput }) {
       return singleton(async () => {
         const policyAttachments = new PolicyAttachmentsGenerator(resourceRepository);
-        await policyAttachments.generate(args?.input?.policies ?? []);
 
         try {
           const rg = await fetchAndValidate(args.input);
+          await policyAttachments.generate(args?.input?.policies ?? []);
 
           await policyAttachments.writeToRepo();
           await resourceRepository.update(rg);
@@ -297,10 +297,10 @@ const resolvers: IResolvers = {
     updatePolicies(_, args: { input: PolicyInput[] }) {
       return singleton(async () => {
         const policyAttachments = new PolicyAttachmentsGenerator(resourceRepository);
-        await policyAttachments.generate(args.input);
 
         try {
           const rg = await fetchAndValidate({ policies: args.input });
+          await policyAttachments.generate(args.input);
 
           await policyAttachments.writeToRepo();
           await resourceRepository.update(rg);

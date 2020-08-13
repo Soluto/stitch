@@ -96,6 +96,8 @@ If one policy is dependent on another the `query` property can include the follo
 
 The policy arguments should be set as the query arguments.
 
+Note that due to graphql naming limitations, the name of the policy query has dashes replaced with underscores for both the namespace and the policy name (e.g. namespace `some-ns` and policy name `some-policy` will be called using `policy.some_ns___some_policy`)
+
 In the example below the query has 2 parts: the first one fetches `roles` field from `user` and the second part evaluates `userIsActive`.
 
 ```yaml

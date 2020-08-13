@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`validateMetadataCharacters - Validation that namespaces and names contain only valid gql chars and dashes throws when namespace names contain invalid chars 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Invalid characters found in namespace name special_not_allowed_@@ of resource type schemas, allowed characters are /^[A-Z_a-z-][\\\\w-]*$/",
+      "exception": {}
+    }
+  ],
+  "data": {}
+}
+`;
+
+exports[`validateMetadataCharacters - Validation that namespaces and names contain only valid gql chars and dashes throws when resource names contain invalid chars 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Invalid characters found in resource name special_not_allowed_$$ of resource type policies, allowed characters are /^[A-Z_a-z-][\\\\w-]*$/",
+      "exception": {}
+    }
+  ],
+  "data": {}
+}
+`;
+
+exports[`validateMetadataNameConflicts throws when two namespace names are similar, differing only between underscores and dashes 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Namespace name conflict found between some-ns and some_ns, they have to either match exactly or have a difference in non-special characters",
+      "exception": {}
+    }
+  ],
+  "data": {}
+}
+`;
+
+exports[`validateMetadataNameConflicts throws when two resource names from the same namespace and resource type are similar, differing only between underscores and dashes 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Resource name conflict found between policy-1 and policy_1 of resource type policies in namespace some-ns, they have to either match exactly or have a difference in non-special characters",
+      "exception": {}
+    }
+  ],
+  "data": {}
+}
+`;
