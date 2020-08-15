@@ -1,0 +1,74 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GQL Directive Remote GraphQL server call - Error 401 1`] = `
+Object {
+  "data": Object {
+    "employee": null,
+  },
+  "errors": Array [
+    [GraphQLError: Response not successful: Received status code 401],
+  ],
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`GQL Directive Remote GraphQL server call - Error 500 1`] = `
+Object {
+  "data": Object {
+    "employee": null,
+  },
+  "errors": Array [
+    [GraphQLError: Response not successful: Received status code 500],
+  ],
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`GQL Directive Remote GraphQL server call - Success 1`] = `
+Object {
+  "data": Object {
+    "employee": Object {
+      "bestFriend": Object {
+        "age": 97,
+        "employeeId": "1",
+        "extraFieldThatsNotOnTheRemoteGql": "surprise!",
+      },
+      "name": "ethel",
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`GQL Directive Remote GraphQL server call - Timeout 1`] = `
+Object {
+  "data": Object {
+    "employee": null,
+  },
+  "errors": Array [
+    [GraphQLError: network timeout at: http://localhost:1111/graphql],
+  ],
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;

@@ -43,6 +43,8 @@ const remoteSchema = makeExecutableSchema({
   },
 });
 
+const remoteHost = 'http://localhost:1111';
+
 const schema = {
   metadata: {
     namespace: 'namespace',
@@ -59,7 +61,12 @@ const schema = {
 
     type Query {
       employee(employeeId: ID!): Employee
-        @gql(url: "http://test.gql/graphql", fieldName: "employee", arguments: { id: "{args.employeeId}" })
+        @gql(
+          url: "${remoteHost}/graphql"
+          fieldName: "employee"
+          arguments: { id: "{args.employeeId}" }
+          timeoutMs: 100
+        )
     }
   `),
 };
@@ -72,11 +79,23 @@ const resourceGroup = {
   policies: [],
 };
 
-describe('GQL Directive', () => {
+interface TestCase {
+  statusCode?: number;
+  delay?: number;
+}
+
+const testCases: [string, TestCase][] = [
+  ['Success', {}],
+  ['Error 401', { statusCode: 401 }],
+  ['Error 500', { statusCode: 500 }],
+  ['Timeout', { delay: 2000 }],
+];
+
+describe.each(testCases)('GQL Directive', (testCaseName, { statusCode, delay }) => {
   let client: ApolloServerTestClient;
 
   beforeEachDispose(() => {
-    mockGqlBackend('http://test.gql', remoteSchema);
+    mockGqlBackend(remoteHost, remoteSchema, statusCode, delay);
 
     const stitch = createStitchGateway({ resourceGroups: Rx.of(resourceGroup) });
     client = createTestClient(stitch.server);
@@ -87,42 +106,44 @@ describe('GQL Directive', () => {
     };
   });
 
-  it('Arguments are passed through with variables', async () => {
-    const response = await client.query({
-      query: gql`
-        query EmpById($id: ID!) {
-          employee(employeeId: $id) {
-            name
-            bestFriend {
-              extraFieldThatsNotOnTheRemoteGql
-              employeeId
-              age
+  it(`Remote GraphQL server call - ${testCaseName}`, async () => {
+    const response = await client
+      .query({
+        query: gql`
+          query EmpById($id: ID!) {
+            employee(employeeId: $id) {
+              name
+              bestFriend {
+                extraFieldThatsNotOnTheRemoteGql
+                employeeId
+                age
+              }
             }
           }
-        }
-      `,
-      variables: { id: 2 },
-    });
+        `,
+        variables: { id: 2 },
+      })
+      .catch(e => e.response);
 
-    expect(response.errors).toBeUndefined();
-    expect(response.data).toEqual({
-      employee: {
-        name: ethel.name,
-        bestFriend: {
-          age: miriam.age,
-          employeeId: miriam.employeeId,
-          extraFieldThatsNotOnTheRemoteGql: 'surprise!',
-        },
-      },
-    });
+    expect(response).toMatchSnapshot();
   });
 });
 
-function mockGqlBackend(host: string, schema: GraphQLSchema) {
+function mockGqlBackend(host: string, schema: GraphQLSchema, statusCode = 200, delay = 0) {
   nock(host)
     .persist()
-    .post('/graphql')
+    .post('/graphql', body => body.operationName === 'IntrospectionQuery')
     .reply(200, (_, body: any) =>
+      graphqlSync({
+        schema,
+        source: body.query,
+        variableValues: body.variables,
+        operationName: body.operationName,
+      })
+    )
+    .post('/graphql', body => body.operationName !== 'IntrospectionQuery')
+    .delay(delay)
+    .reply(statusCode, (_, body: any) =>
       graphqlSync({
         schema,
         source: body.query,
