@@ -104,13 +104,13 @@ describe('readFile', () => {
 
   it('returns the file contents as a Buffer', async () => {
     const result = await storage.readFile(filePath);
-    expect(result).toEqual({ content: Buffer.from(fileContent) });
+    expect(result).toEqual({ content: Buffer.from(fileContent), etag });
     expect(mockS3.getObject).toHaveBeenCalledWith({ Key: filePath });
   });
 
   it('returns the file contents as a string when the asString option is sent', async () => {
     const result = await storage.readFile(filePath, { asString: true });
-    expect(result).toEqual({ content: fileContent });
+    expect(result).toEqual({ content: fileContent, etag });
     expect(mockS3.getObject).toHaveBeenCalledWith({ Key: filePath });
   });
 

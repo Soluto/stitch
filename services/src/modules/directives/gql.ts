@@ -50,7 +50,7 @@ export class GqlDirective extends SchemaDirectiveVisitor {
       .then(schema => Object.assign(result, { schema, ready: true }))
       .catch(err => {
         logger.error({ err, url }, 'Failed all retries of fetching introspection query, will retry in 10 minutes');
-        const timeout = setTimeout(() => {
+        const timeout: NodeJS.Timeout = setTimeout(() => {
           this.runIntrospection(retryLink, authLink, result, url);
         }, 10 * 60 * 1000);
         pendingIntrospectionRetries.set(url, timeout);
