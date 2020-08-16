@@ -22,10 +22,10 @@ export class S3Storage implements Storage {
     return { lastModified: stats.LastModified };
   }
 
-  async readFile(filePath: string): Promise<{ content: Buffer }>;
-  async readFile(filePath: string, options: { [k in any]: never }): Promise<{ content: Buffer }>;
+  async readFile(filePath: string): Promise<{ content: Buffer; etag: string }>;
+  async readFile(filePath: string, options: { [k in any]: never }): Promise<{ content: Buffer; etag: string }>;
   async readFile(filePath: string, options: { etag?: string }): Promise<{ content: Buffer; etag: string }>;
-  async readFile(filePath: string, options: { asString?: true }): Promise<{ content: string }>;
+  async readFile(filePath: string, options: { asString?: true }): Promise<{ content: string; etag: string }>;
   async readFile(
     filePath: string,
     options: { asString?: true; etag?: string }
@@ -41,8 +41,6 @@ export class S3Storage implements Storage {
     if (!res.Body) throw new Error(`s3 key ${filePath} does not exist`);
 
     const content = options.asString ? res.Body.toString() : (res.Body as Buffer);
-    if (!options.etag) return { content };
-
     return { content, etag: res.ETag };
   }
 
