@@ -1,5 +1,5 @@
 import { SchemaDirectiveVisitor, makeRemoteExecutableSchema, delegateToSchema, introspectSchema } from 'graphql-tools';
-import { GraphQLField } from 'graphql';
+import { GraphQLField, GraphQLSchema } from 'graphql';
 import { gql } from 'apollo-server-core';
 import { ApolloLink } from 'apollo-link';
 import { HttpLink } from 'apollo-link-http';
@@ -12,8 +12,10 @@ import { getAuthHeaders, AuthenticationConfig } from '../upstream-authentication
 import logger from '../logger';
 import { RequestContext } from '../context';
 
+const pendingIntrospectionRetries = new Map<string, NodeJS.Timeout>();
+
 export class GqlDirective extends SchemaDirectiveVisitor {
-  async createRemoteSchema(url: string, config: AuthenticationConfig, timeoutMs?: number) {
+  createRemoteSchema(url: string, config: AuthenticationConfig, timeoutMs?: number) {
     const httpLink: ApolloLink = new HttpLink({
       uri: url,
       fetch: fetch as any,
@@ -25,7 +27,7 @@ export class GqlDirective extends SchemaDirectiveVisitor {
     const retryLink = new RetryLink({
       delay: { max: 5000 },
       attempts: {
-        max: 10,
+        max: 5,
         retryIf(error) {
           logger.warn({ error, url }, 'Failed fetching introspection query');
           return !!error;
@@ -33,9 +35,26 @@ export class GqlDirective extends SchemaDirectiveVisitor {
       },
     }).concat(authLink);
 
+    pendingIntrospectionRetries.delete(url);
+
+    const result: RemoteSchemaWithStatus = { ready: false };
+    this.runIntrospection(retryLink, authLink, result, url);
+    return result;
+  }
+
+  runIntrospection(retryLink: ApolloLink, authLink: ApolloLink, result: RemoteSchemaWithStatus, url: string) {
     // Only introspection should retry, because if we don't have the introspection result this entire resolver will fail.
     // Normal gql requests should not retry, at least for now, because that is more complicated than introspection.
-    return await introspectSchema(retryLink).then(schema => makeRemoteExecutableSchema({ schema, link: authLink }));
+    introspectSchema(retryLink)
+      .then(schema => makeRemoteExecutableSchema({ schema, link: authLink }))
+      .then(schema => Object.assign(result, { schema, ready: true }))
+      .catch(err => {
+        logger.error({ err, url }, 'Failed all retries of fetching introspection query, will retry in 10 minutes');
+        const timeout = setTimeout(() => {
+          this.runIntrospection(retryLink, authLink, result, url);
+        }, 10 * 60 * 1000);
+        pendingIntrospectionRetries.set(url, timeout);
+      });
   }
 
   visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
@@ -44,8 +63,10 @@ export class GqlDirective extends SchemaDirectiveVisitor {
     const remoteSchema = this.createRemoteSchema(url, this.context.authenticationConfig, timeoutMs);
 
     field.resolve = async (parent, args, context, info) => {
+      if (!remoteSchema.ready) throw new Error(`Failed reaching remote gql server for introspection (url ${url})`);
+
       return await delegateToSchema({
-        schema: await remoteSchema,
+        schema: remoteSchema.schema!,
         operation: operationType,
         fieldName,
         args: deepInject(gqlArgs, parent, args, context, info),
@@ -55,6 +76,11 @@ export class GqlDirective extends SchemaDirectiveVisitor {
     };
   }
 }
+
+type RemoteSchemaWithStatus = {
+  ready: boolean;
+  schema?: GraphQLSchema;
+};
 
 export const sdl = gql`
   enum GraphQLOperationType {
