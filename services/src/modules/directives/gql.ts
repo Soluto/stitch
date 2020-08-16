@@ -13,8 +13,12 @@ import logger from '../logger';
 import { RequestContext } from '../context';
 
 export class GqlDirective extends SchemaDirectiveVisitor {
-  async createRemoteSchema(url: string, config: AuthenticationConfig) {
-    const httpLink: ApolloLink = new HttpLink({ uri: url, fetch: fetch as any, fetchOptions: { timeout: 10000 } });
+  async createRemoteSchema(url: string, config: AuthenticationConfig, timeoutMs?: number) {
+    const httpLink: ApolloLink = new HttpLink({
+      uri: url,
+      fetch: fetch as any,
+      fetchOptions: { timeout: timeoutMs ?? 10000 },
+    });
     const authLink = setContext(async (_, context) => ({
       headers: await getAuthHeaders(config, new URL(url).host, context?.graphqlContext?.request as FastifyRequest),
     })).concat(httpLink);
@@ -35,9 +39,9 @@ export class GqlDirective extends SchemaDirectiveVisitor {
   }
 
   visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
-    const { url, fieldName, arguments: gqlArgs, operationType: operationTypeParam } = this.args;
+    const { url, fieldName, arguments: gqlArgs, operationType: operationTypeParam, timeoutMs } = this.args;
     const operationType = operationTypeParam?.toLowerCase() ?? 'query';
-    const remoteSchema = this.createRemoteSchema(url, this.context.authenticationConfig);
+    const remoteSchema = this.createRemoteSchema(url, this.context.authenticationConfig, timeoutMs);
 
     field.resolve = async (parent, args, context, info) => {
       return await delegateToSchema({
@@ -63,5 +67,6 @@ export const sdl = gql`
     fieldName: String!
     operationType: GraphQLOperationType
     arguments: JSONObject
+    timeoutMs: Int
   ) on FIELD_DEFINITION
 `;

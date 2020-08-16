@@ -1,132 +1,260 @@
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import * as Rx from 'rxjs';
 import { gql } from 'apollo-server-core';
-import { print } from 'graphql';
+import { print, DocumentNode } from 'graphql';
 import * as nock from 'nock';
 import { createStitchGateway } from '../../../src/modules/gateway';
-import { beforeEachDispose } from '../before-each-dispose';
+import { Schema } from '../../../src/modules/resource-repository';
 
-const schema = {
-  metadata: {
-    namespace: 'namespace',
-    name: 'name',
-  },
-  schema: print(gql`
-    type Query {
-      hello: String! @rest(url: "http://test.api/hello")
+interface TestCase {
+  mock: () => nock.Scope;
+  schema: DocumentNode;
+  query: DocumentNode;
+  variables?: Record<string, unknown>;
+  skipMockIsDoneAssert?: boolean;
+}
 
-      helloByName(name: String!): String! @rest(url: "http://test.api/hello?name={args.name}")
+const upstreamHost = 'http://localhost:1111';
 
-      helloPost(name: String!): String!
-        @rest(url: "http://test.api/hello", method: "POST", body: "{{ name: args.name }}")
-
-      helloPostBody(input: JSONObject!): String! @rest(url: "http://test.api/hello", method: "POST")
-
-      helloPostBodyArg(body: JSONObject!): String! @rest(url: "http://test.api/hello", method: "POST", bodyArg: "body")
-    }
-  `),
-};
-
-const resourceGroup = {
-  etag: 'etag',
-  schemas: [schema],
-  upstreams: [],
-  upstreamClientCredentials: [],
-  policies: [],
-};
-
-describe('Rest Directive', () => {
-  let client: ApolloServerTestClient;
-
-  beforeEachDispose(() => {
-    mockRestBackend('http://test.api');
-
-    const stitch = createStitchGateway({ resourceGroups: Rx.of(resourceGroup) });
-    client = createTestClient(stitch.server);
-
-    return () => {
-      nock.cleanAll();
-      return stitch.dispose();
-    };
-  });
-
-  it('Hello world', async () => {
-    const response = await client.query({
+const testCases: [string, TestCase][] = [
+  [
+    'Simple GET',
+    {
+      mock: () => nock(upstreamHost).get('/hello').reply(200, 'world'),
+      schema: gql`
+        type Query {
+          hello: String! @rest(url: "${upstreamHost}/hello")
+        }
+      `,
       query: gql`
-        query {
+        query Hello {
           hello
         }
       `,
-    });
-
-    expect(response.errors).toBeUndefined();
-    expect(response.data).toEqual({ hello: 'world!' });
-  });
-
-  it('Arguments are passed through with variables', async () => {
-    const response = await client.query({
+    },
+  ],
+  [
+    'GET with query params',
+    {
+      mock: () =>
+        nock(upstreamHost)
+          .get('/hello')
+          .query({ name: 'miriam' })
+          .reply(200, url => `${new URL(url, upstreamHost).searchParams.get('name')}!`),
+      schema: gql`
+        type Query {
+          hello(name: String!): String! @rest(url: "${upstreamHost}/hello?name={args.name}")
+        }
+      `,
       query: gql`
-        query HelloByName($name: String!) {
-          helloByName(name: $name)
+        query Hello($name: String!) {
+          hello(name: $name)
         }
       `,
       variables: { name: 'miriam' },
-    });
-
-    expect(response.errors).toBeUndefined();
-    expect(response.data).toEqual({ helloByName: 'miriam!' });
-  });
-
-  it('Post method with argument injection to predefined body', async () => {
-    const response = await client.query({
+    },
+  ],
+  [
+    'POST with predefined body',
+    {
+      mock: () =>
+        nock(upstreamHost)
+          .post('/hello', JSON.stringify({ name: 'joseph' }))
+          .reply(200, 'world'),
+      schema: gql`
+        type Query {
+          hello(name: String!): String!
+            @rest(url: "${upstreamHost}/hello", method: "POST", body: "{{ name: args.name }}")
+        }
+      `,
       query: gql`
-        query HelloPost($name: String!) {
-          helloPost(name: $name)
+        query Hello($name: String!) {
+          hello(name: $name)
         }
       `,
       variables: { name: 'joseph' },
-    });
-
-    expect(response.errors).toBeUndefined();
-    expect(response.data).toEqual({ helloPost: 'world' });
-  });
-
-  it('Post method with body as query argument', async () => {
-    const response = await client.query({
+    },
+  ],
+  [
+    'POST with body from input query argument',
+    {
+      mock: () =>
+        nock(upstreamHost)
+          .post('/hello', JSON.stringify({ name: 'joseph' }))
+          .reply(200, 'world'),
+      schema: gql`
+        type Query {
+          hello(input: JSONObject!): String! @rest(url: "${upstreamHost}/hello", method: "POST")
+        }
+      `,
       query: gql`
-        query HelloPostBody($input: JSONObject!) {
-          helloPostBody(input: $input)
+        query Hello($input: JSONObject!) {
+          hello(input: $input)
         }
       `,
       variables: { input: { name: 'joseph' } },
-    });
-
-    expect(response.errors).toBeUndefined();
-    expect(response.data).toEqual({ helloPostBody: 'world' });
-  });
-
-  it('Post method with body as query argument', async () => {
-    const response = await client.query({
+    },
+  ],
+  [
+    'POST with body from custom query argument',
+    {
+      mock: () =>
+        nock(upstreamHost)
+          .post('/hello', JSON.stringify({ name: 'joseph' }))
+          .reply(200, 'world'),
+      schema: gql`
+        type Query {
+          hello(body: JSONObject!): String! @rest(url: "${upstreamHost}/hello", method: "POST", bodyArg: "body")
+        }
+      `,
       query: gql`
-        query HelloPostBodyArg($body: JSONObject!) {
-          helloPostBodyArg(body: $body)
+        query Hello($body: JSONObject!) {
+          hello(body: $body)
         }
       `,
       variables: { body: { name: 'joseph' } },
-    });
+    },
+  ],
+  [
+    'Error 401 from upstream',
+    {
+      mock: () => nock(upstreamHost).get('/hello').reply(401, 'Unauthorized'),
+      schema: gql`
+        type Query {
+          hello: String! @rest(url: "${upstreamHost}/hello")
+        }
+      `,
+      query: gql`
+        query Hello {
+          hello
+        }
+      `,
+    },
+  ],
+  [
+    'Error 404 from upstream',
+    {
+      mock: () => nock(upstreamHost).get('/hello').reply(404, 'Not Found'),
+      schema: gql`
+        type Query {
+          hello: String! @rest(url: "${upstreamHost}/hello")
+        }
+      `,
+      query: gql`
+        query Hello {
+          hello
+        }
+      `,
+    },
+  ],
+  [
+    'Error 500 from upstream',
+    {
+      mock: () => nock(upstreamHost).get('/hello').reply(500, 'Internal Server Error'),
+      schema: gql`
+        type Query {
+          hello: String! @rest(url: "${upstreamHost}/hello")
+        }
+      `,
+      query: gql`
+        query Hello {
+          hello
+        }
+      `,
+    },
+  ],
+  [
+    'Response timeout from upstream',
+    {
+      mock: () => nock(upstreamHost).get('/hello').delay(1000).reply(200, 'world'),
+      schema: gql`
+        type Query {
+          hello: String! @rest(url: "${upstreamHost}/hello", timeoutMs: 500)
+        }
+      `,
+      query: gql`
+        query Hello {
+          hello
+        }
+      `,
+      skipMockIsDoneAssert: true,
+    },
+  ],
+  [
+    'Connection timeout from upstream',
+    {
+      mock: () => nock(upstreamHost).get('/hello').delayConnection(1000).reply(200, 'world'),
+      schema: gql`
+        type Query {
+          hello: String! @rest(url: "${upstreamHost}/hello", timeoutMs: 500)
+        }
+      `,
+      query: gql`
+        query Hello {
+          hello
+        }
+      `,
+      skipMockIsDoneAssert: true,
+    },
+  ],
+  [
+    'Empty response body',
+    {
+      mock: () => nock(upstreamHost).get('/hello').reply(),
+      schema: gql`
+        type Query {
+          hello: String! @rest(url: "${upstreamHost}/hello")
+        }
+      `,
+      query: gql`
+        query Hello {
+          hello
+        }
+      `,
+    },
+  ],
+];
 
-    expect(response.errors).toBeUndefined();
-    expect(response.data).toEqual({ helloPostBodyArg: 'world' });
+describe.each(testCases)('Rest directive - %s', (_, { mock, schema, query, variables, skipMockIsDoneAssert }) => {
+  let client: ApolloServerTestClient;
+  let disposeServer: any;
+  let nockScope: nock.Scope;
+  beforeAll(async () => {
+    const schemaResource: Schema = {
+      metadata: {
+        namespace: 'integration-tests',
+        name: 'rest-directive',
+      },
+      schema: print(schema),
+    };
+
+    const resourceGroup = {
+      etag: 'etag',
+      schemas: [schemaResource],
+      upstreams: [],
+      upstreamClientCredentials: [],
+      policies: [],
+    };
+
+    const { server, dispose } = createStitchGateway({ resourceGroups: Rx.of(resourceGroup) });
+    client = createTestClient(server);
+    disposeServer = dispose;
+
+    nockScope = mock();
+    expect(nockScope).toBeDefined();
+  });
+
+  afterAll(async () => {
+    disposeServer && (await disposeServer());
+    nock.cleanAll();
+  });
+
+  test('call qraphql', async () => {
+    const response = await client.query({ query, variables }).catch(e => e.response);
+    expect(response).toMatchSnapshot();
+
+    if (!skipMockIsDoneAssert) {
+      expect(nockScope.isDone()).toBeTruthy();
+    }
   });
 });
-
-function mockRestBackend(host: string) {
-  return nock(host)
-    .get('/hello')
-    .reply(200, 'world!')
-    .get('/hello')
-    .query({ name: 'miriam' })
-    .reply(200, url => `${new URL(url, host).searchParams.get('name')}!`)
-    .post('/hello', JSON.stringify({ name: 'joseph' }))
-    .reply(200, 'world');
-}
