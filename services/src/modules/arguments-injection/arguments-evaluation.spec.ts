@@ -70,6 +70,14 @@ const testCases: [string, TestCase][] = [
       expected: { foo: 'Foo', bar: 'Bar', baz: '{ "foo": "FOO", "bar": { "baz": "BAZ" } }' },
     },
   ],
+  [
+    'Return value if not valid',
+    {
+      template: '{{ foo, bar }',
+      data: { foo: 'Foo', bar: 'Bar' },
+      expected: '{{ foo, bar }',
+    },
+  ],
 ];
 
 describe('Argument Injection Tests - Evaluation', () => {
