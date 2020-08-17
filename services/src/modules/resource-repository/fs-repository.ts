@@ -19,6 +19,11 @@ export class FileSystemResourceRepository extends ResourceRepository {
     await super.writePolicyAttachment(filename, content);
   }
 
+  async listPolicyAttachments() {
+    await this.initializePolicyAttachmentsFolder();
+    return super.listPolicyAttachments();
+  }
+
   private async initializePolicyAttachmentsFolder() {
     if (this.policyAttachmentsFolderInitialized) return;
 
