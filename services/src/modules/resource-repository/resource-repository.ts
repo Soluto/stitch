@@ -48,7 +48,7 @@ export class ResourceRepository implements IResourceRepository {
     if (this.isRegistry) return;
     const newRefreshedAt = new Date();
 
-    const allAttachments = await this.storage.listFiles(this.policyAttachmentsFolderPath);
+    const allAttachments = await this.listPolicyAttachments();
     const attachmentsToRefresh = allAttachments.filter(a => this.shouldRefreshPolicyAttachment(a)).map(a => a.filePath);
 
     if (attachmentsToRefresh.length > 0) {
@@ -60,6 +60,10 @@ export class ResourceRepository implements IResourceRepository {
     }
 
     this.policyAttachments.refreshedAt = newRefreshedAt;
+  }
+
+  protected async listPolicyAttachments() {
+    return this.storage.listFiles(this.policyAttachmentsFolderPath);
   }
 
   protected shouldRefreshPolicyAttachment({ filePath, lastModified }: listFilesItem): boolean {
