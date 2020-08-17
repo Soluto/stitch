@@ -33,7 +33,13 @@ const testCases: [string, ResourceGroup][] = [
             }
 
             type Query {
-              foo: [Foo!]! @stub(value: [{ common: "FOO", bar: "BAR" }, { common: "FOO", bar: "BAZ" }])
+              foo: [Foo!]!
+                @stub(
+                  value: [
+                    { common: "FOO", bar: "BAR", __typename: "Bar" }
+                    { common: "FOO", baz: "BAZ", __typename: "Baz" }
+                  ]
+                )
             }
           `),
         },
@@ -45,6 +51,37 @@ const testCases: [string, ResourceGroup][] = [
   ],
   [
     'Union',
+    {
+      schemas: [
+        {
+          metadata: {
+            namespace: 'integration-tests',
+            name: 'implicit-test-resolver',
+          },
+          schema: print(gql`
+            type Bar {
+              bar: String!
+            }
+
+            type Baz {
+              baz: String!
+            }
+
+            union Foo = Bar | Baz
+
+            type Query {
+              foo: [Foo!]! @stub(value: [{ bar: "BAR", __typename: "Bar" }, { baz: "BAZ", __typename: "Baz" }])
+            }
+          `),
+        },
+      ],
+      upstreams: [],
+      upstreamClientCredentials: [],
+      policies: [],
+    },
+  ],
+  [
+    'Error when __typename is missing',
     {
       schemas: [
         {

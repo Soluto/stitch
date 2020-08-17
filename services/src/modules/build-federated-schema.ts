@@ -21,6 +21,7 @@ import { makeExecutableSchema, SchemaDirectiveVisitor } from 'graphql-tools';
 import { composeAndValidate } from '@apollo/federation';
 import { GraphQLResolverMap } from 'apollo-graphql';
 import { ApolloError } from 'apollo-server-core';
+import createTypeResolvers from './implicit-type-resolver';
 
 interface DirectiveVisitors {
   [directiveName: string]: typeof SchemaDirectiveVisitor;
@@ -85,10 +86,13 @@ export function buildSchemaFromFederatedTypeDefs({
     fullTypeDefWithoutDirectives
   );
 
+  // Create typeResolvers for interfaces and unions
+  const typeResolvers = createTypeResolvers(fullTypeDefWithDirectives);
+
   // Create final schema, re-adding directive definitions and directive implementations
   const schema = makeExecutableSchema({
     typeDefs: [directiveTypeDefs, fullTypeDefWithDirectives],
-    resolvers,
+    resolvers: [resolvers, typeResolvers],
   });
 
   SchemaDirectiveVisitor.visitSchemaDirectives(schema, schemaDirectives, schemaDirectivesContext);
@@ -100,7 +104,7 @@ function addDirectivesToTypeDefs(
   objectTypeDirectives: DirectivesUsagesByObjectName,
   fieldDefinitionDirectives: DirectivesUsagesByObjectAndFieldNames,
   typeDef: DocumentNode
-) {
+): DocumentNode {
   return visit(typeDef, {
     ObjectTypeDefinition(node) {
       const objectDirectives = objectTypeDirectives[node.name.value];
