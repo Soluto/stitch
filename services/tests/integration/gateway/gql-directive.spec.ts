@@ -6,6 +6,7 @@ import { gql } from 'apollo-server-core';
 import { graphqlSync, GraphQLSchema, print } from 'graphql';
 import { createStitchGateway } from '../../../src/modules/gateway';
 import { beforeEachDispose } from '../before-each-dispose';
+import { sleep } from '../../helpers/utility';
 
 const miriam = {
   employeeId: '1',
@@ -94,11 +95,14 @@ const testCases: [string, TestCase][] = [
 describe.each(testCases)('GQL Directive', (testCaseName, { statusCode, delay }) => {
   let client: ApolloServerTestClient;
 
-  beforeEachDispose(() => {
+  beforeEachDispose(async () => {
     mockGqlBackend(remoteHost, remoteSchema, statusCode, delay);
 
     const stitch = createStitchGateway({ resourceGroups: Rx.of(resourceGroup) });
     client = createTestClient(stitch.server);
+
+    // Wait for introspection queries
+    await sleep(100);
 
     return () => {
       nock.cleanAll();
