@@ -155,3 +155,9 @@ In the example above, the `roles` argument value is received by using the Argume
 **_Important!_** The [order of directives](https://github.com/graphql/graphql-spec/blob/master/spec/Section%202%20--%20Language.md#directives) does matter! The directives are applied in order they appear in schema. Object type directives are applied before field definition directives.
 
 The `@policy` directive is required to be set **the last** either on object type or field definition.
+
+## Base policy
+
+Any policy (that doesn't contains query) can be set as base policy. Base policy is applied automatically to every single field in query.
+
+If field has `@policy` directive both base policy and the attached policy will be checked. Base policy will be checked first. If the attached policy defined with `shouldOverrideBasePolicy` option the base policy won't be checked.
