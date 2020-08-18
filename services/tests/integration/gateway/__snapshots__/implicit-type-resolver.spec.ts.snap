@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Implicit Type Resolver Tests Error when __typename is missing 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Expecting a \\"__typename\\" property in source when resolving an interface or union: Foo.",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {}
+}
+`;
+
+exports[`Implicit Type Resolver Tests Interface 1`] = `
+Object {
+  "data": Object {
+    "foo": Array [
+      Object {
+        "bar": "BAR",
+      },
+      Object {
+        "baz": "BAZ",
+      },
+    ],
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Implicit Type Resolver Tests Union 1`] = `
+Object {
+  "data": Object {
+    "foo": Array [
+      Object {
+        "bar": "BAR",
+      },
+      Object {
+        "baz": "BAZ",
+      },
+    ],
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
