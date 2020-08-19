@@ -22,7 +22,7 @@ export const schema: Schema = {
   },
   schema: print(gql`
     type Query {
-      ado_foo: String! @stub(value: "bar") @policy(namespace: "auth_directives_order", name: "alwaysDeny")
+      ado_foo: String! @localResolver(value: "bar") @policy(namespace: "auth_directives_order", name: "alwaysDeny")
     }
   `),
 };

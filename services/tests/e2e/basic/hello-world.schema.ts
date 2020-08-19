@@ -8,7 +8,7 @@ export const schema1 = {
   },
   schema: print(gql`
     type Query {
-      foo: String! @stub(value: "BAR")
+      foo: String! @localResolver(value: "BAR")
     }
   `),
 };
@@ -20,7 +20,7 @@ export const schema2 = {
   },
   schema: print(gql`
     type Query {
-      foo: String! @stub(value: "BAZ")
+      foo: String! @localResolver(value: "BAZ")
     }
   `),
 };

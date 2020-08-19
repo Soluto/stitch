@@ -32,17 +32,17 @@ export const schema: Schema = {
   },
   schema: print(gql`
     type Foo @policy(namespace: "auth_object_directive", name: "alwaysAllow") {
-      bar: String! @stub(value: "BAR")
-      baz: String! @stub(value: "BAZ") @policy(namespace: "auth_object_directive", name: "alwaysDeny")
+      bar: String! @localResolver(value: "BAR")
+      baz: String! @localResolver(value: "BAZ") @policy(namespace: "auth_object_directive", name: "alwaysDeny")
     }
 
     type Foo2 @policy(namespace: "auth_object_directive", name: "alwaysDeny") {
-      bar2: String! @stub(value: "BAR")
+      bar2: String! @localResolver(value: "BAR")
     }
 
     type Query {
-      aod_foo: Foo! @stub(value: {})
-      aod_foo2: Foo2! @stub(value: {})
+      aod_foo: Foo! @localResolver(value: {})
+      aod_foo2: Foo2! @localResolver(value: {})
     }
   `),
 };

@@ -13,13 +13,13 @@ const schema = {
   },
   schema: print(gql`
     type Query {
-      date: Date! @stub(value: "1991-10-05")
-      dateTime: DateTime! @stub(value: "2008-03-07T19:33:15.233Z")
-      timestamp: DateTime! @stub(value: 1582114537)
-      time: Time! @stub(value: "19:33:15.233Z")
-      rawJson: JSON! @stub(value: { a: { nested: { structure: 123 } } })
-      jsonArray: JSON! @stub(value: [1, 2, 3])
-      jsonObject: JSONObject! @stub(value: { hello: "world" })
+      date: Date! @localResolver(value: "1991-10-05")
+      dateTime: DateTime! @localResolver(value: "2008-03-07T19:33:15.233Z")
+      timestamp: DateTime! @localResolver(value: 1582114537)
+      time: Time! @localResolver(value: "19:33:15.233Z")
+      rawJson: JSON! @localResolver(value: { a: { nested: { structure: 123 } } })
+      jsonArray: JSON! @localResolver(value: [1, 2, 3])
+      jsonObject: JSONObject! @localResolver(value: { hello: "world" })
     }
   `),
 };

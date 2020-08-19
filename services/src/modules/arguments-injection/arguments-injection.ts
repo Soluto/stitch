@@ -35,6 +35,7 @@ export function deepInject(
   context: RequestContext,
   info: GraphQLResolveInfo
 ) {
+  if (!isObject(obj) || Array.isArray(obj)) return obj;
   const newObj = { ...obj };
 
   for (const key in obj) {

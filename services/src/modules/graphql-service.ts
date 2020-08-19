@@ -132,7 +132,7 @@ function getPolicyQueryName({ namespace, name }: ResourceMetadata) {
 
 const defaultSchema: Schema = {
   metadata: { namespace: 'internal', name: 'default' },
-  schema: 'type Query { default: String! @stub(value: "default") }',
+  schema: 'type Query { default: String! @localResolver(value: "default") }',
 };
 
 const initialSchema: Schema = {
@@ -142,7 +142,7 @@ const initialSchema: Schema = {
   },
   schema: `
     type Query {
-        policy: Policy! @stub(value: {
+        policy: Policy! @localResolver(value: {
             default: {
                 allow: true
             }

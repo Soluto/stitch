@@ -71,7 +71,7 @@ Here there are some examples to for injection of different sources
 ```graphql
 # Schema
 type Query {
-  foo: String! @stub(value: "bar")
+  foo: String! @localResolver(value: "bar")
 }
 
 #Query
@@ -87,7 +87,7 @@ query {
 ```graphql
 # Schema
 type Query {
-  foo(arg1: String): String! @stub(value: "{args.arg1}")
+  foo(arg1: String): String! @localResolver(value: "{args.arg1}")
 }
 
 #Query
@@ -103,7 +103,7 @@ query {
 ```graphql
 # Schema
 type Query {
-  foo: String! @stub(value: "{source.bar}")
+  foo: String! @localResolver(value: "{source.bar}")
 }
 
 #Query
@@ -120,7 +120,7 @@ query {
 ```graphql
 # Schema
 type Query {
-  foo: String! @stub(value: "{vars.var1}")
+  foo: String! @localResolver(value: "{vars.var1}")
 }
 
 #Query
@@ -149,7 +149,7 @@ type Region {
 
 type City {
   name: String!
-  countryCode: String! @stub(value: "{exports.countryCode}")
+  countryCode: String! @localResolver(value: "{exports.countryCode}")
 }
 
 type Query {
@@ -175,7 +175,7 @@ query {
 ```graphql
 # Schema
 type Query {
-  foo: String! @stub(value: "{jwt.roles}") # foo field will be resolved to roles claim of the request JWT.
+  foo: String! @localResolver(value: "{jwt.roles}") # foo field will be resolved to roles claim of the request JWT.
 }
 
 #Query
@@ -183,3 +183,28 @@ query {
   foo
 }
 ```
+
+#### Returning a JSON Object with injection
+
+```graphql
+# Schema
+type SomeType {
+  foo: String!
+  baz: String!
+}
+
+type Query {
+  someType(arg1: String): SomeType! @localResolver(value: "{{ foo: source.bar, baz: args.arg1 }}")
+}
+
+#Query
+query {
+  someType(arg1: "qux") {
+    foo
+    baz
+  }
+}
+```
+
+> rootValue: `{ bar: 'bar' }`
+> Result: `{ foo: 'bar', baz: 'qux' }`
