@@ -10,25 +10,27 @@ A simple no-code way to create a graphql API for an existing data source (REST, 
 
 The registry is our attempt at solving the issue of collaborating on a single graph in a large organization. Independent teams can author their own schemas representing their own data sources, and the end result is one big collaborative graph for all of the organization's data.
 
-# Documentation
+## Documentation
 
--   [Graph Composition Model](docs/graph_composition.md)
--   [Data Sources](./docs/data_sources.md)
--   [Parameter Injection](./docs/parameter_injection.md)
--   [Scalars](./docs/scalars.md)
--   [CLI](./cli)
--   [Upstream Authentication](./docs/upstream_authentication.md)
+- [Graph Composition Model](docs/graph_composition.md)
+- [Data Sources](./docs/data_sources.md)
+- [Arguments Injection](./docs/arguments_injection.md)
+- [Scalars](./docs/scalars.md)
+- [CLI](./cli)
+- [Upstream Authentication](./docs/upstream_authentication.md)
+- [Authentication](./docs/authentication.md)
+- [Authorization](./docs/authorization.md)
 
-# Development
+## Development
 
-## Running locally
+### Running locally
 
 Use the Tiltfile/docker-compose.yml located in `deployment/dev` to get a local env running quickly
 
-## CI & Versioning
+### CI & Versioning
 
--   Tests run on all pull requests
--   When merging to master, CI will publish soluto/stitch:\$commit_sha and soluto/stitch:latest
--   When pushing a version tag to the repo, CI will pick it up and create a docker image from the tagged commit tagged as the git tag. I.E. pushing v7.0 tag will create soluto/stitch:v7.0
+- Tests run on all pull requests
+- When merging to master, CI will publish soluto/stitch:\$commit_sha and soluto/stitch:latest
+- When pushing a version tag to the repo, CI will pick it up and create a docker image from the tagged commit tagged as the git tag. I.E. pushing v7.0 tag will create soluto/stitch:v7.0
 
 [![Stitch](https://circleci.com/gh/Soluto/stitch.svg?style=svg)](https://circleci.com/gh/Soluto/stitch)
