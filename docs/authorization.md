@@ -158,6 +158,6 @@ The `@policy` directive is required to be set **the last** either on object type
 
 ## Base policy
 
-Any policy (that doesn't contains query) can be set as base policy. Base policy is applied automatically to every single field in query.
+Any policy (that doesn't contain query) can be set as base policy. Base policy is applied automatically to every single field in query.
 
-If field has `@policy` directive both base policy and the attached policy will be checked. Base policy will be checked first. If the attached policy defined with `shouldOverrideBasePolicy` option the base policy won't be checked.
+If field has `@policy` directive both base policy and the attached policy will be checked. Base policy will be checked first. If the attached policy is defined with the `shouldOverrideBasePolicy` option the base policy won't be checked.

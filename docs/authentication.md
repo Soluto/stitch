@@ -6,7 +6,7 @@
 
 Gateway service supports different types of authentication.
 
-1. Anonymous authentication: There is no any credentials or token check for endpoint.
+1. Anonymous authentication: There are no credentials or token check for endpoint.
 
 2. JWT Bearer authentication: The request should include `Authorization` header with JWT token. The token should be valid and properly-signed.
 
@@ -17,6 +17,8 @@ Gateway exposes 3 endpoints:
 1. `/metrics` for Prometheus metrics
 2. `/.well-known/apollo/server-health` for Apollo Server health check
 3. `/graphql` for graphql requests.
+
+Gateway reads the configuration from `AUTHENTICATION_CONFIGURATION` environment variable on startup if exists or uses default configuration.
 
 By default all 3 endpoints are configured with anonymous strategy. See [here](../services/src/modules/config.ts).
 
@@ -63,7 +65,7 @@ Base policy:
 
 ```json
 {
-  "namespace": "intra",
+  "namespace": "infra",
   "name": "check_audience",
   "args": {
     "aud": "{jwt.aud}",
