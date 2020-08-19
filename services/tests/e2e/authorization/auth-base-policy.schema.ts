@@ -62,12 +62,12 @@ export const schema = {
   metadata: { namespace: 'auth_bp', name: 'foo' },
   schema: print(gql`
     type Query {
-      bp_foo: String @stub(value: "FOO")
+      bp_foo: String @localResolver(value: "FOO")
       bp_bar: String
-        @stub(value: "BAR")
+        @localResolver(value: "BAR")
         @policy(namespace: "auth_bp", name: "regular_policy", args: { isActive: "{jwt.isActive}" })
       bp_baz: String
-        @stub(value: "BAZ")
+        @localResolver(value: "BAZ")
         @policy(namespace: "auth_bp", name: "override_base_policy", args: { isGuest: "{jwt.isGuest}" })
     }
   `),

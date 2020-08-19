@@ -64,8 +64,8 @@ const testCases: [string, ResourceGroup & { etag: string }][] = [
           },
           schema: print(gql`
             type Query {
-              foo: String @stub(value: "FOO") @policy(namespace: "ns", name: "field_policy")
-              bar: String @stub(value: "BAR")
+              foo: String @localResolver(value: "FOO") @policy(namespace: "ns", name: "field_policy")
+              bar: String @localResolver(value: "BAR")
             }
           `),
         },
@@ -92,8 +92,8 @@ const testCases: [string, ResourceGroup & { etag: string }][] = [
           },
           schema: print(gql`
             type Query {
-              foo: String @stub(value: "FOO") @policy(namespace: "ns", name: "field_policy")
-              bar: String @stub(value: "BAR")
+              foo: String @localResolver(value: "FOO") @policy(namespace: "ns", name: "field_policy")
+              bar: String @localResolver(value: "BAR")
             }
           `),
         },
@@ -120,8 +120,8 @@ const testCases: [string, ResourceGroup & { etag: string }][] = [
           },
           schema: print(gql`
             type Query {
-              foo: String @stub(value: "FOO") @policy(namespace: "ns", name: "override_base_policy")
-              bar: String @stub(value: "BAR")
+              foo: String @localResolver(value: "FOO") @policy(namespace: "ns", name: "override_base_policy")
+              bar: String @localResolver(value: "BAR")
             }
           `),
         },
@@ -148,8 +148,8 @@ const testCases: [string, ResourceGroup & { etag: string }][] = [
           },
           schema: print(gql`
             type Query {
-              foo: String @stub(value: "FOO") @policy(namespace: "ns", name: "override_base_policy")
-              bar: String @stub(value: "BAR")
+              foo: String @localResolver(value: "FOO") @policy(namespace: "ns", name: "override_base_policy")
+              bar: String @localResolver(value: "BAR")
             }
           `),
         },

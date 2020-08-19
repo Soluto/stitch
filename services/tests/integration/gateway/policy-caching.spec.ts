@@ -24,7 +24,7 @@ const userSchema: Schema = {
     }
 
     type Query {
-      user: User! @stub(value: { id: "42", firstName: "John", middleName: "Hope", lastName: "Smith" })
+      user: User! @localResolver(value: { id: "42", firstName: "John", middleName: "Hope", lastName: "Smith" })
     }
   `),
 };
@@ -38,7 +38,7 @@ const userRolesSchema: Schema = {
     }
 
     type Query {
-      userRole(userId: ID!): UserRole! @stub(value: { id: "42", role: "admin" })
+      userRole(userId: ID!): UserRole! @localResolver(value: { id: "42", role: "admin" })
     }
   `),
 };

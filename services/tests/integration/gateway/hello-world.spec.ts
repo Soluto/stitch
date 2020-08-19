@@ -14,7 +14,7 @@ const schema = {
   },
   schema: print(gql`
     type Query {
-      hello: String! @stub(value: "world!")
+      hello: String! @localResolver(value: "world!")
     }
   `),
 };

@@ -1,6 +1,7 @@
 import { concatAST } from 'graphql';
 import { SchemaDirectiveVisitor } from 'graphql-tools';
 import { sdl as stubSdl, StubDirective } from './stub';
+import { sdl as localResolverSdl, LocalResolverDirective } from './local-resolver';
 import { sdl as restSdl, RestDirective } from './rest';
 import { sdl as gqlSdl, GqlDirective } from './gql';
 import { sdl as exportSdl, ExportDirective } from './export';
@@ -15,6 +16,16 @@ export const directiveMap: { [visitorName: string]: typeof SchemaDirectiveVisito
   select: SelectDirective,
   policy: PolicyDirective,
   policyQuery: PolicyQueryDirective,
+  localResolver: LocalResolverDirective,
 };
 
-export const sdl = concatAST([stubSdl, restSdl, gqlSdl, exportSdl, selectSdl, policySdl, policyQuerySdl]);
+export const sdl = concatAST([
+  stubSdl,
+  restSdl,
+  gqlSdl,
+  exportSdl,
+  selectSdl,
+  policySdl,
+  policyQuerySdl,
+  localResolverSdl,
+]);

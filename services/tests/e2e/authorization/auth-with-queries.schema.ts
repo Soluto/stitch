@@ -101,7 +101,7 @@ export const schema: Schema = {
 
     type Query {
       allowedEmployee: Employee!
-        @stub(
+        @localResolver(
           value: {
             id: "1"
             name: "John Smith"
@@ -111,7 +111,7 @@ export const schema: Schema = {
           }
         )
       deniedEmployee1: Employee!
-        @stub(
+        @localResolver(
           value: {
             id: "2"
             name: "Mark Zuckerberg"
@@ -121,7 +121,7 @@ export const schema: Schema = {
           }
         )
       deniedEmployee2: Employee!
-        @stub(
+        @localResolver(
           value: {
             id: "2"
             name: "Tom Baker"
@@ -131,7 +131,7 @@ export const schema: Schema = {
           }
         )
       classifiedDepartments: [Department!]!
-        @stub(value: [{ id: "D1000", name: "VIP" }])
+        @localResolver(value: [{ id: "D1000", name: "VIP" }])
         @policy(namespace: "auth-with-query", name: "always-denied")
     }
   `),

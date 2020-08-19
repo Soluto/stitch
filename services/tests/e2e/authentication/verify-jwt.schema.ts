@@ -9,7 +9,7 @@ export const schema: Schema = {
   },
   schema: print(gql`
     type Query {
-      jwt_foo: String @stub(value: "FOO")
+      jwt_foo: String @localResolver(value: "FOO")
     }
   `),
 };

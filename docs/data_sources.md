@@ -8,16 +8,16 @@ All of these use Stitch's [parameter injection](./parameter_injection.md) syntax
 
 ```graphql
 type Query {
-    allUsers: [User!] @rest(url: "http://user-service/users")
+  allUsers: [User!] @rest(url: "http://user-service/users")
 
-    userById(userId: ID!): User @rest(url: "https://user-service/users/{args.userId}")
+  userById(userId: ID!): User @rest(url: "https://user-service/users/{args.userId}")
 
-    userById(userId: ID!): User
-        @rest(url: "https://old-user-service/getUser", query: [{key: "id", value: "{args.userId}"}])
+  userById(userId: ID!): User
+    @rest(url: "https://old-user-service/getUser", query: [{ key: "id", value: "{args.userId}" }])
 }
 
 type Mutation {
-    createUser(body: UserInput!): User @rest(url: "https://user-service/users", method: "POST", bodyArg: "body")
+  createUser(body: UserInput!): User @rest(url: "https://user-service/users", method: "POST", bodyArg: "body")
 }
 ```
 
@@ -89,20 +89,74 @@ directive @gql(
 )
 ```
 
-## @stub
+## @localResolver
+
+`@localResolver` lets you create a stub resolver, but make no mistake - this can be used with full parameter injection syntax to create complex resolvers.
+
+The optional `mergeStrategy` parameter allows choosing between replacing/merging/deep merging with the existing resolver value for the field. The `Replace` strategy is used by default.
+
+Example of replacing the existing resolver value:
+
+```graphql
+type Query {
+  isAlive: Boolean @localResolver(value: true)
+  jsonEcho(input: JSON!): JSON @localResolver(value: { wrapper: "{args.input}" })
+}
+
+type User {
+  firstName: String!
+  lastName: String!
+  fullName: String! @localResolver(value: "{source.firstName} {source.lastName}")
+}
+```
+
+Example of merging with the existing resolver value:
+
+```graphql
+type User {
+    firstName: String!
+    lastName: String!
+    fullName: String // not supplied by the resolver
+}
+
+type Query {
+    getUser: User! @localResolver(value: { fullName: "${source.firstName} ${source.lastName}" }, mergeStrategy: Merge)
+}
+```
+
+Full parameters:
+
+```graphql
+enum LocalResolverMergeStrategy {
+    Replace
+    Merge
+    MergeDeep
+}
+
+directive @localResolver(
+    value: JSON!
+    mergeStrategy: LocalResolverMergeStrategy = Replace
+)
+```
+
+## @export
+
+See [Parameter Injection](./parameter_injection.md#exports) for details
+
+## @stub (Deprecated, use @localResolver instead)
 
 `@stub` lets you create a stub resolver, but make no mistake - this can be used with full parameter injection syntax to create complex resolvers. Examples:
 
 ```graphql
 type Query {
-    isAlive: Boolean @stub(value: true)
-    jsonEcho(input: JSON!): JSON @stub(value: {wrapper: "{args.input}"})
+  isAlive: Boolean @stub(value: true)
+  jsonEcho(input: JSON!): JSON @stub(value: { wrapper: "{args.input}" })
 }
 
 type User {
-    firstName: String!
-    lastName: String!
-    fullName: String! @stub(value: "{source.firstName} {source.lastName}")
+  firstName: String!
+  lastName: String!
+  fullName: String! @stub(value: "{source.firstName} {source.lastName}")
 }
 ```
 
@@ -111,7 +165,3 @@ Full parameters:
 ```graphql
 directive @stub(value: JSON!)
 ```
-
-## @export
-
-See [Parameter Injection](./parameter_injection.md#exports) for details

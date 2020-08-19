@@ -56,7 +56,7 @@ const schema = {
       employeeId: ID!
       name: String!
       age: Int!
-      extraFieldThatsNotOnTheRemoteGql: String! @stub(value: "surprise!")
+      extraFieldThatsNotOnTheRemoteGql: String! @localResolver(value: "surprise!")
       bestFriend: Employee
     }
 
@@ -105,7 +105,7 @@ describe.each(testCases)('GQL Directive', (testCaseName, { statusCode, delay }) 
     client = createTestClient(stitch.server);
 
     // Wait for introspection queries
-    await sleep(100);
+    await sleep(200);
 
     return () => {
       nock.cleanAll();

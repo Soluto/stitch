@@ -46,7 +46,7 @@ const schema: Schema = {
   schema: print(gql`
     type Employee {
       name: String!
-      organizationName: ID! @stub(value: "{exports.organizationName}")
+      organizationName: ID! @localResolver(value: "{exports.organizationName}")
     }
 
     type Team {

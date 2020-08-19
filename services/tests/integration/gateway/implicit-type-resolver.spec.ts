@@ -34,7 +34,7 @@ const testCases: [string, ResourceGroup][] = [
 
             type Query {
               foo: [Foo!]!
-                @stub(
+                @localResolver(
                   value: [
                     { common: "FOO", bar: "BAR", __typename: "Bar" }
                     { common: "FOO", baz: "BAZ", __typename: "Baz" }
@@ -70,7 +70,7 @@ const testCases: [string, ResourceGroup][] = [
             union Foo = Bar | Baz
 
             type Query {
-              foo: [Foo!]! @stub(value: [{ bar: "BAR", __typename: "Bar" }, { baz: "BAZ", __typename: "Baz" }])
+              foo: [Foo!]! @localResolver(value: [{ bar: "BAR", __typename: "Bar" }, { baz: "BAZ", __typename: "Baz" }])
             }
           `),
         },
@@ -101,7 +101,7 @@ const testCases: [string, ResourceGroup][] = [
             union Foo = Bar | Baz
 
             type Query {
-              foo: [Foo!]! @stub(value: [{ bar: "BAR" }, { baz: "BAZ" }])
+              foo: [Foo!]! @localResolver(value: [{ bar: "BAR" }, { baz: "BAZ" }])
             }
           `),
         },

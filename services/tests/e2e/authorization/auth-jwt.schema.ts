@@ -58,9 +58,9 @@ export const schema = {
     }
 
     type Query {
-      user: User! @stub(value: ${userQueryStub('normal')})
-      userAdmin: User! @stub(value: ${userQueryStub('admin')})
-      arbitraryData: ArbitraryData! @stub(value: { arbitraryField: "arbitraryValue" })
+      user: User! @localResolver(value: ${userQueryStub('normal')})
+      userAdmin: User! @localResolver(value: ${userQueryStub('admin')})
+      arbitraryData: ArbitraryData! @localResolver(value: { arbitraryField: "arbitraryValue" })
     }
   `),
 };

@@ -4,7 +4,7 @@ import { ApolloServer, IResolvers } from 'apollo-server-fastify';
 import { when } from 'jest-when';
 import { concatAST, DocumentNode } from 'graphql';
 import { policySdl, PolicyDirective, PolicyExecutor } from '../../../src/modules/directives/policy';
-import { sdl as stubSdl, StubDirective } from '../../../src/modules/directives/stub';
+import { sdl as localResolverSdl, LocalResolverDirective } from '../../../src/modules/directives/local-resolver';
 import { sdl as lowerCaseSdl, LowerCaseDirective } from '../utils/lower-case-directive';
 import { sdl as mockSdl, MockDirective } from '../utils/mock-directive';
 import { baseTypeDef, resolvers as baseResolvers } from '../../../src/modules/base-schema';
@@ -68,7 +68,7 @@ const testCases: [string, TestCase][] = [
           bar: String! @policy(namespace: "ns", name: "alwaysAllow")
         }
         type Query {
-          foo: Foo! @stub(value: { bar: "BAR" })
+          foo: Foo! @localResolver(value: { bar: "BAR" })
         }
       `,
     },
@@ -81,7 +81,7 @@ const testCases: [string, TestCase][] = [
           bar: String! @policy(namespace: "ns", name: "alwaysDeny")
         }
         type Query {
-          foo: Foo! @stub(value: { bar: "BAR" })
+          foo: Foo! @localResolver(value: { bar: "BAR" })
         }
       `,
     },
@@ -91,10 +91,10 @@ const testCases: [string, TestCase][] = [
     {
       typeDefs: gql`
         type Foo {
-          bar: String! @stub(value: "BAR") @policy(namespace: "ns", name: "alwaysAllow")
+          bar: String! @localResolver(value: "BAR") @policy(namespace: "ns", name: "alwaysAllow")
         }
         type Query {
-          foo: Foo! @stub(value: {})
+          foo: Foo! @localResolver(value: {})
         }
       `,
     },
@@ -104,10 +104,10 @@ const testCases: [string, TestCase][] = [
     {
       typeDefs: gql`
         type Foo {
-          bar: String! @stub(value: "BAR") @policy(namespace: "ns", name: "alwaysDeny")
+          bar: String! @localResolver(value: "BAR") @policy(namespace: "ns", name: "alwaysDeny")
         }
         type Query {
-          foo: Foo! @stub(value: {})
+          foo: Foo! @localResolver(value: {})
         }
       `,
     },
@@ -118,10 +118,10 @@ const testCases: [string, TestCase][] = [
     {
       typeDefs: gql`
         type Foo {
-          bar: String! @policy(namespace: "ns", name: "alwaysAllow") @stub(value: "BAR")
+          bar: String! @policy(namespace: "ns", name: "alwaysAllow") @localResolver(value: "BAR")
         }
         type Query {
-          foo: Foo! @stub(value: {})
+          foo: Foo! @localResolver(value: {})
         }
       `,
     },
@@ -132,10 +132,10 @@ const testCases: [string, TestCase][] = [
     {
       typeDefs: gql`
         type Foo {
-          bar: String! @policy(namespace: "ns", name: "alwaysDeny") @stub(value: "BAR")
+          bar: String! @policy(namespace: "ns", name: "alwaysDeny") @localResolver(value: "BAR")
         }
         type Query {
-          foo: Foo! @stub(value: {})
+          foo: Foo! @localResolver(value: {})
         }
       `,
     },
@@ -145,10 +145,10 @@ const testCases: [string, TestCase][] = [
     {
       typeDefs: gql`
         type Foo @policy(namespace: "ns", name: "alwaysAllow") {
-          bar: String! @stub(value: "BAR")
+          bar: String! @localResolver(value: "BAR")
         }
         type Query {
-          foo: Foo! @stub(value: {})
+          foo: Foo! @localResolver(value: {})
         }
       `,
     },
@@ -158,10 +158,10 @@ const testCases: [string, TestCase][] = [
     {
       typeDefs: gql`
         type Foo @policy(namespace: "ns", name: "alwaysDeny") {
-          bar: String! @stub(value: "BAR")
+          bar: String! @localResolver(value: "BAR")
         }
         type Query {
-          foo: Foo! @stub(value: {})
+          foo: Foo! @localResolver(value: {})
         }
       `,
     },
@@ -174,7 +174,7 @@ const testCases: [string, TestCase][] = [
           bar: String!
         }
         type Query {
-          foo: Foo! @stub(value: { bar: "BAR" })
+          foo: Foo! @localResolver(value: { bar: "BAR" })
         }
       `,
     },
@@ -187,7 +187,7 @@ const testCases: [string, TestCase][] = [
           bar: String!
         }
         type Query {
-          foo: Foo! @stub(value: { bar: "BAR" })
+          foo: Foo! @localResolver(value: { bar: "BAR" })
         }
       `,
     },
@@ -197,10 +197,10 @@ const testCases: [string, TestCase][] = [
     {
       typeDefs: gql`
         type Foo {
-          bar: String! @stub(value: "BAR") @lowerCase @policy(namespace: "ns", name: "alwaysAllow")
+          bar: String! @localResolver(value: "BAR") @lowerCase @policy(namespace: "ns", name: "alwaysAllow")
         }
         type Query {
-          foo: Foo! @stub(value: {})
+          foo: Foo! @localResolver(value: {})
         }
       `,
     },
@@ -210,10 +210,10 @@ const testCases: [string, TestCase][] = [
     {
       typeDefs: gql`
         type Foo {
-          bar: String! @stub(value: "BAR") @lowerCase @policy(namespace: "ns", name: "alwaysDeny")
+          bar: String! @localResolver(value: "BAR") @lowerCase @policy(namespace: "ns", name: "alwaysDeny")
         }
         type Query {
-          foo: Foo! @stub(value: {})
+          foo: Foo! @localResolver(value: {})
         }
       `,
     },
@@ -224,10 +224,10 @@ const testCases: [string, TestCase][] = [
       // This is incorrect order of directives but it still does work by chance.
       typeDefs: gql`
         type Foo {
-          bar: String! @stub(value: "BAR") @policy(namespace: "ns", name: "alwaysAllow") @lowerCase
+          bar: String! @localResolver(value: "BAR") @policy(namespace: "ns", name: "alwaysAllow") @lowerCase
         }
         type Query {
-          foo: Foo! @stub(value: {})
+          foo: Foo! @localResolver(value: {})
         }
       `,
     },
@@ -238,10 +238,10 @@ const testCases: [string, TestCase][] = [
     {
       typeDefs: gql`
         type Foo {
-          bar: String! @stub(value: "BAR") @policy(namespace: "ns", name: "alwaysDeny") @lowerCase
+          bar: String! @localResolver(value: "BAR") @policy(namespace: "ns", name: "alwaysDeny") @lowerCase
         }
         type Query {
-          foo: Foo! @stub(value: {})
+          foo: Foo! @localResolver(value: {})
         }
       `,
     },
@@ -254,7 +254,7 @@ const testCases: [string, TestCase][] = [
           bar: String! @policy(namespace: "ns", name: "alwaysAllow")
         }
         type Query {
-          foo: Foo! @stub(value: { bar: "BAR" })
+          foo: Foo! @localResolver(value: { bar: "BAR" })
         }
       `,
     },
@@ -267,7 +267,7 @@ const testCases: [string, TestCase][] = [
           bar: String! @policy(namespace: "ns", name: "alwaysDeny")
         }
         type Query {
-          foo: Foo! @stub(value: { bar: "BAR" })
+          foo: Foo! @localResolver(value: { bar: "BAR" })
         }
       `,
     },
@@ -280,7 +280,7 @@ const testCases: [string, TestCase][] = [
           bar: String!
         }
         type Query {
-          foo: Foo! @stub(value: { bar: "BAR" })
+          foo: Foo! @localResolver(value: { bar: "BAR" })
         }
       `,
     },
@@ -293,7 +293,7 @@ const testCases: [string, TestCase][] = [
           bar: String!
         }
         type Query {
-          foo: Foo! @stub(value: { bar: "BAR" })
+          foo: Foo! @localResolver(value: { bar: "BAR" })
         }
       `,
     },
@@ -307,7 +307,7 @@ const testCases: [string, TestCase][] = [
           bar: String!
         }
         type Query {
-          foo: Foo! @stub(value: { bar: "BAR" })
+          foo: Foo! @localResolver(value: { bar: "BAR" })
         }
       `,
     },
@@ -321,7 +321,7 @@ const testCases: [string, TestCase][] = [
           bar: String!
         }
         type Query {
-          foo: Foo! @stub(value: { bar: "BAR" })
+          foo: Foo! @localResolver(value: { bar: "BAR" })
         }
       `,
     },
@@ -334,7 +334,7 @@ const testCases: [string, TestCase][] = [
           bar: String!
         }
         type Query {
-          foo: Foo! @stub(value: { id: "1" })
+          foo: Foo! @localResolver(value: { id: "1" })
         }
       `,
     },
@@ -347,7 +347,7 @@ const testCases: [string, TestCase][] = [
           bar: String!
         }
         type Query {
-          foo: Foo! @stub(value: { id: "1" })
+          foo: Foo! @localResolver(value: { id: "1" })
         }
       `,
     },
@@ -368,10 +368,10 @@ describe.each(testCases)('Policy Directive Tests', (testName, { typeDefs, resolv
 
   beforeAll(() => {
     server = new ApolloServer({
-      typeDefs: concatAST([baseTypeDef, typeDefs, stubSdl, policySdl, lowerCaseSdl, mockSdl]),
+      typeDefs: concatAST([baseTypeDef, typeDefs, localResolverSdl, policySdl, lowerCaseSdl, mockSdl]),
       resolvers: [resolvers ?? {}, baseResolvers],
       schemaDirectives: {
-        stub: StubDirective,
+        localResolver: LocalResolverDirective,
         policy: PolicyDirective,
         lowerCase: LowerCaseDirective,
         mock: MockDirective,

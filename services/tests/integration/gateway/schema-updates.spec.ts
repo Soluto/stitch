@@ -14,7 +14,7 @@ const schema1 = {
   },
   schema: print(gql`
     type Query {
-      version: String! @stub(value: "v1")
+      version: String! @localResolver(value: "v1")
     }
   `),
 };
@@ -26,7 +26,7 @@ const schema2 = {
   },
   schema: print(gql`
     type Query {
-      version: String! @stub(value: "v2")
+      version: String! @localResolver(value: "v2")
     }
   `),
 };
