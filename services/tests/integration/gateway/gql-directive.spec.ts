@@ -98,7 +98,10 @@ describe.each(testCases)('GQL Directive', (testCaseName, { statusCode, delay }) 
   beforeEachDispose(async () => {
     mockGqlBackend(remoteHost, remoteSchema, statusCode, delay);
 
-    const stitch = createStitchGateway({ resourceGroups: Rx.of(resourceGroup) });
+    const stitch = createStitchGateway({
+      resourceGroups: Rx.of(resourceGroup),
+      fastifyInstance: { metrics: undefined as any },
+    });
     client = createTestClient(stitch.server);
 
     // Wait for introspection queries

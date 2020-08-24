@@ -130,7 +130,10 @@ describe.each(testCases)('Implicit Type Resolver Tests', (testName, resourceGrou
   `;
 
   beforeEachDispose(() => {
-    const stitch = createStitchGateway({ resourceGroups: Rx.of(resourceGroup) });
+    const stitch = createStitchGateway({
+      resourceGroups: Rx.of(resourceGroup),
+      fastifyInstance: { metrics: undefined as any },
+    });
     client = createTestClient(stitch.server);
 
     return () => {

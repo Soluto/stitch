@@ -1,23 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Metrics Check metrics 1`] = `
-# HELP graphql_errors_in_response Graphql Errors Counter
-# TYPE graphql_errors_in_response counter
-graphql_errors_in_response X
 # HELP graphql_request_duration_seconds request duration in seconds
 # TYPE graphql_request_duration_seconds histogram
-graphql_request_duration_seconds_bucket{le="0.005"} X
-graphql_request_duration_seconds_bucket{le="0.01"} X
-graphql_request_duration_seconds_bucket{le="0.025"} X
-graphql_request_duration_seconds_bucket{le="0.05"} X
-graphql_request_duration_seconds_bucket{le="0.1"} X
-graphql_request_duration_seconds_bucket{le="0.25"} X
-graphql_request_duration_seconds_bucket{le="0.5"} X
-graphql_request_duration_seconds_bucket{le="1"} X
-graphql_request_duration_seconds_bucket{le="2.5"} X
-graphql_request_duration_seconds_bucket{le="5"} X
-graphql_request_duration_seconds_bucket{le="10"} X
-graphql_request_duration_seconds_bucket{le="+Inf"} X
-graphql_request_duration_seconds_sum X
-graphql_request_duration_seconds_count X
+graphql_request_duration_seconds_bucket{le="X",status="X"} Y
+graphql_request_duration_seconds_sum{status="X"} Y
+graphql_request_duration_seconds_count{status="X"} Y
+# HELP graphql_resolver_duration_seconds resolver duration in seconds
+# TYPE graphql_resolver_duration_seconds histogram
+graphql_resolver_duration_seconds_bucket{le="X",parentType="X",fieldName="X",status="X"} Y
+graphql_resolver_duration_seconds_sum{parentType="X",fieldName="X",status="X"} Y
+graphql_resolver_duration_seconds_count{parentType="X",fieldName="X",status="X"} Y
 `;

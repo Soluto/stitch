@@ -6,8 +6,8 @@ export default {
     const metrics: string[] = val;
     const metricsWithoutValues = metrics.map(line => {
       if (line.startsWith('#')) return line;
-      return line.replace(/ [+-]?\d+(\.\d+)?$/, ' X');
+      return line.replace(/="[\w+.]+"/g, '="X"').replace(/ [+-]?\d+(\.\d+)?$/, ' Y');
     });
-    return metricsWithoutValues.join('\n');
+    return metricsWithoutValues.filter((line, idx) => metricsWithoutValues.indexOf(line) === idx).join('\n');
   },
 };

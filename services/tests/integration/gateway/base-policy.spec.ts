@@ -169,7 +169,10 @@ describe.each(testCases)('Base Policy Tests', (testName, resourceGroup) => {
   `;
 
   beforeEachDispose(() => {
-    const stitch = createStitchGateway({ resourceGroups: Rx.of(resourceGroup) });
+    const stitch = createStitchGateway({
+      resourceGroups: Rx.of(resourceGroup),
+      fastifyInstance: { metrics: undefined as any },
+    });
     client = createTestClient(stitch.server);
 
     return () => {
