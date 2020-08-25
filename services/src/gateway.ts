@@ -20,13 +20,6 @@ import jwtDecoderPlugin from './modules/authentication/jwt-decoder-plugin';
 async function run() {
   logger.info('Stitch gateway booting up...');
 
-  const { server, dispose } = createStitchGateway({
-    resourceGroups: pollForUpdates(getResourceRepository(), config.resourceUpdateInterval),
-    tracing: config.enableGraphQLTracing,
-    playground: config.enableGraphQLPlayground,
-    introspection: config.enableGraphQLIntrospection,
-  });
-
   const app = fastify()
     .register(authPlugin)
     .register(jwtPlugin, {
@@ -36,8 +29,19 @@ async function run() {
       },
     })
     .register(jwtDecoderPlugin)
-    .register(fastifyMetrics, { endpoint: '/metrics' })
-    .register(server.createHandler({ path: '/graphql' }));
+    .register(fastifyMetrics, {
+      endpoint: '/metrics',
+    });
+
+  const { server, dispose } = createStitchGateway({
+    resourceGroups: pollForUpdates(getResourceRepository(), config.resourceUpdateInterval),
+    tracing: config.enableGraphQLTracing,
+    playground: config.enableGraphQLPlayground,
+    introspection: config.enableGraphQLIntrospection,
+    fastifyInstance: app,
+  });
+
+  app.register(server.createHandler({ path: '/graphql' }));
   app.after(() => {
     app.addHook('onRequest', app.auth([jwtAuthStrategy, anonymousAuthStrategy]));
   });

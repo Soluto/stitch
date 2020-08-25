@@ -81,7 +81,10 @@ describe('Policy Caching', () => {
   beforeEachDispose(() => {
     _evaluatePolicySpy = jest.spyOn(PolicyExecutor.prototype as any, '_evaluatePolicy');
 
-    const stitch = createStitchGateway({ resourceGroups: Rx.of(resourceGroup) });
+    const stitch = createStitchGateway({
+      resourceGroups: Rx.of(resourceGroup),
+      fastifyInstance: { metrics: undefined as any },
+    });
     client = createTestClient(stitch.server);
 
     return () => {

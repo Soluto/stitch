@@ -43,7 +43,7 @@ describe('Hello world', () => {
 
   beforeEachDispose(() => {
     resourceGroups = new Rx.BehaviorSubject({ ...resourceGroup, schemas: [schema1] } as ResourceGroup);
-    const stitch = createStitchGateway({ resourceGroups });
+    const stitch = createStitchGateway({ resourceGroups, fastifyInstance: { metrics: undefined as any } });
     client = createTestClient(stitch.server);
 
     return () => {

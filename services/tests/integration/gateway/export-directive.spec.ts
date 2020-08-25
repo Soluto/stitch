@@ -78,7 +78,10 @@ describe('Export Directive', () => {
   beforeEachDispose(() => {
     mockRestBackend('http://test.api');
 
-    const stitch = createStitchGateway({ resourceGroups: Rx.of(resourceGroup) });
+    const stitch = createStitchGateway({
+      resourceGroups: Rx.of(resourceGroup),
+      fastifyInstance: { metrics: undefined as any },
+    });
     client = createTestClient(stitch.server);
 
     return () => {
