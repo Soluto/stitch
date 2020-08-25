@@ -5,6 +5,7 @@ import {
 } from 'apollo-server-plugin-base';
 import { FastifyInstance } from 'fastify';
 import { Histogram } from 'prom-client';
+import { defaultFieldResolver } from 'graphql';
 
 let requestDurationHistogram: Histogram<string> | undefined;
 let resolverDurationHistogram: Histogram<string> | undefined;
@@ -39,12 +40,13 @@ export function createMetricsPlugin(fastifyInstance: Pick<FastifyInstance, 'metr
             fieldResolverParams: GraphQLFieldResolverParams<unknown, unknown, Record<string, unknown>>
           ): ((error: Error | null, result?: unknown) => void) | void {
             const {
-              info: {
-                fieldName,
-                parentType: { name: parentType },
-              },
+              info: { fieldName, parentType },
             } = fieldResolverParams;
-            const endResolverTimer = resolverDurationHistogram?.startTimer({ parentType, fieldName });
+
+            const fieldResolver = parentType.getFields()[fieldName].resolve;
+            if (!fieldResolver || fieldResolver === defaultFieldResolver) return;
+
+            const endResolverTimer = resolverDurationHistogram?.startTimer({ parentType: parentType.name, fieldName });
             return (error: Error | null) => {
               endResolverTimer?.({ status: error ? 'error' : 'success' });
             };
