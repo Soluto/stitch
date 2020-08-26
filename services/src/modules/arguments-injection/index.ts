@@ -1,4 +1,4 @@
 import evaluate from './arguments-evaluation';
-import { inject, deepInject } from './arguments-injection';
+import { inject } from './arguments-injection';
 
-export { inject, deepInject, evaluate as injectArgs };
+export { inject, evaluate as injectArgs };
