@@ -2,6 +2,7 @@ import { GraphQLResolveInfo } from 'graphql';
 import { FastifyRequest } from 'fastify';
 import { RequestContext } from '../context';
 import { getExportsProxy } from '../exports';
+import { isObject } from '../utils';
 import evaluate from './arguments-evaluation';
 
 declare module '../context' {
@@ -10,7 +11,7 @@ declare module '../context' {
   }
 }
 
-export function inject<T = unknown>(
+function injectTemplate<T = unknown>(
   template: string,
   source: unknown | undefined,
   args: Record<string, unknown> | undefined,
@@ -28,29 +29,23 @@ export function inject<T = unknown>(
   return evaluate<T>(template, data);
 }
 
-export function deepInject(
-  obj: { [key: string]: unknown },
-  parent: unknown,
-  args: Record<string, unknown>,
-  context: RequestContext,
-  info: GraphQLResolveInfo
-) {
-  if (!isObject(obj) || Array.isArray(obj)) return obj;
-  const newObj = { ...obj };
+export function inject(
+  input: unknown,
+  parent: unknown | undefined,
+  args: Record<string, unknown> | undefined,
+  context: Pick<RequestContext, 'exports' | 'request'> | undefined,
+  info?: GraphQLResolveInfo
+): unknown {
+  if (typeof input === 'string') return injectTemplate(input, parent, args, context, info);
 
-  for (const key in obj) {
-    const value = obj[key];
-
-    if (typeof value === 'string') {
-      newObj[key] = inject(value, parent, args, context, info);
-    } else if (isObject(value)) {
-      newObj[key] = deepInject(value, parent, args, context, info);
-    }
+  if (isObject(input)) {
+    return Object.entries(input).reduce((obj, [key, value]) => {
+      obj[key] = inject(value, parent, args, context, info);
+      return obj;
+    }, {} as Record<string, unknown>);
   }
 
-  return newObj;
-}
+  if (Array.isArray(input)) return input.map(value => inject(value, parent, args, context, info));
 
-function isObject(val: unknown): val is Record<string, unknown> {
-  return typeof val === 'object' && val !== null;
+  return input;
 }

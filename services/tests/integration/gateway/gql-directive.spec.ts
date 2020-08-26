@@ -105,7 +105,7 @@ describe.each(testCases)('GQL Directive', (testCaseName, { statusCode, delay }) 
     client = createTestClient(stitch.server);
 
     // Wait for introspection queries
-    await sleep(200);
+    await sleep(300);
 
     return () => {
       nock.cleanAll();

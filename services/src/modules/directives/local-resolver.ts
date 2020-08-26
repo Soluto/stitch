@@ -2,7 +2,8 @@ import { SchemaDirectiveVisitor } from 'graphql-tools';
 import { GraphQLField, defaultFieldResolver } from 'graphql';
 import { gql } from 'apollo-server-core';
 import * as lodash from 'lodash';
-import { inject, deepInject } from '../arguments-injection';
+import { isObject } from '../utils';
+import { inject } from '../arguments-injection';
 import { RequestContext } from '../context';
 
 export class LocalResolverDirective extends SchemaDirectiveVisitor {
@@ -11,18 +12,16 @@ export class LocalResolverDirective extends SchemaDirectiveVisitor {
     const originalResolve = field.resolve || defaultFieldResolver;
 
     field.resolve = async (parent, args, context, info) => {
-      const stubValue =
-        typeof value === 'string'
-          ? inject(value, parent, args, context, info)
-          : deepInject(value, parent, args, context, info);
-
+      const stubValue = inject(value, parent, args, context, info);
       if (mergeStrategy === MergeStrategy.Replace) return stubValue;
+
+      if (!isObject(stubValue)) throw new Error(invalidStubTypeErrorMessage);
 
       const originalValue = await originalResolve.call(field, parent, args, context, info);
 
       return mergeStrategy === MergeStrategy.MergeDeep
         ? lodash.merge(originalValue, stubValue)
-        : { ...originalValue, ...(stubValue as any) };
+        : { ...originalValue, ...stubValue };
     };
   }
 }
@@ -44,3 +43,6 @@ enum MergeStrategy {
 }
 type LocalResolverValue = string | Record<string, unknown>;
 type LocalResolverArgs = { value: LocalResolverValue; mergeStrategy: MergeStrategy };
+
+const invalidStubTypeErrorMessage =
+  'For @localResolver with Merge or MergeDeep strategies, the value parameter must evaluate to an object type';

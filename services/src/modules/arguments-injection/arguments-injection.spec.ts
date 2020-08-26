@@ -2,7 +2,7 @@ import { RequestContext } from '../context';
 import { inject } from './arguments-injection';
 
 interface TestCase {
-  template: string;
+  input: unknown;
   source?: unknown;
   args?: Record<string, unknown>;
   context?: Pick<RequestContext, 'request' | 'exports'>;
@@ -13,7 +13,7 @@ const testCases: [string, TestCase][] = [
   [
     'From source',
     {
-      template: '{source.id}',
+      input: '{source.id}',
       source: { id: '1' },
       expected: '1',
     },
@@ -21,7 +21,7 @@ const testCases: [string, TestCase][] = [
   [
     'From args',
     {
-      template: '{args.isWorking}',
+      input: '{args.isWorking}',
       args: { isWorking: true },
       expected: true,
     },
@@ -29,7 +29,7 @@ const testCases: [string, TestCase][] = [
   [
     'From JWT',
     {
-      template: '{jwt.email}',
+      input: '{jwt.email}',
       context: {
         request: {
           headers: {},
@@ -46,11 +46,39 @@ const testCases: [string, TestCase][] = [
       expected: 'something@domain.com',
     },
   ],
+  [
+    'Deep inject object that contains objects and arrays',
+    {
+      input: {
+        obj: { f1: 'v1', arg: '{args.argKey}' },
+        arr: ['first', '{source.srcKey}'],
+        inj: '{args.argKey}',
+        static: 42,
+      },
+      args: { argKey: 'argVal' },
+      source: { srcKey: 'srcVal' },
+      expected: {
+        obj: { f1: 'v1', arg: 'argVal' },
+        arr: ['first', 'srcVal'],
+        inj: 'argVal',
+        static: 42,
+      },
+    },
+  ],
+  [
+    'Deep inject array that contains objects and arrays',
+    {
+      input: [{ f1: 'v1', arg: '{args.argKey}' }, ['first', '{source.srcKey}'], '{args.argKey}', 42],
+      args: { argKey: 'argVal' },
+      source: { srcKey: 'srcVal' },
+      expected: [{ f1: 'v1', arg: 'argVal' }, ['first', 'srcVal'], 'argVal', 42],
+    },
+  ],
 ];
 
 describe('Argument Injection Tests', () => {
-  test.each(testCases)('%s', (_, { template, source, args, context, expected }) => {
-    const result = inject(template, source, args, context);
+  test.each(testCases)('%s', (_, { input, source, args, context, expected }) => {
+    const result = inject(input, source, args, context);
     expect(result).toEqual(expected);
   });
 });

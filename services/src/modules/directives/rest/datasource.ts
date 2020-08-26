@@ -18,7 +18,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
   ) {
     const headers = this.parseHeaders(params.headers, parent, args, info);
     const requestInit: RequestInit = { headers, timeout: params.timeoutMs ?? 10000, method: params.method };
-    const url = new URL(inject(params.url, parent, args, this.context, info));
+    const url = new URL(inject(params.url, parent, args, this.context, info) as string);
     this.addQueryParams(url.searchParams, params.query, parent, args, info);
 
     const authHeaders = await getAuthHeaders(this.context.authenticationConfig, url.host, this.context.request);
