@@ -5,11 +5,12 @@ on:
     paths-ignore:
       - README.md
       - docs
+    branches-ignore:
+      - master
 
 jobs:
   test_js:
     runs-on: ubuntu-latest
-    if: ${{ github.ref != 'refs/heads/master' }}
     steps:
       - uses: actions/checkout@v2
 
