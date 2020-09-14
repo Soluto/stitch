@@ -43,5 +43,5 @@ export class PolicyDirective extends SchemaDirectiveVisitor {
 }
 
 export const sdl = gql`
-  directive @policy(namespace: String!, name: String!, args: JSONObject) on OBJECT | FIELD_DEFINITION
+  directive @policy(namespace: String!, name: String!, args: JSONObject) repeatable on OBJECT | FIELD_DEFINITION
 `;

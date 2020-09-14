@@ -96,6 +96,100 @@ exports[`Policy Directive Tests Mock, policy on object, stub on parent query (DE
 }
 `;
 
+exports[`Policy Directive Tests Multiple policies on object, stub on parent query (ALLOW and ALLOW = ALLOW) 1`] = `
+Object {
+  "data": Object {
+    "foo": Object {
+      "bar": "BAR: 1",
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Policy Directive Tests Multiple policies on object, stub on parent query (ALLOW and DENY = DENY) 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Error",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {}
+}
+`;
+
+exports[`Policy Directive Tests Multiple policies on object, stub on parent query (DENY and ALLOW = DENY) 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Error",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {}
+}
+`;
+
+exports[`Policy Directive Tests Multiple policy on field, resolver on object (ALLOW and ALLOW = ALLOW) 1`] = `
+Object {
+  "data": Object {
+    "foo": Object {
+      "bar": "BAR",
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Policy Directive Tests Multiple policy on field, resolver on object (ALLOW and DENY = DENY) 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Error",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {}
+}
+`;
+
+exports[`Policy Directive Tests Multiple policy on field, resolver on object (DENY and ALLOW = DENY) 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Error",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {}
+}
+`;
+
 exports[`Policy Directive Tests Policy on field, resolver on object (ALLOW) 1`] = `
 Object {
   "data": Object {

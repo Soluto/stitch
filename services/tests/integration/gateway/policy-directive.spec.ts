@@ -14,6 +14,8 @@ const mockValidatePolicy = jest.fn();
 // eslint-disable-next-line unicorn/no-useless-undefined
 when(mockValidatePolicy).calledWith({ namespace: 'ns', name: 'alwaysAllow' }).mockResolvedValue(undefined);
 when(mockValidatePolicy).calledWith({ namespace: 'ns', name: 'alwaysDeny' }).mockRejectedValue(new Error('Error'));
+// eslint-disable-next-line unicorn/no-useless-undefined
+when(mockValidatePolicy).calledWith({ namespace: 'ns', name: 'alwaysAllow2' }).mockResolvedValue(undefined);
 jest.mock('../../../src/modules/directives/policy/policy-executor', () => ({
   default: jest.fn().mockImplementation(() => ({ validatePolicy: mockValidatePolicy })),
 }));
@@ -344,6 +346,99 @@ const testCases: [string, TestCase][] = [
     {
       typeDefs: gql`
         type Foo @mock @policy(namespace: "ns", name: "alwaysDeny") {
+          bar: String!
+        }
+        type Query {
+          foo: Foo! @localResolver(value: { id: "1" })
+        }
+      `,
+    },
+  ],
+  [
+    'Multiple policy on field, resolver on object (ALLOW and ALLOW = ALLOW)',
+    {
+      typeDefs: gql`
+        type Foo {
+          bar: String! @policy(namespace: "ns", name: "alwaysAllow") @policy(namespace: "ns", name: "alwaysAllow2")
+        }
+        type Query {
+          foo: Foo!
+        }
+      `,
+      resolvers: {
+        Query: {
+          foo: () => ({ bar: 'BAR' }),
+        },
+      },
+    },
+  ],
+  [
+    'Multiple policy on field, resolver on object (ALLOW and DENY = DENY)',
+    {
+      typeDefs: gql`
+        type Foo {
+          bar: String! @policy(namespace: "ns", name: "alwaysAllow") @policy(namespace: "ns", name: "alwaysDeny")
+        }
+        type Query {
+          foo: Foo!
+        }
+      `,
+      resolvers: {
+        Query: {
+          foo: () => ({ bar: 'BAR' }),
+        },
+      },
+    },
+  ],
+  [
+    'Multiple policy on field, resolver on object (DENY and ALLOW = DENY)',
+    {
+      typeDefs: gql`
+        type Foo {
+          bar: String! @policy(namespace: "ns", name: "alwaysDeny") @policy(namespace: "ns", name: "alwaysAllow")
+        }
+        type Query {
+          foo: Foo!
+        }
+      `,
+      resolvers: {
+        Query: {
+          foo: () => ({ bar: 'BAR' }),
+        },
+      },
+    },
+  ],
+  [
+    'Multiple policies on object, stub on parent query (ALLOW and ALLOW = ALLOW)',
+    {
+      typeDefs: gql`
+        type Foo @mock @policy(namespace: "ns", name: "alwaysAllow") @policy(namespace: "ns", name: "alwaysAllow2") {
+          bar: String!
+        }
+        type Query {
+          foo: Foo! @localResolver(value: { id: "1" })
+        }
+      `,
+    },
+  ],
+  [
+    'Multiple policies on object, stub on parent query (ALLOW and DENY = DENY)',
+    {
+      typeDefs: gql`
+        type Foo @mock @policy(namespace: "ns", name: "alwaysAllow") @policy(namespace: "ns", name: "alwaysDeny") {
+          bar: String!
+        }
+        type Query {
+          foo: Foo! @localResolver(value: { id: "1" })
+        }
+      `,
+    },
+  ],
+  [
+    'Multiple policies on object, stub on parent query (DENY and ALLOW = DENY)',
+    {
+      typeDefs: gql`
+        type Foo @mock @policy(namespace: "ns", name: "alwaysDeny") @policy(namespace: "ns", name: "alwaysAllow") {
           bar: String!
         }
         type Query {
