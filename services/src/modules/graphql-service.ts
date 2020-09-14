@@ -9,7 +9,7 @@ import { buildSchemaFromFederatedTypeDefs } from './build-federated-schema';
 import * as baseSchema from './base-schema';
 import { ActiveDirectoryAuth, AuthenticationConfig } from './upstream-authentication';
 import logger from './logger';
-import { AuthorizationConfig, PolicyExecutor } from './directives/policy';
+import { AuthorizationConfig, PolicyExecutor, policyScalarResolvers } from './directives/policy';
 
 export function createGraphQLService(config: { resourceGroups: Observable<ResourceGroup> }) {
   let currentSchemaConfig: GraphQLServiceConfig;
@@ -104,7 +104,7 @@ export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
     typeDefs: Object.fromEntries([...schemaTypeDefs, ...policyQueryTypeDefs]),
     baseTypeDefs: baseSchema.baseTypeDef,
     directiveTypeDefs: directivesSdl,
-    resolvers: baseSchema.resolvers,
+    resolvers: { ...baseSchema.resolvers, ...policyScalarResolvers },
     schemaDirectives: directiveMap,
     schemaDirectivesContext: { authenticationConfig, authorizationConfig },
   });
