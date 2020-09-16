@@ -33,3 +33,5 @@ const defaultAuthenticationConfig: AuthenticationConfig = {
 };
 export const authenticationConfig =
   (envVar.get('AUTHENTICATION_CONFIGURATION').asJsonObject() as AuthenticationConfig) ?? defaultAuthenticationConfig;
+
+export const argumentInjectionBuiltIns = envVar.get('ARGUMENT_INJECTION_BUILTIN').asString();

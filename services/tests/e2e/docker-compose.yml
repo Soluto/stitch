@@ -27,6 +27,9 @@ services:
             "paths": ["/metrics", "/.well-known/apollo/server-health"]
           }
         }
+      ARGUMENT_INJECTION_BUILTIN: /argument-injection-builtin
+    volumes:
+      - ./config/argument-injection-builtin:/argument-injection-builtin:ro
 
   registry:
     build:

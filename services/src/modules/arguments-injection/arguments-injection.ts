@@ -3,7 +3,7 @@ import { FastifyRequest } from 'fastify';
 import { RequestContext } from '../context';
 import { getExportsProxy } from '../exports';
 import { isObject } from '../utils';
-import evaluate from './arguments-evaluation';
+import { evaluate } from './arguments-evaluation';
 
 declare module '../context' {
   interface RequestContext {

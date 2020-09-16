@@ -8,6 +8,7 @@ const options = {
     COMPOSE_DOCKER_CLI_BUILD: '1',
     DOCKER_BUILDKIT: '1',
     PATH: process.env.PATH,
+    HOME: process.env.HOME,
   },
   log: true,
 };

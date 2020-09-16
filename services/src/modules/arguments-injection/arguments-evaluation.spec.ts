@@ -1,4 +1,4 @@
-import evaluate from './arguments-evaluation';
+import { evaluate } from './arguments-evaluation';
 
 interface TestCase {
   template: string;

@@ -5,7 +5,12 @@ import { createGraphQLService } from './graphql-service';
 import { RESTDirectiveDataSource } from './directives/rest';
 import { ResourceGroup } from './resource-repository';
 import { ExportTrackingExtension } from './exports';
-import { createBasicPolicyPlugin, createLoggingPlugin, createMetricsPlugin } from './plugins';
+import {
+  createBasicPolicyPlugin,
+  createLoggingPlugin,
+  createMetricsPlugin,
+  createArgumentInjectionPlugin,
+} from './plugins';
 
 export interface GatewayConfig extends Config {
   resourceGroups: Observable<ResourceGroup>;
@@ -19,7 +24,12 @@ export function createStitchGateway(config: GatewayConfig) {
     ...apolloConfig,
     gateway,
     extensions: [() => new ExportTrackingExtension()],
-    plugins: [createBasicPolicyPlugin, createLoggingPlugin(), createMetricsPlugin(fastifyInstance)],
+    plugins: [
+      createBasicPolicyPlugin,
+      createLoggingPlugin(),
+      createMetricsPlugin(fastifyInstance),
+      createArgumentInjectionPlugin(),
+    ],
     subscriptions: false,
     context(request: fastify.FastifyRequest) {
       const ctx = {
