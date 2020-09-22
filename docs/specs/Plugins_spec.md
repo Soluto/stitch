@@ -26,14 +26,11 @@ spec:
     schemaDirectivesContext: Record<string, unknown>
   apollo:
     plugins: ApolloServerPlugin[]
-  fastify:
-    middlewares: FastifyMiddleware[]
-    decorators: FastifyDecorator[]
-    plugins: FastifyPlugin[]
-    hooks: FastifyHook[]
+  fastify: FastifyInstance => FastifyInstance
   stitch:
     argument_injection_builtIns: any[]
     upstreams: Upstream[]
+    resourceGroupTransforms: ResourceGroup => ResourceGroup
 ```
 
 ## API Reference
@@ -87,35 +84,17 @@ As defined [here](https://github.com/apollographql/apollo-server/blob/43bbb54da0
 
 ---
 
+> <h2>Another option is to add `ApolloServerConfig => ApolloServerConfig` transform function that will do all the changes mentioned above (GraphQL and Apollo Server sections).</h2>
+
+---
+
 ### Fastify
 
 Plugin can extend fastify server functionality. Apollo Server in current version uses [fastify](https://github.com/fastify/fastify) module at 2.x version. There is already Apollo Server version 3.0.0-alpha3 that depends on Fastify version 3.x.
 
 Example to Fastify server extension can be `Authentication strategies` that are implemented hardcoded in Stitch.
 
-In most cases the Fastify server functionality extension will involve several if not all following properties:
-
-#### Fastify middlewares
-
-As described [here](https://github.com/fastify/fastify/blob/master/docs/Middleware.md) From Fastify v3, middleware support does not come out of the box with the framework itself, but it's offered as an external plugin via `fastify-express` and `middie`.
-
----
-
-#### Fastify decorators
-
-As described [here](https://github.com/fastify/fastify/blob/master/docs/Decorators.md)
-
----
-
-#### Fastify plugins
-
-As described [here](https://github.com/fastify/fastify/blob/master/docs/Plugins.md)
-
----
-
-#### hooks
-
-as described [here](https://github.com/fastify/fastify/blob/master/docs/Hooks.md)
+To extend Fastify instance functionality the plugin should provide transformation function that receives instance as argument and returns modified instance. The transformation function can register [fastify plugins](https://github.com/fastify/fastify/blob/master/docs/Plugins.md), add [decorators](https://github.com/fastify/fastify/blob/master/docs/Decorators.md) and [hooks](https://github.com/fastify/fastify/blob/master/docs/Hooks.md)
 
 ---
 
@@ -144,6 +123,14 @@ type Query {
 #### upstreams
 
 Upstreams are outgoing network interceptors that can enrich request. For example, OpenId upstream adds to outgoing request authorization header with Bearer JWT.
+
+---
+
+#### resourceGroupTransforms
+
+Function that will be invoked at Registry. It receives [`ResourceGroup`](https://github.com/Soluto/stitch/blob/4fc839a1792e969203ae63ea8d6ace6553e5cdd6/services/src/modules/resource-repository/types.ts#L7) and returns modified object.
+
+For example, the input resource group schema can contain directives as short-hand definitions and the transformation replace directives with some field definitions.
 
 ---
 
