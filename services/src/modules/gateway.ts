@@ -5,7 +5,7 @@ import { createGraphQLService } from './graphql-service';
 import { RESTDirectiveDataSource } from './directives/rest';
 import { ResourceGroup } from './resource-repository';
 import { ExportTrackingExtension } from './exports';
-import { createBasicPolicyPlugin, createLoggingPlugin, createMetricsPlugin } from './plugins';
+import { createBasicPolicyPlugin, createLoggingPlugin, createMetricsPlugin } from './apollo-server-plugins';
 
 export interface GatewayConfig extends Config {
   resourceGroups: Observable<ResourceGroup>;
