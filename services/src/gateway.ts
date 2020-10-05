@@ -16,9 +16,12 @@ import {
 } from './modules/resource-repository';
 import { getSecret, jwtAuthStrategy, anonymousAuthStrategy } from './modules/authentication';
 import jwtDecoderPlugin from './modules/authentication/jwt-decoder-plugin';
+import { loadPlugins } from './modules/plugins';
 
 async function run() {
   logger.info('Stitch gateway booting up...');
+
+  await loadPlugins();
 
   const app = fastify()
     .register(authPlugin)
