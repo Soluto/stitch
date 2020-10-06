@@ -5,6 +5,7 @@ import { resolvers, typeDefs } from './modules/registry-schema';
 import logger from './modules/logger';
 import * as opaHelper from './modules/opa-helper';
 import { handleSignals, handleUncaughtErrors } from './modules/shutdown-handler';
+import { loadPlugins } from './modules/plugins';
 
 export const app = new ApolloServer({
   typeDefs,
@@ -18,6 +19,7 @@ async function run() {
   await opaHelper.initializeForRegistry();
 
   logger.info('Stitch registry booting up...');
+  await loadPlugins();
 
   const server = fastify();
   server.register(app.createHandler({ path: '/graphql' }));

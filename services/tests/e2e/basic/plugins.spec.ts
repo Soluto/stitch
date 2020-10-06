@@ -17,6 +17,7 @@ describe('Plugins', () => {
   const query = print(gql`
     query {
       pl_foo
+      pl_bar
     }
   `);
 
@@ -43,7 +44,9 @@ describe('Plugins', () => {
 
     // Wait for gateway to update
     await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
+  });
 
+  test('Check plugins', async () => {
     const response = await gatewayClient.request(query);
     expect(response).toMatchSnapshot();
   });

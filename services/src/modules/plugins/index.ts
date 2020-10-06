@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import { join } from 'path';
 import { pluginsDir } from '../config';
 import logger from '../logger';
+import { ResourceGroup } from '../resource-repository';
 import { StitchPlugin } from './types';
 
 const plugins: StitchPlugin[] = [];
@@ -38,4 +39,24 @@ export async function buildArgumentInjectionGlobals(): Promise<Record<string, un
   return plugins
     .filter(p => p.addArgumentInjectionGlobals)
     .reduce(async (acc, cur) => ({ ...acc, ...(await cur.addArgumentInjectionGlobals!()) }), {});
+}
+
+export async function transformResourcesUpdates(
+  resourceGroup: Partial<ResourceGroup>
+): Promise<Partial<ResourceGroup>> {
+  return plugins
+    .filter(p => p.transformResourcesUpdates)
+    .reduce<Partial<ResourceGroup> | Promise<Partial<ResourceGroup>>>(
+      async (res, cur) => cur.transformResourcesUpdates!(await res),
+      resourceGroup
+    );
+}
+
+export async function transformResourceGroup(resourceGroup: ResourceGroup): Promise<ResourceGroup> {
+  return plugins
+    .filter(p => p.transformResourceGroup)
+    .reduce<ResourceGroup | Promise<ResourceGroup>>(
+      async (res, cur) => cur.transformResourceGroup!(await res),
+      resourceGroup
+    );
 }

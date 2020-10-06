@@ -1,7 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Plugins Setup schema 1`] = `
+exports[`Plugins Check plugins 1`] = `
 Object {
-  "pl_foo": "__BAZ__",
+  "pl_bar": "__BAR__",
+  "pl_foo": "__FOO__",
 }
 `;

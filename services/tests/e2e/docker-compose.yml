@@ -45,6 +45,8 @@ services:
     env_file: .env
     environment:
       PORT: 80
+    volumes:
+      - ./config/plugins:/plugins:ro
 
   minio:
     image: minio/minio
