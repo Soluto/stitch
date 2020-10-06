@@ -1,14 +1,13 @@
-import { ResourceMetadataInput, PolicyInput } from '../registry';
-import * as opaHelper from './opa-helper';
-import logger from './logger';
-import { PolicyType, ResourceRepository } from './resource-repository';
+import * as opaHelper from '../opa-helper';
+import logger from '../logger';
+import { PolicyType, ResourceRepository } from '../resource-repository';
+import resourceRepository from './repository';
+import { ResourceMetadataInput, PolicyInput } from './types';
 
 type TempLocalPolicyAttachment = { metadata: ResourceMetadataInput; path: string; type: PolicyType };
 
 export default class PolicyAttachmentsGenerator {
   protected policyAttachments: TempLocalPolicyAttachment[] = [];
-
-  constructor(protected resourceRepository: ResourceRepository) {}
 
   async generate(policies: PolicyInput[]) {
     for (const policy of policies) {
@@ -21,7 +20,7 @@ export default class PolicyAttachmentsGenerator {
 
   async writeToRepo() {
     for (const attachment of this.policyAttachments) {
-      await policyAttachmentStrategies[attachment.type].writeToRepo(this.resourceRepository, attachment);
+      await policyAttachmentStrategies[attachment.type].writeToRepo(resourceRepository, attachment);
     }
   }
 
