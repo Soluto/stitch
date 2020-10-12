@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Plugins: transformResourcesUpdates transformResourcesUpdates 1`] = `
+Object {
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "new-name",
+        "namespace": "new-ns",
+      },
+      "schema": "
+              type Query {
+                foo: String!
+              }
+            ",
+    },
+  ],
+}
+`;
