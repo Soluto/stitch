@@ -27,6 +27,9 @@ services:
             "paths": ["/metrics", "/.well-known/apollo/server-health"]
           }
         }
+      PLUGINS_DIR: /plugins
+    volumes:
+      - ./config/plugins:/plugins:ro
 
   registry:
     build:
@@ -42,6 +45,8 @@ services:
     env_file: .env
     environment:
       PORT: 80
+    volumes:
+      - ./config/plugins:/plugins:ro
 
   minio:
     image: minio/minio

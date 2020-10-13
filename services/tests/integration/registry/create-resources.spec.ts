@@ -6,7 +6,7 @@ import { gql } from 'apollo-server-core';
 import { mocked } from 'ts-jest/utils';
 import * as nock from 'nock';
 import { beforeEachDispose } from '../before-each-dispose';
-import { app, AuthType } from '../../../src/registry';
+import { app } from '../../../src/registry';
 import { mockResourceBucket } from '../resource-bucket';
 import { ResourceGroup } from '../../../src/modules/resource-repository';
 import {
@@ -18,6 +18,7 @@ import {
 } from '../../../src/modules/resource-repository/types';
 import { tmpPoliciesDir } from '../../../src/modules/config';
 import mockFsForOpa from '../../helpers/mock-fs-for-opa';
+import { AuthType } from '../../../src/modules/registry-schema';
 
 jest.mock('child_process', () => ({
   exec: jest.fn((_, cb) => cb()),

@@ -1,11 +1,12 @@
 import { VM } from 'vm2';
+import { argumentInjectionGlobals } from '../plugins';
 
 const exprStart = /{/g;
 const fullCapture = /(^{[^{]+}$)|(^{{.+}}$)/g;
 
 function evaluate<T>(template: string, data?: Record<string, unknown>): T {
   try {
-    const vm = new VM().setGlobals(data);
+    const vm = new VM().setGlobal('globals', argumentInjectionGlobals).setGlobals(data);
     const fullMatch = template.match(fullCapture);
     if (fullMatch) {
       return vm.run(`(function evaluate() { return ${template.slice(1, -1)}; })()`);

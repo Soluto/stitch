@@ -1,3 +1,15 @@
-export { createBasicPolicyPlugin } from './base-policy';
-export { createLoggingPlugin } from './logging';
-export { createMetricsPlugin } from './metrics';
+import {
+  argumentInjectionGlobals,
+  loadPlugins,
+  buildArgumentInjectionGlobals,
+  transformResourceGroup,
+  transformResourcesUpdates,
+} from './apply-plugins';
+
+export {
+  argumentInjectionGlobals,
+  loadPlugins,
+  buildArgumentInjectionGlobals,
+  transformResourceGroup,
+  transformResourcesUpdates,
+};
