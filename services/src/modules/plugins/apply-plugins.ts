@@ -1,4 +1,4 @@
-import { readdir } from 'fs/promises';
+import { promises as fs } from 'fs';
 import { join } from 'path';
 import { pluginsDir } from '../config';
 import logger from '../logger';
@@ -10,7 +10,7 @@ export let argumentInjectionGlobals: Record<string, unknown> = {};
 
 export async function loadPlugins() {
   if (!pluginsDir) return;
-  const pluginList = await readdir(pluginsDir);
+  const pluginList = await fs.readdir(pluginsDir);
 
   await Promise.all(
     pluginList.map(async name => {
