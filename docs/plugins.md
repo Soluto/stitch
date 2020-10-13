@@ -2,17 +2,18 @@
 
 ## General
 
-Plugins allows to extend Stitch functionality. Plugin can modify resource group, add predefined globals to [Argument Injection](./arguments_injection.md) mechanism. In future we plan to allow modify Fastify and Apollo servers configuration, add and modify Graphql schema and more.
+Plugins allow extending Stitch functionality. Plugin can modify the resource group, and add predefined globals to the [Argument Injection](./arguments_injection.md) mechanism. In the future, we plan to allow modifying Fastify and Apollo servers configurations, add and modify Graphql schema and more.
 
 ## Installation
 
-Stitch loads plugins from specific location that can be configured by environment variable `PLUGINS_DIR`. Each file or folder of the root level are tried to be loaded. It can be single javascript file, directory containing `index.js` file or directory with `package.json` file with `main` property.
+Stitch loads plugins from a specific location that can be configured by the environment variable `PLUGINS_DIR`.
+Each file or folder at the root level is loaded. It can be a single javascript file, a directory containing `index.js` file, or a directory with a `package.json` file that has the `main` property.
 
 The plugin file cannot require npm modules. It should export one of the following:
 
-1. Object implementing StitchPlugin interface (see below)
-2. Promise to the object as described in (1)
-3. Parameterless function returning object or promise to the object as described in (1)
+1. An object implementing the StitchPlugin interface (see below)
+2. A promise to the object as described in (1)
+3. A parameterless function returning an object, or a promise to the object as described in (1)
 
 ## StitchPlugin interface
 
@@ -27,13 +28,13 @@ export interface StitchPlugin {
 }
 ```
 
-> Plugin name is optional and by default is the file or folder name.
+> The plugin name is optional, and by default it is set to the file or folder name.
 
 ## API Reference
 
 ### addArgumentInjectionGlobals
 
-Returns object or promise to the object that will be available in [Argument Injection](./arguments_injection.md) clauses as `globals` constant.
+Returns an object or a promise to the object that will be available in [Argument Injection](./arguments_injection.md) clauses under the `globals` constant.
 
 Example:
 
@@ -69,9 +70,9 @@ Result: `{ foo: "__HELLO__" }`.
 
 ## transformResourcesUpdates
 
-Allows to transform the part of resource group being mutating by call to Registry service. This method receives part of `ResourceGroup` and return the same type of the promise to it.
+Allows transforming the part of the resource group being mutated by a call to the Registry service. This method receives a part of the `ResourceGroup` and returns the same type of promise to it.
 
-For example the following plugin removes all policies of resource group:
+For example, the following plugin removes all policies of a resource group:
 
 ```javascript
 {
@@ -84,9 +85,9 @@ For example the following plugin removes all policies of resource group:
 
 ## transformResourceGroup
 
-Allows to transform the resource group. This transformation is done every time the resource group is changed mutation call to Registry service.
+Allows transforming the resource group. This transformation is done every time the resource group is changed by a mutation call to the Registry service.
 
-For example this plugin adds base policy if not exists:
+For example this plugin adds a base policy if one does not exist:
 
 ```javascript
 {
