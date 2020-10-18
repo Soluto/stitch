@@ -22,6 +22,7 @@ import { composeAndValidate } from '@apollo/federation';
 import { GraphQLResolverMap } from 'apollo-graphql';
 import { ApolloError } from 'apollo-server-core';
 import createTypeResolvers from './implicit-type-resolver';
+import { knownApolloDirectives } from './config';
 
 interface DirectiveVisitors {
   [directiveName: string]: typeof SchemaDirectiveVisitor;
@@ -137,16 +138,13 @@ function addDirectivesToTypeDefs(
   });
 }
 
-// TODO:Check the list of apollo federation directives when upgrading apollo version
-const federationDirectives = ['key', 'extends', 'external', 'requires', 'provides'];
-
 export function collectAndRemoveCustomDirectives(typeDef: DocumentNode) {
   const objectTypeDirectivesUsages: DirectivesUsagesByObjectName = {};
   const fieldDefinitionDirectivesUsages: DirectivesUsagesByObjectAndFieldNames = {};
 
   const typeDefWithoutDirectives = visit(typeDef, {
     Directive(node, _key, _parent, _path, ancestors) {
-      if (federationDirectives.some(directive => directive === node.name.value)) {
+      if (knownApolloDirectives.some(directive => directive === node.name.value)) {
         return;
       }
 

@@ -1,14 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Metrics Check metrics 1`] = `
-# HELP graphql_request_duration_seconds request duration in seconds
-# TYPE graphql_request_duration_seconds histogram
-graphql_request_duration_seconds_bucket{le="X",status="X"} Y
-graphql_request_duration_seconds_sum{status="X"} Y
-graphql_request_duration_seconds_count{status="X"} Y
-# HELP graphql_resolver_duration_seconds resolver duration in seconds
-# TYPE graphql_resolver_duration_seconds histogram
-graphql_resolver_duration_seconds_bucket{le="X",parentType="X",fieldName="X",status="X"} Y
-graphql_resolver_duration_seconds_sum{parentType="X",fieldName="X",status="X"} Y
-graphql_resolver_duration_seconds_count{parentType="X",fieldName="X",status="X"} Y
+graphql_resolver_duration_seconds_bucket{le="X",parentType: Query,fieldName: m_foo,status: success} Y
+graphql_resolver_duration_seconds_sum{parentType: Query,fieldName: m_foo,status: success} Y
+graphql_resolver_duration_seconds_count{parentType: Query,fieldName: m_foo,status: success} Y
+graphql_resolver_duration_seconds_bucket{le="X",parentType: MetricsFoo,fieldName: baz,status: success} Y
+graphql_resolver_duration_seconds_sum{parentType: MetricsFoo,fieldName: baz,status: success} Y
+graphql_resolver_duration_seconds_count{parentType: MetricsFoo,fieldName: baz,status: success} Y
 `;
