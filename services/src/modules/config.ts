@@ -37,7 +37,7 @@ export const authenticationConfig =
 export const pluginsDir = envVar.get('PLUGINS_DIR').asString();
 
 // TODO:Check the list of apollo federation directives when upgrading apollo version
-const defaultKnownApolloDirectives = ['key', 'extends', 'external', 'requires', 'provides'];
+const defaultKnownApolloDirectives = 'key,extends,external,requires,provides';
 export const knownApolloDirectives = envVar
   .get('KNOWN_APOLLO_DIRECTIVES')
   .default(defaultKnownApolloDirectives)
