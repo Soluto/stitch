@@ -18,6 +18,8 @@ describe('Plugins', () => {
     query {
       pl_foo
       pl_bar
+      pl_tar
+      pl_baz
     }
   `);
 

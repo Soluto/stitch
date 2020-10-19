@@ -1,0 +1,6 @@
+{
+  "main": "main.js",
+  "dependencies": {
+    "string-format": "^2.0.0"
+  }
+}

@@ -14,6 +14,12 @@ export const schema = {
       pl_bar: String!
         @localResolver(value: "{globals.someUtilFn('BAR')}")
         @policy(namespace: "plugins", name: "whole-rg-policy")
+      pl_tar: String!
+        @localResolver(value: "{globals.inspect('TAR')}")
+        @policy(namespace: "plugins", name: "whole-rg-policy")
+      pl_baz: String!
+        @localResolver(value: "{globals.format('BAZ')}")
+        @policy(namespace: "plugins", name: "whole-rg-policy")
     }
   `),
 };
