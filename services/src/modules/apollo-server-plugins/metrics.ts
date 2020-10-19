@@ -48,8 +48,7 @@ export function createMetricsPlugin(fastifyInstance: Pick<FastifyInstance, 'metr
             const intuitiveValue = parentObject?.[fieldName];
 
             const fieldDirectives = parentType.getFields()[fieldName].astNode?.directives;
-            const hasCustomDirectives =
-              fieldDirectives?.filter(d => !knownApolloDirectives.includes(d.name.value))?.length ?? 0 > 0;
+            const hasCustomDirectives = fieldDirectives?.some(d => !knownApolloDirectives.has(d.name.value));
 
             if (intuitiveValue && !hasCustomDirectives) {
               // TODO: This is patch that should remove all fields which are resolved by default resolver.

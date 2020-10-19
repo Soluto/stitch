@@ -8,12 +8,12 @@ export const schema1 = {
   },
   schema: print(gql`
     type Query {
-      m_foo: MetricsFoo! @stub(value: { bar: "BAR", baz: "BAZ" })
+      m_foo: MetricsFoo! @localResolver(value: { bar: "BAR", baz: "BAZ" })
     }
 
     type MetricsFoo {
       bar: String!
-      baz: String! @stub(value: "{source.baz.toLowerCase()}")
+      baz: String! @localResolver(value: "{source.baz.toLowerCase()}")
       # TODO: Fix registry to accept Apollo Federation directives
       # taz: String! @requires(fields: "baz")
     }
@@ -27,12 +27,12 @@ export const schema2 = {
   },
   schema: print(gql`
     type Query {
-      m_foo: MetricsFoo! @stub(value: { bar: "BAR_NEW", baz: "BAZ_NEW" })
+      m_foo: MetricsFoo! @localResolver(value: { bar: "BAR_NEW", baz: "BAZ_NEW" })
     }
 
     type MetricsFoo {
       bar: String!
-      baz: String! @stub(value: "{source.baz.toLowerCase()}")
+      baz: String! @localResolver(value: "{source.baz.toLowerCase()}")
       # TODO: Fix registry to accept Apollo Federation directives
       # taz: String! @requires(fields: "baz")
     }

@@ -144,7 +144,7 @@ export function collectAndRemoveCustomDirectives(typeDef: DocumentNode) {
 
   const typeDefWithoutDirectives = visit(typeDef, {
     Directive(node, _key, _parent, _path, ancestors) {
-      if (knownApolloDirectives.some(directive => directive === node.name.value)) {
+      if (knownApolloDirectives.has(node.name.value)) {
         return;
       }
 
