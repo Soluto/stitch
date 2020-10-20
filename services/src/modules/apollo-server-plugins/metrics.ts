@@ -5,7 +5,7 @@ import {
 } from 'apollo-server-plugin-base';
 import { FastifyInstance } from 'fastify';
 import { Histogram } from 'prom-client';
-import { defaultFieldResolver } from 'graphql';
+import { knownApolloDirectives } from '../config';
 
 let requestDurationHistogram: Histogram<string> | undefined;
 let resolverDurationHistogram: Histogram<string> | undefined;
@@ -40,11 +40,21 @@ export function createMetricsPlugin(fastifyInstance: Pick<FastifyInstance, 'metr
             fieldResolverParams: GraphQLFieldResolverParams<unknown, unknown, Record<string, unknown>>
           ): ((error: Error | null, result?: unknown) => void) | void {
             const {
+              source,
               info: { fieldName, parentType },
             } = fieldResolverParams;
 
-            const fieldResolver = parentType.getFields()[fieldName].resolve;
-            if (!fieldResolver || fieldResolver === defaultFieldResolver) return;
+            const parentObject = source as Record<string, unknown>;
+            const intuitiveValue = parentObject?.[fieldName];
+
+            const fieldDirectives = parentType.getFields()[fieldName].astNode?.directives;
+            const hasCustomDirectives = fieldDirectives?.some(d => !knownApolloDirectives.has(d.name.value));
+
+            if (intuitiveValue && !hasCustomDirectives) {
+              // TODO: This is patch that should remove all fields which are resolved by default resolver.
+              // Unfortunately, this patch will remove also fields with custom resolver that replaces source object property with name like a field
+              return;
+            }
 
             const endResolverTimer = resolverDurationHistogram?.startTimer({ parentType: parentType.name, fieldName });
             return (error: Error | null) => {

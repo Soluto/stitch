@@ -11,10 +11,16 @@ import { schema1, schema2 } from './metrics.schema';
 const gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
 const registryClient = new GraphQLClient('http://localhost:8090/graphql');
 
+const metricsEndpoint = 'http://localhost:8080/metrics';
+
 describe('Metrics', () => {
   const query = print(gql`
     query {
-      m_foo
+      m_foo {
+        bar
+        baz
+        # taz TODO: Fix registry to accept Apollo Federation directives
+      }
     }
   `);
 
@@ -39,7 +45,7 @@ describe('Metrics', () => {
   });
 
   test('Check metrics', async () => {
-    const response = await fetch('http://localhost:8080/metrics');
+    const response = await fetch(metricsEndpoint);
     expect(response.ok).toBeTruthy();
     const body = await response.text();
     const metrics = body.split('\n');
@@ -58,15 +64,14 @@ describe('Metrics', () => {
   });
 
   test('Check metrics again', async () => {
-    const response = await fetch('http://localhost:8080/metrics');
+    const response = await fetch(metricsEndpoint);
     expect(response.ok).toBeTruthy();
     const body = await response.text();
     const metrics = body.split('\n');
-    const graphqlMetric = metrics.find(m =>
-      m.startsWith('graphql_request_duration_seconds_bucket{le="0.025",status="success"}')
-    );
-    expect(graphqlMetric).toBeDefined();
-    const [, metricValue] = graphqlMetric!.split(' ');
-    expect(Number(metricValue)).toBeGreaterThanOrEqual(1);
+    expect(
+      metrics.some(
+        m => m === 'graphql_resolver_duration_seconds_count{parentType="MetricsFoo",fieldName="baz",status="success"} 1'
+      )
+    ).toBeTruthy();
   });
 });
