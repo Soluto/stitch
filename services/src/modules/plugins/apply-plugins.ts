@@ -36,9 +36,14 @@ export async function loadPlugins() {
 }
 
 export async function buildArgumentInjectionGlobals(): Promise<Record<string, unknown>> {
-  return plugins
+  const globals = await plugins
     .filter(p => p.addArgumentInjectionGlobals)
-    .reduce(async (acc, cur) => ({ ...acc, ...(await cur.addArgumentInjectionGlobals!()) }), {});
+    .reduce(async (resultPromise, curPlugin) => {
+      const resultGlobals = await resultPromise;
+      const curPluginGlobals = await curPlugin.addArgumentInjectionGlobals!();
+      return { ...resultGlobals, ...curPluginGlobals };
+    }, Promise.resolve({}));
+  return globals;
 }
 
 export async function transformResourcesUpdates(

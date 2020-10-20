@@ -1,3 +1,7 @@
+const { join } = require('path');
+const { readdir, lstat } = require('fs').promises;
+const { execSync } = require('child_process');
+
 const DefaultJestRunner = require('jest-runner');
 const dockerCompose = require('docker-compose');
 const waitFor = require('./wait-for');
@@ -19,6 +23,8 @@ class SerialJestRunner extends DefaultJestRunner {
   }
 
   async setup() {
+    await this.preparePlugins();
+
     await dockerCompose.buildAll(options);
     await dockerCompose.upAll(options);
 
@@ -37,6 +43,23 @@ class SerialJestRunner extends DefaultJestRunner {
       await super.runTests(tests, watcher, onStart, onResult, onFailure, options);
     } finally {
       await this.teardown();
+    }
+  }
+
+  async preparePlugins() {
+    const pluginsDir = join(__dirname, './config/plugins');
+    const pluginList = await readdir(pluginsDir);
+    for (const name of pluginList) {
+      const pluginPath = join(pluginsDir, name);
+      const pluginStat = await lstat(pluginPath);
+      if (pluginStat.isDirectory()) {
+        const packageJsonPath = join(pluginPath, 'package.json');
+        const packageJsonStat = await lstat(packageJsonPath).catch(() => null);
+        if (packageJsonStat) {
+          const result = execSync('npm install', { encoding: 'utf8', cwd: pluginPath });
+          console.log(result);
+        }
+      }
     }
   }
 }
