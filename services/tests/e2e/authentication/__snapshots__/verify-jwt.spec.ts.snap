@@ -9,8 +9,23 @@ Object {
 }
 `;
 
+exports[`Authentication - Verify JWT Invalid JWT token: gateway logs 1`] = `
+"**** START OUTPUT CAPTURE *****\\"
+gateway_1           | [hh:mm:ss] [31mERROR[39m (SigningKeyNotFoundError): [36mFailed to get JWK for request token.[39m
+gateway_1           |     SigningKeyNotFoundError: Unable to find a signing key that matches 'C1B59DF60057CFB292C4E36CCE329615'
+gateway_1           | [hh:mm:ss] [34mDEBUG[39m (SigningKeyNotFoundError): [36mFailed to verify request JWT[39m
+gateway_1           |     SigningKeyNotFoundError: Unable to find a signing key that matches 'C1B59DF60057CFB292C4E36CCE329615'
+gateway_1           | \\"***** END OUTPUT CAPTURE *****"
+`;
+
 exports[`Authentication - Verify JWT Valid JWT token 1`] = `
 Object {
   "jwt_foo": "FOO",
 }
+`;
+
+exports[`Authentication - Verify JWT Valid JWT token: gateway logs 1`] = `
+"**** START OUTPUT CAPTURE *****\\"
+gateway_1           | [deprecated] A \\"ExportTrackingExtension\\" was defined within the \\"extensions\\" configuration for Apollo Server.  The API on which this extension is built (\\"graphql-extensions\\") is being deprecated in the next major version of Apollo Server in favor of the new plugin API.  See https://go.apollo.dev/s/plugins for the documentation on how these plugins are to be defined and used.
+gateway_1           | \\"***** END OUTPUT CAPTURE *****"
 `;

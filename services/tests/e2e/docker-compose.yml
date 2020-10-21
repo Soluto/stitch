@@ -30,6 +30,7 @@ services:
       PLUGINS_DIR: /plugins
     volumes:
       - ./config/plugins:/plugins:ro
+      - ./config/scripts:/scripts:ro
 
   registry:
     build:
