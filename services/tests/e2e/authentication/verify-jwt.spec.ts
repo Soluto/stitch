@@ -31,9 +31,13 @@ describe('Authentication - Verify JWT', () => {
     const endContainerOutputCapture = await startContainerOutputCapture('gateway');
     const result = await gatewayClient.request(query);
     const captureResult = await endContainerOutputCapture();
+    const logs = captureResult
+      .split('\n')
+      .filter(line => !line.includes('    at ') && !line.includes('[deprecated]'))
+      .join('\n');
 
     expect(result).toMatchSnapshot();
-    expect(captureResult).toMatchSnapshot('gateway logs');
+    expect(logs).toMatchSnapshot('gateway logs');
   });
 
   test('Invalid JWT token', async () => {
