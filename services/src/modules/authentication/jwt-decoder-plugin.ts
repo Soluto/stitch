@@ -36,7 +36,7 @@ function decodeRequestJwt(this: FastifyRequest) {
     }
     return;
   } catch (e) {
-    logger.warn(e, 'Fail to extract and decode JWT from request');
+    logger.debug(e, 'Fail to extract and decode JWT from request');
     return;
   }
 }
