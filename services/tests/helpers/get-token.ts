@@ -28,14 +28,15 @@ export async function getToken(
 export async function getInvalidToken(
   clientId = 'gateway-client-id',
   scope = ['stitch-gateway'],
-  issuer = 'http://localhost:8070'
+  issuer = 'http://localhost:8070',
+  audience = 'Stitch Gateway'
 ): Promise<string> {
   const secret = new NodeRSA({ b: 2048 }).exportKey('private');
   const accessToken = jwtUtil.sign({ client_id: clientId, scope }, secret, {
     algorithm: 'RS256',
     issuer,
     keyid: 'C1B59DF60057CFB292C4E36CCE329615',
-    audience: 'Stitch Gateway',
+    audience,
     jwtid: '248A293C7FA8D9C3BDB021F963344E94',
   });
   return accessToken;

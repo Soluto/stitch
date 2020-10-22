@@ -29,11 +29,13 @@ Usually only `/graphql` endpoint should be protected by non-anonymous strategy. 
   "jwt": {
     "<<< JWT issuer >>>": {
       "jwkUrl": "<<< Oidc Provider's JWKs Endpoint >>>",
+      // Audience is optional field and will be validated only if defined. See below another way to validate audience using policies.
+      "audience": "<<Stitch audience>>"
       "authenticatedPaths": ["/graphql"]
     }
   },
   "anonymous": {
-    "paths": ["/metrics", "/.well-known/apollo/server-health"]
+    "publicPaths": ["/metrics", "/.well-known/apollo/server-health"]
   }
 }
 ```

@@ -20,11 +20,12 @@ services:
           "jwt": {
             "http://localhost:8070": {
               "jwkUrl": "http://oidc-server-mock/.well-known/openid-configuration/jwks",
+              "audience": "Stitch Gateway",
               "authenticatedPaths": ["/graphql"]
             }
           },
           "anonymous": {
-            "paths": ["/metrics", "/.well-known/apollo/server-health"]
+            "publicPaths": ["/metrics", "/.well-known/apollo/server-health"]
           }
         }
       PLUGINS_DIR: /plugins
@@ -67,7 +68,7 @@ services:
 
   oidc-server-mock:
     container_name: oidc-server-mock
-    image: soluto/oidc-server-mock:0.2.2
+    image: soluto/oidc-server-mock:0.3.0
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       SERVER_OPTIONS_PATH: /config/server-options.json
