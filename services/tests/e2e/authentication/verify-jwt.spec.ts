@@ -3,6 +3,7 @@ import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { sleep } from '../../helpers/utility';
 import { UpdateSchemasMutationResponse, createSchemaMutation } from '../../helpers/registry-request-builder';
 import { getToken, getInvalidToken } from '../../helpers/get-token';
+import { startContainerOutputCapture } from '../../helpers/get-container-logs';
 import { schema, query } from './verify-jwt.schema';
 
 describe('Authentication - Verify JWT', () => {
@@ -26,14 +27,32 @@ describe('Authentication - Verify JWT', () => {
   test('Valid JWT token', async () => {
     const accessToken = await getToken();
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
+
+    const endContainerOutputCapture = await startContainerOutputCapture('gateway');
     const result = await gatewayClient.request(query);
+    const captureResult = await endContainerOutputCapture();
+    const logs = captureResult
+      .split('\n')
+      .filter(line => !line.includes('    at ') && !line.includes('[deprecated]'))
+      .join('\n');
+
     expect(result).toMatchSnapshot();
+    expect(logs).toMatchSnapshot('gateway logs');
   });
 
   test('Invalid JWT token', async () => {
     const accessToken = await getInvalidToken();
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
+
+    const endContainerOutputCapture = await startContainerOutputCapture('gateway');
     const result = await gatewayClient.request(query).catch(e => e.response);
+    const captureResult = await endContainerOutputCapture();
+    const logs = captureResult
+      .split('\n')
+      .filter(line => !line.includes('    at ') && !line.includes('[deprecated]'))
+      .join('\n');
+
     expect(result).toMatchSnapshot();
+    expect(logs).toMatchSnapshot('gateway logs');
   });
 });
