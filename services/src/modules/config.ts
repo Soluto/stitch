@@ -35,7 +35,7 @@ export const tmpPoliciesDir = envVarExt
 // Authentication
 const defaultAuthenticationConfig: AuthenticationConfig = {
   anonymous: {
-    paths: ['/metrics', '/.well-known/apollo/server-health', '/graphql'],
+    publicPaths: ['/metrics', '/.well-known/apollo/server-health', '/graphql'],
   },
 };
 export const authenticationConfig =

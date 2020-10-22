@@ -6,7 +6,7 @@ export default function (
   _reply: fastify.FastifyReply<unknown>,
   done: (error?: Error) => void
 ) {
-  const anonymousPaths = authenticationConfig?.anonymous?.paths;
+  const anonymousPaths = authenticationConfig?.anonymous?.publicPaths;
   if (anonymousPaths?.some(ap => request.raw.url?.endsWith(ap))) {
     done();
     return;

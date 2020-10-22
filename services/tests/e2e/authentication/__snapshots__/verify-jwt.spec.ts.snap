@@ -18,6 +18,39 @@ exports[`Authentication - Verify JWT Invalid JWT token: gateway logs 1`] = `
 \\"***** END OUTPUT CAPTURE *****"
 `;
 
+exports[`Authentication - Verify JWT Unexpected audience 1`] = `
+Object {
+  "error": "Unauthorized",
+  "message": "Unauthorized",
+  "status": 401,
+  "statusCode": 401,
+}
+`;
+
+exports[`Authentication - Verify JWT Unexpected audience: gateway logs 1`] = `
+"**** START OUTPUT CAPTURE *****\\"
+[hh:mm:ss] [34mDEBUG[39m: [36mUnexpected audience[39m
+    issuer: \\"http://localhost:8070\\"
+    audience: \\"Stitch Other\\"
+\\"***** END OUTPUT CAPTURE *****"
+`;
+
+exports[`Authentication - Verify JWT Unknown issuer 1`] = `
+Object {
+  "error": "Unauthorized",
+  "message": "Unauthorized",
+  "status": 401,
+  "statusCode": 401,
+}
+`;
+
+exports[`Authentication - Verify JWT Unknown issuer: gateway logs 1`] = `
+"**** START OUTPUT CAPTURE *****\\"
+[hh:mm:ss] [34mDEBUG[39m: [36mUnknown issuer[39m
+    issuer: \\"http://microsoft.com\\"
+\\"***** END OUTPUT CAPTURE *****"
+`;
+
 exports[`Authentication - Verify JWT Valid JWT token 1`] = `
 Object {
   "jwt_foo": "FOO",
