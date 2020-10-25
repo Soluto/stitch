@@ -90,6 +90,21 @@ Object {
 }
 `;
 
+exports[`Rest directive - Mutation call qraphql 1`] = `
+Object {
+  "data": Object {
+    "hello": "world",
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
 exports[`Rest directive - POST with body from custom query argument call qraphql 1`] = `
 Object {
   "data": Object {
