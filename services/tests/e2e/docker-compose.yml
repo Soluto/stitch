@@ -19,7 +19,7 @@ services:
         {
           "jwt": {
             "http://localhost:8070": {
-              "jwkUrl": "http://oidc-server-mock/.well-known/openid-configuration/jwks",
+              "jwksUri": "http://oidc-server-mock/.well-known/openid-configuration/jwks",
               "audience": "Stitch Gateway",
               "authenticatedPaths": ["/graphql"]
             }
