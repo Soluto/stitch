@@ -10,7 +10,8 @@ const formatLogs = (logs: string) =>
   logs
     .split('\n')
     .filter(line => !line.includes('    at ') && !line.includes('[deprecated]'))
-    .join('\n');
+    .join('\n')
+    .replace(/(?<=durationMs: )\d*\.?\d*/gm, 'XXX');
 
 describe('Authentication - Verify JWT', () => {
   const gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
@@ -30,7 +31,7 @@ describe('Authentication - Verify JWT', () => {
     await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
   });
 
-  test('Valid JWT token', async () => {
+  test('Valid JWT', async () => {
     const accessToken = await getToken();
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
 
@@ -43,7 +44,7 @@ describe('Authentication - Verify JWT', () => {
     expect(logs).toMatchSnapshot('gateway logs');
   });
 
-  test('Invalid JWT token', async () => {
+  test('Invalid JWT', async () => {
     const accessToken = await getInvalidToken();
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
 
@@ -80,6 +81,19 @@ describe('Authentication - Verify JWT', () => {
 
     const endContainerOutputCapture = await startContainerOutputCapture('gateway');
     const result = await gatewayClient.request(query).catch(e => e.response);
+    expect(result).toMatchSnapshot();
+
+    const captureResult = await endContainerOutputCapture();
+    const logs = formatLogs(captureResult);
+    expect(logs).toMatchSnapshot('gateway logs');
+  });
+
+  test('Second call with valid JWT - JWKs caching', async () => {
+    const accessToken = await getToken();
+    gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
+
+    const endContainerOutputCapture = await startContainerOutputCapture('gateway');
+    const result = await gatewayClient.request(query);
     expect(result).toMatchSnapshot();
 
     const captureResult = await endContainerOutputCapture();

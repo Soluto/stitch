@@ -73,6 +73,7 @@ export async function startContainerOutputCapture(container: string) {
     return result
       .substring(startCapturePosition, endCapturePosition)
       .replace(/\[\d\d:\d\d:\d\d]/g, '[hh:mm:ss]')
-      .replace(/\n.+\| /g, '\n');
+      .replace(/\n.+\| /g, '\n')
+      .replace(/\[\d\dm/g, '');
   };
 }

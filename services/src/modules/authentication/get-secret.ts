@@ -8,6 +8,19 @@ import { authenticationConfig } from '../config';
 
 const createClient = (jwks as unknown) as (options: ClientOptions) => JwksClient;
 
+const jwkClients: Record<string, JwksClient> = {};
+
+function getJwkClient(jwksUri: string) {
+  if (!jwkClients[jwksUri]) {
+    logger.debug({ jwksUri }, 'New JWK received. Creating new client...');
+    jwkClients[jwksUri] = createClient({
+      jwksUri,
+      cacheMaxAge: 24 * 60 * 60 * 1000,
+    });
+  }
+  return jwkClients[jwksUri]!;
+}
+
 export default function getSecret(
   request: fastify.FastifyRequest,
   _reply: fastify.FastifyReply<unknown>,
@@ -24,17 +37,16 @@ export default function getSecret(
     return;
   }
 
-  const jwkClient = createClient({
-    jwksUri: issuerConfig.jwkUrl,
-  });
+  const jwkClient = getJwkClient(issuerConfig.jwksUri);
 
   jwkClient.getSigningKey(kid, (err, key) => {
     if (err) {
-      logger.error(err, 'Failed to get JWK for request token.');
+      logger.error({ err, jwksUri: issuerConfig.jwksUri }, 'Failed to get JWK for request token.');
       // eslint-disable-next-line unicorn/no-useless-undefined
       cb(err, undefined);
       return;
     }
+    logger.trace({ jwksUri: issuerConfig.jwksUri }, 'JWK found');
     cb(null, key.getPublicKey());
   });
 }

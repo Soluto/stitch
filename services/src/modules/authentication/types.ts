@@ -1,5 +1,5 @@
 export interface IssuerConfig {
-  jwkUrl: string;
+  jwksUri: string;
   audience?: string;
   authenticatedPaths: string[];
 }
