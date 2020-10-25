@@ -1,6 +1,6 @@
-import { RESTDataSource } from 'apollo-datasource-rest';
-import { RequestInit, Headers, Request } from 'apollo-server-env';
-import { GraphQLResolveInfo } from 'graphql';
+import { RESTDataSource, Request } from 'apollo-datasource-rest';
+import { RequestInit, Headers } from 'apollo-server-env';
+import { GraphQLResolveInfo, isNullableType } from 'graphql';
 import { inject } from '../../arguments-injection';
 import { RequestContext } from '../../context';
 import { getAuthHeaders } from '../../upstream-authentication';
@@ -21,10 +21,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     const url = new URL(inject(params.url, parent, args, this.context, info) as string);
     this.addQueryParams(url.searchParams, params.query, parent, args, info);
 
-    const authHeaders = await getAuthHeaders(this.context.authenticationConfig, url.host, this.context.request);
-    if (authHeaders != undefined) {
-      headers.append('Authorization', authHeaders.Authorization);
-    }
+    await this.addAuthentication(url, headers);
 
     const body = this.getBody(params, parent, args, context, info);
     if (body) {
@@ -36,7 +33,18 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     const cacheKey = this.cacheKeyFor(request);
     const response = await this.httpCache.fetch(request, { cacheKey });
 
+    const notFoundAsNull = params.notFoundAsNull ?? isNullableType(info.returnType);
+    if (response.status === 404 && notFoundAsNull) {
+      return null;
+    }
     return this.didReceiveResponse(response, request);
+  }
+
+  private async addAuthentication(url: URL, headers: Headers) {
+    const authHeaders = await getAuthHeaders(this.context.authenticationConfig, url.host, this.context.request);
+    if (authHeaders != undefined) {
+      headers.append('Authorization', authHeaders.Authorization);
+    }
   }
 
   getBody(

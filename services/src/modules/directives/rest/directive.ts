@@ -25,5 +25,6 @@ export const sdl = gql`
     query: [KeyValue!]
     headers: [KeyValue!]
     timeoutMs: Int
+    notFoundAsNull: Boolean
   ) on FIELD_DEFINITION
 `;
