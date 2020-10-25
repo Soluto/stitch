@@ -213,6 +213,27 @@ const testCases: [string, TestCase][] = [
       `,
     },
   ],
+  [
+    'Mutation',
+    {
+      mock: () =>
+        nock(upstreamHost)
+          .post('/hello', JSON.stringify({ name: 'joseph' }))
+          .reply(200, 'world'),
+      schema: gql`
+        type Mutation {
+          hello(name: String!): String!
+            @rest(url: "${upstreamHost}/hello", method: "POST", body: "{{ name: args.name }}")
+        }
+      `,
+      query: gql`
+        mutation Hello($name: String!) {
+          hello(name: $name)
+        }
+      `,
+      variables: { name: 'joseph' },
+    },
+  ],
 ];
 
 describe.each(testCases)('Rest directive - %s', (_, { mock, schema, query, variables, skipMockIsDoneAssert }) => {
