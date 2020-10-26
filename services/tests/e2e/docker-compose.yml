@@ -18,9 +18,18 @@ services:
       AUTHENTICATION_CONFIGURATION: |
         {
           "jwt": {
-            "http://localhost:8070": {
-              "jwksUri": "http://oidc-server-mock/.well-known/openid-configuration/jwks",
+            "http://localhost:8060": {
+              "authority": "http://oidc-server-mock:8060",
               "audience": "Stitch Gateway",
+              "authenticatedPaths": ["/graphql"]
+            },
+            "http://localhost:8070": {
+              "authority": "http://authority-without-discrovery-endpoint",
+              "audience": "Stitch Gateway",
+              "jwksConfig": {
+                "jwksUri": "http://oidc-server-mock:8070/.well-known/openid-configuration/jwks",
+                "timeout": 1000
+              },
               "authenticatedPaths": ["/graphql"]
             }
           },
@@ -71,6 +80,7 @@ services:
     image: soluto/oidc-server-mock:0.3.0
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8060;http://+:8070
       SERVER_OPTIONS_PATH: /config/server-options.json
       API_SCOPES_PATH: /config/api-scopes.json
       API_RESOURCES_PATH: /config/api-resources.json
@@ -79,4 +89,5 @@ services:
     volumes:
       - ./config/oidc:/config:ro
     ports:
-      - 8070:80
+      - 8060:8060
+      - 8070:8070

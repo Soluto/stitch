@@ -58,7 +58,7 @@ describe('Authentication - Verify JWT', () => {
   });
 
   test('Unknown issuer', async () => {
-    const accessToken = await getInvalidToken('gateway-client-id', ['stitch-gateway'], 'http://microsoft.com');
+    const accessToken = await getInvalidToken({ issuer: 'http://microsoft.com' });
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
 
     const endContainerOutputCapture = await startContainerOutputCapture('gateway');
@@ -71,12 +71,7 @@ describe('Authentication - Verify JWT', () => {
   });
 
   test('Unexpected audience', async () => {
-    const accessToken = await getInvalidToken(
-      'gateway-client-id',
-      ['stitch-other'],
-      'http://localhost:8070',
-      'Stitch Other'
-    );
+    const accessToken = await getInvalidToken({ audience: 'Stitch Other' });
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
 
     const endContainerOutputCapture = await startContainerOutputCapture('gateway');
@@ -90,6 +85,19 @@ describe('Authentication - Verify JWT', () => {
 
   test('Second call with valid JWT - JWKs caching', async () => {
     const accessToken = await getToken();
+    gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
+
+    const endContainerOutputCapture = await startContainerOutputCapture('gateway');
+    const result = await gatewayClient.request(query);
+    expect(result).toMatchSnapshot();
+
+    const captureResult = await endContainerOutputCapture();
+    const logs = formatLogs(captureResult);
+    expect(logs).toMatchSnapshot('gateway logs');
+  });
+
+  test('Authority without discovery endpoint', async () => {
+    const accessToken = await getToken({ tokenEndpoint: 'http://localhost:8070/connect/token' });
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
 
     const endContainerOutputCapture = await startContainerOutputCapture('gateway');

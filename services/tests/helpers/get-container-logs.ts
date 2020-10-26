@@ -70,10 +70,13 @@ export async function startContainerOutputCapture(container: string) {
     const startCapturePosition = result.lastIndexOf(startOutputCaptureMsg) + 1;
     const endCapturePosition = result.indexOf(endOutputCaptureMsg, startCapturePosition) + endOutputCaptureMsg.length;
 
-    return result
-      .substring(startCapturePosition, endCapturePosition)
-      .replace(/\[\d\d:\d\d:\d\d]/g, '[hh:mm:ss]')
-      .replace(/\n.+\| /g, '\n')
-      .replace(/\[\d\dm/g, '');
+    return (
+      result
+        .substring(startCapturePosition, endCapturePosition)
+        .replace(/\[\d\d:\d\d:\d\d]/g, '[hh:mm:ss]')
+        .replace(/\n.+\| /g, '\n')
+        // eslint-disable-next-line no-control-regex
+        .replace(/\u001B[();?[]{0,2}(;?\d)*./g, '')
+    );
   };
 }

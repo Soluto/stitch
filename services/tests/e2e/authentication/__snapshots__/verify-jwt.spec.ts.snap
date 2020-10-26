@@ -1,5 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Authentication - Verify JWT Authority without discovery endpoint 1`] = `
+Object {
+  "jwt_foo": "FOO",
+}
+`;
+
+exports[`Authentication - Verify JWT Authority without discovery endpoint: gateway logs 1`] = `
+"**** START OUTPUT CAPTURE *****\\"
+[hh:mm:ss] TRACE: JWK found
+    authority: \\"http://authority-without-discrovery-endpoint\\"
+[hh:mm:ss] TRACE: JWT verified
+    issuer: \\"http://localhost:8070\\"
+[hh:mm:ss] TRACE: Started to handle request
+    query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
+[hh:mm:ss] TRACE: Finished to handle request
+    query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
+    durationMs: XXX
+\\"***** END OUTPUT CAPTURE *****"
+`;
+
 exports[`Authentication - Verify JWT Invalid JWT 1`] = `
 Object {
   "error": "Unauthorized",
@@ -11,7 +31,8 @@ Object {
 
 exports[`Authentication - Verify JWT Invalid JWT: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
-[hh:mm:ss] ERROR: Failed to get JWK for request token.
+[hh:mm:ss] DEBUG: New JWK received. Creating new client...
+[hh:mm:ss] ERROR: Failed to get JWK for request token.
     err: {
       \\"type\\": \\"SigningKeyNotFoundError\\",
       \\"message\\": \\"Unable to find a signing key that matches 'C1B59DF60057CFB292C4E36CCE329615'\\",
@@ -19,8 +40,9 @@ exports[`Authentication - Verify JWT Invalid JWT: gateway logs 1`] = `
           SigningKeyNotFoundError: Unable to find a signing key that matches 'C1B59DF60057CFB292C4E36CCE329615'
       \\"name\\": \\"SigningKeyNotFoundError\\"
     }
-    jwksUri: \\"http://oidc-server-mock/.well-known/openid-configuration/jwks\\"
-[hh:mm:ss] DEBUG (SigningKeyNotFoundError): Failed to verify request JWT
+    authority: \\"http://authority-without-discrovery-endpoint\\"
+    jwksUri: \\"http://oidc-server-mock:8070/.well-known/openid-configuration/jwks\\"
+[hh:mm:ss] DEBUG (SigningKeyNotFoundError): Failed to verify request JWT
     SigningKeyNotFoundError: Unable to find a signing key that matches 'C1B59DF60057CFB292C4E36CCE329615'
 \\"***** END OUTPUT CAPTURE *****"
 `;
@@ -33,13 +55,13 @@ Object {
 
 exports[`Authentication - Verify JWT Second call with valid JWT - JWKs caching: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
-[hh:mm:ss] TRACE: JWK found
-    jwksUri: \\"http://oidc-server-mock/.well-known/openid-configuration/jwks\\"
-[hh:mm:ss] TRACE: JWT verified
-    issuer: \\"http://localhost:8070\\"
-[hh:mm:ss] TRACE: Started to handle request
+[hh:mm:ss] TRACE: JWK found
+    authority: \\"http://oidc-server-mock:8060\\"
+[hh:mm:ss] TRACE: JWT verified
+    issuer: \\"http://localhost:8060\\"
+[hh:mm:ss] TRACE: Started to handle request
     query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
-[hh:mm:ss] TRACE: Finished to handle request
+[hh:mm:ss] TRACE: Finished to handle request
     query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
     durationMs: XXX
 \\"***** END OUTPUT CAPTURE *****"
@@ -56,7 +78,7 @@ Object {
 
 exports[`Authentication - Verify JWT Unexpected audience: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
-[hh:mm:ss] DEBUG: Unexpected audience
+[hh:mm:ss] DEBUG: Unexpected audience
     issuer: \\"http://localhost:8070\\"
     audience: \\"Stitch Other\\"
 \\"***** END OUTPUT CAPTURE *****"
@@ -73,7 +95,7 @@ Object {
 
 exports[`Authentication - Verify JWT Unknown issuer: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
-[hh:mm:ss] DEBUG: Unknown issuer
+[hh:mm:ss] DEBUG: Unknown issuer
     issuer: \\"http://microsoft.com\\"
 \\"***** END OUTPUT CAPTURE *****"
 `;
@@ -86,15 +108,15 @@ Object {
 
 exports[`Authentication - Verify JWT Valid JWT: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
-[hh:mm:ss] DEBUG: New JWK received. Creating new client...
-    jwksUri: \\"http://oidc-server-mock/.well-known/openid-configuration/jwks\\"
-[hh:mm:ss] TRACE: JWK found
-    jwksUri: \\"http://oidc-server-mock/.well-known/openid-configuration/jwks\\"
-[hh:mm:ss] TRACE: JWT verified
-    issuer: \\"http://localhost:8070\\"
-[hh:mm:ss] TRACE: Started to handle request
+[hh:mm:ss] DEBUG: New JWK received. Creating new client...
+    jwksUri: \\"http://oidc-server-mock:8060/.well-known/openid-configuration/jwks\\"
+[hh:mm:ss] TRACE: JWK found
+    authority: \\"http://oidc-server-mock:8060\\"
+[hh:mm:ss] TRACE: JWT verified
+    issuer: \\"http://localhost:8060\\"
+[hh:mm:ss] TRACE: Started to handle request
     query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
-[hh:mm:ss] TRACE: Finished to handle request
+[hh:mm:ss] TRACE: Finished to handle request
     query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
     durationMs: XXX
 \\"***** END OUTPUT CAPTURE *****"

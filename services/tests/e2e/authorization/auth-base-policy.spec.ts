@@ -70,7 +70,7 @@ describe('Authorization - Base policy', () => {
   });
 
   test.each(testCases)('%s', async (_, clientConfig) => {
-    const accessToken = await getToken(clientConfig.ClientId);
+    const accessToken = await getToken({ clientId: clientConfig.ClientId });
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
     const result = await gatewayClient.request(query).catch(err => err.response);
     expect(result).toMatchSnapshot();
