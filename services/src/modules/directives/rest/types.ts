@@ -11,4 +11,5 @@ export interface RestParams {
   query?: KeyValue[];
   headers?: KeyValue[];
   timeoutMs?: number;
+  notFoundAsNull?: boolean;
 }

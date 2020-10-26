@@ -132,12 +132,60 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'Error 404 from upstream',
+    'Error 404 from upstream (nullable return type)',
+    {
+      mock: () => nock(upstreamHost).get('/hello').reply(404, 'Not Found'),
+      schema: gql`
+        type Query {
+          hello: String @rest(url: "${upstreamHost}/hello")
+        }
+      `,
+      query: gql`
+        query Hello {
+          hello
+        }
+      `,
+    },
+  ],
+  [
+    'Error 404 from upstream (not nullable return type)',
     {
       mock: () => nock(upstreamHost).get('/hello').reply(404, 'Not Found'),
       schema: gql`
         type Query {
           hello: String! @rest(url: "${upstreamHost}/hello")
+        }
+      `,
+      query: gql`
+        query Hello {
+          hello
+        }
+      `,
+    },
+  ],
+  [
+    'Error 404 from upstream (notFoundAsNull is true)',
+    {
+      mock: () => nock(upstreamHost).get('/hello').reply(404, 'Not Found'),
+      schema: gql`
+        type Query {
+          hello: String @rest(url: "${upstreamHost}/hello", notFoundAsNull: true)
+        }
+      `,
+      query: gql`
+        query Hello {
+          hello
+        }
+      `,
+    },
+  ],
+  [
+    'Error 404 from upstream (notFoundAsNull is false)',
+    {
+      mock: () => nock(upstreamHost).get('/hello').reply(404, 'Not Found'),
+      schema: gql`
+        type Query {
+          hello: String @rest(url: "${upstreamHost}/hello", notFoundAsNull: false)
         }
       `,
       query: gql`

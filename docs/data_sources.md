@@ -32,10 +32,12 @@ input KeyValue {
 directive @rest(
     url: String!
     method: String      # Defaults to GET
+    body: String
     bodyArg: String     # Defaults to "input"
     query: [KeyValue!]
     headers: [KeyValue!]
     timeoutMs: Int      # Defaults to 10 seconds
+    notFoundAsNull: Boolean # Defaults to isNullableType of field type
 )
 ```
 
