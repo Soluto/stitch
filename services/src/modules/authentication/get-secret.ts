@@ -26,10 +26,10 @@ const defaultConfig: Partial<ClientOptions> = {
   cacheMaxAge: 24 * 60 * 60 * 1000,
 };
 
-async function getJwkClient(authority: string, jwksConfig: Partial<ClientOptions>) {
+async function getJwkClient(authority: string, jwksConfig?: Partial<ClientOptions>) {
   if (!jwkClients[authority]) {
-    const jwksUri = await getJwksUri(authority);
-    logger.debug({ jwksUri }, 'New JWK received. Creating new client...');
+    const jwksUri = jwksConfig?.jwksUri ?? (await getJwksUri(authority));
+    logger.debug({ authority, jwksUri }, 'New authority received. Creating new JWKs client...');
     const clientOptions: Partial<ClientOptions> = {
       jwksUri,
       ...defaultConfig,
@@ -64,7 +64,7 @@ export default async function getSecret(
 
   jwkClient.getSigningKey(kid, (err, key) => {
     if (err) {
-      logger.error({ err, authority, jwksUri: jwksConfig.jwksUri }, 'Failed to get JWK for request token.');
+      logger.error({ err, authority, jwksUri: jwksConfig?.jwksUri }, 'Failed to get JWK for request token.');
       // eslint-disable-next-line unicorn/no-useless-undefined
       cb(err, undefined);
       return;

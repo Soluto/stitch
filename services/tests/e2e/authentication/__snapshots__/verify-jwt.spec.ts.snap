@@ -31,7 +31,9 @@ Object {
 
 exports[`Authentication - Verify JWT Invalid JWT: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
-[hh:mm:ss] DEBUG: New JWK received. Creating new client...
+[hh:mm:ss] DEBUG: New authority received. Creating new JWKs client...
+    authority: \\"http://authority-without-discrovery-endpoint\\"
+    jwksUri: \\"http://oidc-server-mock:8070/.well-known/openid-configuration/jwks\\"
 [hh:mm:ss] ERROR: Failed to get JWK for request token.
     err: {
       \\"type\\": \\"SigningKeyNotFoundError\\",
@@ -108,7 +110,8 @@ Object {
 
 exports[`Authentication - Verify JWT Valid JWT: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
-[hh:mm:ss] DEBUG: New JWK received. Creating new client...
+[hh:mm:ss] DEBUG: New authority received. Creating new JWKs client...
+    authority: \\"http://oidc-server-mock:8060\\"
     jwksUri: \\"http://oidc-server-mock:8060/.well-known/openid-configuration/jwks\\"
 [hh:mm:ss] TRACE: JWK found
     authority: \\"http://oidc-server-mock:8060\\"
