@@ -64,14 +64,14 @@ describe('authorization', () => {
   });
 
   it('rejects access to a field based on JWT info', async () => {
-    const accessToken = await getToken('e2e-jwt-disallowed-client-id');
+    const accessToken = await getToken({ clientId: 'e2e-jwt-disallowed-client-id' });
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
     const response = await gatewayClient.request(arbitraryDataQuery).catch(err => err.response);
     expect(response).toMatchSnapshot();
   });
 
   it('allows access to a field based on JWT info', async () => {
-    const accessToken = await getToken('e2e-jwt-allowed-client-id');
+    const accessToken = await getToken({ clientId: 'e2e-jwt-allowed-client-id' });
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
     const response: any = await gatewayClient.request(arbitraryDataQuery);
     expect(response).toMatchSnapshot();
