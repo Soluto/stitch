@@ -5,6 +5,7 @@ export interface IssuerConfig {
   jwksConfig?: Partial<ClientOptions>;
   audience?: string;
   authenticatedPaths: string[];
+  description?: string;
 }
 
 export interface AuthenticationConfig {

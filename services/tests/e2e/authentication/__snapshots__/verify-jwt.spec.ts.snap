@@ -44,8 +44,15 @@ exports[`Authentication - Verify JWT Invalid JWT: gateway logs 1`] = `
     }
     authority: \\"http://authority-without-discrovery-endpoint\\"
     jwksUri: \\"http://oidc-server-mock:8070/.well-known/openid-configuration/jwks\\"
-[hh:mm:ss] DEBUG (SigningKeyNotFoundError): Failed to verify request JWT
-    SigningKeyNotFoundError: Unable to find a signing key that matches 'C1B59DF60057CFB292C4E36CCE329615'
+[hh:mm:ss] DEBUG: Failed to verify request JWT
+    err: {
+      \\"type\\": \\"SigningKeyNotFoundError\\",
+      \\"message\\": \\"Unable to find a signing key that matches 'C1B59DF60057CFB292C4E36CCE329615'\\",
+      \\"stack\\":
+          SigningKeyNotFoundError: Unable to find a signing key that matches 'C1B59DF60057CFB292C4E36CCE329615'
+      \\"name\\": \\"SigningKeyNotFoundError\\"
+    }
+    issuer: \\"http://localhost:8070\\"
 \\"***** END OUTPUT CAPTURE *****"
 `;
 
