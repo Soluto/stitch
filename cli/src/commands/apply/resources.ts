@@ -29,9 +29,11 @@ Uploaded successfully!
       this.log(`Dry run mode ON - No changes will be made to the registry`);
     }
 
-    this.log(`${dryRun ? 'Verifying' : 'Uploading'} resources from ${args.resourcesPath}...`);
-
     const resourceGroup = await this.pathToResourceGroup(args.resourcesPath);
+    const resourceCounts = Object.entries(resourceGroup).map(([key, value]) => ({ key, count: value?.length ?? 0 }));
+
+    this.log(`${dryRun ? 'Verifying' : 'Uploading'} resources from ${args.resourcesPath}...`);
+    resourceCounts.forEach(({ key, count }) => this.log(`  ${key}: ${count}`));
 
     await uploadResourceGroup(resourceGroup, {
       registryUrl: flags['registry-url'],
