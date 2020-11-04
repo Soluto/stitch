@@ -1,0 +1,7 @@
+kind: Policy
+metadata:
+  namespace: employee-ns
+  name: employee-allow
+type: opa
+code: |
+  default allow = true
