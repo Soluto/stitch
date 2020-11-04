@@ -31,7 +31,8 @@ Usually only `/graphql` endpoint should be protected by non-anonymous strategy. 
       "jwksUri": "<<< Oidc Provider's JWKs Endpoint >>>",
       // Audience is optional field and will be validated only if defined. See below another way to validate audience using policies.
       "audience": "<<Stitch audience>>",
-      "authenticatedPaths": ["/graphql"]
+      "authenticatedPaths": ["/graphql"],
+      "description": "Some OpenId Provider"
     }
   },
   "anonymous": {

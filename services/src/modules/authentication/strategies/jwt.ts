@@ -31,8 +31,8 @@ export default async function (request: fastify.FastifyRequest): Promise<void> {
       // Verify JWT signing, expiration and more
       await request.jwtVerify();
       logger.trace({ issuer }, 'JWT verified');
-    } catch (error) {
-      logger.debug(error, 'Failed to verify request JWT');
+    } catch (err) {
+      logger.debug({ err, issuer }, 'Failed to verify request JWT');
       throw new Error('Unauthorized');
     }
   }

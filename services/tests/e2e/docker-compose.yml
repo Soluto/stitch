@@ -21,6 +21,7 @@ services:
             "http://localhost:8060": {
               "authority": "http://oidc-server-mock:8060",
               "audience": "Stitch Gateway",
+              "description": "OpenId provider with discovery endpoint",
               "authenticatedPaths": ["/graphql"]
             },
             "http://localhost:8070": {
@@ -30,6 +31,7 @@ services:
                 "jwksUri": "http://oidc-server-mock:8070/.well-known/openid-configuration/jwks",
                 "timeout": 1000
               },
+              "description": "OpenId provider without discovery endpoint",
               "authenticatedPaths": ["/graphql"]
             }
           },
