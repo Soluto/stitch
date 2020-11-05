@@ -23,20 +23,25 @@ Uploaded successfully!
 
   async run() {
     const { args, flags } = this.parse(ApplyResources);
+    const dryRun = flags['dry-run'];
 
-    if (flags['dry-run']) {
+    if (dryRun) {
       this.log(`Dry run mode ON - No changes will be made to the registry`);
     }
 
-    this.log(`Uploading resource ${args.resourcesPath}`);
-
     const resourceGroup = await this.pathToResourceGroup(args.resourcesPath);
+    const resourceCounts = Object.entries(resourceGroup).map(([key, value]) => ({ key, count: value?.length ?? 0 }));
+
+    this.log(`${dryRun ? 'Verifying' : 'Uploading'} resources from ${args.resourcesPath}...`);
+    resourceCounts.forEach(({ key, count }) => this.log(`  ${key}: ${count}`));
 
     await uploadResourceGroup(resourceGroup, {
       registryUrl: flags['registry-url'],
       authorizationHeader: flags['authorization-header'],
-      dryRun: flags['dry-run'],
+      dryRun,
     });
+
+    this.log(`Resources from ${args.resourcesPath} were ${dryRun ? 'verified' : 'uploaded'} successfully.`);
   }
 
   async pathToResourceGroup(filePath: string): Promise<ResourceGroupInput> {
