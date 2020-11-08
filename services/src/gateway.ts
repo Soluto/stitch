@@ -14,8 +14,13 @@ import {
   CompositeResourceRepository,
   IResourceRepository,
 } from './modules/resource-repository';
-import { getSecret, jwtAuthStrategy, anonymousAuthStrategy } from './modules/authentication';
-import jwtDecoderPlugin from './modules/authentication/jwt-decoder-plugin';
+import {
+  getSecret,
+  jwtAuthStrategy,
+  anonymousAuthStrategy,
+  anonymousPlugin,
+  jwtDecoderPlugin,
+} from './modules/authentication';
 import { loadPlugins } from './modules/plugins';
 
 async function run() {
@@ -32,6 +37,7 @@ async function run() {
       },
     })
     .register(jwtDecoderPlugin)
+    .register(anonymousPlugin)
     .register(fastifyMetrics, {
       endpoint: '/metrics',
     });

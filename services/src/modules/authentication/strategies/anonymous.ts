@@ -1,15 +1,19 @@
-import * as fastify from 'fastify';
+import { FastifyRequest } from 'fastify';
 import { authenticationConfig } from '../../config';
 
-export default function (
-  request: fastify.FastifyRequest,
-  _reply: fastify.FastifyReply<unknown>,
-  done: (error?: Error) => void
-) {
-  const anonymousPaths = authenticationConfig?.anonymous?.publicPaths;
-  if (anonymousPaths?.some(ap => request.raw.url?.endsWith(ap))) {
-    done();
-    return;
+export default async function (request: FastifyRequest): Promise<void> {
+  const config = authenticationConfig?.anonymous;
+  if (!config) throw new Error('Unauthorized');
+  if (config.rejectAuthorizationHeader) {
+    if (request.headers.authorization) {
+      throw new Error('Unauthorized');
+    }
   }
-  done(new Error('Unauthorized'));
+
+  const anonymousPaths = config.publicPaths;
+  if (!anonymousPaths) throw new Error('Unauthorized');
+  if (!anonymousPaths.some(ap => request.raw.url?.endsWith(ap))) {
+    throw new Error('Unauthorized');
+  }
+  request._isAnonymousAccess = true;
 }
