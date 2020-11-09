@@ -12,5 +12,6 @@ export interface AuthenticationConfig {
   jwt?: Record<string, IssuerConfig>;
   anonymous?: {
     publicPaths: string[];
+    rejectAuthorizationHeader?: boolean;
   };
 }

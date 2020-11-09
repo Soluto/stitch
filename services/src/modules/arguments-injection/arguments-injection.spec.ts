@@ -5,7 +5,7 @@ interface TestCase {
   input: unknown;
   source?: unknown;
   args?: Record<string, unknown>;
-  context?: Pick<RequestContext, 'request' | 'exports'>;
+  context?: Pick<RequestContext, 'request' | 'exports' | 'request'>;
   expected: unknown;
 }
 
@@ -32,6 +32,7 @@ const testCases: [string, TestCase][] = [
       input: '{jwt.email}',
       context: {
         request: {
+          isAnonymousAccess: () => false,
           headers: {},
           decodeJWT() {
             return {
@@ -44,6 +45,23 @@ const testCases: [string, TestCase][] = [
         exports: { resolve: () => ({}) },
       },
       expected: 'something@domain.com',
+    },
+  ],
+  [
+    'From isAnonymousAccess',
+    {
+      input: '{isAnonymousAccess}',
+      context: {
+        request: {
+          isAnonymousAccess: () => true,
+          headers: {},
+          decodeJWT(): undefined {
+            return;
+          },
+        },
+        exports: { resolve: () => ({}) },
+      },
+      expected: true,
     },
   ],
   [
