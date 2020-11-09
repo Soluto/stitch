@@ -7,7 +7,7 @@ import evaluate from './arguments-evaluation';
 
 declare module '../context' {
   interface RequestContext {
-    request: Pick<FastifyRequest, 'headers' | 'decodeJWT'>;
+    request: Pick<FastifyRequest, 'headers' | 'decodeJWT' | 'isAnonymousAccess'>;
   }
 }
 
@@ -22,6 +22,7 @@ function injectTemplate<T = unknown>(
     source,
     args,
     jwt: context?.request?.decodeJWT?.()?.payload,
+    isAnonymousAccess: context?.request?.isAnonymousAccess?.(),
     exports: info && context && getExportsProxy(context.exports, info?.parentType, source as Record<string, unknown>),
     vars: info?.variableValues,
   };

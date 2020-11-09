@@ -15,10 +15,11 @@ The argument expression can be dependent on several sources:
 - Parent fields
 - Ancestor's fields exported higher in query result tree
 - GraphQL query variables
+- `isAnonymousAccess()` method that returns `true` if the HTTP request has no `Authorization` header. Otherwise returns `false`.
 
 ### Syntax
 
-#### Static value
+#### Static values
 
 The value is set hardcoded.
 
