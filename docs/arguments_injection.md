@@ -11,6 +11,7 @@ Argument injection mechanism allows to use expressions in arguments that will be
 The argument expression can be dependent on several sources:
 
 - Request JWT
+- Request headers
 - Field arguments
 - Parent fields
 - Ancestor's fields exported higher in query result tree
@@ -177,6 +178,20 @@ query {
 # Schema
 type Query {
   foo: String! @localResolver(value: "{jwt.roles}") # foo field will be resolved to roles claim of the request JWT.
+}
+
+#Query
+query {
+  foo
+}
+```
+
+#### Headers
+
+```graphql
+# Schema
+type Query {
+  foo: String! @localResolver(value: "{headers['x-api-client']}") # foo field will be resolved to the request x-api-client header.
 }
 
 #Query

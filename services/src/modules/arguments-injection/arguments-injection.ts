@@ -22,6 +22,7 @@ function injectTemplate<T = unknown>(
     source,
     args,
     jwt: context?.request?.decodeJWT?.()?.payload,
+    headers: context?.request?.headers,
     isAnonymousAccess: context?.request?.isAnonymousAccess?.(),
     exports: info && context && getExportsProxy(context.exports, info?.parentType, source as Record<string, unknown>),
     vars: info?.variableValues,

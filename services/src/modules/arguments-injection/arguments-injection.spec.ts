@@ -29,6 +29,25 @@ const testCases: [string, TestCase][] = [
   [
     'From JWT',
     {
+      input: '{headers["x-client-id"]}',
+      context: {
+        request: {
+          isAnonymousAccess: () => false,
+          headers: {
+            'x-client-id': 'some-service',
+          },
+          decodeJWT(): undefined {
+            return;
+          },
+        },
+        exports: { resolve: () => ({}) },
+      },
+      expected: 'some-service',
+    },
+  ],
+  [
+    'From headers',
+    {
       input: '{jwt.email}',
       context: {
         request: {
