@@ -27,7 +27,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'From JWT',
+    'From headers',
     {
       input: '{headers["x-client-id"]}',
       context: {
@@ -46,7 +46,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'From headers',
+    'From JWT',
     {
       input: '{jwt.email}',
       context: {
