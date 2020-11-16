@@ -60,8 +60,30 @@ args:
 
 <!-- commands -->
 
+- [`stitch apply:base-policy RESOURCEPATH`](#stitch-applybase-policy-resourcepath)
 - [`stitch apply:resources RESOURCESPATH`](#stitch-applyresources-resourcespath)
 - [`stitch help [COMMAND]`](#stitch-help-command)
+
+## `stitch apply:base-policy RESOURCEPATH`
+
+Apply base policy
+
+```
+USAGE
+  $ stitch apply:base-policy RESOURCEPATH
+
+OPTIONS
+  --authorization-header=authorization-header  Custom authorization header
+  --dry-run                                    Should perform a dry run
+  --registry-url=registry-url                  (required) Url of the registry
+
+EXAMPLE
+
+         $ stitch apply:base-policy base-policy.yaml
+         Uploaded successfully!
+```
+
+_See code: [src/commands/apply/base-policy.ts](https://github.com/Soluto/stitch/blob/v0.0.7/src/commands/apply/base-policy.ts)_
 
 ## `stitch apply:resources RESOURCESPATH`
 
@@ -81,7 +103,7 @@ EXAMPLE
   Uploaded successfully!
 ```
 
-_See code: [src/commands/apply/resources.ts](https://github.com/Soluto/stitch/blob/v0.0.6/src/commands/apply/resources.ts)_
+_See code: [src/commands/apply/resources.ts](https://github.com/Soluto/stitch/blob/v0.0.7/src/commands/apply/resources.ts)_
 
 ## `stitch help [COMMAND]`
 

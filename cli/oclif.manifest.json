@@ -1,6 +1,36 @@
 {
   "version": "0.0.7",
   "commands": {
+    "apply:base-policy": {
+      "id": "apply:base-policy",
+      "description": "Apply base policy",
+      "pluginName": "stitch-cli",
+      "pluginType": "core",
+      "aliases": [],
+      "examples": ["\n      $ stitch apply:base-policy base-policy.yaml\n      Uploaded successfully!\n    "],
+      "flags": {
+        "registry-url": {
+          "name": "registry-url",
+          "type": "option",
+          "description": "Url of the registry",
+          "required": true
+        },
+        "dry-run": {
+          "name": "dry-run",
+          "type": "boolean",
+          "description": "Should perform a dry run",
+          "required": false,
+          "allowNo": false
+        },
+        "authorization-header": {
+          "name": "authorization-header",
+          "type": "option",
+          "description": "Custom authorization header",
+          "required": false
+        }
+      },
+      "args": [{ "name": "resourcePath", "required": true }]
+    },
     "apply:resources": {
       "id": "apply:resources",
       "description": "Apply resources",
