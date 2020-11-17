@@ -27,6 +27,7 @@ Full parameters:
 input KeyValue {
     key: String!
     value: String!
+    required: Boolean # Defaults to false. Used with query parameters
 }
 
 directive @rest(

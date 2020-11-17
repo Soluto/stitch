@@ -19,7 +19,10 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     const headers = this.parseHeaders(params.headers, parent, args, info);
     const requestInit: RequestInit = { headers, timeout: params.timeoutMs ?? 10000, method: params.method };
     const url = new URL(inject(params.url, parent, args, this.context, info) as string);
-    this.addQueryParams(url.searchParams, params.query, parent, args, info);
+    const validQueryParams = this.addQueryParams(url.searchParams, params.query, parent, args, info);
+    if (!validQueryParams) {
+      return null;
+    }
 
     await this.addAuthentication(url, headers);
 
@@ -86,10 +89,16 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     args: GraphQLArguments,
     info: GraphQLResolveInfo
   ) {
-    if (!kvs || kvs.length == 0) return;
+    let validQueryParams = true;
+
+    if (!kvs || kvs.length == 0) return validQueryParams;
 
     for (const kv of kvs) {
       const value = inject(kv.value, parent, args, this.context, info);
+      if (!value && kv.required) {
+        validQueryParams = false;
+        break;
+      }
       if (!value) {
         continue;
       }
@@ -101,6 +110,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
         params.append(kv.key, String(value));
       }
     }
+    return validQueryParams;
   }
 }
 

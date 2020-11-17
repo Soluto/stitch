@@ -15,6 +15,7 @@ export const sdl = gql`
   input KeyValue {
     key: String!
     value: String!
+    required: Boolean
   }
 
   directive @rest(

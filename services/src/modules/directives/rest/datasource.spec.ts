@@ -131,4 +131,39 @@ describe('REST directive data source', () => {
     expect(req.headers.get('Content-Type')).toBe('application/json');
     expect(await req.text()).toBe('{"name":"aviv"}');
   });
+
+  it('Sends request if required query parameters are included', async () => {
+    await ds.doRequest(
+      {
+        url: 'http://somewhere',
+        method: 'GET',
+        query: [{ key: 'field1', value: 'value1', required: true }],
+      },
+      null,
+      {} as any,
+      {} as any,
+      {} as any
+    );
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const req = fetchMock.mock.calls[0][0] as Request;
+    expect(req.url).toBe('http://somewhere/?field1=value1');
+    expect(req.method).toBe('GET');
+  });
+
+  it('Does not send request if required query parameters are missing values', async () => {
+    await ds.doRequest(
+      {
+        url: 'http://somewhere',
+        method: 'GET',
+        query: [{ key: 'field1', value: '', required: true }],
+      },
+      null,
+      {} as any,
+      {} as any,
+      {} as any
+    );
+
+    expect(fetchMock).toHaveBeenCalledTimes(0);
+  });
 });
