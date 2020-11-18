@@ -65,9 +65,11 @@ export interface FetchLatestResult {
   resourceGroup: ResourceGroup;
 }
 
+export type UpdateOptions = { registry: boolean };
+
 export interface IResourceRepository {
   fetchLatest(): Promise<FetchLatestResult>;
-  update(rg: ResourceGroup): Promise<void>;
+  update(rg: ResourceGroup, options?: UpdateOptions): Promise<void>;
   writePolicyAttachment(filename: string, content: Buffer): Promise<void>;
 }
 

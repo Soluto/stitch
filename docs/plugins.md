@@ -23,7 +23,6 @@ export interface StitchPlugin {
 
   addArgumentInjectionGlobals?(): ValueOrPromise<Record<string, unknown>>;
 
-  transformResourcesUpdates?(resourcesUpdates: Partial<ResourceGroup>): ValueOrPromise<Partial<ResourceGroup>>;
   transformResourceGroup?(resourceGroup: ResourceGroup): ValueOrPromise<ResourceGroup>;
 }
 ```
@@ -67,21 +66,6 @@ query {
 ```
 
 Result: `{ foo: "__HELLO__" }`.
-
-## transformResourcesUpdates
-
-Allows transforming the part of the resource group being mutated by a call to the Registry service. This method receives a part of the `ResourceGroup` and returns the same type of promise to it.
-
-For example, the following plugin removes all policies of a resource group:
-
-```javascript
-{
-  name: 'remove-policies'
-  transformResourcesUpdates(rg) {
-    return { ...rg, policies: [] };
-  }
-}
-```
 
 ## transformResourceGroup
 

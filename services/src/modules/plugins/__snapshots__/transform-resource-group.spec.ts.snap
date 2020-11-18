@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Plugins: transformResourceGroup transformResourceGroup 1`] = `
+Object {
+  "policies": Array [
+    Object {
+      "code": "REGO code",
+      "metadata": Object {
+        "name": "policy",
+        "namespace": "ns",
+      },
+      "type": "opa",
+    },
+  ],
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "new-name",
+        "namespace": "new-ns",
+      },
+      "schema": "
+              type Query {
+                foo: String!
+              }
+            ",
+    },
+  ],
+  "upstreamClientCredentials": Array [],
+  "upstreams": Array [],
+}
+`;

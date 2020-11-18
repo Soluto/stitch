@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
 import { PolicyType, ResourceGroup } from '../resource-repository';
-import { plugins, transformResourcesUpdates } from './apply-plugins';
+import { plugins, transformResourceGroup } from './apply-plugins';
 import { StitchPlugin } from './types';
 
-const resourceGroup: Partial<ResourceGroup> = {
+const resourceGroup: ResourceGroup = {
   schemas: [
     {
       metadata: {
@@ -17,18 +17,21 @@ const resourceGroup: Partial<ResourceGroup> = {
             `,
     },
   ],
+  upstreams: [],
+  upstreamClientCredentials: [],
+  policies: [],
 };
 const loadedPlugins: StitchPlugin[] = [
   {
     name: 'rename-name',
-    transformResourcesUpdates(updates: Partial<ResourceGroup>) {
-      return _.set(updates, 'schemas[0].metadata.name', 'new-name');
+    transformResourceGroup(rg: ResourceGroup) {
+      return _.set(rg, 'schemas[0].metadata.name', 'new-name');
     },
   },
   {
     name: 'rename-namespace',
-    transformResourcesUpdates(updates: Partial<ResourceGroup>) {
-      return _.set(updates, 'schemas[0].metadata.namespace', 'new-ns');
+    transformResourceGroup(rg: ResourceGroup) {
+      return _.set(rg, 'schemas[0].metadata.namespace', 'new-ns');
     },
   },
   {
@@ -54,11 +57,11 @@ const loadedPlugins: StitchPlugin[] = [
   },
 ];
 
-describe('Plugins: transformResourcesUpdates', () => {
-  test('transformResourcesUpdates', async () => {
+describe('Plugins: transformResourceGroup', () => {
+  test('transformResourceGroup', async () => {
     plugins.splice(0, plugins.length);
     plugins.push(...loadedPlugins);
-    const result = await transformResourcesUpdates(resourceGroup);
+    const result = await transformResourceGroup(resourceGroup);
     expect(result).toMatchSnapshot();
   });
 });

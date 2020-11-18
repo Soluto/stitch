@@ -9,16 +9,18 @@ export class S3ResourceRepository extends ResourceRepository {
     protected storage: S3Storage,
     protected resourceFilePath: string,
     protected policyAttachmentsFolderPath: string,
-    protected isRegistry = false
+    protected isRegistry = false,
+    protected registryResourceFilePath?: string
   ) {
-    super(storage, resourceFilePath, policyAttachmentsFolderPath, isRegistry);
+    super(storage, resourceFilePath, policyAttachmentsFolderPath, isRegistry, registryResourceFilePath);
   }
 
   async fetchLatest(): Promise<FetchLatestResult> {
     let content: string, etag: string;
+    const resourceFilePath = this.isRegistry ? this.registryResourceFilePath! : this.resourceFilePath;
 
     try {
-      ({ content, etag } = await this.storage.readFile(this.resourceFilePath, {
+      ({ content, etag } = await this.storage.readFile(resourceFilePath, {
         asString: true,
         etag: this.resourceGroup?.etag,
       }));
@@ -45,7 +47,12 @@ export class S3ResourceRepository extends ResourceRepository {
   static fromEnvironment(options: { isRegistry: boolean } = { isRegistry: false }) {
     const s3endpoint = envVar.get('S3_ENDPOINT').required().asString();
     const bucketName = envVar.get('S3_RESOURCE_BUCKET_NAME').required().asString();
-    const resourceFilePath = envVar.get('S3_RESOURCE_OBJECT_KEY').default('resources.json').asString();
+    const resourceFilePath = envVar.get('S3_RESOURCE_OBJECT_KEY').default('resources-gateway.json').asString();
+
+    let registryResourceEnvVar = envVar.get('S3_REGISTRY_RESOURCE_OBJECT_KEY');
+    if (options.isRegistry) registryResourceEnvVar = registryResourceEnvVar.default('resources-registry.json');
+    const registryResourceFilePath = registryResourceEnvVar.asString();
+
     const policyAttachmentsFolderPath = envVar
       .get('S3_POLICY_ATTACHMENTS_KEY_PREFIX')
       .default('policyAttachments/')
@@ -54,7 +61,13 @@ export class S3ResourceRepository extends ResourceRepository {
     const awsSecretAccessKey = envVar.get('S3_AWS_SECRET_ACCESS_KEY').asString();
 
     const s3Storage = new S3Storage(bucketName, s3endpoint, awsAccessKeyId, awsSecretAccessKey);
-    return new S3ResourceRepository(s3Storage, resourceFilePath, policyAttachmentsFolderPath, options.isRegistry);
+    return new S3ResourceRepository(
+      s3Storage,
+      resourceFilePath,
+      policyAttachmentsFolderPath,
+      options.isRegistry,
+      registryResourceFilePath
+    );
   }
 }
 

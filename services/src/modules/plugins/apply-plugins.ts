@@ -46,17 +46,6 @@ export async function buildArgumentInjectionGlobals(): Promise<Record<string, un
   return globals;
 }
 
-export async function transformResourcesUpdates(
-  resourceGroup: Partial<ResourceGroup>
-): Promise<Partial<ResourceGroup>> {
-  return plugins
-    .filter(p => p.transformResourcesUpdates)
-    .reduce<Partial<ResourceGroup> | Promise<Partial<ResourceGroup>>>(
-      async (res, cur) => cur.transformResourcesUpdates!(await res),
-      resourceGroup
-    );
-}
-
 export async function transformResourceGroup(resourceGroup: ResourceGroup): Promise<ResourceGroup> {
   return plugins
     .filter(p => p.transformResourceGroup)

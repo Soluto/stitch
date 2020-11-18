@@ -1,0 +1,35 @@
+{
+    "schemas": [
+        {
+            "metadata": {"namespace": "testing", "name": "postmanecho"},
+            "schema": "type Query {\n        echo(in: JSON!): JSON @rest(url: \"https://postman-echo.com/post\", method: \"POST\", bodyArg: \"in\")\n    }\n    "
+        },
+        {
+            "metadata": {"namespace": "testing", "name": "countries"},
+            "schema": "type Continent {\n        code: String\n        name: String\n        something: String @stub(value: \"rawr\")\n        countries: [Country]\n      }\n\n      type Country {\n        code: String\n        name: String\n        native: String\n        phone: String\n        continent: Continent\n        currency: String\n        languages: [Language]\n        emoji: String\n        emojiU: String\n      }\n\n      type Language {\n        code: String\n        name: String\n        native: String\n        rtl: Int\n      }\n\n      type Query {\n        continents: [Continent] @gql(url: \"https://countries.trevorblades.com/\", fieldName: \"continents\")\n        country(countryCode: String!): Country @gql(url: \"https://countries.trevorblades.com/\", fieldName: \"country\", arguments: {code: \"{args.countryCode}\"})\n        estonia: Country @gql(url: \"https://countries.trevorblades.com/\", fieldName: \"country\", arguments: {code: \"EE\"})\n      }"
+        },
+        {
+            "metadata": {"namespace": "jsonplaceholder", "name": "users"},
+            "schema": "type Query {\n        user(id: String): User @rest(url: \"https://jsonplaceholder.typicode.com/users/{args.id}\")\n    }\n\n    type User @key(fields: \"id\") {\n        id: ID!\n        name: String!\n        username: String!\n        email: String\n        address: Address\n        phone: String\n        website: String\n        company: Company\n    }\n\n    type Address {\n        street: String!\n        suite: String\n        city: String!\n        zipcode: String\n        geo: Geo\n    }\n\n    type Geo {\n        lat: String!\n        lng: String!\n    }\n\n    type Company {\n        name: String!\n        catchPhrase: String\n        bs: String\n    }"
+        },
+        {
+            "metadata": {"namespace": "jsonplaceholder", "name": "todos"},
+            "schema": "type Todo {\n        id: ID!\n        title: String!\n        completed: Boolean!\n    }\n\n    extend type User @key(fields: \"id\") {\n        id: ID! @external\n        todos: [Todo] @rest(url: \"https://jsonplaceholder.typicode.com/todos?userId={source.id}\")\n    }"
+        },
+        {
+            "metadata": {"namespace": "jsonplaceholder", "name": "albums"},
+            "schema": "extend type User @key(fields: \"id\") {\n        id: ID! @external\n        albums: [Album] @rest(url: \"https://jsonplaceholder.typicode.com/albums?userId={source.id}\")\n    }\n\n    type Album @key(fields: \"id\") {\n        id: ID!\n        title: String!\n    }"
+        },
+        {
+            "metadata": {"namespace": "jsonplaceholder", "name": "photos"},
+            "schema": "extend type Album @key(fields: \"id\") {\n        id: ID! @external\n        photos: [Photo] @rest(url: \"https://jsonplaceholder.typicode.com/photos?albumId={source.id}\")\n    }\n\n    type Photo {\n        id: ID!\n        title: String!\n        url: String!\n        thumbnailUrl: String!\n    }"
+        },
+        {
+            "metadata": {"namespace": "jsonplaceholder", "name": "posts"},
+            "schema": "extend type User @key(fields: \"id\") {\n        id: ID! @external\n        posts: [Post] @rest(url: \"https://jsonplaceholder.typicode.com/posts?userId={source.id}\")\n    }\n\n    type Post {\n        id: ID!\n        title: String!\n        body: String!\n        comments: [Comment] @rest(url: \"https://jsonplaceholder.typicode.com/comments?postId={source.id}\")\n    }\n\n    type Comment {\n        id: ID!\n        name: String!\n        email: String!\n        body: String!\n    }\n    "
+        }
+    ],
+    "upstreams": [],
+    "upstreamClientCredentials": [],
+    "policies": []
+}
