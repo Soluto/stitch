@@ -1,6 +1,6 @@
 import { RESTDataSource, Request } from 'apollo-datasource-rest';
 import { RequestInit, Headers } from 'apollo-server-env';
-import { GraphQLResolveInfo, isNullableType } from 'graphql';
+import {  GraphQLError, GraphQLResolveInfo, isNullableType } from 'graphql';
 import { inject } from '../../arguments-injection';
 import { RequestContext } from '../../context';
 import { getAuthHeaders } from '../../upstream-authentication';
@@ -19,10 +19,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     const headers = this.parseHeaders(params.headers, parent, args, info);
     const requestInit: RequestInit = { headers, timeout: params.timeoutMs ?? 10000, method: params.method };
     const url = new URL(inject(params.url, parent, args, this.context, info) as string);
-    const validQueryParams = this.addQueryParams(url.searchParams, params.query, parent, args, info);
-    if (!validQueryParams) {
-      return null;
-    }
+    this.addQueryParams(url.searchParams, params.query, parent, args, info);
 
     await this.addAuthentication(url, headers);
 
@@ -76,6 +73,9 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
 
     for (const kv of kvs) {
       const value = inject(kv.value, parent, args, this.context, info) as string;
+      if (!value && kv.required){
+        throw new GraphQLError(`${kv.key} header is required`);
+      }
       headers.append(kv.key, value);
     }
 
@@ -89,15 +89,13 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     args: GraphQLArguments,
     info: GraphQLResolveInfo
   ) {
-    let validQueryParams = true;
 
-    if (!kvs || kvs.length == 0) return validQueryParams;
+    if (!kvs || kvs.length == 0) return;
 
     for (const kv of kvs) {
       const value = inject(kv.value, parent, args, this.context, info);
       if (!value && kv.required) {
-        validQueryParams = false;
-        break;
+        throw new GraphQLError(`${kv.key} query parameter is required`);
       }
       if (!value) {
         continue;
@@ -110,7 +108,6 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
         params.append(kv.key, String(value));
       }
     }
-    return validQueryParams;
   }
 }
 
