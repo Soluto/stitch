@@ -6,10 +6,11 @@ export function mockResourceBucket(initialValue: ResourceGroup, initialPolicyFil
   const s3endpoint = process.env.S3_ENDPOINT;
   const bucketName = process.env.S3_RESOURCE_BUCKET_NAME;
   const objectKey = process.env.S3_RESOURCE_OBJECT_KEY;
+  const registryObjectKey = process.env.S3_REGISTRY_RESOURCE_OBJECT_KEY;
   const policiesKeyPrefix = process.env.S3_POLICY_ATTACHMENTS_KEY_PREFIX;
   const policiesPrefixQueryParamRegex = `prefix=${encodeURIComponent(policiesKeyPrefix!)}.*`;
   const queryParamsSeparatorRegex = '?.*';
-  const value = { current: initialValue, policyFiles: initialPolicyFiles };
+  const value = { current: initialValue, policyFiles: initialPolicyFiles, currentRegistry: initialValue };
 
   nock(s3endpoint!)
     .persist()
@@ -18,6 +19,12 @@ export function mockResourceBucket(initialValue: ResourceGroup, initialPolicyFil
     .put(`/${bucketName!}/${objectKey}`)
     .reply(200, (_, body) => {
       value.current = JSON.parse(body as string) as ResourceGroup;
+    })
+    .get(`/${bucketName!}/${registryObjectKey}`)
+    .reply(200, value.currentRegistry)
+    .put(`/${bucketName!}/${registryObjectKey}`)
+    .reply(200, (_, body) => {
+      value.currentRegistry = JSON.parse(body as string) as ResourceGroup;
     })
     .get(new RegExp(`/${bucketName!}${queryParamsSeparatorRegex}${policiesPrefixQueryParamRegex}`))
     .reply(200, () => {

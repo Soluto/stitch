@@ -2,7 +2,7 @@ import * as path from 'path';
 import pLimit from 'p-limit';
 import { Storage, listFilesItem } from '../storage';
 import { getWasmPolicy } from '../directives/policy/opa';
-import { FetchLatestResult, ResourceGroup, IResourceRepository, PolicyAttachments } from '.';
+import { FetchLatestResult, ResourceGroup, IResourceRepository, PolicyAttachments, UpdateOptions } from '.';
 
 export class ResourceRepository implements IResourceRepository {
   protected resourceGroup?: { lastModified?: Date; resources: ResourceGroup };
@@ -12,11 +12,13 @@ export class ResourceRepository implements IResourceRepository {
     protected storage: Storage,
     protected resourceFilePath: string,
     protected policyAttachmentsFolderPath: string,
-    protected isRegistry = false
+    protected isRegistry = false,
+    protected registryResourceFilePath?: string
   ) {}
 
   async fetchLatest(): Promise<FetchLatestResult> {
-    const stats = await this.storage.fileStats(this.resourceFilePath);
+    const resourceFilePath = this.isRegistry ? this.registryResourceFilePath! : this.resourceFilePath;
+    const stats = await this.storage.fileStats(resourceFilePath);
 
     if (this.resourceGroup?.lastModified?.getTime() === stats.lastModified.getTime()) {
       await this.refreshPolicyAttachments();
@@ -25,7 +27,7 @@ export class ResourceRepository implements IResourceRepository {
       return { isNew: false, resourceGroup: this.resourceGroup.resources };
     }
 
-    const { content } = await this.storage.readFile(this.resourceFilePath, { asString: true });
+    const { content } = await this.storage.readFile(resourceFilePath, { asString: true });
     const resources = JSON.parse(content) as ResourceGroup;
     this.resourceGroup = { lastModified: stats.lastModified, resources };
 
@@ -35,8 +37,12 @@ export class ResourceRepository implements IResourceRepository {
     return { isNew: true, resourceGroup: resources };
   }
 
-  async update(resources: ResourceGroup): Promise<void> {
-    await this.storage.writeFile(this.resourceFilePath, JSON.stringify(resources));
+  async update(resources: ResourceGroup, options?: UpdateOptions): Promise<void> {
+    const defaultOptions = { registry: false };
+    const { registry } = { ...defaultOptions, ...options };
+    const resourceFilePath = registry ? this.registryResourceFilePath! : this.resourceFilePath;
+
+    await this.storage.writeFile(resourceFilePath, JSON.stringify(resources));
   }
 
   async writePolicyAttachment(filename: string, content: Buffer): Promise<void> {

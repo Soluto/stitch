@@ -7,6 +7,5 @@ export interface StitchPlugin {
 
   addArgumentInjectionGlobals?(): ValueOrPromise<Record<string, unknown>>;
 
-  transformResourcesUpdates?(resourcesUpdates: Partial<ResourceGroup>): ValueOrPromise<Partial<ResourceGroup>>;
   transformResourceGroup?(resourceGroup: ResourceGroup): ValueOrPromise<ResourceGroup>;
 }

@@ -36,6 +36,7 @@ describe('Authentication - Verify JWT', () => {
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
 
     const endContainerOutputCapture = await startContainerOutputCapture('gateway');
+    await sleep(50); // wait a bit longer for output capture
     const result = await gatewayClient.request(query);
     expect(result).toMatchSnapshot();
 
