@@ -141,6 +141,18 @@ directive @localResolver(
 )
 ```
 
+The optional `enabledIf` parameter allows ignore the `value` if its content is evaluated to `false`.
+For example:
+
+```graphql
+type Foo {
+  bar: String! @localResolver(enabledIf: "{!source.bar}", value: "N/A")
+}
+```
+
+In this case if the `source` object doesn't have `bar` property or it's null or undefined the field value will be `"N/A"`. Otherwise it will be the result of the original field resolver.
+When the `mergeStrategy` is set to `Merge` or `MergeDeep` the original resolver result and the `value` parameter evaluation will be merged only if the `enabledIf` is true. Otherwise the field value will be the result of the original field resolver.
+
 ## @export
 
 See [Parameter Injection](./parameter_injection.md#exports) for details
