@@ -1,10 +1,12 @@
 import { RESTDataSource, Request } from 'apollo-datasource-rest';
 import { RequestInit, Headers } from 'apollo-server-env';
-import { GraphQLResolveInfo, isNullableType } from 'graphql';
+import {  GraphQLError, GraphQLResolveInfo, isNullableType } from 'graphql';
 import { inject } from '../../arguments-injection';
 import { RequestContext } from '../../context';
 import { getAuthHeaders } from '../../upstream-authentication';
 import { KeyValue, RestParams } from './types';
+
+const hasValue = (value: unknown) => value !== null && typeof value !== undefined && value !== undefined && value !== '';
 
 type GraphQLArguments = { [key: string]: unknown };
 
@@ -73,6 +75,9 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
 
     for (const kv of kvs) {
       const value = inject(kv.value, parent, args, this.context, info) as string;
+      if (!hasValue(value) && kv.required){
+        throw new GraphQLError(`${kv.key} header is required`);
+      }
       headers.append(kv.key, value);
     }
 
@@ -86,13 +91,18 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     args: GraphQLArguments,
     info: GraphQLResolveInfo
   ) {
+
     if (!kvs || kvs.length == 0) return;
 
     for (const kv of kvs) {
       const value = inject(kv.value, parent, args, this.context, info);
-      if (!value) {
+      if (!hasValue(value)) {
+        if(kv.required) {
+          throw new GraphQLError(`${kv.key} query parameter is required`);
+        }
         continue;
       }
+
       if (Array.isArray(value)) {
         for (const elem of value) {
           params.append(kv.key, elem);

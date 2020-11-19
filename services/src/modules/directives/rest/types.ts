@@ -1,6 +1,7 @@
 export interface KeyValue {
   key: string;
   value: string;
+  required?: boolean;
 }
 
 export interface RestParams {
