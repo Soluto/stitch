@@ -8,11 +8,13 @@ import { RequestContext } from '../context';
 
 export class LocalResolverDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
-    const { value, mergeStrategy, enabled: enabledCondition } = this.args as LocalResolverArgs;
+    const { value, mergeStrategy, enabledIf } = this.args as LocalResolverArgs;
     const originalResolve = field.resolve || defaultFieldResolver;
 
     field.resolve = async (parent, args, context, info) => {
-      const isEnabled = !enabledCondition || inject(enabledCondition, parent, args, context, info);
+      const enabledIfResult = inject(enabledIf, parent, args, context, info);
+      // If injection throws it returns the template. In this case fail the condition
+      const isEnabled = enabledIfResult && enabledIfResult !== enabledIf;
       if (!isEnabled) return await originalResolve.call(field, parent, args, context, info);
 
       const stubValue = inject(value, parent, args, context, info);
@@ -39,7 +41,7 @@ export const sdl = gql`
   directive @localResolver(
     value: JSON = null
     mergeStrategy: LocalResolverMergeStrategy = Replace
-    enabled: String
+    enabledIf: String = "{ true }"
   ) on FIELD_DEFINITION
 `;
 
@@ -49,7 +51,7 @@ enum MergeStrategy {
   MergeDeep = 'MergeDeep',
 }
 type LocalResolverValue = string | Record<string, unknown>;
-type LocalResolverArgs = { value: LocalResolverValue; mergeStrategy: MergeStrategy; enabled?: string };
+type LocalResolverArgs = { value: LocalResolverValue; mergeStrategy: MergeStrategy; enabledIf?: string };
 
 const invalidStubTypeErrorMessage =
   'For @localResolver with Merge or MergeDeep strategies, the value parameter must evaluate to an object type';

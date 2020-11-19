@@ -146,11 +146,11 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'Enabled is true, strategy is replace',
+    'EnabledIf is true, strategy is replace',
     {
       typeDefs: gql`
         type Query {
-          foo: String! @localResolver(value: "FOO", enabled: "{ true }")
+          foo: String! @localResolver(value: "FOO", enabledIf: "{ true }")
         }
       `,
       query: gql`
@@ -167,11 +167,11 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'Enabled is false, strategy is replace',
+    'EnabledIf is false, strategy is replace',
     {
       typeDefs: gql`
         type Query {
-          foo: String! @localResolver(value: "FOO", enabled: "{ false }")
+          foo: String! @localResolver(value: "FOO", enabledIf: "{ false }")
         }
       `,
       query: gql`
@@ -188,7 +188,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'Enabled is true, strategy is merge',
+    'EnabledIf is true, strategy is merge',
     {
       typeDefs: gql`
         type Foo {
@@ -197,7 +197,7 @@ const testCases: [string, TestCase][] = [
         }
 
         type Query {
-          foo: Foo! @localResolver(value: { baz: "BAZ" }, enabled: "{ true }", mergeStrategy: Merge)
+          foo: Foo! @localResolver(value: { baz: "BAZ" }, enabledIf: "{ true }", mergeStrategy: Merge)
         }
       `,
       query: gql`
@@ -217,7 +217,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'Enabled is false, strategy is merge',
+    'EnabledIf is false, strategy is merge',
     {
       typeDefs: gql`
         type Foo {
@@ -226,7 +226,7 @@ const testCases: [string, TestCase][] = [
         }
 
         type Query {
-          foo: Foo! @localResolver(value: { baz: "BAZ" }, enabled: "{ false }", mergeStrategy: Merge)
+          foo: Foo! @localResolver(value: { baz: "BAZ" }, enabledIf: "{ false }", mergeStrategy: Merge)
         }
       `,
       query: gql`
@@ -241,6 +241,27 @@ const testCases: [string, TestCase][] = [
       resolvers: {
         Query: {
           foo: () => ({ bar: 'BAR' }),
+        },
+      },
+    },
+  ],
+  [
+    'EnabledIf condition throws',
+    {
+      typeDefs: gql`
+        type Query {
+          foo: String! @localResolver(value: "FOO", enabledIf: "{ something that throws }")
+        }
+      `,
+      query: gql`
+        query {
+          foo
+        }
+      `,
+      expected: { foo: 'BAR' },
+      resolvers: {
+        Query: {
+          foo: () => 'BAR',
         },
       },
     },
