@@ -145,6 +145,106 @@ const testCases: [string, TestCase][] = [
       resolvers: {},
     },
   ],
+  [
+    'Enabled is true, strategy is replace',
+    {
+      typeDefs: gql`
+        type Query {
+          foo: String! @localResolver(value: "FOO", enabled: "{ true }")
+        }
+      `,
+      query: gql`
+        query {
+          foo
+        }
+      `,
+      expected: { foo: 'FOO' },
+      resolvers: {
+        Query: {
+          foo: () => 'BAR',
+        },
+      },
+    },
+  ],
+  [
+    'Enabled is false, strategy is replace',
+    {
+      typeDefs: gql`
+        type Query {
+          foo: String! @localResolver(value: "FOO", enabled: "{ false }")
+        }
+      `,
+      query: gql`
+        query {
+          foo
+        }
+      `,
+      expected: { foo: 'BAR' },
+      resolvers: {
+        Query: {
+          foo: () => 'BAR',
+        },
+      },
+    },
+  ],
+  [
+    'Enabled is true, strategy is merge',
+    {
+      typeDefs: gql`
+        type Foo {
+          bar: String
+          baz: String
+        }
+
+        type Query {
+          foo: Foo! @localResolver(value: { baz: "BAZ" }, enabled: "{ true }", mergeStrategy: Merge)
+        }
+      `,
+      query: gql`
+        query {
+          foo {
+            bar
+            baz
+          }
+        }
+      `,
+      expected: { foo: { bar: 'BAR', baz: 'BAZ' } },
+      resolvers: {
+        Query: {
+          foo: () => ({ bar: 'BAR' }),
+        },
+      },
+    },
+  ],
+  [
+    'Enabled is false, strategy is merge',
+    {
+      typeDefs: gql`
+        type Foo {
+          bar: String
+          baz: String
+        }
+
+        type Query {
+          foo: Foo! @localResolver(value: { baz: "BAZ" }, enabled: "{ false }", mergeStrategy: Merge)
+        }
+      `,
+      query: gql`
+        query {
+          foo {
+            bar
+            baz
+          }
+        }
+      `,
+      expected: { foo: { bar: 'BAR', baz: null } },
+      resolvers: {
+        Query: {
+          foo: () => ({ bar: 'BAR' }),
+        },
+      },
+    },
+  ],
 ];
 
 const baseTypeDefs = gql`
