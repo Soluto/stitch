@@ -1,4 +1,4 @@
-FROM node:12-buster-slim as base
+FROM node:lts-buster-slim as base
 WORKDIR /build
 
 FROM base as dependencies
@@ -20,7 +20,7 @@ RUN if [ "$RUN_TESTS" = "true" ]; then npm run test; fi
 FROM build-dependencies as build
 RUN npm run build
 
-FROM node:12-buster-slim
+FROM node:lts-buster-slim
 WORKDIR /service
 COPY --from=dependencies /build/node_modules ./node_modules
 COPY --from=build /build/dist ./dist
