@@ -25,9 +25,9 @@ Full parameters:
 
 ```graphql
 input KeyValue {
-    key: String!
-    value: String!
-    required: Boolean # Defaults to false
+  key: String!
+  value: String!
+  required: Boolean # Defaults to false
 }
 
 directive @rest(
