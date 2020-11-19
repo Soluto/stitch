@@ -12,8 +12,7 @@ export class LocalResolverDirective extends SchemaDirectiveVisitor {
     const originalResolve = field.resolve || defaultFieldResolver;
 
     field.resolve = async (parent, args, context, info) => {
-      const isEnabled =
-        !enabledCondition || (enabledCondition && inject(enabledCondition, parent, args, context, info));
+      const isEnabled = !enabledCondition || inject(enabledCondition, parent, args, context, info);
       if (!isEnabled) return await originalResolve.call(field, parent, args, context, info);
 
       const stubValue = inject(value, parent, args, context, info);
