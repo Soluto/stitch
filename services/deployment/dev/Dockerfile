@@ -1,4 +1,4 @@
-FROM node:12-buster-slim
+FROM node:lts-buster-slim
 WORKDIR /service
 COPY . .
 RUN npm install
