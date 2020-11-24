@@ -1,3 +1,4 @@
+import { gql } from 'apollo-server-core';
 import { PolicyDefinition } from '../../resource-repository';
 import { sdl as policySdl, PolicyDirective } from './policy';
 import { sdl as policiesSdl, PoliciesDirective, resolvers as policyScalarResolvers } from './policies';
@@ -22,3 +23,13 @@ export type AuthorizationConfig = {
   policyExecutor: PolicyExecutor;
   basePolicy?: Policy;
 };
+
+export const policyBaseSdl = gql`
+  type PolicyResult {
+    allow: Boolean!
+  }
+
+  type Policy {
+    default: PolicyResult!
+  }
+`;

@@ -41,6 +41,7 @@
     "fastify-plugin": "^1.6.1",
     "graphql": "^15.2.0",
     "graphql-iso-date": "^3.6.1",
+    "graphql-scalars": "^1.5.0",
     "graphql-tools": "^4.0.8",
     "graphql-type-json": "^0.3.2",
     "jsonwebtoken": "^8.5.1",
