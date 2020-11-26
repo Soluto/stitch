@@ -3,7 +3,7 @@
 exports[`Scalars Date is declared 1`] = `
 Object {
   "data": Object {
-    "foo": "2020-12-23",
+    "foo": "2020-12-24",
   },
   "errors": undefined,
 }
