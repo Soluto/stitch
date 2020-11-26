@@ -14,7 +14,7 @@ import * as oidcClients from '../config/oidc/clients-configuration.json';
 import { getToken } from '../../helpers/get-token';
 import { schema, policies, query } from './auth-base-policy.schema';
 
-const gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
+let gatewayClient: GraphQLClient;
 const registryClient = new GraphQLClient('http://localhost:8090/graphql');
 
 const testCases: [string, { ClientId: string }][] = oidcClients
@@ -69,9 +69,18 @@ describe('Authorization - Base policy', () => {
     await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
   });
 
+  beforeEach(() => {
+    gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
+  });
+
   test.each(testCases)('%s', async (_, clientConfig) => {
     const accessToken = await getToken({ clientId: clientConfig.ClientId });
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
+    const result = await gatewayClient.request(query).catch(err => err.response);
+    expect(result).toMatchSnapshot();
+  });
+
+  test('Anonymous access', async () => {
     const result = await gatewayClient.request(query).catch(err => err.response);
     expect(result).toMatchSnapshot();
   });
