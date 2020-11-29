@@ -1,5 +1,5 @@
 {
-  "version": "0.0.7",
+  "version": "0.0.9",
   "commands": {
     "apply:base-policy": {
       "id": "apply:base-policy",
@@ -57,7 +57,8 @@
           "type": "option",
           "description": "Custom authorization header",
           "required": false
-        }
+        },
+        "exclude": { "name": "exclude", "type": "option", "description": "Resource types to skip", "required": false }
       },
       "args": [{ "name": "resourcesPath", "required": true }]
     }
