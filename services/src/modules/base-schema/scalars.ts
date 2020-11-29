@@ -1,11 +1,15 @@
 import { gql } from 'apollo-server-core';
+import {
+  EmailAddressTypeDefinition,
+  EmailAddressResolver,
+  PhoneNumberTypeDefinition,
+  PhoneNumberResolver,
+} from 'graphql-scalars';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
 import { GraphQLDate, GraphQLDateTime, GraphQLTime } from 'graphql-iso-date';
-import { concatAST } from 'graphql';
 import { GraphQLResolverMap } from 'apollo-graphql';
-import { sdl as directivesSdl } from './directives';
 
-export const baseTypeDef = gql`
+export const sdl = gql`
   scalar JSON
   scalar JSONObject
 
@@ -13,16 +17,9 @@ export const baseTypeDef = gql`
   scalar Time
   scalar DateTime
 
-  type PolicyResult {
-    allow: Boolean!
-  }
-
-  type Policy {
-    default: PolicyResult!
-  }
+  ${EmailAddressTypeDefinition}
+  ${PhoneNumberTypeDefinition}
 `;
-
-export const typeDef = concatAST([baseTypeDef, directivesSdl]);
 
 export const resolvers: GraphQLResolverMap = {
   JSON: GraphQLJSON,
@@ -30,4 +27,6 @@ export const resolvers: GraphQLResolverMap = {
   Date: GraphQLDate,
   Time: GraphQLTime,
   DateTime: GraphQLDateTime,
+  EmailAddress: EmailAddressResolver,
+  PhoneNumber: PhoneNumberResolver,
 };

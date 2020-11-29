@@ -1,0 +1,70 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Scalars Date is declared 1`] = `
+Object {
+  "data": Object {
+    "foo": "2020-12-24",
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`Scalars DateTime is declared 1`] = `
+Object {
+  "data": Object {
+    "foo": "2017-01-10T21:33:15.233Z",
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`Scalars EmailAddress is declared 1`] = `
+Object {
+  "data": Object {
+    "foo": "stitch@email.com",
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`Scalars JSON is declared 1`] = `
+Object {
+  "data": Object {
+    "foo": Array [
+      "bar",
+      "baz",
+    ],
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`Scalars JSONObject is declared 1`] = `
+Object {
+  "data": Object {
+    "foo": Object {
+      "bar": 1,
+      "baz": true,
+    },
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`Scalars PhoneNumber is declared 1`] = `
+Object {
+  "data": Object {
+    "foo": "+12225555",
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`Scalars Time is declared 1`] = `
+Object {
+  "data": Object {
+    "foo": "14:30:00.000Z",
+  },
+  "errors": undefined,
+}
+`;

@@ -7,6 +7,7 @@ import { sdl as gqlSdl, GqlDirective } from './gql';
 import { sdl as exportSdl, ExportDirective } from './export';
 import { sdl as selectSdl, SelectDirective } from './select';
 import {
+  policyBaseSdl,
   policySdl,
   policiesSdl,
   policyQuerySdl,
@@ -40,4 +41,4 @@ export const sdl = concatAST([
   localResolverSdl,
 ]);
 
-export { policyScalarResolvers };
+export { policyScalarResolvers, policyBaseSdl };
