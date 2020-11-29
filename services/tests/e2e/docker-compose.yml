@@ -37,7 +37,7 @@ services:
           },
           "anonymous": {
             "rejectAuthorizationHeader": true,
-            "publicPaths": ["/metrics", "/.well-known/apollo/server-health"]
+            "publicPaths": ["/metrics", "/.well-known/apollo/server-health", "/graphql"]
           }
         }
       PLUGINS_DIR: /plugins

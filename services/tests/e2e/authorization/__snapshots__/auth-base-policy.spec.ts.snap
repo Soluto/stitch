@@ -1,5 +1,29 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Authorization - Base policy Anonymous access 1`] = `
+{
+  "errors": [
+    {
+      "message": "Unauthorized by policy base_policy in namespace internal",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    },
+    {
+      "message": "Unauthorized by policy base_policy in namespace internal",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "bp_foo": null,
+    "bp_bar": null,
+    "bp_baz": "BAZ"
+  }
+}
+`;
+
 exports[`Authorization - Base policy JWT pass all policies 1`] = `
 Object {
   "bp_bar": "BAR",
