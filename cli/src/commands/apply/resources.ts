@@ -17,6 +17,7 @@ Uploaded successfully!
     'registry-url': flags.string({ required: true, env: 'STITCH_REGISTRY_URL', description: 'Url of the registry' }),
     'dry-run': flags.boolean({ required: false, default: false, description: 'Should perform a dry run' }),
     'authorization-header': flags.string({ required: false, description: 'Custom authorization header' }),
+    'skip-resource-types': flags.string({ required: false, description: 'Resource types to skip' }),
   };
 
   static args = [{ name: 'resourcesPath', required: true }];
@@ -29,11 +30,14 @@ Uploaded successfully!
       this.log(`Dry run mode ON - No changes will be made to the registry`);
     }
 
-    const resourceGroup = await this.pathToResourceGroup(args.resourcesPath);
+    const resourceTypesToSkip = flags['skip-resource-types']?.split(',');
+    const resourceGroup = await this.pathToResourceGroup(args.resourcesPath, resourceTypesToSkip);
     const resourceCounts = Object.entries(resourceGroup).map(([key, value]) => ({ key, count: value?.length ?? 0 }));
 
     this.log(`${dryRun ? 'Verifying' : 'Uploading'} resources from ${args.resourcesPath}...`);
-    resourceCounts.forEach(({ key, count }) => this.log(`  ${key}: ${count}`));
+    resourceCounts.forEach(({ key, count }) =>
+      this.log(`  ${key}: ${count}${resourceTypesToSkip?.includes(key) ? ' - Skipped' : ''}`)
+    );
 
     await uploadResourceGroup(resourceGroup, {
       registryUrl: flags['registry-url'],
@@ -44,13 +48,13 @@ Uploaded successfully!
     this.log(`Resources from ${args.resourcesPath} were ${dryRun ? 'verified' : 'uploaded'} successfully.`);
   }
 
-  async pathToResourceGroup(filePath: string): Promise<ResourceGroupInput> {
+  async pathToResourceGroup(filePath: string, resourceTypesToSkip?: string[]): Promise<ResourceGroupInput> {
     const fileStats = await fs.stat(filePath);
 
     if (fileStats.isFile()) {
       const fileContentsBuf = await fs.readFile(filePath);
       const contents = safeLoadAll(fileContentsBuf.toString());
-      return this.resourcesToResourceGroup({ [filePath]: contents });
+      return this.resourcesToResourceGroup({ [filePath]: contents }, resourceTypesToSkip);
     }
 
     if (fileStats.isDirectory()) {
@@ -74,13 +78,14 @@ Uploaded successfully!
     return { schemas: [], upstreams: [], upstreamClientCredentials: [], policies: [] };
   }
 
-  resourcesToResourceGroup(files: { [filepath: string]: any[] }) {
+  resourcesToResourceGroup(files: { [filepath: string]: any[] }, resourceTypesToSkip?: string[]) {
     const rg: ResourceGroupInput = { schemas: [], upstreams: [], upstreamClientCredentials: [], policies: [] };
 
     for (const filepath in files) {
       const resources = files[filepath];
       for (const resourceWithKind of resources) {
         const { kind, ...resource } = resourceWithKind;
+        if (resourceTypesToSkip?.includes(kind)) continue;
         // We don't bother validating the resources, since GraphQL provides a strong enough validation
         // Client-side validation can be added later on to not require a server hop
         switch (kind) {

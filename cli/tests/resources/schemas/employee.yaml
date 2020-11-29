@@ -4,5 +4,5 @@ metadata:
   name: employee
 schema: |
   type Query {
-    foo: String!
+    foo: String! @rest(url: "https://employee-api")
   }

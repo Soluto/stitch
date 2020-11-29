@@ -83,7 +83,7 @@ EXAMPLE
          Uploaded successfully!
 ```
 
-_See code: [src/commands/apply/base-policy.ts](https://github.com/Soluto/stitch/blob/v0.0.7/src/commands/apply/base-policy.ts)_
+_See code: [src/commands/apply/base-policy.ts](https://github.com/Soluto/stitch/blob/v0.0.9/src/commands/apply/base-policy.ts)_
 
 ## `stitch apply:resources RESOURCESPATH`
 
@@ -96,6 +96,7 @@ USAGE
 OPTIONS
   --authorization-header=authorization-header  Custom authorization header
   --dry-run                                    Should perform a dry run
+  --exclude=exclude                            Resource types to skip
   --registry-url=registry-url                  (required) Url of the registry
 
 EXAMPLE
@@ -103,7 +104,7 @@ EXAMPLE
   Uploaded successfully!
 ```
 
-_See code: [src/commands/apply/resources.ts](https://github.com/Soluto/stitch/blob/v0.0.7/src/commands/apply/resources.ts)_
+_See code: [src/commands/apply/resources.ts](https://github.com/Soluto/stitch/blob/v0.0.9/src/commands/apply/resources.ts)_
 
 ## `stitch help [COMMAND]`
 
@@ -120,6 +121,6 @@ OPTIONS
   --all  see all commands in CLI
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v2.2.3/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.0/src/commands/help.ts)_
 
 <!-- commandsstop -->

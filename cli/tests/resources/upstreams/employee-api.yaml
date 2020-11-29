@@ -1,0 +1,10 @@
+kind: Upstream
+metadata:
+  name: employee-api
+  namespace: employee-ns
+host: 'employee-api.domain.com'
+auth:
+  type: ActiveDirectory
+  activeDirectory:
+    authority: https://login.microsoftonline.com
+    resource: http://employee-api
