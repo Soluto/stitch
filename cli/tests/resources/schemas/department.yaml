@@ -1,0 +1,6 @@
+kind: SchemaV2
+metadata:
+  namespace: employee-ns
+  name: deployment
+schemaFiles:
+  - ./**/*.gql

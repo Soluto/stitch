@@ -1,6 +1,6 @@
 {
   "name": "stitch-cli",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "author": "Aviv Rozenboim @AvivRubys",
   "repository": "Soluto/stitch",
   "homepage": "https://github.com/Soluto/stitch",
@@ -21,6 +21,7 @@
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.0",
+    "fast-glob": "^3.2.4",
     "graphql-request": "^1.8.2",
     "js-yaml": "^3.14.0",
     "tslib": "^2.0.3"

@@ -3,6 +3,7 @@ import * as path from 'path';
 import { Command, flags } from '@oclif/command';
 import { safeLoadAll } from 'js-yaml';
 import { ResourceGroupInput, uploadResourceGroup } from '../../client';
+import buildStitchedSchema from '../../utils/build-stitched-schema';
 
 export default class ApplyResources extends Command {
   static description = 'Apply resources';
@@ -51,7 +52,7 @@ Uploaded successfully!
   async pathToResourceGroup(filePath: string, resourceTypesToSkip?: string[]): Promise<ResourceGroupInput> {
     const fileStats = await fs.stat(filePath);
 
-    if (fileStats.isFile()) {
+    if (fileStats.isFile() && filePath.toLocaleLowerCase().endsWith('yaml')) {
       const fileContentsBuf = await fs.readFile(filePath);
       const contents = safeLoadAll(fileContentsBuf.toString());
       return this.resourcesToResourceGroup({ [filePath]: contents }, resourceTypesToSkip);
@@ -78,7 +79,7 @@ Uploaded successfully!
     return { schemas: [], upstreams: [], upstreamClientCredentials: [], policies: [] };
   }
 
-  resourcesToResourceGroup(files: { [filepath: string]: any[] }, resourceTypesToSkip?: string[]) {
+  async resourcesToResourceGroup(files: { [filepath: string]: any[] }, resourceTypesToSkip?: string[]) {
     const rg: ResourceGroupInput = { schemas: [], upstreams: [], upstreamClientCredentials: [], policies: [] };
 
     for (const filepath in files) {
@@ -91,6 +92,9 @@ Uploaded successfully!
         switch (kind) {
           case 'Schema':
             rg.schemas!.push(resource);
+            continue;
+          case 'SchemaV2':
+            rg.schemas!.push(await buildStitchedSchema(resource));
             continue;
           case 'Upstream':
             rg.upstreams!.push(resource);
