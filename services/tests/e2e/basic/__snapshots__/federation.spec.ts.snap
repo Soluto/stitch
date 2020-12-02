@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Schema Federation Send request 1`] = `
+Object {
+  "baz": Object {
+    "foo": Object {
+      "bar": "ONE",
+      "tar": "TAR",
+    },
+  },
+  "quz": Object {
+    "bar": "TWO",
+  },
+}
+`;
