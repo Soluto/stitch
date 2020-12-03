@@ -63,6 +63,7 @@
         "ts-jest",
         "xml2js",
         "@oclif",
+        "globby",
         "@jest/types"
       ],
       "tryExtensions": [".ts", ".json", ".node"]
