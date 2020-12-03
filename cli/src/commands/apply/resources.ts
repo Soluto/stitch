@@ -117,5 +117,5 @@ Uploaded successfully!
 }
 
 function safeConcat<T>(...arrays: (T[] | null | undefined)[]) {
-  return ([] as T[]).concat(...arrays.filter(Array.isArray));
+  return ([] as T[]).concat(...arrays.filter(Array.isArray).map(a => a!));
 }
