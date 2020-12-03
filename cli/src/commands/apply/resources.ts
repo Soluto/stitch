@@ -3,6 +3,7 @@ import * as path from 'path';
 import { Command, flags } from '@oclif/command';
 import { safeLoadAll } from 'js-yaml';
 import { ResourceGroupInput, uploadResourceGroup } from '../../client';
+import buildStitchedSchema from '../../utils/read-schema-files';
 
 export default class ApplyResources extends Command {
   static description = 'Apply resources';
@@ -51,7 +52,7 @@ Uploaded successfully!
   async pathToResourceGroup(filePath: string, resourceTypesToSkip?: string[]): Promise<ResourceGroupInput> {
     const fileStats = await fs.stat(filePath);
 
-    if (fileStats.isFile()) {
+    if (fileStats.isFile() && filePath.toLocaleLowerCase().endsWith('yaml')) {
       const fileContentsBuf = await fs.readFile(filePath);
       const contents = safeLoadAll(fileContentsBuf.toString());
       return this.resourcesToResourceGroup({ [filePath]: contents }, resourceTypesToSkip);
@@ -78,7 +79,7 @@ Uploaded successfully!
     return { schemas: [], upstreams: [], upstreamClientCredentials: [], policies: [] };
   }
 
-  resourcesToResourceGroup(files: { [filepath: string]: any[] }, resourceTypesToSkip?: string[]) {
+  async resourcesToResourceGroup(files: { [filepath: string]: any[] }, resourceTypesToSkip?: string[]) {
     const rg: ResourceGroupInput = { schemas: [], upstreams: [], upstreamClientCredentials: [], policies: [] };
 
     for (const filepath in files) {
@@ -90,7 +91,11 @@ Uploaded successfully!
         // Client-side validation can be added later on to not require a server hop
         switch (kind) {
           case 'Schema':
-            rg.schemas!.push(resource);
+            if (resource.schema) {
+              rg.schemas!.push(resource);
+            } else if (resource.schemaFiles) {
+              rg.schemas!.push(await buildStitchedSchema(resource));
+            }
             continue;
           case 'Upstream':
             rg.upstreams!.push(resource);
@@ -113,5 +118,5 @@ Uploaded successfully!
 }
 
 function safeConcat<T>(...arrays: (T[] | null | undefined)[]) {
-  return ([] as T[]).concat(...arrays.filter(Array.isArray));
+  return ([] as T[]).concat(...arrays.filter(Array.isArray).map(a => a!));
 }

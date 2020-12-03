@@ -1,0 +1,27 @@
+name: CLI
+
+on:
+  push:
+    paths:
+      - 'cli/**'
+    branches-ignore:
+      - master
+
+jobs:
+  test:
+    name: Run CLI tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '14'
+
+      - name: npm ci
+        run: npm ci
+        working-directory: cli
+
+      - name: npm run test
+        run: npm run test
+        working-directory: cli
