@@ -1,6 +1,6 @@
 # Stitch CLI
 
-# Resources
+## Resources
 
 Commands like `apply:resources` expect resources in YAML files in a specific format:
 
@@ -15,6 +15,19 @@ schema: |
           @rest(url: "http://users-service/users/{args.id}")
   }
 ```
+
+Or the schema resource can include file patterns of gql files.
+
+```yaml
+kind: Schema
+metadata:
+  name: usersApi
+  namespace: users
+schemaFiles:
+  - ./**/*.gql
+```
+
+This option will be used only when there is no `schema` property defined.
 
 ```yaml
 kind: Upstream
@@ -56,15 +69,18 @@ args:
   role: String
 ```
 
-# Commands
+## Commands
 
 <!-- commands -->
 
-- [`stitch apply:base-policy RESOURCEPATH`](#stitch-applybase-policy-resourcepath)
-- [`stitch apply:resources RESOURCESPATH`](#stitch-applyresources-resourcespath)
-- [`stitch help [COMMAND]`](#stitch-help-command)
+- [Stitch CLI](#stitch-cli)
+  - [Resources](#resources)
+  - [Commands](#commands)
+    - [`stitch apply:base-policy RESOURCEPATH`](#stitch-applybase-policy-resourcepath)
+    - [`stitch apply:resources RESOURCESPATH`](#stitch-applyresources-resourcespath)
+    - [`stitch help [COMMAND]`](#stitch-help-command)
 
-## `stitch apply:base-policy RESOURCEPATH`
+### `stitch apply:base-policy RESOURCEPATH`
 
 Apply base policy
 
@@ -83,9 +99,9 @@ EXAMPLE
          Uploaded successfully!
 ```
 
-_See code: [src/commands/apply/base-policy.ts](https://github.com/Soluto/stitch/blob/v0.0.9/src/commands/apply/base-policy.ts)_
+_See code: [src/commands/apply/base-policy.ts](https://github.com/Soluto/stitch/blob/v0.0.10/src/commands/apply/base-policy.ts)_
 
-## `stitch apply:resources RESOURCESPATH`
+### `stitch apply:resources RESOURCESPATH`
 
 Apply resources
 
@@ -96,21 +112,21 @@ USAGE
 OPTIONS
   --authorization-header=authorization-header  Custom authorization header
   --dry-run                                    Should perform a dry run
-  --exclude=exclude                            Resource types to skip
   --registry-url=registry-url                  (required) Url of the registry
+  --skip-resource-types=skip-resource-types    Resource types to skip
 
 EXAMPLE
   $ stitch apply:resources schema.gql
   Uploaded successfully!
 ```
 
-_See code: [src/commands/apply/resources.ts](https://github.com/Soluto/stitch/blob/v0.0.9/src/commands/apply/resources.ts)_
+_See code: [src/commands/apply/resources.ts](https://github.com/Soluto/stitch/blob/v0.0.10/src/commands/apply/resources.ts)_
 
-## `stitch help [COMMAND]`
+### `stitch help [COMMAND]`
 
 display help for stitch
 
-```
+```plain
 USAGE
   $ stitch help [COMMAND]
 
