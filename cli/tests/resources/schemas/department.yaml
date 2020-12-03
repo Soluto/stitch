@@ -1,4 +1,4 @@
-kind: SchemaV2
+kind: Schema
 metadata:
   namespace: employee-ns
   name: deployment

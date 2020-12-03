@@ -91,10 +91,11 @@ Uploaded successfully!
         // Client-side validation can be added later on to not require a server hop
         switch (kind) {
           case 'Schema':
-            rg.schemas!.push(resource);
-            continue;
-          case 'SchemaV2':
-            rg.schemas!.push(await buildStitchedSchema(resource));
+            if (resource.schema) {
+              rg.schemas!.push(resource);
+            } else if (resource.schemaFiles) {
+              rg.schemas!.push(await buildStitchedSchema(resource));
+            }
             continue;
           case 'Upstream':
             rg.upstreams!.push(resource);
