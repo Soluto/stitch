@@ -3,7 +3,7 @@ import * as path from 'path';
 import { Command, flags } from '@oclif/command';
 import { safeLoadAll } from 'js-yaml';
 import { ResourceGroupInput, uploadResourceGroup } from '../../client';
-import buildStitchedSchema from '../../utils/build-stitched-schema';
+import buildStitchedSchema from '../../utils/read-schema-files';
 
 export default class ApplyResources extends Command {
   static description = 'Apply resources';
