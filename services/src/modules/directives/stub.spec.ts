@@ -1,9 +1,9 @@
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { ApolloServerBase, gql } from 'apollo-server-core';
-import { ApolloServer, SchemaDirectiveVisitor } from 'apollo-server-fastify';
+import { ApolloServer } from 'apollo-server-fastify';
 import { concatAST, DocumentNode } from 'graphql';
+import { IResolvers, SchemaDirectiveVisitor } from 'graphql-tools';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
-import { GraphQLResolverMap } from 'apollo-graphql';
 import { sdl as stubSdl, StubDirective } from './stub';
 
 interface TestCase {
@@ -96,7 +96,7 @@ const schemaDirectives: Record<string, typeof SchemaDirectiveVisitor> = {
   stub: StubDirective,
 };
 
-const resolvers: GraphQLResolverMap = {
+const resolvers: IResolvers = {
   JSON: GraphQLJSON,
   JSONObject: GraphQLJSONObject,
 };

@@ -1,15 +1,14 @@
 import { Unsubscriber, GraphQLServiceConfig, SchemaChangeCallback, gql } from 'apollo-server-core';
 import { parse, execute, DocumentNode } from 'graphql';
 import { Observable, Subscription } from 'rxjs';
-import { shareReplay, map, take, tap, catchError, skip } from 'rxjs/operators';
+import { shareReplay, map, mergeMap, take, tap, catchError, skip } from 'rxjs/operators';
 import type { GraphQLRequestContextExecutionDidStart } from 'apollo-server-types';
-import { directiveMap, sdl as directivesSdl } from './directives';
 import { ResourceGroup, PolicyDefinition, Schema, ResourceMetadata } from './resource-repository';
 import { buildSchemaFromFederatedTypeDefs } from './build-federated-schema';
-import * as baseSchema from './base-schema';
+import getBaseSchema from './base-schema';
 import { ActiveDirectoryAuth, AuthenticationConfig } from './upstream-authentication';
 import logger from './logger';
-import { AuthorizationConfig, PolicyExecutor, policyScalarResolvers } from './directives/policy';
+import { AuthorizationConfig, PolicyExecutor } from './directives/policy';
 
 export function createGraphQLService(config: { resourceGroups: Observable<ResourceGroup> }) {
   let currentSchemaConfig: GraphQLServiceConfig;
@@ -17,7 +16,7 @@ export function createGraphQLService(config: { resourceGroups: Observable<Resour
   const subscription = new Subscription();
   const newSchemaConfigs = config.resourceGroups.pipe(
     tap(() => logger.info('Loading new resources')),
-    map(createSchemaConfig),
+    mergeMap(createSchemaConfig),
     catchError((error, obs) => {
       logger.error(error, 'Error creating schema config');
       return obs.pipe(skip(1));
@@ -72,7 +71,7 @@ function buildPolicyGqlQuery(policy: PolicyDefinition): DocumentNode {
         `;
 }
 
-export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
+export async function createSchemaConfig(rg: ResourceGroup): Promise<GraphQLServiceConfig> {
   const activeDirectoryAuth = new ActiveDirectoryAuth();
   const upstreamsByHost = new Map(rg.upstreams.map(u => [u.host, u]));
   const upstreamClientCredentialsByAuthority = new Map(
@@ -100,12 +99,12 @@ export function createSchemaConfig(rg: ResourceGroup): GraphQLServiceConfig {
 
   const schemaTypeDefs = schemas.map(s => [`${s.metadata.namespace}/${s.metadata.name}`, parse(s.schema)]);
   const policyQueryTypeDefs = policies.map(p => [getPolicyQueryName(p.metadata), buildPolicyGqlQuery(p)]);
+  const baseSchema = await getBaseSchema();
   const schema = buildSchemaFromFederatedTypeDefs({
     typeDefs: Object.fromEntries([...schemaTypeDefs, ...policyQueryTypeDefs]),
-    baseTypeDefs: baseSchema.baseTypeDef,
-    directiveTypeDefs: directivesSdl,
-    resolvers: { ...baseSchema.resolvers, ...policyScalarResolvers },
-    schemaDirectives: directiveMap,
+    baseTypeDefs: baseSchema.typeDefs,
+    resolvers: { ...baseSchema.resolvers },
+    schemaDirectives: baseSchema.directives,
     schemaDirectivesContext: { authenticationConfig, authorizationConfig },
   });
 
