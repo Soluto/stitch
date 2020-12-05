@@ -64,7 +64,8 @@
         "xml2js",
         "@oclif",
         "globby",
-        "@jest/types"
+        "@jest/types",
+        "lodash.merge"
       ],
       "tryExtensions": [".ts", ".json", ".node"]
     }

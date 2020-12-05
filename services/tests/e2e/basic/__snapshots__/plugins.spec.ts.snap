@@ -4,6 +4,8 @@ exports[`Plugins Check plugins 1`] = `
 Object {
   "pl_bar": "'BAR'",
   "pl_foo": "__FOO__",
+  "pl_new_bar": "RAB WEN",
+  "pl_new_foo": "{\\"x\\":1,\\"y\\":2}",
   "pl_tar": "Hello, TAR!",
 }
 `;
