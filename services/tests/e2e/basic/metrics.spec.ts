@@ -84,6 +84,6 @@ describe('Metrics', () => {
     expect(response.ok).toBeTruthy();
     const body = await response.text();
     const metrics = body.split('\n');
-    expect(metrics.length).toMatchSnapshot();
+    expect(metrics.length).toBeGreaterThan(0);
   });
 });
