@@ -17,13 +17,13 @@ export const schema1 = {
       bar: BarEnum!
     }
 
-    type Foo implements IBar @key(fields: "bar") {
+    type FedFoo implements IBar @key(fields: "bar") {
       bar: BarEnum! @localResolver(value: "ONE")
       tar: String! @localResolver(value: "TAR")
     }
 
     type Query {
-      foo: Foo! @localResolver(value: "{{}}")
+      fed_foo: FedFoo! @localResolver(value: "{{}}")
     }
   `),
 };
@@ -34,7 +34,7 @@ export const schema2 = {
     name: 'name',
   },
   schema: print(gql`
-    extend type Foo @key(fields: "bar") {
+    extend type FedFoo @key(fields: "bar") {
       bar: BarEnum! @external
     }
 
@@ -45,7 +45,7 @@ export const schema2 = {
     }
 
     type Baz {
-      foo: Foo! @localResolver(value: "{{}}")
+      foo: FedFoo! @localResolver(value: "{{}}")
     }
 
     interface IBar {
