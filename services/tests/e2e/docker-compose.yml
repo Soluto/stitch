@@ -14,7 +14,7 @@ services:
     command: gateway
     env_file: .env
     environment:
-      NODE_ENV: testing
+      NODE_ENV: test
       PORT: 80
       AUTHENTICATION_CONFIGURATION: |
         {
@@ -58,7 +58,7 @@ services:
     command: registry
     env_file: .env
     environment:
-      NODE_ENV: testing
+      NODE_ENV: test
       PORT: 80
     volumes:
       - ./config/plugins:/plugins:ro
