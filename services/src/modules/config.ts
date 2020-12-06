@@ -32,6 +32,10 @@ export const tmpPoliciesDir = envVarExt
   .default(path.resolve(process.cwd(), 'tmp/policies'))
   .asString();
 
+export const ignorePolicies =
+  envVar.get('NODE_ENV').required().asString() !== 'production' &&
+  envVar.get('IGNORE_POLICIES').default('false').asBoolStrict();
+
 // Authentication
 const defaultAuthenticationConfig: AuthenticationConfig = {
   anonymous: {

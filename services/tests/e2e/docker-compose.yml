@@ -14,6 +14,7 @@ services:
     command: gateway
     env_file: .env
     environment:
+      NODE_ENV: test
       PORT: 80
       AUTHENTICATION_CONFIGURATION: |
         {
@@ -40,7 +41,6 @@ services:
             "publicPaths": ["/metrics", "/.well-known/apollo/server-health", "/graphql"]
           }
         }
-      PLUGINS_DIR: /plugins
     volumes:
       - ./config/plugins:/plugins:ro
       - ./config/scripts:/scripts:ro
@@ -58,6 +58,7 @@ services:
     command: registry
     env_file: .env
     environment:
+      NODE_ENV: test
       PORT: 80
     volumes:
       - ./config/plugins:/plugins:ro

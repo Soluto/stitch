@@ -1,6 +1,7 @@
 import * as fastify from 'fastify';
 import { ApolloServer, Config } from 'apollo-server-fastify';
 import { Observable } from 'rxjs';
+import { ignorePolicies } from './config';
 import { createGraphQLService } from './graphql-service';
 import { RESTDirectiveDataSource } from './directives/rest';
 import { ResourceGroup } from './resource-repository';
@@ -24,6 +25,7 @@ export function createStitchGateway(config: GatewayConfig) {
     context(request: fastify.FastifyRequest) {
       const ctx = {
         request,
+        ignorePolicies,
       };
       return ctx;
     },
