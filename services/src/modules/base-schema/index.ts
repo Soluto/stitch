@@ -1,12 +1,21 @@
-import { concatAST } from 'graphql';
-import { GraphQLResolverMap } from 'apollo-graphql';
-import { policyBaseSdl, sdl as directivesSdl } from '../directives';
+import { concatAST, DocumentNode } from 'graphql';
+import { IResolvers, SchemaDirectiveVisitor } from 'graphql-tools';
+import { policyBaseSdl, sdl as directivesSdl, directiveMap } from '../directives';
+import { transformBaseSchema as applyPlugins } from '../plugins';
 import { sdl as scalarsSdl, resolvers as scalarResolvers } from './scalars';
 
-export const baseTypeDef = concatAST([scalarsSdl, policyBaseSdl]);
+export type BaseSchema = {
+  typeDefs: DocumentNode;
+  resolvers: IResolvers;
+  directives: Record<string, typeof SchemaDirectiveVisitor>;
+};
 
-export const typeDef = concatAST([baseTypeDef, directivesSdl]);
-
-export const resolvers: GraphQLResolverMap = {
-  ...scalarResolvers,
+export default async (): Promise<BaseSchema> => {
+  const baseSchema = {
+    typeDefs: concatAST([scalarsSdl, directivesSdl, policyBaseSdl]),
+    resolvers: scalarResolvers,
+    directives: directiveMap,
+  };
+  const baseSchemaWithPlugins = await applyPlugins(baseSchema);
+  return baseSchemaWithPlugins;
 };

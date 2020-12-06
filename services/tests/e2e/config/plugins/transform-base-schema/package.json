@@ -1,0 +1,19 @@
+{
+  "name": "transform-base-schema",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist",
+  "scripts": {
+    "prepare": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "graphql": "^15.4.0",
+    "graphql-tools": "^4.0.8"
+  },
+  "devDependencies": {
+    "typescript": "^4.1.2"
+  }
+}

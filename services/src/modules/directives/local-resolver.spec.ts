@@ -1,9 +1,8 @@
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { ApolloServerBase, gql } from 'apollo-server-core';
-import { ApolloServer, SchemaDirectiveVisitor } from 'apollo-server-fastify';
+import { ApolloServer, IResolvers, SchemaDirectiveVisitor } from 'apollo-server-fastify';
 import { concatAST, DocumentNode } from 'graphql';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
-import { GraphQLResolverMap } from 'apollo-graphql';
 import { sdl as localResolverSdl, LocalResolverDirective } from './local-resolver';
 
 interface TestCase {
@@ -12,7 +11,7 @@ interface TestCase {
   rootValue?: unknown;
   variables?: Record<string, unknown>;
   expected?: unknown;
-  resolvers?: GraphQLResolverMap;
+  resolvers?: IResolvers;
   only?: boolean;
 }
 
@@ -285,7 +284,7 @@ const schemaDirectives: Record<string, typeof SchemaDirectiveVisitor> = {
   localResolver: LocalResolverDirective,
 };
 
-const baseResolvers: GraphQLResolverMap = {
+const baseResolvers: IResolvers = {
   JSON: GraphQLJSON,
   JSONObject: GraphQLJSONObject,
 };

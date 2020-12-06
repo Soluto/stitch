@@ -1,9 +1,10 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
+import { BaseSchema } from '../base-schema';
 import { pluginsDir } from '../config';
 import logger from '../logger';
 import { ResourceGroup } from '../resource-repository';
-import { StitchPlugin } from './types';
+import { StitchPlugin, ValueOrPromise } from './types';
 
 export const plugins: StitchPlugin[] = [];
 export let argumentInjectionGlobals: Record<string, unknown> = {};
@@ -49,8 +50,11 @@ export async function buildArgumentInjectionGlobals(): Promise<Record<string, un
 export async function transformResourceGroup(resourceGroup: ResourceGroup): Promise<ResourceGroup> {
   return plugins
     .filter(p => p.transformResourceGroup)
-    .reduce<ResourceGroup | Promise<ResourceGroup>>(
-      async (res, cur) => cur.transformResourceGroup!(await res),
-      resourceGroup
-    );
+    .reduce<ValueOrPromise<ResourceGroup>>(async (res, cur) => cur.transformResourceGroup!(await res), resourceGroup);
+}
+
+export async function transformBaseSchema(baseSchema: BaseSchema): Promise<BaseSchema> {
+  return plugins
+    .filter(p => p.transformBaseSchema)
+    .reduce<ValueOrPromise<BaseSchema>>(async (res, cur) => cur.transformBaseSchema!(await res), baseSchema);
 }

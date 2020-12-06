@@ -7,7 +7,8 @@ import {
 } from 'graphql-scalars';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
 import { GraphQLDate, GraphQLDateTime, GraphQLTime } from 'graphql-iso-date';
-import { GraphQLResolverMap } from 'apollo-graphql';
+import { IResolvers } from 'graphql-tools';
+import { policyScalarResolvers } from '../directives/policy';
 
 export const sdl = gql`
   scalar JSON
@@ -21,7 +22,7 @@ export const sdl = gql`
   ${PhoneNumberTypeDefinition}
 `;
 
-export const resolvers: GraphQLResolverMap = {
+export const resolvers: IResolvers = {
   JSON: GraphQLJSON,
   JSONObject: GraphQLJSONObject,
   Date: GraphQLDate,
@@ -29,4 +30,5 @@ export const resolvers: GraphQLResolverMap = {
   DateTime: GraphQLDateTime,
   EmailAddress: EmailAddressResolver,
   PhoneNumber: PhoneNumberResolver,
+  ...policyScalarResolvers,
 };

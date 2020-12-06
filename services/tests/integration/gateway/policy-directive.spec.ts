@@ -1,13 +1,13 @@
 import { ApolloServerTestClient, createTestClient } from 'apollo-server-testing';
 import { ApolloServerBase, gql } from 'apollo-server-core';
-import { ApolloServer, IResolvers } from 'apollo-server-fastify';
+import { ApolloServer } from 'apollo-server-fastify';
+import { IResolvers } from 'graphql-tools';
 import { when } from 'jest-when';
 import { concatAST, DocumentNode } from 'graphql';
-import { policySdl, PolicyDirective, PolicyExecutor } from '../../../src/modules/directives/policy';
-import { sdl as localResolverSdl, LocalResolverDirective } from '../../../src/modules/directives/local-resolver';
+import { PolicyExecutor } from '../../../src/modules/directives/policy';
 import { sdl as lowerCaseSdl, LowerCaseDirective } from '../utils/lower-case-directive';
 import { sdl as mockSdl, MockDirective } from '../utils/mock-directive';
-import { baseTypeDef, resolvers as baseResolvers } from '../../../src/modules/base-schema';
+import getBaseSchema from '../../../src/modules/base-schema';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 
 const mockValidatePolicy = jest.fn();
@@ -366,13 +366,13 @@ describe.each(testCases)('Policy Directive Tests', (testName, { typeDefs, resolv
     }
   `;
 
-  beforeAll(() => {
+  beforeAll(async () => {
+    const baseSchema = await getBaseSchema();
     server = new ApolloServer({
-      typeDefs: concatAST([baseTypeDef, typeDefs, localResolverSdl, policySdl, lowerCaseSdl, mockSdl]),
-      resolvers: [resolvers ?? {}, baseResolvers],
+      typeDefs: concatAST([baseSchema.typeDefs, typeDefs, lowerCaseSdl, mockSdl]),
+      resolvers: [resolvers ?? {}, baseSchema.resolvers],
       schemaDirectives: {
-        localResolver: LocalResolverDirective,
-        policy: PolicyDirective,
+        ...baseSchema.directives,
         lowerCase: LowerCaseDirective,
         mock: MockDirective,
       },

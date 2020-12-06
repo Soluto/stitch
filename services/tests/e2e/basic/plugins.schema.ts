@@ -17,6 +17,8 @@ export const schema = {
       pl_tar: String!
         @localResolver(value: "{globals.format('TAR')}")
         @policy(namespace: "plugins", name: "whole-rg-policy")
+      pl_new_foo: Point! @localResolver(value: { x: 1, y: 2 })
+      pl_new_bar: String! @localResolver(value: "NEW BAR") @reverse
     }
   `),
 };

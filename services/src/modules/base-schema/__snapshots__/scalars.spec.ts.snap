@@ -60,6 +60,15 @@ Object {
 }
 `;
 
+exports[`Scalars PolicyDetails is declared 1`] = `
+Object {
+  "data": Object {
+    "foo": "{\\"namespace\\":\\"ns\\",\\"name\\":\\"my-policy\\",\\"args\\":{\\"foo\\":\\"{source.foo}\\"}}",
+  },
+  "errors": undefined,
+}
+`;
+
 exports[`Scalars Time is declared 1`] = `
 Object {
   "data": Object {

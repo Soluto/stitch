@@ -19,11 +19,11 @@ The plugin file cannot require npm modules. It should export one of the followin
 
 ```typescript
 export interface StitchPlugin {
-  name?: string;
-
   addArgumentInjectionGlobals?(): ValueOrPromise<Record<string, unknown>>;
 
   transformResourceGroup?(resourceGroup: ResourceGroup): ValueOrPromise<ResourceGroup>;
+
+  transformBaseSchema?(baseSchema: BaseSchema): ValueOrPromise<BaseSchema>;
 }
 ```
 
@@ -85,6 +85,41 @@ For example this plugin adds a base policy if one does not exist:
       },
     }};
   }
+}
+```
+
+## transformBaseSchema
+
+Allow to transform the base schema. This method can modify the scalars and directives definitions.
+
+For example this plugin adds new directive and scalar:
+
+```typescript
+const sdl = parse(`
+  directive @myDirective on FIELD_DEFINITION
+
+  scalar MyScalar
+`);
+
+class MyDirective extends SchemaDirectiveVisitor {
+  ...
+}
+
+const MyScalar = new GraphQLScalarType({
+  ...
+});
+
+const resolvers: IResolvers = {
+  MyScalar,
+};
+
+export function transformBaseSchema(baseSchema: BaseSchema): BaseSchema {
+  const result = {
+    typeDefs: concatAST([baseSchema.typeDefs, sdl]),
+    resolvers: { ...baseSchema.resolvers, ...resolvers }, // Important: consider to use deep merge. In some cases it's inevitable
+    directives: { ...baseSchema.directives, myDirective: MyDirective },
+  };
+  return result;
 }
 ```
 
