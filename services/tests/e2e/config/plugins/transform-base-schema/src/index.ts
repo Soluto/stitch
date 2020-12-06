@@ -12,7 +12,6 @@ import {
   ValueNode,
 } from 'graphql';
 import { IResolvers, SchemaDirectiveVisitor } from 'graphql-tools';
-import merge from 'lodash.merge';
 
 type BaseSchema = {
   typeDefs: DocumentNode;
@@ -63,7 +62,7 @@ const resolvers: IResolvers = {
 export function transformBaseSchema(baseSchema: BaseSchema): BaseSchema {
   const result = {
     typeDefs: concatAST([baseSchema.typeDefs, sdl]),
-    resolvers: merge(baseSchema.resolvers, resolvers),
+    resolvers: { ...baseSchema.resolvers, ...resolvers },
     directives: { ...baseSchema.directives, reverse: ReverseDirective },
   };
   return result;
