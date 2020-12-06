@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Ignore Policies Call gateway 1`] = `
+Object {
+  "ip_foo": "FOO",
+}
+`;
