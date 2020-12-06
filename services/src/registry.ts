@@ -1,5 +1,6 @@
 import { ApolloServer } from 'apollo-server-fastify';
 import * as fastify from 'fastify';
+import * as fastifyMetrics from 'fastify-metrics';
 import * as config from './modules/config';
 import { resolvers, typeDefs } from './modules/registry-schema';
 import logger from './modules/logger';
@@ -22,7 +23,7 @@ async function run() {
   await loadPlugins();
 
   const server = fastify();
-  server.register(app.createHandler({ path: '/graphql' }));
+  server.register(app.createHandler({ path: '/graphql' })).register(fastifyMetrics, { endpoint: '/metrics' });
   const address = await server.listen(config.httpPort, '0.0.0.0');
   logger.info({ address }, 'Stitch registry started');
 

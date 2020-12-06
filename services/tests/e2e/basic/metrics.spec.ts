@@ -8,10 +8,14 @@ import { UpdateSchemasMutationResponse, createSchemaMutation } from '../../helpe
 import { sleep } from '../../helpers/utility';
 import { schema1, schema2 } from './metrics.schema';
 
-const gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
-const registryClient = new GraphQLClient('http://localhost:8090/graphql');
+const gatewayBaseUrl = 'http://localhost:8080';
+const registryBaseUrl = 'http://localhost:8090';
 
-const metricsEndpoint = 'http://localhost:8080/metrics';
+const gatewayClient = new GraphQLClient(`${gatewayBaseUrl}/graphql`);
+const registryClient = new GraphQLClient(`${registryBaseUrl}/graphql`);
+
+const gatewayMetricsEndpoint = `${gatewayBaseUrl}/metrics`;
+const registryMetricsEndpoint = `${registryBaseUrl}/metrics`;
 
 describe('Metrics', () => {
   const query = print(gql`
@@ -45,7 +49,7 @@ describe('Metrics', () => {
   });
 
   test('Check metrics', async () => {
-    const response = await fetch(metricsEndpoint);
+    const response = await fetch(gatewayMetricsEndpoint);
     expect(response.ok).toBeTruthy();
     const body = await response.text();
     const metrics = body.split('\n');
@@ -64,7 +68,7 @@ describe('Metrics', () => {
   });
 
   test('Check metrics again', async () => {
-    const response = await fetch(metricsEndpoint);
+    const response = await fetch(gatewayMetricsEndpoint);
     expect(response.ok).toBeTruthy();
     const body = await response.text();
     const metrics = body.split('\n');
@@ -73,5 +77,13 @@ describe('Metrics', () => {
         m => m === 'graphql_resolver_duration_seconds_count{parentType="MetricsFoo",fieldName="baz",status="success"} 1'
       )
     ).toBeTruthy();
+  });
+
+  test('Registry metrics', async () => {
+    const response = await fetch(registryMetricsEndpoint);
+    expect(response.ok).toBeTruthy();
+    const body = await response.text();
+    const metrics = body.split('\n');
+    expect(metrics.length).toMatchSnapshot();
   });
 });

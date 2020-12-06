@@ -8,3 +8,5 @@ graphql_resolver_duration_seconds_bucket{le="X",parentType: MetricsFoo,fieldName
 graphql_resolver_duration_seconds_sum{parentType: MetricsFoo,fieldName: baz,status: success} Y
 graphql_resolver_duration_seconds_count{parentType: MetricsFoo,fieldName: baz,status: success} Y
 `;
+
+exports[`Metrics Registry metrics 1`] = `174`;
