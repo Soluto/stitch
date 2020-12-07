@@ -35,7 +35,12 @@ export interface StitchPlugin {
 
 ### configure
 
-Optional method that's called on plugin initialization. Can receive some configuration from the Stitch.
+Optional method that's called on plugin initialization. Stitch will send it the configuration relevant for this plugin, based on the values defined in the `PLUGINS_CONFIGURATION` environment variable.
+
+For example, with this env var value:
+`PLUGINS_CONFIGURATION={ "awesome-plugin.js": { "arg1": "val1" } }`
+
+The `options` param for the `configure` function will be `{ arg: 'val1' }`
 
 > Note: It's recommended to implement `configure` to get and validate plugin configuration rather than to use environment variables.
 
