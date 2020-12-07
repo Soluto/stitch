@@ -2,6 +2,7 @@ import { IResolvers } from 'graphql-tools';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
 import pLimit from 'p-limit';
 import * as _ from 'lodash';
+import { GraphQLResolveInfo } from 'graphql';
 import { createSchemaConfig } from '../graphql-service';
 import { applyResourceGroupUpdates, ResourceGroup } from '../resource-repository';
 import { validateResourceGroupOrThrow } from '../validation';
@@ -39,29 +40,24 @@ async function fetchAndValidate(
   return { gatewayRg, registryRg };
 }
 
-async function validateResourceGroup(_: unknown, args: { input: ResourceGroupInput }) {
-  const policyAttachments = new PolicyAttachmentsGenerator();
-
-  try {
-    await fetchAndValidate(args.input, policyAttachments);
-  } finally {
-    await policyAttachments.cleanup();
-  }
-
-  return { success: true };
-}
-
-async function updateResourceGroup(_: unknown, args: { input: ResourceGroupInput }) {
+async function handleResourceGroupRequest(
+  _: unknown,
+  args: { input: ResourceGroupInput },
+  _context: unknown,
+  info: GraphQLResolveInfo
+) {
   return singleton(async () => {
     const policyAttachments = new PolicyAttachmentsGenerator();
 
     try {
       const { gatewayRg, registryRg } = await fetchAndValidate(args.input, policyAttachments);
-      await policyAttachments.writeToRepo();
-      await Promise.all([
-        resourceRepository.update(registryRg, { registry: true }),
-        resourceRepository.update(gatewayRg),
-      ]);
+      if (info.operation.operation === 'mutation') {
+        await policyAttachments.writeToRepo();
+        await Promise.all([
+          resourceRepository.update(registryRg, { registry: true }),
+          resourceRepository.update(gatewayRg),
+        ]);
+      }
     } finally {
       await policyAttachments.cleanup();
     }
@@ -76,37 +72,47 @@ const resolvers: IResolvers = {
   JSON: GraphQLJSON,
   JSONObject: GraphQLJSONObject,
   Query: {
-    validateResourceGroup,
+    validateResourceGroup: handleResourceGroupRequest,
 
-    validateSchemas: (_, args: { input: SchemaInput[] }) =>
-      validateResourceGroup(_, { input: { schemas: args.input } }),
+    validateSchemas: (_, args: { input: SchemaInput[] }, _context: unknown, info: GraphQLResolveInfo) =>
+      handleResourceGroupRequest(_, { input: { schemas: args.input } }, _context, info),
 
-    validateUpstreams: (_, args: { input: UpstreamInput[] }) =>
-      validateResourceGroup(_, { input: { upstreams: args.input } }),
+    validateUpstreams: (_, args: { input: UpstreamInput[] }, _context: unknown, info: GraphQLResolveInfo) =>
+      handleResourceGroupRequest(_, { input: { upstreams: args.input } }, _context, info),
 
-    validateUpstreamClientCredentials: (_, args: { input: UpstreamClientCredentialsInput[] }) =>
-      validateResourceGroup(_, { input: { upstreamClientCredentials: args.input } }),
+    validateUpstreamClientCredentials: (
+      _,
+      args: { input: UpstreamClientCredentialsInput[] },
+      _context: unknown,
+      info: GraphQLResolveInfo
+    ) => handleResourceGroupRequest(_, { input: { upstreamClientCredentials: args.input } }, _context, info),
 
-    validatePolicies: (_, args: { input: PolicyInput[] }) =>
-      validateResourceGroup(_, { input: { policies: args.input } }),
+    validatePolicies: (_, args: { input: PolicyInput[] }, _context: unknown, info: GraphQLResolveInfo) =>
+      handleResourceGroupRequest(_, { input: { policies: args.input } }, _context, info),
 
-    validateBasePolicy: (_, args: { input: BasePolicyInput }) =>
-      validateResourceGroup(_, { input: { basePolicy: args.input } }),
+    validateBasePolicy: (_, args: { input: BasePolicyInput }, _context: unknown, info: GraphQLResolveInfo) =>
+      handleResourceGroupRequest(_, { input: { basePolicy: args.input } }, _context, info),
   },
   Mutation: {
-    updateResourceGroup,
-    updateSchemas: (_, args: { input: SchemaInput[] }) => updateResourceGroup(_, { input: { schemas: args.input } }),
+    updateResourceGroup: handleResourceGroupRequest,
+    updateSchemas: (_, args: { input: SchemaInput[] }, _context: unknown, info: GraphQLResolveInfo) =>
+      handleResourceGroupRequest(_, { input: { schemas: args.input } }, _context, info),
 
-    updateUpstreams: (_, args: { input: UpstreamInput[] }) =>
-      updateResourceGroup(_, { input: { upstreams: args.input } }),
+    updateUpstreams: (_, args: { input: UpstreamInput[] }, _context: unknown, info: GraphQLResolveInfo) =>
+      handleResourceGroupRequest(_, { input: { upstreams: args.input } }, _context, info),
 
-    updateUpstreamClientCredentials: (_, args: { input: UpstreamClientCredentialsInput[] }) =>
-      updateResourceGroup(_, { input: { upstreamClientCredentials: args.input } }),
+    updateUpstreamClientCredentials: (
+      _: unknown,
+      args: { input: UpstreamClientCredentialsInput[] },
+      _context: unknown,
+      info: GraphQLResolveInfo
+    ) => handleResourceGroupRequest(_, { input: { upstreamClientCredentials: args.input } }, _context, info),
 
-    updatePolicies: (_, args: { input: PolicyInput[] }) => updateResourceGroup(_, { input: { policies: args.input } }),
+    updatePolicies: (_, args: { input: PolicyInput[] }, _context: unknown, info: GraphQLResolveInfo) =>
+      handleResourceGroupRequest(_, { input: { policies: args.input } }, _context, info),
 
-    updateBasePolicy: (_, args: { input: BasePolicyInput }) =>
-      updateResourceGroup(_, { input: { basePolicy: args.input } }),
+    updateBasePolicy: (_, args: { input: BasePolicyInput }, _context: unknown, info: GraphQLResolveInfo) =>
+      handleResourceGroupRequest(_, { input: { basePolicy: args.input } }, _context, info),
   },
 };
 
