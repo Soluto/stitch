@@ -19,6 +19,8 @@ The plugin file cannot require npm modules. It should export one of the followin
 
 ```typescript
 export interface StitchPlugin {
+  configure?(options?: unknown): ValueOrPromise<void>;
+
   addArgumentInjectionGlobals?(): ValueOrPromise<Record<string, unknown>>;
 
   transformResourceGroup?(resourceGroup: ResourceGroup): ValueOrPromise<ResourceGroup>;
@@ -30,6 +32,17 @@ export interface StitchPlugin {
 > The plugin name is optional, and by default it is set to the file or folder name.
 
 ## API Reference
+
+### configure
+
+Optional method that's called on plugin initialization. Stitch will send it the configuration relevant for this plugin, based on the values defined in the `PLUGINS_CONFIGURATION` environment variable.
+
+For example, with this env var value:
+`PLUGINS_CONFIGURATION={ "awesome-plugin.js": { "arg1": "val1" } }`
+
+The `options` param for the `configure` function will be `{ arg: 'val1' }`
+
+> Note: It's recommended to implement `configure` to get and validate plugin configuration rather than to use environment variables.
 
 ### addArgumentInjectionGlobals
 

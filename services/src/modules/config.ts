@@ -45,7 +45,9 @@ const defaultAuthenticationConfig: AuthenticationConfig = {
 export const authenticationConfig =
   (envVarExt.get('AUTHENTICATION_CONFIGURATION').asJsonObject() as AuthenticationConfig) ?? defaultAuthenticationConfig;
 
+// Plugins
 export const pluginsDir = envVar.get('PLUGINS_DIR').asString();
+export const pluginsConfig = envVar.get('PLUGINS_CONFIGURATION').asJsonObject() as Record<string, unknown> | undefined;
 
 // TODO:Check the list of apollo federation directives when upgrading apollo version
 const defaultKnownApolloDirectives = 'key,extends,external,requires,provides';
