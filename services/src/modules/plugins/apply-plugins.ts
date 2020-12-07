@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { BaseSchema } from '../base-schema';
-import { pluginsDir } from '../config';
+import { pluginsDir, pluginsConfig } from '../config';
 import logger from '../logger';
 import { ResourceGroup } from '../resource-repository';
 import { StitchPlugin, ValueOrPromise } from './types';
@@ -19,6 +19,11 @@ export async function loadPlugins() {
         const pluginImport = await import(join(pluginsDir!, name));
         const plugin: Partial<Omit<StitchPlugin, 'name'>> =
           typeof pluginImport === 'function' ? await pluginImport.call() : pluginImport;
+
+        if (plugin.configure) {
+          await plugin.configure(pluginsConfig?.[name]);
+        }
+
         plugins.push({ name, ...plugin });
         logger.info({ name }, `Plugin ${name} has been loaded successfully.`);
       } catch (err) {
