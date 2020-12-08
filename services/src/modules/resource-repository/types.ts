@@ -28,8 +28,9 @@ export interface Schema extends Resource {
 }
 
 export interface Upstream extends Resource {
-  host: string;
-  origin?: string;
+  host?: string;
+  sourceHosts?: string[];
+  destinationOrigin?: string;
   auth?: {
     type: AuthType;
     activeDirectory: {

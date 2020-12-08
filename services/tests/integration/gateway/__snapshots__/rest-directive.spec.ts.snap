@@ -227,7 +227,7 @@ Object {
 }
 `;
 
-exports[`Rest directive - Upstream origin call qraphql 1`] = `
+exports[`Rest directive - Upstream destinationOrigin call qraphql 1`] = `
 Object {
   "data": Object {
     "hello": "world",

@@ -285,7 +285,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'Upstream origin',
+    'Upstream destinationOrigin',
     {
       mock: () => nock(upstreamRealOrigin).get('/hello').reply(200, 'world'),
       schema: gql`
@@ -321,7 +321,7 @@ describe.each(testCases)('Rest directive - %s', (_, { mock, schema, query, varia
         name: 'rest-directive-upstream',
       },
       host: new URL(upstreamLogicHost).host,
-      origin: upstreamRealOrigin,
+      destinationOrigin: upstreamRealOrigin,
     };
 
     const resourceGroup = {

@@ -26,8 +26,8 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     let url = new URL(inject(params.url, parent, args, this.context, info) as string);
 
     const upstream = this.context.authenticationConfig.getUpstreamByHost(url.host);
-    if (upstream?.origin) {
-      url = new URL(url.href.replace(url.origin, upstream.origin));
+    if (upstream?.destinationOrigin) {
+      url = new URL(url.href.replace(url.origin, upstream.destinationOrigin));
     }
 
     this.addQueryParams(url.searchParams, params.query, parent, args, info);

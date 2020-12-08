@@ -64,8 +64,8 @@ export class GqlDirective extends SchemaDirectiveVisitor {
     const operationType = operationTypeParam?.toLowerCase() ?? 'query';
     const upstream = this.context.authenticationConfig.getUpstreamByHost(url.host);
     let upstreamUrl = new URL(url);
-    if (upstream?.origin) {
-      upstreamUrl = new URL(url.replace(url.origin, upstream.origin));
+    if (upstream?.destinationOrigin) {
+      upstreamUrl = new URL(url.replace(url.origin, upstream.destinationOrigin));
     }
     const remoteSchema = this.createRemoteSchema(
       upstreamUrl.href,

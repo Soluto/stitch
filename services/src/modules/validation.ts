@@ -13,21 +13,53 @@ function validateUpstreams(upstreams: Upstream[]) {
 
   const existingHosts = new Map<string, Upstream>();
   for (const upstream of upstreams) {
-    const existingUpstream = existingHosts.get(upstream.host);
-    if (typeof existingUpstream === 'undefined') {
-      existingHosts.set(upstream.host, upstream);
-    } else {
+    if (upstream.host && upstream.sourceHosts) {
       errors.push(
-        new ApolloError('Duplicate host found on upstream', 'DUPLICATE_UPSTREAM_FOUND', {
-          host: upstream.host,
-          upstreams: [upstream.metadata, existingUpstream.metadata],
-        })
+        new ApolloError(
+          'Upstream should have either "host" property or "sourceHosts" but no both',
+          'INVALID_UPSTREAM',
+          {
+            metadata: upstream.metadata,
+          }
+        )
       );
+      continue;
+    }
+
+    if (upstream.host) {
+      const existingUpstream = existingHosts.get(upstream.host);
+      if (existingUpstream) {
+        errors.push(
+          new ApolloError('Duplicate host found on upstream', 'DUPLICATE_UPSTREAM_FOUND', {
+            host: upstream.host,
+            upstreams: [upstream.metadata, existingUpstream.metadata],
+          })
+        );
+        continue;
+      }
+      existingHosts.set(upstream.host, upstream);
+    }
+    if (upstream.sourceHosts) {
+      for (const sourceHost in upstream.sourceHosts) {
+        const existingUpstream = existingHosts.get(sourceHost);
+        if (existingUpstream) {
+          errors.push(
+            new ApolloError('Duplicate host found on upstream', 'DUPLICATE_UPSTREAM_FOUND', {
+              host: sourceHost,
+              upstreams: [upstream.metadata, existingUpstream.metadata],
+            })
+          );
+          continue;
+        }
+        existingHosts.set(sourceHost, upstream);
+      }
     }
   }
 
   const existingResourceAuthorityPairs = new Map<string, Upstream>();
   for (const upstream of upstreams) {
+    if (!upstream.auth) continue;
+
     const upstreamKey = JSON.stringify(upstream.auth.activeDirectory);
     const existingUpstream = existingResourceAuthorityPairs.get(upstreamKey);
     if (typeof existingUpstream === 'undefined') {

@@ -79,8 +79,8 @@ const upstream: Upstream = {
     namespace: 'namespace',
     name: 'name',
   },
-  host: new URL(remoteLogicalHost).host,
-  origin: remoteHost,
+  sourceHosts: [new URL(remoteLogicalHost).host],
+  destinationOrigin: remoteHost,
 };
 
 const resourceGroup = {

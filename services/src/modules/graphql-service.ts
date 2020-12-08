@@ -3,7 +3,7 @@ import { parse, execute, DocumentNode } from 'graphql';
 import { Observable, Subscription } from 'rxjs';
 import { shareReplay, map, mergeMap, take, tap, catchError, skip } from 'rxjs/operators';
 import type { GraphQLRequestContextExecutionDidStart } from 'apollo-server-types';
-import { ResourceGroup, PolicyDefinition, Schema, ResourceMetadata } from './resource-repository';
+import { ResourceGroup, PolicyDefinition, Schema, ResourceMetadata, Upstream } from './resource-repository';
 import { buildSchemaFromFederatedTypeDefs } from './build-federated-schema';
 import getBaseSchema from './base-schema';
 import { ActiveDirectoryAuth, AuthenticationConfig } from './upstream-authentication';
@@ -73,7 +73,12 @@ function buildPolicyGqlQuery(policy: PolicyDefinition): DocumentNode {
 
 export async function createSchemaConfig(rg: ResourceGroup): Promise<GraphQLServiceConfig> {
   const activeDirectoryAuth = new ActiveDirectoryAuth();
-  const upstreamsByHost = new Map(rg.upstreams.map(u => [u.host, u]));
+  const upstreamsByHost: [string, Upstream][] = rg.upstreams.filter(u => u.host).map(u => [u.host!, u]);
+  const upstreamsBySourceHosts: [string, Upstream][] = rg.upstreams
+    .filter(u => u.sourceHosts)
+    .flatMap(u => u.sourceHosts!.map(sh => [sh, u] as [string, Upstream]));
+
+  const upstreamsMap = new Map(([] as [string, Upstream][]).concat(upstreamsByHost, upstreamsBySourceHosts));
   const upstreamClientCredentialsByAuthority = new Map(
     rg.upstreamClientCredentials.map(u => [u.activeDirectory.authority, u])
   );
@@ -82,7 +87,7 @@ export async function createSchemaConfig(rg: ResourceGroup): Promise<GraphQLServ
 
   const authenticationConfig: AuthenticationConfig = {
     getUpstreamByHost(host: string) {
-      return upstreamsByHost.get(host);
+      return upstreamsMap.get(host);
     },
     getUpstreamClientCredentialsByAuthority(authority: string) {
       return upstreamClientCredentialsByAuthority.get(authority);

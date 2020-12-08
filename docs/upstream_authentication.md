@@ -28,8 +28,11 @@ kind: Upstream
 metadata:
   name: organization-api
   namespace: organizations-team
-host: 'organizations.example.com'
-origin: 'http://some-real-origin'
+host: 'organizations.example.com' # Deprecated
+sourceHosts:
+  - 'organization1.example.com'
+  - 'organization2.example.com'
+destinationOrigin: 'http://some-real-origin' # Optional
 auth:
   type: ActiveDirectory
   activeDirectory:
@@ -37,10 +40,11 @@ auth:
     resource: <active directory resource id>
 ```
 
-At runtime, `host` works as a selector - with this upstream applied, stitch knows that any request going out to `organizations.example.com` needs a `Bearer` token from the specified authority, for the specified resource.
+At runtime, `sourceHosts` property works as a selector - with this upstream applied, stitch knows that any request going out to `organization1.example.com` needs a `Bearer` token from the specified authority, for the specified resource.
+The deprecated `host` property works like `sourceHosts` but it's single value and not a list.
 
-`origin` is the OPTIONAL property. If it is set its value replaces the `url` origin. It can be useful to use the same schema in different environments.
-So the `url` in schema can have some logical name of the service (it still should be valid URL) and in each environment differen `Upstream` resource can be used.
+`destinationOrigin` is the OPTIONAL property. If it is set its value replaces the `url` origin. It can be useful to use the same schema in different environments.
+So the `url` in schema can have some logical name of the service (it still should be valid URL) and in each environment different `Upstream` resource can be used.
 
 ## UpstreamClientCredentials
 
