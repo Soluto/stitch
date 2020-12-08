@@ -226,3 +226,18 @@ Object {
   },
 }
 `;
+
+exports[`Rest directive - Upstream origin call qraphql 1`] = `
+Object {
+  "data": Object {
+    "hello": "world",
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;

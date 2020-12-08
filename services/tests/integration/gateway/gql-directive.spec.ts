@@ -7,6 +7,7 @@ import { graphqlSync, GraphQLSchema, print } from 'graphql';
 import { createStitchGateway } from '../../../src/modules/gateway';
 import { beforeEachDispose } from '../before-each-dispose';
 import { sleep } from '../../helpers/utility';
+import { Schema, Upstream } from '../../../src/modules/resource-repository';
 
 const miriam = {
   employeeId: '1',
@@ -45,8 +46,9 @@ const remoteSchema = makeExecutableSchema({
 });
 
 const remoteHost = 'http://localhost:1111';
+const remoteLogicalHost = 'https://my-service';
 
-const schema = {
+const schema: Schema = {
   metadata: {
     namespace: 'namespace',
     name: 'name',
@@ -72,10 +74,19 @@ const schema = {
   `),
 };
 
+const upstream: Upstream = {
+  metadata: {
+    namespace: 'namespace',
+    name: 'name',
+  },
+  host: new URL(remoteLogicalHost).host,
+  origin: remoteHost,
+};
+
 const resourceGroup = {
   etag: 'etag',
   schemas: [schema],
-  upstreams: [],
+  upstreams: [upstream],
   upstreamClientCredentials: [],
   policies: [],
 };
@@ -83,6 +94,7 @@ const resourceGroup = {
 interface TestCase {
   statusCode?: number;
   delay?: number;
+  host?: string;
 }
 
 const testCases: [string, TestCase][] = [
@@ -90,13 +102,14 @@ const testCases: [string, TestCase][] = [
   ['Error 401', { statusCode: 401 }],
   ['Error 500', { statusCode: 500 }],
   ['Timeout', { delay: 2000 }],
+  ['Upstream Host', { host: remoteLogicalHost }],
 ];
 
-describe.each(testCases)('GQL Directive', (testCaseName, { statusCode, delay }) => {
+describe.each(testCases)('GQL Directive', (testCaseName, { statusCode, delay, host }) => {
   let client: ApolloServerTestClient;
 
   beforeEachDispose(async () => {
-    mockGqlBackend(remoteHost, remoteSchema, statusCode, delay);
+    mockGqlBackend(host ?? remoteHost, remoteSchema, statusCode, delay);
 
     const stitch = createStitchGateway({
       resourceGroups: Rx.of(resourceGroup),

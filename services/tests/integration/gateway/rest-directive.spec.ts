@@ -4,7 +4,7 @@ import { gql } from 'apollo-server-core';
 import { print, DocumentNode } from 'graphql';
 import * as nock from 'nock';
 import { createStitchGateway } from '../../../src/modules/gateway';
-import { Schema } from '../../../src/modules/resource-repository';
+import { Schema, Upstream } from '../../../src/modules/resource-repository';
 
 interface TestCase {
   mock: () => nock.Scope;
@@ -15,6 +15,8 @@ interface TestCase {
 }
 
 const upstreamHost = 'http://localhost:1111';
+const upstreamLogicHost = 'https://my-service';
+const upstreamRealOrigin = 'http://localhost:2222';
 
 const testCases: [string, TestCase][] = [
   [
@@ -282,6 +284,22 @@ const testCases: [string, TestCase][] = [
       variables: { name: 'joseph' },
     },
   ],
+  [
+    'Upstream origin',
+    {
+      mock: () => nock(upstreamRealOrigin).get('/hello').reply(200, 'world'),
+      schema: gql`
+        type Query {
+          hello: String! @rest(url: "${upstreamLogicHost}/hello")
+        }
+      `,
+      query: gql`
+        query Hello {
+          hello
+        }
+      `,
+    },
+  ],
 ];
 
 describe.each(testCases)('Rest directive - %s', (_, { mock, schema, query, variables, skipMockIsDoneAssert }) => {
@@ -297,10 +315,19 @@ describe.each(testCases)('Rest directive - %s', (_, { mock, schema, query, varia
       schema: print(schema),
     };
 
+    const upstreamResource: Upstream = {
+      metadata: {
+        namespace: 'integration-tests',
+        name: 'rest-directive-upstream',
+      },
+      host: new URL(upstreamLogicHost).host,
+      origin: upstreamRealOrigin,
+    };
+
     const resourceGroup = {
       etag: 'etag',
       schemas: [schemaResource],
-      upstreams: [],
+      upstreams: [upstreamResource],
       upstreamClientCredentials: [],
       policies: [],
     };

@@ -72,3 +72,20 @@ Object {
   },
 }
 `;
+
+exports[`GQL Directive Remote GraphQL server call - Upstream Host 1`] = `
+Object {
+  "data": Object {
+    "employee": null,
+  },
+  "errors": Array [
+    [GraphQLError: Failed reaching remote gql server for introspection (url http://localhost:1111/graphql)],
+  ],
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;

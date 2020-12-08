@@ -11,18 +11,19 @@ import { inject } from '../arguments-injection';
 import { getAuthHeaders, AuthenticationConfig } from '../upstream-authentication';
 import logger from '../logger';
 import { RequestContext } from '../context';
+import { Upstream } from '../resource-repository';
 
 const pendingIntrospectionRetries = new Map<string, NodeJS.Timeout>();
 
 export class GqlDirective extends SchemaDirectiveVisitor {
-  createRemoteSchema(url: string, config: AuthenticationConfig, timeoutMs?: number) {
+  createRemoteSchema(url: string, upstream: Upstream, config: AuthenticationConfig, timeoutMs?: number) {
     const httpLink: ApolloLink = new HttpLink({
       uri: url,
       fetch: fetch as any,
       fetchOptions: { timeout: timeoutMs ?? 10000 },
     });
     const authLink = setContext(async (_, context) => ({
-      headers: await getAuthHeaders(config, new URL(url).host, context?.graphqlContext?.request as FastifyRequest),
+      headers: await getAuthHeaders(upstream, config, context?.graphqlContext?.request as FastifyRequest),
     })).concat(httpLink);
     const retryLink = new RetryLink({
       delay: { max: 5000 },
@@ -61,7 +62,17 @@ export class GqlDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
     const { url, fieldName, arguments: gqlArgs, operationType: operationTypeParam, timeoutMs } = this.args;
     const operationType = operationTypeParam?.toLowerCase() ?? 'query';
-    const remoteSchema = this.createRemoteSchema(url, this.context.authenticationConfig, timeoutMs);
+    const upstream = this.context.authenticationConfig.getUpstreamByHost(url.host);
+    let upstreamUrl = new URL(url);
+    if (upstream?.origin) {
+      upstreamUrl = new URL(url.replace(url.origin, upstream.origin));
+    }
+    const remoteSchema = this.createRemoteSchema(
+      upstreamUrl.href,
+      upstream,
+      this.context.authenticationConfig,
+      timeoutMs
+    );
 
     field.resolve = async (parent, args, context, info) => {
       if (!remoteSchema.ready) throw new Error(`Failed reaching remote gql server for introspection (url ${url})`);

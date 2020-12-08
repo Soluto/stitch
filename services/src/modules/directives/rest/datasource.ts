@@ -1,12 +1,14 @@
 import { RESTDataSource, Request } from 'apollo-datasource-rest';
 import { RequestInit, Headers } from 'apollo-server-env';
-import {  GraphQLError, GraphQLResolveInfo, isNullableType } from 'graphql';
+import { GraphQLError, GraphQLResolveInfo, isNullableType } from 'graphql';
 import { inject } from '../../arguments-injection';
 import { RequestContext } from '../../context';
+import { Upstream } from '../../resource-repository';
 import { getAuthHeaders } from '../../upstream-authentication';
 import { KeyValue, RestParams } from './types';
 
-const hasValue = (value: unknown) => value !== null && typeof value !== undefined && value !== undefined && value !== '';
+const hasValue = (value: unknown) =>
+  value !== null && typeof value !== undefined && value !== undefined && value !== '';
 
 type GraphQLArguments = { [key: string]: unknown };
 
@@ -20,10 +22,19 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
   ) {
     const headers = this.parseHeaders(params.headers, parent, args, info);
     const requestInit: RequestInit = { headers, timeout: params.timeoutMs ?? 10000, method: params.method };
-    const url = new URL(inject(params.url, parent, args, this.context, info) as string);
+
+    let url = new URL(inject(params.url, parent, args, this.context, info) as string);
+
+    const upstream = this.context.authenticationConfig.getUpstreamByHost(url.host);
+    if (upstream?.origin) {
+      url = new URL(url.href.replace(url.origin, upstream.origin));
+    }
+
     this.addQueryParams(url.searchParams, params.query, parent, args, info);
 
-    await this.addAuthentication(url, headers);
+    if (upstream && upstream.auth) {
+      await this.addAuthentication(upstream, headers);
+    }
 
     const body = this.getBody(params, parent, args, context, info);
     if (body) {
@@ -42,8 +53,8 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     return this.didReceiveResponse(response, request);
   }
 
-  private async addAuthentication(url: URL, headers: Headers) {
-    const authHeaders = await getAuthHeaders(this.context.authenticationConfig, url.host, this.context.request);
+  private async addAuthentication(upstream: Upstream, headers: Headers) {
+    const authHeaders = await getAuthHeaders(upstream, this.context.authenticationConfig, this.context.request);
     if (authHeaders != undefined) {
       headers.append('Authorization', authHeaders.Authorization);
     }
@@ -75,7 +86,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
 
     for (const kv of kvs) {
       const value = inject(kv.value, parent, args, this.context, info) as string;
-      if (!hasValue(value) && kv.required){
+      if (!hasValue(value) && kv.required) {
         throw new GraphQLError(`${kv.key} header is required`);
       }
       headers.append(kv.key, value);
@@ -91,13 +102,12 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     args: GraphQLArguments,
     info: GraphQLResolveInfo
   ) {
-
     if (!kvs || kvs.length == 0) return;
 
     for (const kv of kvs) {
       const value = inject(kv.value, parent, args, this.context, info);
       if (!hasValue(value)) {
-        if(kv.required) {
+        if (kv.required) {
           throw new GraphQLError(`${kv.key} query parameter is required`);
         }
         continue;
