@@ -1,4 +1,4 @@
-import { promises as fs } from 'fs';
+import { PathLike, promises as fs } from 'fs';
 import { mocked } from 'ts-jest/utils';
 import { minutesAgo } from '../../../tests/helpers/utility';
 import { FileSystemStorage } from '.';
@@ -62,7 +62,7 @@ describe('listFiles', () => {
     const result = await storage.listFiles(folderPath);
     expect(result).toEqual(expectedResult);
 
-    expect(mockedFs.readdir).toHaveBeenCalledWith(folderPath);
+    expect(mockedFs.readdir as (path: PathLike) => Promise<string[]>).toHaveBeenCalledWith(folderPath);
     expect(mockedFs.stat).toHaveBeenCalledTimes(2);
     expect(mockedFs.stat).toHaveBeenCalledWith(expectedResult[0].filePath);
     expect(mockedFs.stat).toHaveBeenCalledWith(expectedResult[1].filePath);

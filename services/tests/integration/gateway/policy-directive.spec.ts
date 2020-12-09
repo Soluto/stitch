@@ -7,7 +7,7 @@ import { concatAST, DocumentNode } from 'graphql';
 import { PolicyExecutor } from '../../../src/modules/directives/policy';
 import { sdl as lowerCaseSdl, LowerCaseDirective } from '../utils/lower-case-directive';
 import { sdl as mockSdl, MockDirective } from '../utils/mock-directive';
-import getBaseSchema from '../../../src/modules/base-schema';
+import getBaseSchema, { BaseSchema } from '../../../src/modules/base-schema';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 
 const mockValidatePolicy = jest.fn();
@@ -354,7 +354,7 @@ const testCases: [string, TestCase][] = [
   ],
 ];
 
-describe.each(testCases)('Policy Directive Tests', (testName, { typeDefs, resolvers }) => {
+describe('Policy Directive Tests', () => {
   let client: ApolloServerTestClient;
   let server: ApolloServerBase;
 
@@ -366,8 +366,14 @@ describe.each(testCases)('Policy Directive Tests', (testName, { typeDefs, resolv
     }
   `;
 
+  let baseSchema: BaseSchema;
+
   beforeAll(async () => {
-    const baseSchema = await getBaseSchema();
+    baseSchema = await getBaseSchema();
+    expect.addSnapshotSerializer(GraphQLErrorSerializer);
+  });
+
+  test.each(testCases)('%s', async (_, { typeDefs, resolvers }) => {
     server = new ApolloServer({
       typeDefs: concatAST([baseSchema.typeDefs, typeDefs, lowerCaseSdl, mockSdl]),
       resolvers: [resolvers ?? {}, baseSchema.resolvers],
@@ -384,10 +390,6 @@ describe.each(testCases)('Policy Directive Tests', (testName, { typeDefs, resolv
     });
     client = createTestClient(server);
 
-    expect.addSnapshotSerializer(GraphQLErrorSerializer);
-  });
-
-  test(testName, async () => {
     const response = await client.query({ query });
     expect(response).toMatchSnapshot();
   });
