@@ -17,6 +17,7 @@ export default class ApplyBasePolicy extends Command {
     'registry-url': flags.string({ required: true, env: 'STITCH_REGISTRY_URL', description: 'Url of the registry' }),
     'dry-run': flags.boolean({ required: false, default: false, description: 'Should perform a dry run' }),
     'authorization-header': flags.string({ required: false, description: 'Custom authorization header' }),
+    timeout: flags.integer({ required: false, default: 10000, description: 'Request timeout' }),
   };
 
   static args = [{ name: 'resourcePath', required: true }];
@@ -33,11 +34,17 @@ export default class ApplyBasePolicy extends Command {
     const basePolicyContent = await fs.readFile(args.resourcePath, { encoding: 'utf8' });
     const basePolicy = safeLoad(basePolicyContent) as BasePolicyInput;
 
-    await uploadBasePolicy(basePolicy, {
-      registryUrl: flags['registry-url'],
-      authorizationHeader: flags['authorization-header'],
-      dryRun,
-    });
+    await uploadBasePolicy(
+      basePolicy,
+      {
+        registryUrl: flags['registry-url'],
+        authorizationHeader: flags['authorization-header'],
+        dryRun,
+      },
+      {
+        timeout: flags.timeout,
+      }
+    );
 
     this.log(`Base policy from ${args.resourcePath} was ${dryRun ? 'verified' : 'uploaded'} successfully.`);
   }

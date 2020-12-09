@@ -19,6 +19,7 @@ Uploaded successfully!
     'dry-run': flags.boolean({ required: false, default: false, description: 'Should perform a dry run' }),
     'authorization-header': flags.string({ required: false, description: 'Custom authorization header' }),
     'skip-resource-types': flags.string({ required: false, description: 'Resource types to skip' }),
+    timeout: flags.integer({ required: false, default: 10000, description: 'Request timeout' }),
   };
 
   static args = [{ name: 'resourcesPath', required: true }];
@@ -40,11 +41,17 @@ Uploaded successfully!
       this.log(`  ${key}: ${count}${resourceTypesToSkip?.includes(key) ? ' - Skipped' : ''}`)
     );
 
-    await uploadResourceGroup(resourceGroup, {
-      registryUrl: flags['registry-url'],
-      authorizationHeader: flags['authorization-header'],
-      dryRun,
-    });
+    await uploadResourceGroup(
+      resourceGroup,
+      {
+        registryUrl: flags['registry-url'],
+        authorizationHeader: flags['authorization-header'],
+        dryRun,
+      },
+      {
+        timeout: flags.timeout,
+      }
+    );
 
     this.log(`Resources from ${args.resourcesPath} were ${dryRun ? 'verified' : 'uploaded'} successfully.`);
   }

@@ -1,3 +1,5 @@
+/* eslint-disable promise/valid-params */
+/* eslint-disable promise/catch-or-return */
 import { expect, test } from '@oclif/test';
 
 describe('Apply base policy', () => {
@@ -21,4 +23,20 @@ describe('Apply base policy', () => {
     .it('Verify', ctx => {
       expect(ctx.stdout).to.contain('was verified successfully');
     });
+
+  test
+    .nock('http://registry', api => api.post('/graphql').delay(100).reply(200))
+    .stdout()
+    .stderr()
+    .command([
+      'apply:base-policy',
+      '--dry-run',
+      '--registry-url=http://registry/graphql',
+      '--timeout=50',
+      'tests/resources/base-policy.yaml',
+    ])
+    .catch((e: Error) => expect(e.message).contains('network timeout at: http://registry/graphql'), {
+      raiseIfNotThrown: true,
+    })
+    .it('Timeout', () => {});
 });

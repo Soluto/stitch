@@ -1,38 +1,65 @@
-import { GraphQLClient } from 'graphql-request';
+import { GraphQLClient, gql } from 'graphql-request';
 import { BasePolicyInput, ResourceGroupInput } from './types';
 
-const UploadResourceGroupMutation = `
-mutation UploadResources($resourceGroup: ResourceGroupInput!) {
+export interface RequestInit {
+  body?: BodyInit | null;
+  cache?: RequestCache;
+  credentials?: RequestCredentials;
+  headers?: HeadersInit;
+  integrity?: string;
+  keepalive?: boolean;
+  method?: string;
+  mode?: RequestMode;
+  redirect?: RequestRedirect;
+  referrer?: string;
+  referrerPolicy?: ReferrerPolicy;
+  signal?: AbortSignal | null;
+  timeout?: number;
+  window?: any;
+  fetch?: any;
+}
+
+const UploadResourceGroupMutation = gql`
+  mutation UploadResources($resourceGroup: ResourceGroupInput!) {
     result: updateResourceGroup(input: $resourceGroup) {
-        success
+      success
     }
-}`;
+  }
+`;
 
-const ValidateResourceGroupQuery = `
-query ValidateResources($resourceGroup: ResourceGroupInput!) {
+const ValidateResourceGroupQuery = gql`
+  query ValidateResources($resourceGroup: ResourceGroupInput!) {
     result: validateResourceGroup(input: $resourceGroup) {
-        success
+      success
     }
-}`;
+  }
+`;
 
-const UploadBasePolicyMutation = `
-mutation UploadBasePolicyMutation($basePolicy: BasePolicyInput!) {
+const UploadBasePolicyMutation = gql`
+  mutation UploadBasePolicyMutation($basePolicy: BasePolicyInput!) {
     result: updateBasePolicy(input: $basePolicy) {
-        success
+      success
     }
-}`;
+  }
+`;
 
-const ValidateBasePolicyQuery = `
-query ValidateBasePolicyQuery($basePolicy: BasePolicyInput!) {
+const ValidateBasePolicyQuery = gql`
+  query ValidateBasePolicyQuery($basePolicy: BasePolicyInput!) {
     result: validateBasePolicy(input: $basePolicy) {
-        success
+      success
     }
-}`;
+  }
+`;
 
-function initClient(options: { registryUrl: string; dryRun?: boolean; authorizationHeader?: string }) {
-  const clientOptions = { timeout: 10000, headers: {} as { [name: string]: string } };
+function initClient(
+  options: { registryUrl: string; dryRun?: boolean; authorizationHeader?: string },
+  clientOptions: Partial<RequestInit>
+) {
   if (typeof options.authorizationHeader !== 'undefined') {
-    clientOptions.headers['Authorization'] = options.authorizationHeader;
+    if (!clientOptions.headers) {
+      clientOptions.headers = {};
+    }
+    (clientOptions.headers as Record<string, string>)['Authorization'] = options.authorizationHeader;
   }
   const registryClient = new GraphQLClient(options.registryUrl, clientOptions);
   return registryClient;
@@ -44,9 +71,10 @@ export async function uploadResourceGroup(
     registryUrl: string;
     dryRun?: boolean;
     authorizationHeader?: string;
-  }
+  },
+  clientOptions: Partial<RequestInit>
 ) {
-  const registryClient = initClient(options);
+  const registryClient = initClient(options, clientOptions);
 
   const query = options.dryRun ? ValidateResourceGroupQuery : UploadResourceGroupMutation;
 
@@ -65,9 +93,10 @@ export async function uploadBasePolicy(
     registryUrl: string;
     dryRun?: boolean;
     authorizationHeader?: string;
-  }
+  },
+  clientOptions: Partial<RequestInit>
 ) {
-  const registryClient = initClient(options);
+  const registryClient = initClient(options, clientOptions);
 
   const query = options.dryRun ? ValidateBasePolicyQuery : UploadBasePolicyMutation;
 

@@ -3,12 +3,13 @@
     "baseUrl": "src",
     "declaration": true,
     "importHelpers": true,
+    "lib": ["DOM", "ES2020"],
     "module": "commonjs",
     "outDir": "lib",
     "rootDir": "./src",
     "strict": true,
     "types": ["node", "mocha"],
-    "target": "es2017"
+    "target": "es2020"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.spec.ts", "tests/**/*"]
