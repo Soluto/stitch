@@ -1,0 +1,27 @@
+name: PR
+
+on:
+  push:
+    paths:
+      - 'services/**'
+    branches-ignore:
+      - master
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: '14'
+
+      - name: npm ci
+        run: npm ci
+        working-directory: services
+
+      - name: npm run test
+        run: npm run test:full
+        working-directory: services
