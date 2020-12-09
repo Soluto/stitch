@@ -21,43 +21,9 @@ jobs:
       - docker/push:
           image: soluto/stitch
           tag: '$CIRCLE_TAG'
-  build_test:
-    executor: linux
-    steps:
-      - checkout
-      - node/install:
-          install-yarn: false
-          node-version: 12.18.3
-      - run:
-          command: |
-            cd services
-            npm ci
-            npm run test:full
 
 workflows:
   version: 2
-  pull_request:
-    jobs:
-      - build_test:
-          filters:
-            branches:
-              ignore:
-                - master
-  master:
-    jobs:
-      - docker/publish:
-          executor: linux
-          deploy: true
-          docker-username: DOCKERHUB_USERNAME
-          docker-password: DOCKERHUB_PASSWORD
-          image: soluto/stitch
-          path: ./services
-          dockerfile: deployment/docker/Dockerfile
-          tag: '$CIRCLE_SHA1,latest'
-          filters:
-            branches:
-              only:
-                - master
   release_tag:
     jobs:
       - create_docker_tag:
