@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "test": "jest --config jest.config.js",
+    "test:leaks": "node --trace-warnings node_modules/.bin/jest --runInBand --detectOpenHandles --config jest.config.js",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand --config jest.config.js",
     "test:e2e": "jest --runInBand --config jest.config.e2e.js",
     "test:full": "jest --config jest.config.full.js",
