@@ -1,11 +1,11 @@
 version: 2.1
 orbs:
-  docker: circleci/docker@0.5.20
-  node: circleci/node@1.1.6
+  docker: circleci/docker@1.5.0
+
 executors:
   linux:
     machine:
-      image: ubuntu-1604:201903-01
+      image: ubuntu-2004:202010-01
 jobs:
   create_docker_tag:
     executor: linux
@@ -14,13 +14,14 @@ jobs:
       - docker/check:
           docker-username: DOCKERHUB_USERNAME
           docker-password: DOCKERHUB_PASSWORD
-      - docker/pull:
-          images: 'soluto/stitch:$CIRCLE_SHA1'
-      - run:
-          command: 'docker tag soluto/stitch:$CIRCLE_SHA1 soluto/stitch:$CIRCLE_TAG'
+      - docker/build:
+          images: soluto/stitch
+          path: ./services
+          dockerfile: deployment/docker/Dockerfile
+          tag: '$CIRCLE_TAG'
       - docker/push:
           image: soluto/stitch
-          tag: '$CIRCLE_TAG'
+          tag: '$CIRCLE_TAG,latest'
 
 workflows:
   version: 2
