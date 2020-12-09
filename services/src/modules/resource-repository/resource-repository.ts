@@ -1,5 +1,5 @@
 import * as path from 'path';
-import pLimit from 'p-limit';
+import * as pLimit from 'p-limit';
 import { Storage, listFilesItem } from '../storage';
 import { getWasmPolicy } from '../directives/policy/opa';
 import { FetchLatestResult, ResourceGroup, IResourceRepository, PolicyAttachments, UpdateOptions } from '.';

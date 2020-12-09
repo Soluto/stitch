@@ -31,6 +31,7 @@
     "node/no-unsupported-features/es-syntax": "off",
     "promise/param-names": "off",
     "unicorn/catch-error-name": "off",
+    "unicorn/import-style": "off",
     "unicorn/no-fn-reference-in-iterator": "off",
     "unicorn/no-null": "off",
     "unicorn/no-reduce": "off",
