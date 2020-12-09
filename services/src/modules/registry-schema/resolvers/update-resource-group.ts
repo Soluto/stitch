@@ -1,5 +1,6 @@
 import pLimit from 'p-limit';
 import * as _ from 'lodash';
+import logger from '../../logger';
 import { createSchemaConfig } from '../../graphql-service';
 import { applyResourceGroupUpdates } from '../../resource-repository';
 import { validateResourceGroupOrThrow } from '../../validation';
@@ -12,6 +13,7 @@ const singleton = pLimit(1);
 
 export default async function (updates: ResourceGroupInput, dryRun = false) {
   return singleton(async () => {
+    logger.info(`Proceeding ${dryRun ? 'validate' : 'update'} resources request...`);
     const policyAttachments = new PolicyAttachmentsGenerator();
 
     try {
@@ -36,7 +38,14 @@ export default async function (updates: ResourceGroupInput, dryRun = false) {
           resourceRepository.update(registryRg, { registry: true }),
           resourceRepository.update(gatewayRg),
         ]);
+        const summary = Object.fromEntries(
+          Object.entries(updates).map(([k, v]) => [k, v ? (Array.isArray(v) ? v.length : 1) : 0])
+        );
+        logger.info(summary, `Resources were ${dryRun ? 'validated' : 'updated'}`);
       }
+    } catch (err) {
+      logger.error({ err }, `${dryRun ? 'Validate' : 'Updated'} resources request failed`);
+      throw err;
     } finally {
       await policyAttachments.cleanup();
     }
