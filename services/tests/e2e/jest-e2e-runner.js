@@ -15,6 +15,9 @@ const options = {
   },
   log: true,
 };
+const upOptions = {
+  commandOptions: ['--force-recreate', '--remove-orphans', '--renew-anon-volumes'],
+};
 
 class SerialJestRunner extends DefaultJestRunner {
   constructor(config, context) {
@@ -23,16 +26,20 @@ class SerialJestRunner extends DefaultJestRunner {
   }
 
   async setup() {
-    await this.preparePlugins();
+    if (!process.env.SKIP_PLUGINS_INSTALL) {
+      await this.preparePlugins();
+    }
 
-    await dockerCompose.buildAll(options);
-    await dockerCompose.upAll(options);
+    if (!process.env.SKIP_IMAGE_BUILD) {
+      await dockerCompose.buildAll(options);
+    }
+    await dockerCompose.upAll({ ...options, ...upOptions });
 
     await waitFor.start(30000);
   }
 
   async teardown() {
-    // await dockerCompose.logs(['gateway', 'registry', 'oidc-server-mock'], options);
+    // await dockerCompose.logs(['gateway', 'registry'], options);
     await dockerCompose.down(options);
     await waitFor.stop(30000);
   }
