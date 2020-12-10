@@ -65,10 +65,10 @@ export const schema = {
       bp_foo: String @localResolver(value: "FOO")
       bp_bar: String
         @localResolver(value: "BAR")
-        @policy(namespace: "auth_bp", name: "regular_policy", args: { isActive: "{jwt.isActive}" })
+        @policy(namespace: "auth_bp", name: "regular_policy", args: { isActive: "{jwt?.isActive}" })
       bp_baz: String
         @localResolver(value: "BAZ")
-        @policy(namespace: "auth_bp", name: "override_base_policy", args: { isGuest: "{jwt.isGuest}" })
+        @policy(namespace: "auth_bp", name: "override_base_policy", args: { isGuest: "{jwt?.isGuest}" })
     }
   `),
 };
