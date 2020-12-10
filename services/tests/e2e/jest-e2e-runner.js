@@ -19,6 +19,10 @@ const upOptions = {
   commandOptions: ['--force-recreate', '--remove-orphans', '--renew-anon-volumes'],
 };
 
+const downOptions = {
+  commandOptions: ['--volumes', '--remove-orphans'],
+};
+
 class SerialJestRunner extends DefaultJestRunner {
   constructor(config, context) {
     super(config, context);
@@ -39,8 +43,10 @@ class SerialJestRunner extends DefaultJestRunner {
   }
 
   async teardown() {
-    // await dockerCompose.logs(['gateway', 'registry'], options);
-    await dockerCompose.down(options);
+    if (process.env.PRINT_CONTAINER_LOGS) {
+      await dockerCompose.logs(['gateway', 'registry'], options);
+    }
+    await dockerCompose.down({ ...options, ...downOptions });
     await waitFor.stop(30000);
   }
 
