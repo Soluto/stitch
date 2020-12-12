@@ -1,4 +1,4 @@
-import { Upstream, UpstreamClientCredentials } from '../resource-repository';
+import { Upstream, UpstreamClientCredentials } from '../../resource-repository';
 import { ActiveDirectoryAuth } from '.';
 
 export interface AuthenticationConfig {
