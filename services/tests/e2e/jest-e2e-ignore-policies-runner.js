@@ -36,7 +36,7 @@ class SerialJestRunner extends DefaultJestRunner {
       await this.preparePlugins();
     }
 
-    if (!process.env.SKIT_IMAGE_BUILD) {
+    if (!process.env.SKIP_IMAGE_BUILD) {
       await dockerCompose.buildAll(options);
     }
 
