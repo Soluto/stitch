@@ -26,7 +26,7 @@ describe('Authorization - Base policy', () => {
     namespace: 'internal',
     name: 'base_policy',
     args: {
-      role: '{jwt.role}',
+      role: '{jwt?.role}',
     },
   };
 

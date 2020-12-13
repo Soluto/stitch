@@ -56,6 +56,14 @@ export const policies: PolicyDefinition[] = [
       isGuest: 'Boolean',
     },
   },
+  {
+    metadata: { namespace: 'auth_bp', name: 'public_policy' },
+    type: PolicyType.opa,
+    shouldOverrideBasePolicy: true,
+    code: `
+      default allow = true
+    `,
+  },
 ];
 
 export const schema = {
@@ -65,10 +73,11 @@ export const schema = {
       bp_foo: String @localResolver(value: "FOO")
       bp_bar: String
         @localResolver(value: "BAR")
-        @policy(namespace: "auth_bp", name: "regular_policy", args: { isActive: "{jwt.isActive}" })
+        @policy(namespace: "auth_bp", name: "regular_policy", args: { isActive: "{jwt?.isActive}" })
       bp_baz: String
         @localResolver(value: "BAZ")
-        @policy(namespace: "auth_bp", name: "override_base_policy", args: { isGuest: "{jwt.isGuest}" })
+        @policy(namespace: "auth_bp", name: "override_base_policy", args: { isGuest: "{jwt?.isGuest}" })
+      bp_taz: String @localResolver(value: "TAZ") @policy(namespace: "auth_bp", name: "public_policy")
     }
   `),
 };
@@ -78,5 +87,6 @@ export const query = print(gql`
     bp_foo
     bp_bar
     bp_baz
+    bp_taz
   }
 `);

@@ -48,7 +48,7 @@ const testCases: [string, TestCase][] = [
   [
     'From JWT',
     {
-      input: '{jwt.email}',
+      input: '{jwt?.email}',
       context: {
         request: {
           isAnonymousAccess: () => false,

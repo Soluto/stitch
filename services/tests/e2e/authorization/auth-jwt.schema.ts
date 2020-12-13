@@ -51,7 +51,7 @@ export const schema = {
         namespace: "auth_jwt",
         name: "jwtName",
         args: {
-          jwtName: "{jwt.name}",
+          jwtName: "{jwt?.name}",
           allowedName: "Varg"
         }
       )
