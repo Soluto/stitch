@@ -25,7 +25,7 @@ export default class PolicyExecutor {
 
   async evaluatePolicy(
     policy: Policy,
-    parent: unknown,
+    source: unknown,
     gqlArgs: GraphQLArguments,
     requestContext: RequestContext,
     info: GraphQLResolveInfo
@@ -35,12 +35,12 @@ export default class PolicyExecutor {
       policy.namespace,
       policy.name
     );
-    return this.getPolicyResult({ policy, parent, gqlArgs, requestContext, info, policyDefinition });
+    return this.getPolicyResult({ policy, source, gqlArgs, requestContext, info, policyDefinition });
   }
 
   evaluatePolicySync(
     policy: Policy,
-    parent: unknown,
+    source: unknown,
     gqlArgs: GraphQLArguments,
     requestContext: RequestContext,
     info: GraphQLResolveInfo
@@ -50,7 +50,7 @@ export default class PolicyExecutor {
       policy.namespace,
       policy.name
     );
-    return this.getPolicyResultSync({ policy, parent, gqlArgs, requestContext, info, policyDefinition });
+    return this.getPolicyResultSync({ policy, source, gqlArgs, requestContext, info, policyDefinition });
   }
 
   async validatePolicy(
@@ -129,7 +129,8 @@ export default class PolicyExecutor {
 
       let policyArgValue = ctx.policy.args[policyArgName];
       if (typeof policyArgValue === 'string') {
-        policyArgValue = inject(policyArgValue, ctx.parent, ctx.gqlArgs, ctx.requestContext, ctx.info);
+        const { source, gqlArgs: args, requestContext: context, info } = ctx;
+        policyArgValue = inject(policyArgValue, { source, args, context, info });
       }
 
       policyArgs[policyArgName] = policyArgValue;

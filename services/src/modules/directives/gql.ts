@@ -63,14 +63,14 @@ export class GqlDirective extends SchemaDirectiveVisitor {
     const operationType = operationTypeParam?.toLowerCase() ?? 'query';
     const remoteSchema = this.createRemoteSchema(url, this.context.authenticationConfig, timeoutMs);
 
-    field.resolve = async (parent, args, context, info) => {
+    field.resolve = async (source, args, context, info) => {
       if (!remoteSchema.ready) throw new Error(`Failed reaching remote gql server for introspection (url ${url})`);
 
       return await delegateToSchema({
         schema: remoteSchema.schema!,
         operation: operationType,
         fieldName,
-        args: inject(gqlArgs, parent, args, context, info) as Record<string, unknown>,
+        args: inject(gqlArgs, { source, args, context, info }) as Record<string, unknown>,
         context,
         info,
       });

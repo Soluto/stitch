@@ -8,8 +8,8 @@ export class StubDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
     const { value } = this.args;
 
-    field.resolve = (parent, args, context, info) =>
-      typeof value === 'string' ? inject(value, parent, args, context, info) : value;
+    field.resolve = (source, args, context, info) =>
+      typeof value === 'string' ? inject(value, { source, args, context, info }) : value;
   }
 }
 

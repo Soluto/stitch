@@ -1,5 +1,5 @@
-import { GraphQLResolveInfo } from 'graphql';
 import { FastifyRequest } from 'fastify';
+import { GraphQLFieldResolverParams } from 'apollo-server-types';
 import { RequestContext } from '../context';
 import { getExportsProxy } from '../exports';
 import { isObject } from '../utils';
@@ -13,11 +13,9 @@ declare module '../context' {
 
 function injectTemplate<T = unknown>(
   template: string,
-  source: unknown | undefined,
-  args: Record<string, unknown> | undefined,
-  context: Pick<RequestContext, 'exports' | 'request'> | undefined,
-  info?: GraphQLResolveInfo
+  params: GraphQLFieldResolverParams<unknown, Pick<RequestContext, 'exports' | 'request'> | undefined>,
 ): T {
+  const { source, args, context, info } = params;
   const data = {
     source,
     args,
@@ -33,21 +31,18 @@ function injectTemplate<T = unknown>(
 
 export function inject(
   input: unknown,
-  parent: unknown | undefined,
-  args: Record<string, unknown> | undefined,
-  context: Pick<RequestContext, 'exports' | 'request'> | undefined,
-  info?: GraphQLResolveInfo
+  params: GraphQLFieldResolverParams<unknown, Pick<RequestContext, 'exports' | 'request'> | undefined>,
 ): unknown {
-  if (typeof input === 'string') return injectTemplate(input, parent, args, context, info);
+  if (typeof input === 'string') return injectTemplate(input, params);
 
   if (isObject(input)) {
     return Object.entries(input).reduce((obj, [key, value]) => {
-      obj[key] = inject(value, parent, args, context, info);
+      obj[key] = inject(value, params);
       return obj;
     }, {} as Record<string, unknown>);
   }
 
-  if (Array.isArray(input)) return input.map(value => inject(value, parent, args, context, info));
+  if (Array.isArray(input)) return input.map(value => inject(value, params));
 
   return input;
 }
