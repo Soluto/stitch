@@ -15,6 +15,7 @@ describe('validateMetadataCharacters - Validation that namespaces and names cont
       upstreams: [],
       upstreamClientCredentials: [],
       policies: [{ metadata: { namespace: 'other-ns', name: 'valid-chars_only' }, type: PolicyType.opa, code: 'code' }],
+      remoteSchemas: [],
     };
   });
 
@@ -60,6 +61,7 @@ describe('validateMetadataNameConflicts', () => {
         { metadata: { namespace: 'some-ns', name: 'policy-1' }, type: PolicyType.opa, code: 'code' },
         { metadata: { namespace: 'some-ns', name: 'policy-2' }, type: PolicyType.opa, code: 'code' },
       ],
+      remoteSchemas: [],
     };
   });
 

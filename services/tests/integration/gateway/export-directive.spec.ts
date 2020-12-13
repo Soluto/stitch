@@ -70,6 +70,7 @@ const resourceGroup: ResourceGroup = {
   upstreams: [],
   upstreamClientCredentials: [],
   policies: [],
+  remoteSchemas: [],
 };
 
 describe('Export Directive', () => {

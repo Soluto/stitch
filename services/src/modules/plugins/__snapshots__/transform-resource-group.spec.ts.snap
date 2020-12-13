@@ -12,6 +12,7 @@ Object {
       "type": "opa",
     },
   ],
+  "remoteSchemas": Array [],
   "schemas": Array [
     Object {
       "metadata": Object {

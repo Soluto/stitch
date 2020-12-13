@@ -56,6 +56,7 @@ const testCases: [string, ResourceGroup & { etag: string }][] = [
       },
       upstreams: [],
       upstreamClientCredentials: [],
+      remoteSchemas: [],
       schemas: [
         {
           metadata: {
@@ -84,6 +85,7 @@ const testCases: [string, ResourceGroup & { etag: string }][] = [
       },
       upstreams: [],
       upstreamClientCredentials: [],
+      remoteSchemas: [],
       schemas: [
         {
           metadata: {
@@ -112,6 +114,7 @@ const testCases: [string, ResourceGroup & { etag: string }][] = [
       },
       upstreams: [],
       upstreamClientCredentials: [],
+      remoteSchemas: [],
       schemas: [
         {
           metadata: {
@@ -140,6 +143,7 @@ const testCases: [string, ResourceGroup & { etag: string }][] = [
       },
       upstreams: [],
       upstreamClientCredentials: [],
+      remoteSchemas: [],
       schemas: [
         {
           metadata: {

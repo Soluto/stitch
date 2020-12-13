@@ -5,6 +5,7 @@ import { print } from 'graphql';
 import { beforeEachDispose } from '../before-each-dispose';
 import { app } from '../../../src/registry';
 import { mockResourceBucket } from '../resource-bucket';
+import { ResourceGroup } from '../../../src/modules/resource-repository';
 
 const badSdlSchema = {
   metadata: { namespace: 'namespace', name: 'name' },
@@ -35,7 +36,13 @@ const badFederationSchemas = [
   },
 ];
 
-const baseResourceGroup = { schemas: [], upstreams: [], upstreamClientCredentials: [], policies: [] };
+const baseResourceGroup: ResourceGroup = {
+  schemas: [],
+  upstreams: [],
+  upstreamClientCredentials: [],
+  policies: [],
+  remoteSchemas: [],
+};
 describe('Creation of invalid schemas', () => {
   let client: ApolloServerTestClient;
 

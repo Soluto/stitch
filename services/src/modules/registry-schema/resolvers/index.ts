@@ -15,40 +15,42 @@ const resolvers: IResolvers = {
   JSON: GraphQLJSON,
   JSONObject: GraphQLJSONObject,
   Query: {
-    validateResourceGroup: (_, args: { input: Partial<ResourceGroupInput> }) =>
-      handleUpdateResourceGroupRequest(args.input, true),
+    validateResourceGroup: (_, args: { input: Partial<ResourceGroupInput> }, context) =>
+      handleUpdateResourceGroupRequest(args.input, context.activeDirectoryAuth, true),
 
-    validateSchemas: (_, args: { input: SchemaInput[] }) =>
-      handleUpdateResourceGroupRequest({ schemas: args.input }, true),
+    validateSchemas: (_, args: { input: SchemaInput[] }, context) =>
+      handleUpdateResourceGroupRequest({ schemas: args.input }, context.activeDirectoryAuth, true),
 
-    validateUpstreams: (_, args: { input: UpstreamInput[] }) =>
-      handleUpdateResourceGroupRequest({ upstreams: args.input }, true),
+    validateUpstreams: (_, args: { input: UpstreamInput[] }, context) =>
+      handleUpdateResourceGroupRequest({ upstreams: args.input }, context.activeDirectoryAuth, true),
 
-    validateUpstreamClientCredentials: (_, args: { input: UpstreamClientCredentialsInput[] }) =>
-      handleUpdateResourceGroupRequest({ upstreamClientCredentials: args.input }, true),
+    validateUpstreamClientCredentials: (_, args: { input: UpstreamClientCredentialsInput[] }, context) =>
+      handleUpdateResourceGroupRequest({ upstreamClientCredentials: args.input }, context.activeDirectoryAuth, true),
 
-    validatePolicies: (_, args: { input: PolicyInput[] }) =>
-      handleUpdateResourceGroupRequest({ policies: args.input }, true),
+    validatePolicies: (_, args: { input: PolicyInput[] }, context) =>
+      handleUpdateResourceGroupRequest({ policies: args.input }, context.activeDirectoryAuth, true),
 
-    validateBasePolicy: (_, args: { input: BasePolicyInput }) =>
-      handleUpdateResourceGroupRequest({ basePolicy: args.input }, true),
+    validateBasePolicy: (_, args: { input: BasePolicyInput }, context) =>
+      handleUpdateResourceGroupRequest({ basePolicy: args.input }, context.activeDirectoryAuth, true),
   },
   Mutation: {
-    updateResourceGroup: (_, args: { input: Partial<ResourceGroupInput> }) =>
-      handleUpdateResourceGroupRequest(args.input),
+    updateResourceGroup: (_, args: { input: Partial<ResourceGroupInput> }, context) =>
+      handleUpdateResourceGroupRequest(args.input, context.activeDirectoryAuth),
 
-    updateSchemas: (_, args: { input: SchemaInput[] }) => handleUpdateResourceGroupRequest({ schemas: args.input }),
+    updateSchemas: (_, args: { input: SchemaInput[] }, context) =>
+      handleUpdateResourceGroupRequest({ schemas: args.input }, context.activeDirectoryAuth),
 
-    updateUpstreams: (_, args: { input: UpstreamInput[] }) =>
-      handleUpdateResourceGroupRequest({ upstreams: args.input }),
+    updateUpstreams: (_, args: { input: UpstreamInput[] }, context) =>
+      handleUpdateResourceGroupRequest({ upstreams: args.input }, context.activeDirectoryAuth),
 
-    updateUpstreamClientCredentials: (_, args: { input: UpstreamClientCredentialsInput[] }) =>
-      handleUpdateResourceGroupRequest({ upstreamClientCredentials: args.input }),
+    updateUpstreamClientCredentials: (_, args: { input: UpstreamClientCredentialsInput[] }, context) =>
+      handleUpdateResourceGroupRequest({ upstreamClientCredentials: args.input }, context.activeDirectoryAuth),
 
-    updatePolicies: (_, args: { input: PolicyInput[] }) => handleUpdateResourceGroupRequest({ policies: args.input }),
+    updatePolicies: (_, args: { input: PolicyInput[] }, context) =>
+      handleUpdateResourceGroupRequest({ policies: args.input }, context.activeDirectoryAuth),
 
-    updateBasePolicy: (_, args: { input: BasePolicyInput }) =>
-      handleUpdateResourceGroupRequest({ basePolicy: args.input }),
+    updateBasePolicy: (_, args: { input: BasePolicyInput }, context) =>
+      handleUpdateResourceGroupRequest({ basePolicy: args.input }, context.activeDirectoryAuth),
   },
 };
 

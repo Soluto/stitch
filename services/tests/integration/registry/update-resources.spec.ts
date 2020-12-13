@@ -77,6 +77,7 @@ const baseResourceGroup: ResourceGroup = {
   upstreams: [upstream],
   upstreamClientCredentials: [upstreamClientCredentials],
   policies: [policy],
+  remoteSchemas: [],
 };
 describe('Update resource', () => {
   let client: ApolloServerTestClient;

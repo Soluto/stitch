@@ -72,6 +72,7 @@ const resourceGroup: ResourceGroup = {
   policyAttachments: {
     [getCompiledFilename(policy.metadata)]: { evaluate: () => [{ result: { allow: true } }] },
   },
+  remoteSchemas: [],
 };
 
 describe('Policy Caching', () => {

@@ -77,6 +77,7 @@ const resourceGroup: ResourceGroup = {
   upstreams: [],
   upstreamClientCredentials: [],
   policies: [],
+  remoteSchemas: [],
 };
 
 describe('Schema Extensions', () => {
