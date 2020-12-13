@@ -98,7 +98,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
   }
 
   private buildRequest(url: URL, requestInit: RequestInit) {
-    applyUpstream(url, requestInit, this.context.authenticationConfig, this.context.request);
+    applyUpstream(url, requestInit, this.context.resourceGroup, this.context.activeDirectoryAuth, this.context.request);
     return new Request(url.href, requestInit);
   }
 }

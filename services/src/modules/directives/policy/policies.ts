@@ -26,9 +26,7 @@ const validatePolicies = async (
   info: GraphQLResolveInfo
 ) => {
   const results = await Promise.allSettled(
-    policies.map((p: Policy) =>
-      context.authorizationConfig.policyExecutor.validatePolicy(p, source, args, context, info)
-    )
+    policies.map((p: Policy) => context.policyExecutor.validatePolicy(p, source, args, context, info))
   );
 
   const allApproved = results.every(r => r.status === 'fulfilled');
