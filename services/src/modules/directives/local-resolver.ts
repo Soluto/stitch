@@ -11,18 +11,18 @@ export class LocalResolverDirective extends SchemaDirectiveVisitor {
     const { value, mergeStrategy, enabledIf } = this.args as LocalResolverArgs;
     const originalResolve = field.resolve || defaultFieldResolver;
 
-    field.resolve = async (parent, args, context, info) => {
-      const enabledIfResult = inject(enabledIf, parent, args, context, info);
+    field.resolve = async (source, args, context, info) => {
+      const enabledIfResult = inject(enabledIf, { source, args, context, info });
       // If injection throws it returns the template. In this case fail the condition
       const isEnabled = enabledIfResult && enabledIfResult !== enabledIf;
-      if (!isEnabled) return await originalResolve.call(field, parent, args, context, info);
+      if (!isEnabled) return await originalResolve.call(field, source, args, context, info);
 
-      const stubValue = inject(value, parent, args, context, info);
+      const stubValue = inject(value, { source, args, context, info });
       if (mergeStrategy === MergeStrategy.Replace) return stubValue;
 
       if (!isObject(stubValue)) throw new Error(invalidStubTypeErrorMessage);
 
-      const originalValue = await originalResolve.call(field, parent, args, context, info);
+      const originalValue = await originalResolve.call(field, source, args, context, info);
 
       return mergeStrategy === MergeStrategy.MergeDeep
         ? lodash.merge(originalValue, stubValue)

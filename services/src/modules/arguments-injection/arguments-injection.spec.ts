@@ -1,11 +1,10 @@
+import { GraphQLFieldResolverParams } from 'apollo-server-types';
 import { RequestContext } from '../context';
 import { inject } from './arguments-injection';
 
 interface TestCase {
   input: unknown;
-  source?: unknown;
-  args?: Record<string, unknown>;
-  context?: Pick<RequestContext, 'request' | 'exports' | 'request'>;
+  params: GraphQLFieldResolverParams<unknown, Pick<RequestContext, 'request' | 'exports' | 'request'>>
   expected: unknown;
 }
 
@@ -14,7 +13,12 @@ const testCases: [string, TestCase][] = [
     'From source',
     {
       input: '{source.id}',
-      source: { id: '1' },
+      params: {
+        source: { id: '1' },
+        args: {},
+        context: {} as any,
+        info: ({} as unknown) as any,
+      },
       expected: '1',
     },
   ],
@@ -22,7 +26,12 @@ const testCases: [string, TestCase][] = [
     'From args',
     {
       input: '{args.isWorking}',
-      args: { isWorking: true },
+      params: {
+        source: null,
+        args: { isWorking: true },
+        context: {} as any,
+        info: ({} as unknown) as any,
+      },
       expected: true,
     },
   ],
@@ -30,17 +39,22 @@ const testCases: [string, TestCase][] = [
     'From headers',
     {
       input: '{headers["x-client-id"]}',
-      context: {
-        request: {
-          isAnonymousAccess: () => false,
-          headers: {
-            'x-client-id': 'some-service',
+      params: {
+        source: null,
+        args: {},
+        context: {
+          request: {
+            isAnonymousAccess: () => false,
+            headers: {
+              'x-client-id': 'some-service',
+            },
+            decodeJWT(): undefined {
+              return;
+            },
           },
-          decodeJWT(): undefined {
-            return;
-          },
+          exports: { resolve: () => ({}) },
         },
-        exports: { resolve: () => ({}) },
+        info: ({} as unknown) as any,
       },
       expected: 'some-service',
     },
@@ -48,20 +62,25 @@ const testCases: [string, TestCase][] = [
   [
     'From JWT',
     {
-      input: '{jwt?.email}',
-      context: {
-        request: {
-          isAnonymousAccess: () => false,
-          headers: {},
-          decodeJWT() {
-            return {
-              header: {},
-              payload: { email: 'something@domain.com' },
-              signature: '',
-            };
+      input: '{jwt.email}',
+      params: {
+        source: null,
+        args: {},
+        context: {
+          request: {
+            isAnonymousAccess: () => false,
+            headers: {},
+            decodeJWT() {
+              return {
+                header: {},
+                payload: { email: 'something@domain.com' },
+                signature: '',
+              };
+            },
           },
+          exports: { resolve: () => ({}) },
         },
-        exports: { resolve: () => ({}) },
+        info: ({} as unknown) as any,
       },
       expected: 'something@domain.com',
     },
@@ -70,15 +89,20 @@ const testCases: [string, TestCase][] = [
     'From isAnonymousAccess',
     {
       input: '{isAnonymousAccess}',
-      context: {
-        request: {
-          isAnonymousAccess: () => true,
-          headers: {},
-          decodeJWT(): undefined {
-            return;
+      params: {
+        source: null,
+        args: {},
+        context: {
+          request: {
+            isAnonymousAccess: () => true,
+            headers: {},
+            decodeJWT(): undefined {
+              return;
+            },
           },
+          exports: { resolve: () => ({}) },
         },
-        exports: { resolve: () => ({}) },
+        info: ({} as unknown) as any,
       },
       expected: true,
     },
@@ -92,8 +116,12 @@ const testCases: [string, TestCase][] = [
         inj: '{args.argKey}',
         static: 42,
       },
-      args: { argKey: 'argVal' },
-      source: { srcKey: 'srcVal' },
+      params: {
+        source: { srcKey: 'srcVal' },
+        args: { argKey: 'argVal' },
+        context: {} as any,
+        info: ({} as unknown) as any,
+      },
       expected: {
         obj: { f1: 'v1', arg: 'argVal' },
         arr: ['first', 'srcVal'],
@@ -106,16 +134,20 @@ const testCases: [string, TestCase][] = [
     'Deep inject array that contains objects and arrays',
     {
       input: [{ f1: 'v1', arg: '{args.argKey}' }, ['first', '{source.srcKey}'], '{args.argKey}', 42],
-      args: { argKey: 'argVal' },
-      source: { srcKey: 'srcVal' },
+      params: {
+        source: { srcKey: 'srcVal' },
+        args: { argKey: 'argVal' },
+        context: {} as any,
+        info: ({} as unknown) as any,
+      },
       expected: [{ f1: 'v1', arg: 'argVal' }, ['first', 'srcVal'], 'argVal', 42],
     },
   ],
 ];
 
 describe('Argument Injection Tests', () => {
-  test.each(testCases)('%s', (_, { input, source, args, context, expected }) => {
-    const result = inject(input, source, args, context);
+  test.each(testCases)('%s', (_, { input, params, expected }) => {
+    const result = inject(input, params);
     expect(result).toEqual(expected);
   });
 });

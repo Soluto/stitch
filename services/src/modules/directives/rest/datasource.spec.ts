@@ -20,7 +20,12 @@ describe('REST directive data source', () => {
   });
 
   it('Defaults to GET', async () => {
-    await ds.doRequest({ url: 'http://somewhere' }, null, {}, {} as any, {} as any);
+    await ds.doRequest({ url: 'http://somewhere' }, {
+      source: null,
+      args: {},
+      context: {} as any,
+      info: {} as any,
+    });
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const req = fetchMock.mock.calls[0][0] as Request;
@@ -38,10 +43,12 @@ describe('REST directive data source', () => {
           { key: 'child', value: '{source.children}' },
         ],
       },
-      { children: ['one', 'two', 3] },
-      { name: 'aviv' },
-      {} as any,
-      {} as any
+      {
+        source: { children: ['one', 'two', 3] },
+        args: { name: 'aviv' },
+        context: {} as any,
+        info: {} as any,
+      }
     );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -58,10 +65,12 @@ describe('REST directive data source', () => {
           { key: 'owner', value: '{args.name}' },
         ],
       },
-      null,
-      { name: 'aviv' },
-      {} as any,
-      {} as any
+      {
+        source: null,
+        args: { name: 'aviv' },
+        context: {} as any,
+        info: {} as any,
+      }
     );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -78,10 +87,12 @@ describe('REST directive data source', () => {
         query: [{ key: 'name', value: '{source.firstName}' }],
         headers: [{ key: 'name', value: '{source.firstName}' }],
       },
-      { firstName: undefined },
-      {},
-      {} as any,
-      {} as any
+      {
+        source: { firstName: undefined },
+        args: {},
+        context: {} as any,
+        info: {} as any,
+      }
     );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -98,10 +109,12 @@ describe('REST directive data source', () => {
           { key: 'owner', value: '{args.name}' },
         ],
       },
-      null,
-      { name: 'aviv' },
-      {} as any,
-      {} as any
+      {
+        source: null,
+        args: { name: 'aviv' },
+        context: {} as any,
+        info: {} as any,
+      }
     );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -120,10 +133,12 @@ describe('REST directive data source', () => {
             { key: 'owner', value: '{args.name}' },
           ],
         },
-        null,
-        { name: 'aviv' },
-        {} as any,
-        {} as any
+        {
+          source: null,
+          args: { name: 'aviv' },
+          context: {} as any,
+          info: {} as any,
+        }
       );
     }catch(err) {
       expect(err.toString()).toBe("mykey header is required");
@@ -140,10 +155,12 @@ describe('REST directive data source', () => {
           { key: 'owner', value: '{args.name}' },
         ],
       },
-      null,
-      { name: 'aviv' },
-      {} as any,
-      {} as any
+      {
+        source: null,
+        args: { name: 'aviv' },
+        context: {} as any,
+        info: {} as any,
+      }
     );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -162,10 +179,12 @@ describe('REST directive data source', () => {
             url: 'http://somewhere',
             method,
           },
-          null,
-          {},
-          {} as any,
-          {} as any
+          {
+            source: null,
+            args: {},
+            context: {} as any,
+            info: {} as any,
+          }
         );
 
         expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -182,10 +201,12 @@ describe('REST directive data source', () => {
         method: 'POST',
         bodyArg: 'input',
       },
-      null,
-      { input: { name: 'aviv' } },
-      {} as any,
-      {} as any
+      {
+        source: null,
+        args: { input: { name: 'aviv' } },
+        context: {} as any,
+        info: {} as any,
+      }
     );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -203,10 +224,12 @@ describe('REST directive data source', () => {
         method: 'GET',
         query: [{ key: 'field1', value: 'value1', required: true }],
       },
-      null,
-      {} as any,
-      {} as any,
-      {} as any
+      {
+        source: null,
+        args: {},
+        context: {} as any,
+        info: {} as any,
+      }
     );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -223,10 +246,12 @@ describe('REST directive data source', () => {
           method: 'GET',
           query: [{ key: 'field1', value: '', required: true }],
         },
-        null,
-        {} as any,
-        {} as any,
-        {} as any
+        {
+          source: null,
+          args: {},
+          context: {} as any,
+          info: {} as any,
+        }
       );
     }catch (err) {
       expect(err.toString()).toBe("field1 query parameter is required");
@@ -241,10 +266,12 @@ describe('REST directive data source', () => {
         method: 'GET',
         query: [{ key: 'field1', value: 'false', required: true }],
       },
-      null,
-      {} as any,
-      {} as any,
-      {} as any
+      {
+        source: null,
+        args: {},
+        context: {} as any,
+        info: {} as any,
+      }
     );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -259,10 +286,12 @@ describe('REST directive data source', () => {
         method: 'GET',
         query: [{ key: 'field1', value: '' }],
       },
-      null,
-      {} as any,
-      {} as any,
-      {} as any
+      {
+        source: null,
+        args: {},
+        context: {} as any,
+        info: {} as any,
+      }
     );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);

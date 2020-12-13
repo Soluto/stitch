@@ -1,6 +1,7 @@
 import { RESTDataSource, Request } from 'apollo-datasource-rest';
 import { RequestInit, Headers } from 'apollo-server-env';
-import {  GraphQLError, GraphQLResolveInfo, isNullableType } from 'graphql';
+import { GraphQLFieldResolverParams } from 'apollo-server-types';
+import {  GraphQLError, isNullableType } from 'graphql';
 import { inject } from '../../arguments-injection';
 import { RequestContext } from '../../context';
 import { getAuthHeaders } from '../../upstream-authentication';
@@ -8,24 +9,19 @@ import { KeyValue, RestParams } from './types';
 
 const hasValue = (value: unknown) => value !== null && typeof value !== undefined && value !== undefined && value !== '';
 
-type GraphQLArguments = { [key: string]: unknown };
-
 export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
   async doRequest(
     params: RestParams,
-    parent: unknown,
-    args: GraphQLArguments,
-    context: RequestContext,
-    info: GraphQLResolveInfo
+    fieldResolverParams: GraphQLFieldResolverParams<unknown, RequestContext>
   ) {
-    const headers = this.parseHeaders(params.headers, parent, args, info);
+    const headers = this.parseHeaders(params.headers, fieldResolverParams);
     const requestInit: RequestInit = { headers, timeout: params.timeoutMs ?? 10000, method: params.method };
-    const url = new URL(inject(params.url, parent, args, this.context, info) as string);
-    this.addQueryParams(url.searchParams, params.query, parent, args, info);
+    const url = new URL(inject(params.url, fieldResolverParams) as string);
+    this.addQueryParams(url.searchParams, params.query, fieldResolverParams);
 
     await this.addAuthentication(url, headers);
 
-    const body = this.getBody(params, parent, args, context, info);
+    const body = this.getBody(params, fieldResolverParams);
     if (body) {
       requestInit.body = JSON.stringify(body);
       headers.append('Content-Type', 'application/json');
@@ -35,7 +31,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     const cacheKey = this.cacheKeyFor(request);
     const response = await this.httpCache.fetch(request, { cacheKey });
 
-    const notFoundAsNull = params.notFoundAsNull ?? isNullableType(info.returnType);
+    const notFoundAsNull = params.notFoundAsNull ?? isNullableType(fieldResolverParams.info.returnType);
     if (response.status === 404 && notFoundAsNull) {
       return null;
     }
@@ -51,22 +47,19 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
 
   getBody(
     params: RestParams,
-    parent: unknown,
-    args: Record<string, unknown>,
-    context: RequestContext,
-    info: GraphQLResolveInfo
+    fieldResolverParams: GraphQLFieldResolverParams<unknown, RequestContext>
   ) {
     const { body, bodyArg } = params;
     if (body && bodyArg) {
       throw new Error('Set either "body" or "bodyArg" argument but not both');
     }
     if (body) {
-      return inject(body, parent, args, context, info);
+      return inject(body, fieldResolverParams);
     }
-    return args[params.bodyArg || 'input'] as ArrayBuffer | ArrayBufferView | string;
+    return fieldResolverParams.args[params.bodyArg || 'input'] as ArrayBuffer | ArrayBufferView | string;
   }
 
-  parseHeaders(kvs: KeyValue[] | undefined, parent: unknown, args: GraphQLArguments, info: GraphQLResolveInfo) {
+  parseHeaders(kvs: KeyValue[] | undefined, fieldResolverParams: GraphQLFieldResolverParams<unknown, RequestContext>) {
     const headers = new Headers();
 
     if (typeof kvs === 'undefined') {
@@ -74,7 +67,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     }
 
     for (const kv of kvs) {
-      const value = inject(kv.value, parent, args, this.context, info) as string;
+      const value = inject(kv.value, fieldResolverParams) as string;
       if (!hasValue(value) && kv.required){
         throw new GraphQLError(`${kv.key} header is required`);
       }
@@ -87,15 +80,13 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
   addQueryParams(
     params: URLSearchParams,
     kvs: KeyValue[] | undefined,
-    parent: unknown,
-    args: GraphQLArguments,
-    info: GraphQLResolveInfo
+    fieldResolverParams: GraphQLFieldResolverParams<unknown, RequestContext>
   ) {
 
     if (!kvs || kvs.length == 0) return;
 
     for (const kv of kvs) {
-      const value = inject(kv.value, parent, args, this.context, info);
+      const value = inject(kv.value, fieldResolverParams);
       if (!hasValue(value)) {
         if(kv.required) {
           throw new GraphQLError(`${kv.key} query parameter is required`);

@@ -43,7 +43,7 @@ export type GraphQLArguments = {
 
 export type PolicyDirectiveExecutionContext = {
   policy: Policy;
-  parent: unknown;
+  source: unknown;
   gqlArgs: GraphQLArguments;
   requestContext: RequestContext;
   info: GraphQLResolveInfo;
