@@ -1,7 +1,7 @@
 import { RESTDataSource, Request, Response } from 'apollo-datasource-rest';
 import { RequestInit, Headers } from 'apollo-server-env';
 import { GraphQLFieldResolverParams } from 'apollo-server-types';
-import {  GraphQLError, isNullableType } from 'graphql';
+import { GraphQLError, isNullableType } from 'graphql';
 import { inject } from '../../arguments-injection';
 import { RequestContext } from '../../context';
 import { applyUpstream } from '../../upstreams';
@@ -32,17 +32,16 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     const { headers: kvs } = params;
     const headers = new Headers();
 
-    if (typeof kvs === 'undefined') {
-      return;
+    if (kvs) {
+      for (const kv of kvs) {
+        const value = inject(kv.value, fieldResolverParams) as string;
+        if (!hasValue(value) && kv.required) {
+          throw new GraphQLError(`${kv.key} header is required`);
+        }
+        headers.append(kv.key, value);
+      }
     }
 
-    for (const kv of kvs) {
-      const value = inject(kv.value, fieldResolverParams) as string;
-      if (!hasValue(value) && kv.required){
-        throw new GraphQLError(`${kv.key} header is required`);
-      }
-      headers.append(kv.key, value);
-    }
     requestInit.headers = headers;
   }
 
@@ -51,14 +50,9 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     if (bodyObj && bodyArg) {
       throw new Error('Set either "body" or "bodyArg" argument but not both');
     }
-    const body = bodyObj
-      ? inject(bodyObj, fieldResolverParams)
-      : fieldResolverParams.args[params.bodyArg || 'input'];
+    const body = bodyObj ? inject(bodyObj, fieldResolverParams) : fieldResolverParams.args[params.bodyArg || 'input'];
     if (body) {
       requestInit.body = JSON.stringify(body);
-      if (!requestInit.headers) {
-        requestInit.headers = new Headers();
-      }
       (requestInit.headers as Headers).append('Content-Type', 'application/json');
     }
   }
