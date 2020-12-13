@@ -20,12 +20,15 @@ describe('REST directive data source', () => {
   });
 
   it('Defaults to GET', async () => {
-    await ds.doRequest({ url: 'http://somewhere' }, {
-      source: null,
-      args: {},
-      context: {} as any,
-      info: {} as any,
-    });
+    await ds.doRequest(
+      { url: 'http://somewhere' },
+      {
+        source: null,
+        args: {},
+        context: {} as any,
+        info: {} as any,
+      }
+    );
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const req = fetchMock.mock.calls[0][0] as Request;
@@ -124,7 +127,7 @@ describe('REST directive data source', () => {
   });
 
   it('Does not send request if required headers are empty', async () => {
-    try{
+    try {
       await ds.doRequest(
         {
           url: 'http://somewhere',
@@ -140,8 +143,8 @@ describe('REST directive data source', () => {
           info: {} as any,
         }
       );
-    }catch(err) {
-      expect(err.toString()).toBe("mykey header is required");
+    } catch (err) {
+      expect(err.toString()).toBe('mykey header is required');
     }
     expect(fetchMock).toHaveBeenCalledTimes(0);
   });
@@ -239,7 +242,7 @@ describe('REST directive data source', () => {
   });
 
   it('Does not send request if required query parameters are missing values', async () => {
-    try{
+    try {
       await ds.doRequest(
         {
           url: 'http://somewhere',
@@ -253,8 +256,8 @@ describe('REST directive data source', () => {
           info: {} as any,
         }
       );
-    }catch (err) {
-      expect(err.toString()).toBe("field1 query parameter is required");
+    } catch (err) {
+      expect(err.toString()).toBe('field1 query parameter is required');
     }
     expect(fetchMock).toHaveBeenCalledTimes(0);
   });

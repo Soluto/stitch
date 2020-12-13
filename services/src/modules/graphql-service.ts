@@ -6,7 +6,7 @@ import type { GraphQLRequestContextExecutionDidStart } from 'apollo-server-types
 import { ResourceGroup, PolicyDefinition, Schema, ResourceMetadata } from './resource-repository';
 import { buildSchemaFromFederatedTypeDefs } from './build-federated-schema';
 import getBaseSchema from './base-schema';
-import { ActiveDirectoryAuth, AuthenticationConfig } from './upstream-authentication';
+import { ActiveDirectoryAuth, AuthenticationConfig } from './upstreams/authentication';
 import logger from './logger';
 import { AuthorizationConfig, PolicyExecutor } from './directives/policy';
 
