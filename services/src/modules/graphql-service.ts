@@ -86,12 +86,15 @@ export async function createSchemaConfig(resourceGroup: ResourceGroup): Promise<
     schemaDirectivesContext: { resourceGroup },
   });
 
+  const policyExecutor = new PolicyExecutor();
+  const activeDirectoryAuth = new ActiveDirectoryAuth();
+
   return {
     schema,
     executor(requestContext) {
       requestContext.context.resourceGroup = resourceGroup;
-      requestContext.context.activeDirectoryAuth = new ActiveDirectoryAuth();
-      requestContext.context.policyExecutor = new PolicyExecutor();
+      requestContext.context.activeDirectoryAuth = activeDirectoryAuth;
+      requestContext.context.policyExecutor = policyExecutor;
 
       return execute({
         document: requestContext.document,
