@@ -30,11 +30,7 @@ export default class PolicyExecutor {
     requestContext: RequestContext,
     info: GraphQLResolveInfo
   ): Promise<boolean> {
-    const policyDefinition = getPolicyDefinition(
-      requestContext.authorizationConfig.policies,
-      policy.namespace,
-      policy.name
-    );
+    const policyDefinition = getPolicyDefinition(requestContext.resourceGroup.policies, policy.namespace, policy.name);
     return this.getPolicyResult({ policy, source, gqlArgs, requestContext, info, policyDefinition });
   }
 
@@ -45,11 +41,7 @@ export default class PolicyExecutor {
     requestContext: RequestContext,
     info: GraphQLResolveInfo
   ): boolean {
-    const policyDefinition = getPolicyDefinition(
-      requestContext.authorizationConfig.policies,
-      policy.namespace,
-      policy.name
-    );
+    const policyDefinition = getPolicyDefinition(requestContext.resourceGroup.policies, policy.namespace, policy.name);
     return this.getPolicyResultSync({ policy, source, gqlArgs, requestContext, info, policyDefinition });
   }
 
@@ -110,7 +102,7 @@ export default class PolicyExecutor {
       ...ctx.policy,
       args,
       query,
-      policyAttachments: ctx.requestContext.authorizationConfig.policyAttachments!,
+      policyAttachments: ctx.requestContext.resourceGroup.policyAttachments!,
     });
     if (!done) throw new Error('in-line query evaluation not yet supported');
     return allow || false;

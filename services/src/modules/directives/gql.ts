@@ -8,21 +8,32 @@ import { setContext } from 'apollo-link-context';
 import fetch from 'node-fetch';
 import { FastifyRequest } from 'fastify';
 import { inject } from '../arguments-injection';
-import { getAuthHeaders, AuthenticationConfig } from '../upstreams/authentication';
+import { ActiveDirectoryAuth, getAuthHeaders } from '../upstreams/authentication';
 import logger from '../logger';
 import { RequestContext } from '../context';
+import { ResourceGroup } from '../resource-repository';
 
 const pendingIntrospectionRetries = new Map<string, NodeJS.Timeout>();
 
 export class GqlDirective extends SchemaDirectiveVisitor {
-  createRemoteSchema(url: string, config: AuthenticationConfig, timeoutMs?: number) {
+  createRemoteSchema(
+    url: string,
+    resourceGroup: ResourceGroup,
+    activeDirectoryAuth: ActiveDirectoryAuth,
+    timeoutMs?: number
+  ) {
     const httpLink: ApolloLink = new HttpLink({
       uri: url,
       fetch: fetch as any,
       fetchOptions: { timeout: timeoutMs ?? 10000 },
     });
     const authLink = setContext(async (_, context) => ({
-      headers: await getAuthHeaders(config, new URL(url).host, context?.graphqlContext?.request as FastifyRequest),
+      headers: await getAuthHeaders(
+        resourceGroup,
+        activeDirectoryAuth,
+        new URL(url).host,
+        context?.graphqlContext?.request as FastifyRequest
+      ),
     })).concat(httpLink);
     const retryLink = new RetryLink({
       delay: { max: 5000 },
@@ -61,7 +72,12 @@ export class GqlDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
     const { url, fieldName, arguments: gqlArgs, operationType: operationTypeParam, timeoutMs } = this.args;
     const operationType = operationTypeParam?.toLowerCase() ?? 'query';
-    const remoteSchema = this.createRemoteSchema(url, this.context.authenticationConfig, timeoutMs);
+    const remoteSchema = this.createRemoteSchema(
+      url,
+      this.context.resourceGroup,
+      this.context.activeDirectoryAuth,
+      timeoutMs
+    );
 
     field.resolve = async (source, args, context, info) => {
       if (!remoteSchema.ready) throw new Error(`Failed reaching remote gql server for introspection (url ${url})`);

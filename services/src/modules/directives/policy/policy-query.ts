@@ -18,13 +18,7 @@ export class PolicyQueryDirective extends SchemaDirectiveVisitor {
         args: args,
       };
 
-      const allow = await context.authorizationConfig.policyExecutor.evaluatePolicy(
-        policy,
-        parent,
-        args,
-        context,
-        info
-      );
+      const allow = await context.policyExecutor.evaluatePolicy(policy, parent, args, context, info);
       return { allow };
     };
   }

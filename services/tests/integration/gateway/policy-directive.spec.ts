@@ -377,9 +377,7 @@ describe.each(testCases)('Policy Directive Tests', (testName, { typeDefs, resolv
         mock: MockDirective,
       },
       context: {
-        authorizationConfig: {
-          policyExecutor: new PolicyExecutor(),
-        },
+        policyExecutor: new PolicyExecutor(),
       },
     });
     client = createTestClient(server);

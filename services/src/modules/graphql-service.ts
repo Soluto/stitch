@@ -6,9 +6,9 @@ import type { GraphQLRequestContextExecutionDidStart } from 'apollo-server-types
 import { ResourceGroup, PolicyDefinition, Schema, ResourceMetadata } from './resource-repository';
 import { buildSchemaFromFederatedTypeDefs } from './build-federated-schema';
 import getBaseSchema from './base-schema';
-import { ActiveDirectoryAuth, AuthenticationConfig } from './upstreams/authentication';
 import logger from './logger';
-import { AuthorizationConfig, PolicyExecutor } from './directives/policy';
+import { ActiveDirectoryAuth } from './upstreams/authentication';
+import { PolicyExecutor } from './directives/policy';
 
 export function createGraphQLService(config: { resourceGroups: Observable<ResourceGroup> }) {
   let currentSchemaConfig: GraphQLServiceConfig;
@@ -71,31 +71,9 @@ function buildPolicyGqlQuery(policy: PolicyDefinition): DocumentNode {
         `;
 }
 
-export async function createSchemaConfig(rg: ResourceGroup): Promise<GraphQLServiceConfig> {
-  const activeDirectoryAuth = new ActiveDirectoryAuth();
-  const upstreamsByHost = new Map(rg.upstreams.map(u => [u.host, u]));
-  const upstreamClientCredentialsByAuthority = new Map(
-    rg.upstreamClientCredentials.map(u => [u.activeDirectory.authority, u])
-  );
-  const schemas = rg.schemas.length === 0 ? [defaultSchema] : [initialSchema, ...rg.schemas];
-  const policies = rg.policies ?? [];
-
-  const authenticationConfig: AuthenticationConfig = {
-    getUpstreamByHost(host: string) {
-      return upstreamsByHost.get(host);
-    },
-    getUpstreamClientCredentialsByAuthority(authority: string) {
-      return upstreamClientCredentialsByAuthority.get(authority);
-    },
-    activeDirectoryAuth,
-  };
-
-  const authorizationConfig: AuthorizationConfig = {
-    policies: rg.policies,
-    policyAttachments: rg.policyAttachments,
-    policyExecutor: new PolicyExecutor(),
-    basePolicy: rg.basePolicy,
-  };
+export async function createSchemaConfig(resourceGroup: ResourceGroup): Promise<GraphQLServiceConfig> {
+  const schemas = resourceGroup.schemas.length === 0 ? [defaultSchema] : [initialSchema, ...resourceGroup.schemas];
+  const policies = resourceGroup.policies ?? [];
 
   const schemaTypeDefs = schemas.map(s => [`${s.metadata.namespace}/${s.metadata.name}`, parse(s.schema)]);
   const policyQueryTypeDefs = policies.map(p => [getPolicyQueryName(p.metadata), buildPolicyGqlQuery(p)]);
@@ -105,14 +83,15 @@ export async function createSchemaConfig(rg: ResourceGroup): Promise<GraphQLServ
     baseTypeDefs: baseSchema.typeDefs,
     resolvers: { ...baseSchema.resolvers },
     schemaDirectives: baseSchema.directives,
-    schemaDirectivesContext: { authenticationConfig, authorizationConfig },
+    schemaDirectivesContext: { resourceGroup },
   });
 
   return {
     schema,
     executor(requestContext) {
-      requestContext.context.authenticationConfig = authenticationConfig;
-      requestContext.context.authorizationConfig = authorizationConfig;
+      requestContext.context.resourceGroup = resourceGroup;
+      requestContext.context.activeDirectoryAuth = new ActiveDirectoryAuth();
+      requestContext.context.policyExecutor = new PolicyExecutor();
 
       return execute({
         document: requestContext.document,
@@ -151,7 +130,8 @@ const initialSchema: Schema = {
 
 declare module './context' {
   interface RequestContext {
-    authenticationConfig: AuthenticationConfig;
-    authorizationConfig: AuthorizationConfig;
+    resourceGroup: ResourceGroup;
+    activeDirectoryAuth: ActiveDirectoryAuth;
+    policyExecutor: PolicyExecutor;
   }
 }

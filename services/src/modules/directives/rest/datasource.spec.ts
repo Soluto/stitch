@@ -5,8 +5,8 @@ import { RESTDirectiveDataSource } from './datasource';
 jest.mock('../../logger');
 
 const emptyContext = {
-  authenticationConfig: {
-    getUpstreamByHost() {},
+  resourceGroup: {
+    upstreams: [],
   },
   request: { headers: {} },
 };

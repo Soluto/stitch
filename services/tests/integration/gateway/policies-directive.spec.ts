@@ -166,9 +166,7 @@ describe.each(testCases)('Policies Directive Tests', (testName, { typeDefs }) =>
         mock: MockDirective,
       },
       context: {
-        authorizationConfig: {
-          policyExecutor: new PolicyExecutor(),
-        },
+        policyExecutor: new PolicyExecutor(),
       },
     });
     client = createTestClient(server);
