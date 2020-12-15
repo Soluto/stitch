@@ -1,8 +1,253 @@
-import 'jest-fetch-mock';
+import * as nock from 'nock';
+import fetch from 'node-fetch';
 import { InMemoryLRUCache } from 'apollo-server-caching';
+import { GraphQLFieldResolverParams } from 'apollo-server-types';
+import { RequestContext } from '../../context';
 import { RESTDirectiveDataSource } from './datasource';
+import { RestParams } from './types';
 
 jest.mock('../../logger');
+
+interface TestCase {
+  setup: () => nock.Scope;
+  restParams: Partial<RestParams>;
+  fieldResolverParams: Partial<GraphQLFieldResolverParams<unknown, RequestContext>>;
+  shouldSkipRequest?: boolean;
+}
+
+const remoteHost = 'http://somewhere';
+const remoteHostResponse = JSON.stringify('DATA');
+
+const testCases: [string, TestCase][] = [
+  [
+    'Defaults to GET',
+    {
+      setup: () => nock(remoteHost).get('/').reply(200, remoteHostResponse),
+      restParams: {},
+      fieldResolverParams: {},
+    },
+  ],
+  [
+    'Includes query parameters, static ones & from params & arrays from params',
+    {
+      setup: () =>
+        nock(remoteHost)
+          .get('/')
+          .query({
+            mykey: 'myvalue',
+            owner: 'aviv',
+            child: ['one', 'two', 'thee'],
+          })
+          .reply(200, remoteHostResponse),
+      restParams: {
+        query: [
+          { key: 'mykey', value: 'myvalue' },
+          { key: 'owner', value: '{args.name}' },
+          { key: 'child', value: '{source.children}' },
+        ],
+      },
+      fieldResolverParams: {
+        source: {
+          children: ['one', 'two', 'thee'],
+        },
+        args: {
+          name: 'aviv',
+        },
+      },
+    },
+  ],
+  [
+    'Includes headers',
+    {
+      setup: () =>
+        nock(remoteHost)
+          .get('/')
+          .matchHeader('mykey', 'myvalue')
+          .matchHeader('owner', 'aviv')
+          .reply(200, remoteHostResponse),
+      restParams: {
+        headers: [
+          { key: 'mykey', value: 'myvalue' },
+          { key: 'owner', value: '{args.name}' },
+        ],
+      },
+      fieldResolverParams: {
+        args: { name: 'aviv' },
+      },
+    },
+  ],
+  [
+    'Skips headers and query params who resolve to undefined',
+    {
+      setup: () => nock(remoteHost).get('/').reply(200, remoteHostResponse),
+      restParams: {
+        query: [{ key: 'name', value: '{source.firstName}' }],
+        headers: [{ key: 'name', value: '{source.firstName}' }],
+      },
+      fieldResolverParams: {
+        source: { firstName: undefined },
+      },
+    },
+  ],
+  [
+    'Sends request if required headers are included',
+    {
+      setup: () =>
+        nock(remoteHost)
+          .matchHeader('mykey', 'myvalue')
+          .matchHeader('owner', 'aviv')
+          .get('/')
+          .reply(200, remoteHostResponse),
+      restParams: {
+        headers: [
+          { key: 'mykey', value: 'myvalue', required: true },
+          { key: 'owner', value: '{args.name}' },
+        ],
+      },
+      fieldResolverParams: {
+        args: { name: 'aviv' },
+      },
+    },
+  ],
+  [
+    'Does not send request if required headers are empty',
+    {
+      setup: () => nock(remoteHost).get('/').reply(200, remoteHostResponse),
+      restParams: {
+        headers: [
+          { key: 'mykey', value: '', required: true },
+          { key: 'owner', value: '{args.name}' },
+        ],
+      },
+      fieldResolverParams: {
+        args: { name: 'aviv' },
+      },
+      shouldSkipRequest: true,
+    },
+  ],
+  [
+    'Sends request when header is missing the value and required is not set (default false)',
+    {
+      setup: () => nock(remoteHost).get('/').matchHeader('owner', 'aviv').reply(200, remoteHostResponse),
+      restParams: {
+        headers: [
+          { key: 'mykey', value: '' },
+          { key: 'owner', value: '{args.name}' },
+        ],
+      },
+      fieldResolverParams: {
+        args: { name: 'aviv' },
+      },
+    },
+  ],
+  [
+    'Supported http methods dispatch with the correct http method (GET)',
+    {
+      setup: () => nock(remoteHost).get('/').reply(200, remoteHostResponse),
+      restParams: {
+        method: 'get',
+      },
+      fieldResolverParams: {},
+    },
+  ],
+  [
+    'Supported http methods dispatch with the correct http method (POST)',
+    {
+      setup: () => nock(remoteHost).post('/').reply(200, remoteHostResponse),
+      restParams: {
+        method: 'post',
+      },
+      fieldResolverParams: {},
+    },
+  ],
+  [
+    'Supported http methods dispatch with the correct http method (PUT)',
+    {
+      setup: () => nock(remoteHost).put('/').reply(200, remoteHostResponse),
+      restParams: {
+        method: 'put',
+      },
+      fieldResolverParams: {},
+    },
+  ],
+  [
+    'Supported http methods dispatch with the correct http method (PATCH)',
+    {
+      setup: () => nock(remoteHost).patch('/').reply(200, remoteHostResponse),
+      restParams: {
+        method: 'patch',
+      },
+      fieldResolverParams: {},
+    },
+  ],
+  [
+    'Supported http methods dispatch with the correct http method (DELETE)',
+    {
+      setup: () => nock(remoteHost).delete('/').reply(200, remoteHostResponse),
+      restParams: {
+        method: 'delete',
+      },
+      fieldResolverParams: {},
+    },
+  ],
+  [
+    'Adds stringified JSON body',
+    {
+      setup: () =>
+        nock(remoteHost)
+          .post('/', JSON.stringify({ name: 'aviv' }))
+          .reply(200, remoteHostResponse),
+      restParams: {
+        method: 'POST',
+        bodyArg: 'input',
+      },
+      fieldResolverParams: {
+        args: { input: { name: 'aviv' } },
+      },
+    },
+  ],
+  [
+    'Sends request if required query parameters are included',
+    {
+      setup: () => nock(remoteHost).get('/').query({ field1: 'value1' }).reply(200, remoteHostResponse),
+      restParams: {
+        query: [{ key: 'field1', value: 'value1', required: true }],
+      },
+      fieldResolverParams: {},
+    },
+  ],
+  [
+    'Does not send request if required query parameters are missing values',
+    {
+      setup: () => nock(remoteHost).get('/').reply(200, remoteHostResponse),
+      restParams: {
+        query: [{ key: 'field1', value: '', required: true }],
+      },
+      fieldResolverParams: {},
+      shouldSkipRequest: true,
+    },
+  ],
+  [
+    'Properly handles boolean query parameter values',
+    {
+      setup: () => nock(remoteHost).get('/').query({ field1: false }).reply(200, remoteHostResponse),
+      restParams: {
+        query: [{ key: 'field1', value: 'false', required: true }],
+      },
+      fieldResolverParams: {},
+    },
+  ],
+  [
+    'Sends request when empty values are sent in the query params and required is not set (default false)',
+    {
+      setup: () => nock(remoteHost).get('/').reply(200, remoteHostResponse),
+      restParams: {
+        query: [{ key: 'field1', value: '' }],
+      },
+      fieldResolverParams: {},
+    },
+  ],
+];
 
 const emptyContext = {
   resourceGroup: {
@@ -10,295 +255,42 @@ const emptyContext = {
   },
   request: { headers: {} },
 };
+
 describe('REST directive data source', () => {
   let ds: RESTDirectiveDataSource;
 
+  const defaultRestParams: RestParams = {
+    url: remoteHost,
+  };
+
+  const defaultFieldResolverParams: GraphQLFieldResolverParams<unknown, RequestContext> = {
+    source: undefined,
+    args: {},
+    context: {} as any,
+    info: {} as any,
+  };
+
   beforeEach(() => {
-    fetchMock.resetMocks();
-    ds = new RESTDirectiveDataSource(fetchMock as any);
+    nock.cleanAll();
+    ds = new RESTDirectiveDataSource(fetch as any);
     ds.initialize({ context: emptyContext as any, cache: new InMemoryLRUCache() });
   });
 
-  it('Defaults to GET', async () => {
-    await ds.doRequest(
-      { url: 'http://somewhere' },
-      {
-        source: null,
-        args: {},
-        context: {} as any,
-        info: {} as any,
-      }
-    );
-
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const req = fetchMock.mock.calls[0][0] as Request;
-    expect(req.url).toBe('http://somewhere/');
-    expect(req.method).toBe('GET');
+  afterEach(() => {
+    nock.cleanAll();
   });
 
-  it('Includes query parameters, static ones & from params & arrays from params', async () => {
-    await ds.doRequest(
-      {
-        url: 'http://somewhere',
-        query: [
-          { key: 'mykey', value: 'myvalue' },
-          { key: 'owner', value: '{args.name}' },
-          { key: 'child', value: '{source.children}' },
-        ],
-      },
-      {
-        source: { children: ['one', 'two', 3] },
-        args: { name: 'aviv' },
-        context: {} as any,
-        info: {} as any,
-      }
-    );
-
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const req = fetchMock.mock.calls[0][0] as Request;
-    expect(req.url).toBe('http://somewhere/?mykey=myvalue&owner=aviv&child=one&child=two&child=3');
-  });
-
-  it('Includes headers', async () => {
-    await ds.doRequest(
-      {
-        url: 'http://somewhere',
-        headers: [
-          { key: 'mykey', value: 'myvalue' },
-          { key: 'owner', value: '{args.name}' },
-        ],
-      },
-      {
-        source: null,
-        args: { name: 'aviv' },
-        context: {} as any,
-        info: {} as any,
-      }
-    );
-
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const req = fetchMock.mock.calls[0][0] as Request;
-    expect(req.headers).toStrictEqual(new Headers({ mykey: 'myvalue', owner: 'aviv' }));
-    expect(req.url).toBe('http://somewhere/');
-    expect(req.method).toBe('GET');
-  });
-
-  it('Skips headers and query params who resolve to undefined', async () => {
-    await ds.doRequest(
-      {
-        url: 'http://somewhere',
-        query: [{ key: 'name', value: '{source.firstName}' }],
-        headers: [{ key: 'name', value: '{source.firstName}' }],
-      },
-      {
-        source: { firstName: undefined },
-        args: {},
-        context: {} as any,
-        info: {} as any,
-      }
-    );
-
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const req = fetchMock.mock.calls[0][0] as Request;
-    expect(req.url).toBe('http://somewhere/');
-  });
-
-  it('Sends request if required headers are included', async () => {
-    await ds.doRequest(
-      {
-        url: 'http://somewhere',
-        headers: [
-          { key: 'mykey', value: 'myvalue', required: true },
-          { key: 'owner', value: '{args.name}' },
-        ],
-      },
-      {
-        source: null,
-        args: { name: 'aviv' },
-        context: {} as any,
-        info: {} as any,
-      }
-    );
-
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const req = fetchMock.mock.calls[0][0] as Request;
-    expect(req.headers.get('mykey')).toBe('myvalue');
-    expect(req.headers.get('owner')).toBe('aviv');
-  });
-
-  it('Does not send request if required headers are empty', async () => {
+  test.each(testCases)('%s', async (_, { setup, restParams, fieldResolverParams, shouldSkipRequest = false }) => {
+    const fetchSpy = setup();
     try {
-      await ds.doRequest(
-        {
-          url: 'http://somewhere',
-          headers: [
-            { key: 'mykey', value: '', required: true },
-            { key: 'owner', value: '{args.name}' },
-          ],
-        },
-        {
-          source: null,
-          args: { name: 'aviv' },
-          context: {} as any,
-          info: {} as any,
-        }
+      const response = await ds.doRequest(
+        { ...defaultRestParams, ...restParams },
+        { ...defaultFieldResolverParams, ...fieldResolverParams }
       );
-    } catch (err) {
-      expect(err.toString()).toBe('mykey header is required');
+      expect(fetchSpy.isDone()).toBe(!shouldSkipRequest);
+      expect(response).toBe(JSON.stringify('DATA'));
+    } catch (e) {
+      expect(e).toMatchSnapshot();
     }
-    expect(fetchMock).toHaveBeenCalledTimes(0);
-  });
-
-  it('Sends request when header is missing the value and required is not set (default false)', async () => {
-    await ds.doRequest(
-      {
-        url: 'http://somewhere',
-        headers: [
-          { key: 'mykey', value: '' },
-          { key: 'owner', value: '{args.name}' },
-        ],
-      },
-      {
-        source: null,
-        args: { name: 'aviv' },
-        context: {} as any,
-        info: {} as any,
-      }
-    );
-
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const req = fetchMock.mock.calls[0][0] as Request;
-    expect(req.headers.get('mykey')).toBe('');
-    expect(req.headers.get('owner')).toBe('aviv');
-  });
-
-  describe('Supported http methods dispatch with the correct http method', () => {
-    const methods = ['GET', 'DELETE', 'POST', 'PUT', 'PATCH'];
-
-    for (const method of methods) {
-      it(method, async () => {
-        await ds.doRequest(
-          {
-            url: 'http://somewhere',
-            method,
-          },
-          {
-            source: null,
-            args: {},
-            context: {} as any,
-            info: {} as any,
-          }
-        );
-
-        expect(fetchMock).toHaveBeenCalledTimes(1);
-        const req = fetchMock.mock.calls[0][0] as Request;
-        expect(req.method).toBe(method);
-      });
-    }
-  });
-
-  it('Adds stringified JSON body', async () => {
-    await ds.doRequest(
-      {
-        url: 'http://somewhere',
-        method: 'POST',
-        bodyArg: 'input',
-      },
-      {
-        source: null,
-        args: { input: { name: 'aviv' } },
-        context: {} as any,
-        info: {} as any,
-      }
-    );
-
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const req = fetchMock.mock.calls[0][0] as Request;
-    expect(req.url).toBe('http://somewhere/');
-    expect(req.method).toBe('POST');
-    expect(req.headers.get('Content-Type')).toBe('application/json');
-    expect(await req.text()).toBe('{"name":"aviv"}');
-  });
-
-  it('Sends request if required query parameters are included', async () => {
-    await ds.doRequest(
-      {
-        url: 'http://somewhere',
-        method: 'GET',
-        query: [{ key: 'field1', value: 'value1', required: true }],
-      },
-      {
-        source: null,
-        args: {},
-        context: {} as any,
-        info: {} as any,
-      }
-    );
-
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const req = fetchMock.mock.calls[0][0] as Request;
-    expect(req.url).toBe('http://somewhere/?field1=value1');
-    expect(req.method).toBe('GET');
-  });
-
-  it('Does not send request if required query parameters are missing values', async () => {
-    try {
-      await ds.doRequest(
-        {
-          url: 'http://somewhere',
-          method: 'GET',
-          query: [{ key: 'field1', value: '', required: true }],
-        },
-        {
-          source: null,
-          args: {},
-          context: {} as any,
-          info: {} as any,
-        }
-      );
-    } catch (err) {
-      expect(err.toString()).toBe('field1 query parameter is required');
-    }
-    expect(fetchMock).toHaveBeenCalledTimes(0);
-  });
-
-  it('Properly handles boolean query parameter values', async () => {
-    await ds.doRequest(
-      {
-        url: 'http://somewhere',
-        method: 'GET',
-        query: [{ key: 'field1', value: 'false', required: true }],
-      },
-      {
-        source: null,
-        args: {},
-        context: {} as any,
-        info: {} as any,
-      }
-    );
-
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const req = fetchMock.mock.calls[0][0] as Request;
-    expect(req.url).toBe('http://somewhere/?field1=false');
-  });
-
-  it('Sends request when empty values are sent in the query params and required is not set (default false)', async () => {
-    await ds.doRequest(
-      {
-        url: 'http://somewhere',
-        method: 'GET',
-        query: [{ key: 'field1', value: '' }],
-      },
-      {
-        source: null,
-        args: {},
-        context: {} as any,
-        info: {} as any,
-      }
-    );
-
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const req = fetchMock.mock.calls[0][0] as Request;
-    expect(req.url).toBe('http://somewhere/');
   });
 });

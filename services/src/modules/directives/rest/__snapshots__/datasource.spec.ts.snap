@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`REST directive data source Does not send request if required headers are empty 1`] = `[GraphQLError: mykey header is required]`;
+
+exports[`REST directive data source Does not send request if required query parameters are missing values 1`] = `[GraphQLError: field1 query parameter is required]`;
