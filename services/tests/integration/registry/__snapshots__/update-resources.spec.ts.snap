@@ -1,0 +1,404 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Update resource Upstream 1`] = `
+Object {
+  "policies": Array [
+    Object {
+      "args": Object {
+        "an": "String",
+        "another": "String!",
+      },
+      "code": "real rego code
+           with multiple
+           lines",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "query": Object {
+        "gql": "some another gql",
+        "variables": Object {
+          "c": "d",
+        },
+      },
+      "type": "opa",
+    },
+  ],
+  "policyAttachments": Object {},
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "schema": "type Query { something: String! }",
+    },
+  ],
+  "upstreamClientCredentials": Array [
+    Object {
+      "activeDirectory": Object {
+        "authority": "https://authority",
+        "clientId": "myClientId",
+        "clientSecret": "myClientSecret",
+      },
+      "authType": "ActiveDirectory",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+  "upstreams": Array [
+    Object {
+      "auth": Object {
+        "activeDirectory": Object {
+          "authority": "https://authority",
+          "resource": "someResource",
+        },
+        "type": "ActiveDirectory",
+      },
+      "host": "test2.api",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+    Object {
+      "host": "some-host",
+      "metadata": Object {
+        "name": "upstreamWithoutAuth",
+        "namespace": "namespace",
+      },
+    },
+  ],
+}
+`;
+
+exports[`Update resource UpstreamClientCredentials 1`] = `
+Object {
+  "policies": Array [
+    Object {
+      "args": Object {
+        "an": "String",
+        "another": "String!",
+      },
+      "code": "real rego code
+           with multiple
+           lines",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "query": Object {
+        "gql": "some another gql",
+        "variables": Object {
+          "c": "d",
+        },
+      },
+      "type": "opa",
+    },
+  ],
+  "policyAttachments": Object {},
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "schema": "type Query { something: String! }",
+    },
+  ],
+  "upstreamClientCredentials": Array [
+    Object {
+      "activeDirectory": Object {
+        "authority": "https://authority",
+        "clientId": "myClientId",
+        "clientSecret": "myOtherClientSecret",
+      },
+      "authType": "ActiveDirectory",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+  "upstreams": Array [
+    Object {
+      "auth": Object {
+        "activeDirectory": Object {
+          "authority": "https://authority",
+          "resource": "someResource",
+        },
+        "type": "ActiveDirectory",
+      },
+      "host": "test.api",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+}
+`;
+
+exports[`Update resource updates a Schema 1`] = `
+Object {
+  "policies": Array [
+    Object {
+      "args": Object {
+        "an": "String",
+        "another": "String!",
+      },
+      "code": "real rego code
+           with multiple
+           lines",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "query": Object {
+        "gql": "some another gql",
+        "variables": Object {
+          "c": "d",
+        },
+      },
+      "type": "opa",
+    },
+  ],
+  "policyAttachments": Object {},
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "schema": "type Query { somethingElse: String! }",
+    },
+  ],
+  "upstreamClientCredentials": Array [
+    Object {
+      "activeDirectory": Object {
+        "authority": "https://authority",
+        "clientId": "myClientId",
+        "clientSecret": "myClientSecret",
+      },
+      "authType": "ActiveDirectory",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+  "upstreams": Array [
+    Object {
+      "auth": Object {
+        "activeDirectory": Object {
+          "authority": "https://authority",
+          "resource": "someResource",
+        },
+        "type": "ActiveDirectory",
+      },
+      "host": "test.api",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+}
+`;
+
+exports[`Update resource updates a Schema using updateResourceGroup 1`] = `
+Object {
+  "policies": Array [
+    Object {
+      "args": Object {
+        "an": "String",
+        "another": "String!",
+      },
+      "code": "real rego code
+           with multiple
+           lines",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "query": Object {
+        "gql": "some another gql",
+        "variables": Object {
+          "c": "d",
+        },
+      },
+      "type": "opa",
+    },
+  ],
+  "policyAttachments": Object {},
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "schema": "type Query { somethingElse: String! }",
+    },
+  ],
+  "upstreamClientCredentials": Array [
+    Object {
+      "activeDirectory": Object {
+        "authority": "https://authority",
+        "clientId": "myClientId",
+        "clientSecret": "myClientSecret",
+      },
+      "authType": "ActiveDirectory",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+  "upstreams": Array [
+    Object {
+      "auth": Object {
+        "activeDirectory": Object {
+          "authority": "https://authority",
+          "resource": "someResource",
+        },
+        "type": "ActiveDirectory",
+      },
+      "host": "test.api",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+}
+`;
+
+exports[`Update resource updates an opa type policy 1`] = `
+Object {
+  "policies": Array [
+    Object {
+      "args": Object {
+        "just": "Int",
+      },
+      "code": "changed code",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "query": Object {
+        "gql": "some another gql",
+        "variables": Object {
+          "c": "d",
+        },
+      },
+      "type": "opa",
+    },
+  ],
+  "policyAttachments": Object {},
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "schema": "type Query { something: String! }",
+    },
+  ],
+  "upstreamClientCredentials": Array [
+    Object {
+      "activeDirectory": Object {
+        "authority": "https://authority",
+        "clientId": "myClientId",
+        "clientSecret": "myClientSecret",
+      },
+      "authType": "ActiveDirectory",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+  "upstreams": Array [
+    Object {
+      "auth": Object {
+        "activeDirectory": Object {
+          "authority": "https://authority",
+          "resource": "someResource",
+        },
+        "type": "ActiveDirectory",
+      },
+      "host": "test.api",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+}
+`;
+
+exports[`Update resource updates an opa type policy using updateResourceGroup 1`] = `
+Object {
+  "policies": Array [
+    Object {
+      "args": Object {
+        "just": "Int",
+      },
+      "code": "changed code",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "query": Object {
+        "gql": "some another gql",
+        "variables": Object {
+          "c": "d",
+        },
+      },
+      "type": "opa",
+    },
+  ],
+  "policyAttachments": Object {},
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "schema": "type Query { something: String! }",
+    },
+  ],
+  "upstreamClientCredentials": Array [
+    Object {
+      "activeDirectory": Object {
+        "authority": "https://authority",
+        "clientId": "myClientId",
+        "clientSecret": "myClientSecret",
+      },
+      "authType": "ActiveDirectory",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+  "upstreams": Array [
+    Object {
+      "auth": Object {
+        "activeDirectory": Object {
+          "authority": "https://authority",
+          "resource": "someResource",
+        },
+        "type": "ActiveDirectory",
+      },
+      "host": "test.api",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+}
+`;

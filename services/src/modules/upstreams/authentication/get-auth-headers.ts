@@ -11,9 +11,9 @@ export async function getAuthHeaders(
 ) {
   // Try AD auth
   const upstream = resourceGroup.upstreams.find(u => u.host === targetHost);
-  if (typeof upstream !== 'undefined') {
+  if (typeof upstream !== 'undefined' && upstream.auth) {
     const credentials = resourceGroup.upstreamClientCredentials.find(
-      uc => uc.activeDirectory.authority === upstream.auth.activeDirectory.authority
+      uc => uc.activeDirectory.authority === upstream.auth!.activeDirectory.authority
     );
     if (typeof credentials !== 'undefined') {
       try {

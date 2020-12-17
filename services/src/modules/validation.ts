@@ -28,6 +28,8 @@ function validateUpstreams(upstreams: Upstream[]) {
 
   const existingResourceAuthorityPairs = new Map<string, Upstream>();
   for (const upstream of upstreams) {
+    if (!upstream.auth) continue;
+
     const upstreamKey = JSON.stringify(upstream.auth.activeDirectory);
     const existingUpstream = existingResourceAuthorityPairs.get(upstreamKey);
     if (typeof existingUpstream === 'undefined') {
