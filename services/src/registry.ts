@@ -7,7 +7,7 @@ import logger from './modules/logger';
 import * as opaHelper from './modules/opa-helper';
 import { handleSignals, handleUncaughtErrors } from './modules/shutdown-handler';
 import { loadPlugins } from './modules/plugins';
-import { ActiveDirectoryAuth } from './modules/upstreams/authentication';
+import { ActiveDirectoryAuth } from './modules/upstreams';
 
 export const app = new ApolloServer({
   typeDefs,

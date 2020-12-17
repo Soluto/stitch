@@ -6,7 +6,7 @@ import { ApolloError } from 'apollo-server-core';
 import { setContext } from 'apollo-link-context';
 import { RetryLink } from 'apollo-link-retry';
 import { FastifyRequest } from 'fastify';
-import { ActiveDirectoryAuth, getAuthHeaders } from '../../upstreams/authentication';
+import { ActiveDirectoryAuth, getAuthHeaders } from '../../upstreams';
 import logger from '../../logger';
 import { ResourceGroup } from '../../resource-repository';
 

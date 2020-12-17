@@ -3,6 +3,8 @@ import { FastifyRequest } from 'fastify';
 import { ResourceGroup } from '../resource-repository';
 import { ActiveDirectoryAuth, getAuthHeaders } from './authentication';
 
+export { ActiveDirectoryAuth, getAuthHeaders };
+
 export async function applyUpstream(
   url: URL,
   requestInit: RequestInit,

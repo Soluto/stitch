@@ -7,7 +7,7 @@ import { ResourceGroup, PolicyDefinition, Schema, ResourceMetadata } from './res
 import { buildSchemaFromFederatedTypeDefs } from './build-federated-schema';
 import getBaseSchema from './base-schema';
 import logger from './logger';
-import { ActiveDirectoryAuth } from './upstreams/authentication';
+import { ActiveDirectoryAuth } from './upstreams';
 import { PolicyExecutor } from './directives/policy';
 
 export function createGraphQLService(config: { resourceGroups: Observable<ResourceGroup> }) {
