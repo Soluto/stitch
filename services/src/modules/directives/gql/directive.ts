@@ -17,7 +17,7 @@ export class GqlDirective extends SchemaDirectiveVisitor {
     const operationType = operationTypeParam?.toLowerCase() ?? 'query';
 
     const remoteSchemas: RemoteSchema[] = this.context.resourceGroup.remoteSchemas;
-    const remoteSchemaResource = remoteSchemas.find(rs => rs.url === url)?.schema;
+    const remoteSchemaResource = remoteSchemas?.find(rs => rs.url === url)?.schema;
     if (!remoteSchemaResource) {
       throw new ApolloError(`Remote schema for ${url} not found in resource group`);
     }
