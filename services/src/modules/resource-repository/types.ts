@@ -1,3 +1,4 @@
+import { RemoteSchema } from '../directives/gql';
 import { Policy, LoadedPolicy } from '../directives/policy/types';
 
 export type PolicyAttachments = Record<string, LoadedPolicy>;
@@ -12,6 +13,7 @@ export interface ResourceGroup {
   // policyAttachments are compiled from the Rego code in opa policies, they are not directly modified by users
   policyAttachments?: PolicyAttachments;
   basePolicy?: Policy;
+  remoteSchemas?: RemoteSchema[];
 }
 
 export interface Resource {

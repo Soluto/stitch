@@ -3,10 +3,11 @@ import * as Rx from 'rxjs';
 import * as nock from 'nock';
 import { makeExecutableSchema } from 'graphql-tools';
 import { gql } from 'apollo-server-core';
-import { graphqlSync, GraphQLSchema, print } from 'graphql';
+import { graphqlSync, GraphQLSchema, print, printSchema } from 'graphql';
 import { createStitchGateway } from '../../../src/modules/gateway';
 import { beforeEachDispose } from '../before-each-dispose';
 import { sleep } from '../../helpers/utility';
+import { RemoteSchema } from '../../../src/modules/directives/gql';
 
 const miriam = {
   employeeId: '1',
@@ -72,12 +73,18 @@ const schema = {
   `),
 };
 
+const remoteSchemaResource: RemoteSchema = {
+  url: `${remoteHost}/graphql`,
+  schema: printSchema(remoteSchema),
+};
+
 const resourceGroup = {
   etag: 'etag',
   schemas: [schema],
   upstreams: [],
   upstreamClientCredentials: [],
   policies: [],
+  remoteSchemas: [remoteSchemaResource],
 };
 
 interface TestCase {
@@ -138,17 +145,7 @@ describe.each(testCases)('GQL Directive', (testCaseName, { statusCode, delay }) 
 
 function mockGqlBackend(host: string, schema: GraphQLSchema, statusCode = 200, delay = 0) {
   nock(host)
-    .persist()
-    .post('/graphql', body => body.operationName === 'IntrospectionQuery')
-    .reply(200, (_, body: any) =>
-      graphqlSync({
-        schema,
-        source: body.query,
-        variableValues: body.variables,
-        operationName: body.operationName,
-      })
-    )
-    .post('/graphql', body => body.operationName !== 'IntrospectionQuery')
+    .post('/graphql')
     .delay(delay)
     .reply(statusCode, (_, body: any) =>
       graphqlSync({

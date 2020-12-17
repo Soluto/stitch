@@ -7,10 +7,14 @@ import logger from './modules/logger';
 import * as opaHelper from './modules/opa-helper';
 import { handleSignals, handleUncaughtErrors } from './modules/shutdown-handler';
 import { loadPlugins } from './modules/plugins';
+import { ActiveDirectoryAuth } from './modules/upstreams/authentication';
 
 export const app = new ApolloServer({
   typeDefs,
   resolvers,
+  context: {
+    activeDirectoryAuth: new ActiveDirectoryAuth(),
+  },
   tracing: config.enableGraphQLTracing,
   playground: config.enableGraphQLPlayground,
   introspection: config.enableGraphQLIntrospection,
