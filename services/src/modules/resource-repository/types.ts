@@ -13,7 +13,7 @@ export interface ResourceGroup {
   // policyAttachments are compiled from the Rego code in opa policies, they are not directly modified by users
   policyAttachments?: PolicyAttachments;
   basePolicy?: Policy;
-  remoteSchemas: RemoteSchema[];
+  remoteSchemas?: RemoteSchema[];
 }
 
 export interface Resource {

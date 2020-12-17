@@ -303,7 +303,6 @@ describe.each(testCases)('Rest directive - %s', (_, { mock, schema, query, varia
       upstreams: [],
       upstreamClientCredentials: [],
       policies: [],
-      remoteSchemas: [],
     };
 
     const { server, dispose } = createStitchGateway({

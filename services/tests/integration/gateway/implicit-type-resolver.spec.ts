@@ -47,7 +47,6 @@ const testCases: [string, ResourceGroup][] = [
       upstreams: [],
       upstreamClientCredentials: [],
       policies: [],
-      remoteSchemas: [],
     },
   ],
   [
@@ -79,7 +78,6 @@ const testCases: [string, ResourceGroup][] = [
       upstreams: [],
       upstreamClientCredentials: [],
       policies: [],
-      remoteSchemas: [],
     },
   ],
   [
@@ -111,7 +109,6 @@ const testCases: [string, ResourceGroup][] = [
       upstreams: [],
       upstreamClientCredentials: [],
       policies: [],
-      remoteSchemas: [],
     },
   ],
 ];

@@ -35,7 +35,6 @@ const resourceGroup = {
   upstreams: [],
   upstreamClientCredentials: [],
   policies: [],
-  remoteSchemas: [],
 };
 
 describe('Hello world', () => {

@@ -21,6 +21,11 @@ export async function updateRemoteGqlSchemas(
   activeDirectoryAuth: ActiveDirectoryAuth
 ) {
   const newSchemas = await fetchRemoteGqlSchemas(schema, resourceGroup, activeDirectoryAuth);
+  if (!newSchemas || newSchemas.length === 0) return;
+
+  if (!resourceGroup.remoteSchemas) {
+    resourceGroup.remoteSchemas = [];
+  }
   resourceGroup.remoteSchemas.push(...newSchemas);
 }
 
@@ -32,7 +37,7 @@ async function fetchRemoteGqlSchemas(
   const results: Record<string, SchemaDirectiveVisitor[]> = SchemaDirectiveVisitor.visitSchemaDirectives(schema, {
     gql: GqlRegistryVisitor,
   });
-  const knownRemoteGqlServers = new Set(resourceGroup.remoteSchemas.map(rs => rs.url));
+  const knownRemoteGqlServers = new Set(resourceGroup.remoteSchemas?.map(rs => rs.url));
   const gqlIntrospectUrls = results['gql']
     .map(i => i.args.url)
     .filter((url, idx, self) => !!url && !knownRemoteGqlServers.has(url) && self.indexOf(url) === idx) as string[];

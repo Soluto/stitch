@@ -1,11 +1,11 @@
 import { gql } from 'apollo-server-core';
 import { concatAST, DocumentNode, graphqlSync, print } from 'graphql';
-import { IResolvers, makeExecutableSchema } from 'graphql-tools';
+import { IResolvers, makeExecutableSchema, SchemaDirectiveVisitor } from 'graphql-tools';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
 import * as nock from 'nock';
 import { ResourceGroup } from '../../resource-repository';
 import { ActiveDirectoryAuth } from '../../upstreams/authentication';
-import { sdl as gqlDirectiveSdl, GqlDirective } from './directive';
+import { sdl as gqlDirectiveSdl } from './directive';
 import { updateRemoteGqlSchemas } from './introspection';
 
 interface RemoteServer {
@@ -15,7 +15,7 @@ interface RemoteServer {
 }
 
 interface TestCase {
-  resourceGroup: Partial<ResourceGroup>;
+  resourceGroupPart?: Partial<ResourceGroup>;
   localSchema: DocumentNode;
   remoteServers: Record<string, RemoteServer>;
 }
@@ -24,7 +24,6 @@ const testCases: [string, TestCase][] = [
   [
     '1. No remote graphql servers',
     {
-      resourceGroup: {},
       localSchema: gql`
         type Query {
           foo: String!
@@ -36,7 +35,6 @@ const testCases: [string, TestCase][] = [
   [
     '2. New unknown remote graphql server',
     {
-      resourceGroup: {},
       localSchema: gql`
         type Query {
           foo: String! @gql(url: "http://remote-gql-test-2/graphql", fieldName: "foo")
@@ -56,7 +54,7 @@ const testCases: [string, TestCase][] = [
   [
     '3. Known remote graphql server',
     {
-      resourceGroup: {
+      resourceGroupPart: {
         remoteSchemas: [
           {
             schema: print(gql`
@@ -83,7 +81,7 @@ const testCases: [string, TestCase][] = [
   [
     '4. One known and one unknown graphql servers',
     {
-      resourceGroup: {
+      resourceGroupPart: {
         remoteSchemas: [
           {
             schema: print(gql`
@@ -118,7 +116,6 @@ const testCases: [string, TestCase][] = [
   [
     '5. Error from remote graphql server',
     {
-      resourceGroup: {},
       localSchema: gql`
         type Query {
           foo: String! @gql(url: "http://remote-gql-test-5/graphql", fieldName: "foo")
@@ -132,6 +129,11 @@ const testCases: [string, TestCase][] = [
     },
   ],
 ];
+
+class GqlDirectiveMock extends SchemaDirectiveVisitor {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  visitFieldDefinition() {}
+}
 
 const mockResponse = (host: string, remoteSchema?: DocumentNode, responseCode = 200) =>
   nock(host)
@@ -164,14 +166,13 @@ describe('Introspection', () => {
     policies: [],
     upstreams: [],
     upstreamClientCredentials: [],
-    remoteSchemas: [],
   };
 
   afterEach(() => {
     nock.cleanAll();
   });
 
-  test.each(testCases)('%s', async (_, { resourceGroup, localSchema, remoteServers }) => {
+  test.each(testCases)('%s', async (_, { resourceGroupPart, localSchema, remoteServers }) => {
     const httpCallMocks: [nock.Scope, boolean][] = Object.entries(
       remoteServers
     ).map(([url, { schema, responseStatusCode, shouldBeSkipped }]: [string, RemoteServer]) => [
@@ -183,12 +184,17 @@ describe('Introspection', () => {
       typeDefs: concatAST([localSchema, gqlDirectiveSdl, scalarsSdl]),
       resolvers: scalarsResolvers,
       schemaDirectives: {
-        gql: GqlDirective,
+        gql: GqlDirectiveMock,
       },
     });
 
+    const resourceGroup = {
+      ...defaultResourceGroup,
+      ...resourceGroupPart,
+    };
+
     try {
-      await updateRemoteGqlSchemas(schema, { ...defaultResourceGroup, ...resourceGroup }, new ActiveDirectoryAuth());
+      await updateRemoteGqlSchemas(schema, resourceGroup, new ActiveDirectoryAuth());
 
       httpCallMocks.forEach(httpCallMock => expect(httpCallMock[0].isDone()).toBe(httpCallMock[1]));
 

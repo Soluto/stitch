@@ -1,11 +1,35 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Introspection 1. No remote graphql servers 1`] = `Object {}`;
+exports[`Introspection 1. No remote graphql servers 1`] = `
+Object {
+  "policies": Array [],
+  "schemas": Array [],
+  "upstreamClientCredentials": Array [],
+  "upstreams": Array [],
+}
+`;
 
-exports[`Introspection 2. New unknown remote graphql server 1`] = `Object {}`;
+exports[`Introspection 2. New unknown remote graphql server 1`] = `
+Object {
+  "policies": Array [],
+  "remoteSchemas": Array [
+    Object {
+      "schema": "type Query {
+  foo: String
+}
+",
+      "url": "http://remote-gql-test-2/graphql",
+    },
+  ],
+  "schemas": Array [],
+  "upstreamClientCredentials": Array [],
+  "upstreams": Array [],
+}
+`;
 
 exports[`Introspection 3. Known remote graphql server 1`] = `
 Object {
+  "policies": Array [],
   "remoteSchemas": Array [
     Object {
       "schema": "type Query {
@@ -15,11 +39,15 @@ Object {
       "url": "http://remote-gql-test-3/graphql",
     },
   ],
+  "schemas": Array [],
+  "upstreamClientCredentials": Array [],
+  "upstreams": Array [],
 }
 `;
 
 exports[`Introspection 4. One known and one unknown graphql servers 1`] = `
 Object {
+  "policies": Array [],
   "remoteSchemas": Array [
     Object {
       "schema": "type Query {
@@ -36,6 +64,9 @@ Object {
       "url": "http://remote-gql-test-4-2/graphql",
     },
   ],
+  "schemas": Array [],
+  "upstreamClientCredentials": Array [],
+  "upstreams": Array [],
 }
 `;
 

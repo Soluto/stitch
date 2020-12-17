@@ -16,8 +16,6 @@ export class GqlDirective extends SchemaDirectiveVisitor {
     const { url, fieldName, arguments: gqlArgs, operationType: operationTypeParam, timeoutMs } = this.args;
     const operationType = operationTypeParam?.toLowerCase() ?? 'query';
 
-    if (!this.context?.resourceGroup) return;
-
     const remoteSchemas: RemoteSchema[] = this.context.resourceGroup.remoteSchemas;
     const remoteSchemaResource = remoteSchemas.find(rs => rs.url === url)?.schema;
     if (!remoteSchemaResource) {

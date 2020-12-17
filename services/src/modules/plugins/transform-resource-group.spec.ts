@@ -20,7 +20,6 @@ const resourceGroup: ResourceGroup = {
   upstreams: [],
   upstreamClientCredentials: [],
   policies: [],
-  remoteSchemas: [],
 };
 const loadedPlugins: StitchPlugin[] = [
   {

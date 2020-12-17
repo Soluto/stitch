@@ -25,7 +25,6 @@ const resourceGroup: ResourceGroup & { etag: string } = {
   upstreams: [],
   upstreamClientCredentials: [],
   policies: [],
-  remoteSchemas: [],
 };
 
 describe('Hello world', () => {

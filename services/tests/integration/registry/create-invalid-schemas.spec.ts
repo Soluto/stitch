@@ -41,7 +41,6 @@ const baseResourceGroup: ResourceGroup = {
   upstreams: [],
   upstreamClientCredentials: [],
   policies: [],
-  remoteSchemas: [],
 };
 describe('Creation of invalid schemas', () => {
   let client: ApolloServerTestClient;

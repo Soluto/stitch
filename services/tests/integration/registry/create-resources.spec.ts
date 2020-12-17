@@ -73,7 +73,6 @@ const baseResourceGroup: ResourceGroup = {
   upstreams: [],
   upstreamClientCredentials: [],
   policies: [],
-  remoteSchemas: [],
 };
 
 describe('Create resource', () => {
