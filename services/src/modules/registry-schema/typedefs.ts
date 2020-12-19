@@ -69,7 +69,8 @@ export default gql`
 
   input UpstreamInput {
     metadata: ResourceMetadataInput!
-    host: String!
+    host: String
+    sourceHosts: [String!]
     auth: AuthInput
   }
 

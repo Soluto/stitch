@@ -70,6 +70,15 @@ Object {
         "namespace": "namespace",
       },
     },
+    Object {
+      "metadata": Object {
+        "name": "upstreamWithSourceHosts",
+        "namespace": "namespace",
+      },
+      "sourceHosts": Array [
+        "some-host-2",
+      ],
+    },
   ],
 }
 `;

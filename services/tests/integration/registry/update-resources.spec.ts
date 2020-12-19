@@ -198,6 +198,10 @@ describe('Update resource', () => {
       metadata: { namespace: 'namespace', name: 'upstreamWithoutAuth' },
       host: 'some-host',
     };
+    const upstreamWithSourceHosts: Upstream = {
+      metadata: { namespace: 'namespace', name: 'upstreamWithSourceHosts' },
+      sourceHosts: ['some-host-2'],
+    };
     const response = await client.mutate({
       mutation: gql`
         mutation CreateUpstream($upstreams: [UpstreamInput!]!) {
@@ -207,7 +211,7 @@ describe('Update resource', () => {
         }
       `,
       variables: {
-        upstreams: [newUpstream, upstreamWithoutAuth],
+        upstreams: [newUpstream, upstreamWithoutAuth, upstreamWithSourceHosts],
       },
     });
 

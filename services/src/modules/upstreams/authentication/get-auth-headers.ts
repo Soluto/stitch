@@ -10,8 +10,10 @@ export async function getAuthHeaders(
   originalRequest?: Pick<FastifyRequest, 'headers'>
 ) {
   // Try AD auth
-  const upstream = resourceGroup.upstreams.find(u => u.host === targetHost);
+  // TODO: Store upstreams in map for quick lookup
+  const upstream = resourceGroup.upstreams.find(u => u.host === targetHost || u.sourceHosts?.includes(targetHost));
   if (typeof upstream !== 'undefined' && upstream.auth) {
+    // TODO: Store upstreamClientCredentials in map for quick lookup
     const credentials = resourceGroup.upstreamClientCredentials.find(
       uc => uc.activeDirectory.authority === upstream.auth!.activeDirectory.authority
     );

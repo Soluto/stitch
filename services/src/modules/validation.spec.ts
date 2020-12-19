@@ -99,3 +99,62 @@ describe('validateMetadataNameConflicts', () => {
     expect(() => validateResourceGroupOrThrow(rg)).not.toThrow();
   });
 });
+
+describe('validate host duplications', () => {
+  let rg: ResourceGroup;
+
+  beforeEach(() => {
+    rg = {
+      schemas: [],
+      upstreams: [],
+      upstreamClientCredentials: [],
+      policies: [],
+    };
+  });
+
+  it('throws on upstream w/o host and sourceHosts', () => {
+    rg.upstreams.push({ metadata: { namespace: 'ns', name: 'u1' } });
+
+    try {
+      validateResourceGroupOrThrow(rg);
+    } catch (err) {
+      expect(err).toMatchSnapshot();
+    }
+  });
+
+  it('throws on upstream w/ host and sourceHosts', () => {
+    rg.upstreams.push({ metadata: { namespace: 'ns', name: 'u1' }, host: 'server-1', sourceHosts: ['server-1'] });
+
+    try {
+      validateResourceGroupOrThrow(rg);
+    } catch (err) {
+      expect(err).toMatchSnapshot();
+    }
+  });
+
+  it('throws on duplicate upstream host', () => {
+    rg.upstreams.push(
+      { metadata: { namespace: 'ns', name: 'u1' }, host: 'server-1' },
+      { metadata: { namespace: 'ns', name: 'u12' }, host: 'server-1' }
+    );
+
+    try {
+      validateResourceGroupOrThrow(rg);
+    } catch (err) {
+      expect(err).toMatchSnapshot();
+    }
+  });
+
+  it('throws on duplicate upstream host and sourceHosts', () => {
+    rg.upstreams.push(
+      { metadata: { namespace: 'ns', name: 'u1' }, host: 'server-1' },
+      { metadata: { namespace: 'ns', name: 'u12' }, sourceHosts: ['server-1', 'server-2'] }
+    );
+
+    try {
+      validateResourceGroupOrThrow(rg);
+    } catch (err) {
+      expect(err).toMatchSnapshot();
+    }
+  });
+});
