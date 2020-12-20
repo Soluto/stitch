@@ -71,6 +71,7 @@ export default gql`
     metadata: ResourceMetadataInput!
     host: String
     sourceHosts: [String!]
+    targetOrigin: String
     auth: AuthInput
   }
 

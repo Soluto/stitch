@@ -4,10 +4,9 @@ import * as nock from 'nock';
 import { makeExecutableSchema } from 'graphql-tools';
 import { gql } from 'apollo-server-core';
 import { graphqlSync, GraphQLSchema, print, printSchema } from 'graphql';
-import { createStitchGateway } from '../../../src/modules/gateway';
-import { beforeEachDispose } from '../before-each-dispose';
-import { sleep } from '../../helpers/utility';
-import { RemoteSchema } from '../../../src/modules/directives/gql';
+import { createStitchGateway } from '../../../../src/modules/gateway';
+import { beforeEachDispose } from '../../before-each-dispose';
+import { RemoteSchema } from '../../../../src/modules/directives/gql';
 
 const miriam = {
   employeeId: '1',
@@ -110,9 +109,6 @@ describe.each(testCases)('GQL Directive', (testCaseName, { statusCode, delay }) 
       fastifyInstance: { metrics: undefined as any },
     });
     client = createTestClient(stitch.server);
-
-    // Wait for introspection queries
-    await sleep(300);
 
     return () => {
       nock.cleanAll();

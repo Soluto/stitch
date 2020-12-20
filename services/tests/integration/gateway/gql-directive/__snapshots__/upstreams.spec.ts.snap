@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Gql - Upstreams No upstreams 1`] = `
+Object {
+  "data": Object {
+    "foo": "FOO",
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Gql - Upstreams Upstream with host and targetOrigin 1`] = `
+Object {
+  "data": Object {
+    "foo": null,
+  },
+  "errors": Array [
+    [GraphQLError: request to http://virtual-host/graphql failed, reason: getaddrinfo ENOTFOUND virtual-host],
+  ],
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Gql - Upstreams Upstream with host without targetOrigin 1`] = `
+Object {
+  "data": Object {
+    "foo": "FOO",
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;

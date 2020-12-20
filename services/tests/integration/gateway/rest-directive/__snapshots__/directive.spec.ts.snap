@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Rest directive - Connection timeout from upstream call qraphql 1`] = `
+exports[`Rest directive Connection timeout from upstream 1`] = `
 Object {
   "data": null,
   "errors": Array [
@@ -15,7 +15,7 @@ Object {
 }
 `;
 
-exports[`Rest directive - Empty response body call qraphql 1`] = `
+exports[`Rest directive Empty response body 1`] = `
 Object {
   "data": Object {
     "hello": "",
@@ -30,7 +30,7 @@ Object {
 }
 `;
 
-exports[`Rest directive - Error 401 from upstream call qraphql 1`] = `
+exports[`Rest directive Error 401 from upstream 1`] = `
 Object {
   "data": null,
   "errors": Array [
@@ -45,7 +45,7 @@ Object {
 }
 `;
 
-exports[`Rest directive - Error 404 from upstream (not nullable return type) call qraphql 1`] = `
+exports[`Rest directive Error 404 from upstream (not nullable return type) 1`] = `
 Object {
   "data": null,
   "errors": Array [
@@ -60,7 +60,7 @@ Object {
 }
 `;
 
-exports[`Rest directive - Error 404 from upstream (notFoundAsNull is false) call qraphql 1`] = `
+exports[`Rest directive Error 404 from upstream (notFoundAsNull is false) 1`] = `
 Object {
   "data": Object {
     "hello": null,
@@ -77,7 +77,7 @@ Object {
 }
 `;
 
-exports[`Rest directive - Error 404 from upstream (notFoundAsNull is true) call qraphql 1`] = `
+exports[`Rest directive Error 404 from upstream (notFoundAsNull is true) 1`] = `
 Object {
   "data": Object {
     "hello": null,
@@ -92,7 +92,7 @@ Object {
 }
 `;
 
-exports[`Rest directive - Error 404 from upstream (nullable return type) call qraphql 1`] = `
+exports[`Rest directive Error 404 from upstream (nullable return type) 1`] = `
 Object {
   "data": Object {
     "hello": null,
@@ -107,7 +107,7 @@ Object {
 }
 `;
 
-exports[`Rest directive - Error 500 from upstream call qraphql 1`] = `
+exports[`Rest directive Error 500 from upstream 1`] = `
 Object {
   "data": null,
   "errors": Array [
@@ -122,7 +122,7 @@ Object {
 }
 `;
 
-exports[`Rest directive - GET with query params call qraphql 1`] = `
+exports[`Rest directive GET with query params 1`] = `
 Object {
   "data": Object {
     "hello": "miriam!",
@@ -137,7 +137,7 @@ Object {
 }
 `;
 
-exports[`Rest directive - Mutation call qraphql 1`] = `
+exports[`Rest directive Mutation 1`] = `
 Object {
   "data": Object {
     "hello": "world",
@@ -152,7 +152,7 @@ Object {
 }
 `;
 
-exports[`Rest directive - POST with body from custom query argument call qraphql 1`] = `
+exports[`Rest directive POST with body from custom query argument 1`] = `
 Object {
   "data": Object {
     "hello": "world",
@@ -167,7 +167,7 @@ Object {
 }
 `;
 
-exports[`Rest directive - POST with body from input query argument call qraphql 1`] = `
+exports[`Rest directive POST with body from input query argument 1`] = `
 Object {
   "data": Object {
     "hello": "world",
@@ -182,7 +182,7 @@ Object {
 }
 `;
 
-exports[`Rest directive - POST with predefined body call qraphql 1`] = `
+exports[`Rest directive POST with predefined body 1`] = `
 Object {
   "data": Object {
     "hello": "world",
@@ -197,7 +197,7 @@ Object {
 }
 `;
 
-exports[`Rest directive - Response timeout from upstream call qraphql 1`] = `
+exports[`Rest directive Response timeout from upstream 1`] = `
 Object {
   "data": null,
   "errors": Array [
@@ -212,7 +212,7 @@ Object {
 }
 `;
 
-exports[`Rest directive - Simple GET call qraphql 1`] = `
+exports[`Rest directive Simple GET 1`] = `
 Object {
   "data": Object {
     "hello": "world",

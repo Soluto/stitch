@@ -31,7 +31,10 @@ Object {
         "name": "name",
         "namespace": "namespace",
       },
-      "schema": "type Query { something: String! }",
+      "schema": "type Query {
+  something: String!
+}
+",
     },
   ],
   "upstreamClientCredentials": Array [
@@ -114,7 +117,10 @@ Object {
         "name": "name",
         "namespace": "namespace",
       },
-      "schema": "type Query { something: String! }",
+      "schema": "type Query {
+  something: String!
+}
+",
     },
   ],
   "upstreamClientCredentials": Array [
@@ -181,7 +187,10 @@ Object {
         "name": "name",
         "namespace": "namespace",
       },
-      "schema": "type Query { somethingElse: String! }",
+      "schema": "type Query {
+  somethingElse: String!
+}
+",
     },
   ],
   "upstreamClientCredentials": Array [
@@ -217,7 +226,7 @@ Object {
 }
 `;
 
-exports[`Update resource updates a Schema using updateResourceGroup 1`] = `
+exports[`Update resource updates a Schema with @gql directive 1`] = `
 Object {
   "policies": Array [
     Object {
@@ -242,13 +251,25 @@ Object {
     },
   ],
   "policyAttachments": Object {},
+  "remoteSchemas": Array [
+    Object {
+      "schema": "type Query {
+  someRemoteGql: String!
+}
+",
+      "url": "http://remote-server/graphql",
+    },
+  ],
   "schemas": Array [
     Object {
       "metadata": Object {
         "name": "name",
         "namespace": "namespace",
       },
-      "schema": "type Query { somethingElse: String! }",
+      "schema": "type Query {
+  someGql: String! @gql(url: \\"http://remote-server/graphql\\", fieldName: \\"someRemoteGql\\")
+}
+",
     },
   ],
   "upstreamClientCredentials": Array [
@@ -312,7 +333,10 @@ Object {
         "name": "name",
         "namespace": "namespace",
       },
-      "schema": "type Query { something: String! }",
+      "schema": "type Query {
+  something: String!
+}
+",
     },
   ],
   "upstreamClientCredentials": Array [
@@ -376,7 +400,10 @@ Object {
         "name": "name",
         "namespace": "namespace",
       },
-      "schema": "type Query { something: String! }",
+      "schema": "type Query {
+  something: String!
+}
+",
     },
   ],
   "upstreamClientCredentials": Array [
