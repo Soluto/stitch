@@ -3,7 +3,18 @@
 exports[`Introspection 1. No remote graphql servers 1`] = `
 Object {
   "policies": Array [],
-  "schemas": Array [],
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "schema-1",
+        "namespace": "ns",
+      },
+      "schema": "type Query {
+  foo: String!
+}
+",
+    },
+  ],
   "upstreamClientCredentials": Array [],
   "upstreams": Array [],
 }
@@ -21,7 +32,18 @@ Object {
       "url": "http://remote-gql-test-2/graphql",
     },
   ],
-  "schemas": Array [],
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "schema-2",
+        "namespace": "ns",
+      },
+      "schema": "type Query {
+  foo: String! @gql(url: \\"http://remote-gql-test-2/graphql\\", fieldName: \\"foo\\")
+}
+",
+    },
+  ],
   "upstreamClientCredentials": Array [],
   "upstreams": Array [],
 }
@@ -39,7 +61,18 @@ Object {
       "url": "http://remote-gql-test-3/graphql",
     },
   ],
-  "schemas": Array [],
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "schema-3",
+        "namespace": "ns",
+      },
+      "schema": "type Query {
+  foo: String! @gql(url: \\"http://remote-gql-test-3/graphql\\", fieldName: \\"foo\\")
+}
+",
+    },
+  ],
   "upstreamClientCredentials": Array [],
   "upstreams": Array [],
 }
@@ -64,7 +97,19 @@ Object {
       "url": "http://remote-gql-test-4-2/graphql",
     },
   ],
-  "schemas": Array [],
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "schema-4",
+        "namespace": "ns",
+      },
+      "schema": "type Query {
+  foo: String! @gql(url: \\"http://remote-gql-test-4-1/graphql\\", fieldName: \\"foo\\")
+  bar: String! @gql(url: \\"http://remote-gql-test-4-2/graphql\\", fieldName: \\"bar\\")
+}
+",
+    },
+  ],
   "upstreamClientCredentials": Array [],
   "upstreams": Array [],
 }

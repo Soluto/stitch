@@ -3,8 +3,10 @@ import { exec } from 'child_process';
 import * as path from 'path';
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { gql } from 'apollo-server-core';
+import { graphqlSync, print } from 'graphql';
 import { mocked } from 'ts-jest/utils';
 import * as nock from 'nock';
+import { makeExecutableSchema } from 'graphql-tools';
 import { beforeEachDispose } from '../before-each-dispose';
 import { app } from '../../../src/registry';
 import { mockResourceBucket } from '../resource-bucket';
@@ -28,9 +30,23 @@ const mockedExec = mocked(exec, true);
 
 const schema: Schema = {
   metadata: { namespace: 'namespace', name: 'name' },
-  schema: 'type Query { something: String! }',
+  schema: print(
+    gql`
+      type Query {
+        something: String!
+      }
+    `
+  ),
 };
-const schemaUpdate: Partial<Schema> = { schema: 'type Query { somethingElse: String! }' };
+const schemaUpdate: Partial<Schema> = {
+  schema: print(
+    gql`
+      type Query {
+        somethingElse: String!
+      }
+    `
+  ),
+};
 
 const upstream: Upstream = {
   metadata: { namespace: 'namespace', name: 'name' },
@@ -112,6 +128,52 @@ describe('Update resource', () => {
 
   it('updates a Schema using updateResourceGroup', async () => {
     const newSchema = { ...schema, ...schemaUpdate };
+    const response = await client.mutate({
+      mutation: gql`
+        mutation UploadResources($resourceGroup: ResourceGroupInput!) {
+          updateResourceGroup(input: $resourceGroup) {
+            success
+          }
+        }
+      `,
+      variables: {
+        resourceGroup: { schemas: [newSchema] },
+      },
+    });
+
+    expect(response.errors).toBeUndefined();
+    expect(response.data).toEqual({ updateResourceGroup: { success: true } });
+    expect(bucketContents.current).toMatchObject({ ...baseResourceGroup, schemas: [newSchema] });
+  });
+
+  it('updates a Schema with @gql directive', async () => {
+    const schemaWithGql: Partial<Schema> = {
+      schema: print(gql`
+        type Query {
+          someGql: String! @gql(url: "http://remote-server/graphql", fieldName: "someRemoteGql")
+        }
+      `),
+    };
+
+    const remoteSchema = gql`
+      type Query {
+        someRemoteGql: String!
+      }
+    `;
+
+    nock('http://remote-server')
+      .persist()
+      .post('/graphql')
+      .reply(200, (_url, body: Record<string, any>) =>
+        graphqlSync({
+          schema: makeExecutableSchema({ typeDefs: remoteSchema }),
+          source: body.query,
+          variableValues: body.variables,
+          operationName: body.operationName,
+        })
+      );
+
+    const newSchema = { ...schema, ...schemaWithGql };
     const response = await client.mutate({
       mutation: gql`
         mutation UploadResources($resourceGroup: ResourceGroupInput!) {
