@@ -2,13 +2,13 @@ import { GraphQLField } from 'graphql';
 import { SchemaDirectiveVisitor, delegateToSchema, makeRemoteExecutableSchema } from 'graphql-tools';
 import { ApolloError, gql } from 'apollo-server-core';
 import { ApolloLink } from 'apollo-link';
-import { HttpLink } from 'apollo-link-http';
+import { createHttpLink } from 'apollo-link-http';
 import { setContext } from 'apollo-link-context';
 import { FastifyRequest } from 'fastify';
 import fetch from 'node-fetch';
 import { inject } from '../../arguments-injection';
 import { RequestContext } from '../../context';
-import { getAuthHeaders } from '../../upstreams/authentication';
+import { applyUpstream } from '../../upstreams';
 import { RemoteSchema } from './introspection';
 
 export class GqlDirective extends SchemaDirectiveVisitor {
@@ -22,24 +22,27 @@ export class GqlDirective extends SchemaDirectiveVisitor {
       throw new ApolloError(`Remote schema for ${url} not found in resource group`);
     }
 
-    const httpLink: ApolloLink = new HttpLink({
-      uri: url,
-      fetch: fetch as any,
-      fetchOptions: { timeout: timeoutMs ?? 10000 },
-    });
-
-    const authHttpLink = setContext(async (_, context) => ({
-      headers: await getAuthHeaders(
-        this.context.resourceGroup,
-        this.context.activeDirectoryAuth,
-        new URL(url).host,
-        context?.graphqlContext?.request as FastifyRequest
-      ),
-    })).concat(httpLink);
+    const link = ApolloLink.from([
+      setContext(async (_, context) => {
+        const requestParams = await applyUpstream(
+          {
+            url: new URL(url),
+          },
+          this.context.resourceGroup,
+          this.context.activeDirectoryAuth,
+          context?.graphqlContext?.request as FastifyRequest
+        );
+        return { ...requestParams, uri: requestParams.url };
+      }),
+      createHttpLink({
+        fetch: fetch as any,
+        fetchOptions: { timeout: timeoutMs ?? 10000 },
+      }),
+    ]);
 
     const remoteSchema = makeRemoteExecutableSchema({
       schema: remoteSchemaResource,
-      link: authHttpLink,
+      link,
     });
 
     field.resolve = async (source, args, context, info) => {

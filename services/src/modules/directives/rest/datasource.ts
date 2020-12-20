@@ -1,10 +1,10 @@
 import { RESTDataSource, Request, Response } from 'apollo-datasource-rest';
-import { RequestInit, Headers } from 'apollo-server-env';
 import { GraphQLFieldResolverParams } from 'apollo-server-types';
+import { RequestInit } from 'apollo-server-env';
 import { GraphQLError, isNullableType } from 'graphql';
 import { inject } from '../../arguments-injection';
 import { RequestContext } from '../../context';
-import { applyUpstream } from '../../upstreams';
+import { applyUpstream, RequestParams } from '../../upstreams';
 import { RestParams } from './types';
 
 type FieldResolverParams = GraphQLFieldResolverParams<unknown, RequestContext, Record<string, unknown>>;
@@ -13,24 +13,23 @@ const hasValue = (value: unknown) =>
   value !== null && typeof value !== undefined && value !== undefined && value !== '';
 export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
   async doRequest(params: RestParams, fieldResolverParams: FieldResolverParams) {
-    const { method, timeoutMs: timeout } = params;
-    const requestInit: RequestInit = { method, timeout };
-    this.setHeaders(requestInit, params, fieldResolverParams);
-    this.setBody(requestInit, params, fieldResolverParams);
-    const url = this.resolveUrl(params, fieldResolverParams);
-    this.setQueryParams(url, params, fieldResolverParams);
+    const { url, method, timeoutMs: timeout } = params;
+    const requestParams: RequestParams = { url: new URL(url), method, timeout };
+    this.setHeaders(requestParams, params, fieldResolverParams);
+    this.setBody(requestParams, params, fieldResolverParams);
+    this.resolveUrl(requestParams, params, fieldResolverParams);
+    this.setQueryParams(requestParams, params, fieldResolverParams);
 
-    const request = new Request(String(url), requestInit);
-    const upstreamRequest = this.buildRequest(url, requestInit);
-    const cacheKey = this.cacheKeyFor(upstreamRequest);
+    const request = await this.buildRequest(requestParams);
+    const cacheKey = this.cacheKeyFor(request);
 
     const response = await this.httpCache.fetch(request, { cacheKey });
-    return this.handleResponse(upstreamRequest, response, params, fieldResolverParams);
+    return this.handleResponse(request, response, params, fieldResolverParams);
   }
 
-  private setHeaders(requestInit: RequestInit, params: RestParams, fieldResolverParams: FieldResolverParams) {
+  private setHeaders(requestParams: RequestParams, params: RestParams, fieldResolverParams: FieldResolverParams) {
     const { headers: kvs } = params;
-    const headers = new Headers();
+    const headers: Record<string, string> = {};
 
     if (kvs) {
       for (const kv of kvs) {
@@ -38,30 +37,30 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
         if (!hasValue(value) && kv.required) {
           throw new GraphQLError(`${kv.key} header is required`);
         }
-        headers.append(kv.key, value);
+        headers[kv.key] = value;
       }
     }
 
-    requestInit.headers = headers;
+    requestParams.headers = headers;
   }
 
-  private setBody(requestInit: RequestInit, params: RestParams, fieldResolverParams: FieldResolverParams) {
+  private setBody(requestParams: RequestParams, params: RestParams, fieldResolverParams: FieldResolverParams) {
     const { body: bodyObj, bodyArg } = params;
     if (bodyObj && bodyArg) {
       throw new Error('Set either "body" or "bodyArg" argument but not both');
     }
     const body = bodyObj ? inject(bodyObj, fieldResolverParams) : fieldResolverParams.args[params.bodyArg || 'input'];
     if (body) {
-      requestInit.body = JSON.stringify(body);
-      (requestInit.headers as Headers).append('Content-Type', 'application/json');
+      requestParams.body = JSON.stringify(body);
+      requestParams.headers!['Content-Type'] = 'application/json';
     }
   }
 
-  private resolveUrl(params: RestParams, fieldResolverParams: FieldResolverParams) {
-    return new URL(inject(params.url, fieldResolverParams) as string);
+  private resolveUrl(requestParams: RequestParams, params: RestParams, fieldResolverParams: FieldResolverParams) {
+    requestParams.url = new URL(inject(params.url, fieldResolverParams) as string);
   }
 
-  private setQueryParams(url: URL, params: RestParams, fieldResolverParams: FieldResolverParams) {
+  private setQueryParams(requestParams: RequestParams, params: RestParams, fieldResolverParams: FieldResolverParams) {
     const { query: kvs } = params;
     if (!kvs || kvs.length == 0) return;
 
@@ -76,10 +75,10 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
 
       if (Array.isArray(value)) {
         for (const elem of value) {
-          url.searchParams.append(kv.key, elem);
+          requestParams.url.searchParams.append(kv.key, elem);
         }
       } else {
-        url.searchParams.append(kv.key, String(value));
+        requestParams.url.searchParams.append(kv.key, String(value));
       }
     }
   }
@@ -97,9 +96,14 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     return this.didReceiveResponse(response, request);
   }
 
-  private buildRequest(url: URL, requestInit: RequestInit) {
-    applyUpstream(url, requestInit, this.context.resourceGroup, this.context.activeDirectoryAuth, this.context.request);
-    return new Request(url.href, requestInit);
+  private async buildRequest(requestParams: RequestParams) {
+    const { url, ...requestInit } = await applyUpstream(
+      requestParams,
+      this.context.resourceGroup,
+      this.context.activeDirectoryAuth,
+      this.context.request
+    );
+    return new Request(url!.href, requestInit as RequestInit);
   }
 }
 

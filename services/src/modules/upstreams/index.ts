@@ -1,17 +1,24 @@
-import { RequestInit } from 'apollo-server-env';
 import { FastifyRequest } from 'fastify';
+import * as _ from 'lodash';
 import { ResourceGroup } from '../resource-repository';
 import { ActiveDirectoryAuth, getAuthHeaders } from './authentication';
 
-export { ActiveDirectoryAuth, getAuthHeaders };
+export { ActiveDirectoryAuth };
+
+export type RequestParams = {
+  url: URL;
+  method?: string;
+  headers?: Record<string, string>;
+  body?: BodyInit;
+  timeout?: number;
+};
 
 export async function applyUpstream(
-  url: URL,
-  requestInit: RequestInit,
+  requestParams: RequestParams,
   resourceGroup: ResourceGroup,
   activeDirectoryAuth: ActiveDirectoryAuth,
   originalRequest?: Pick<FastifyRequest, 'headers'>
-) {
-  const headers = await getAuthHeaders(resourceGroup, activeDirectoryAuth, url.host, originalRequest);
-  requestInit.headers = { ...requestInit.headers, ...headers };
+): Promise<RequestParams> {
+  const headers = await getAuthHeaders(resourceGroup, activeDirectoryAuth, requestParams.url.host, originalRequest);
+  return _.merge({}, requestParams, { headers });
 }

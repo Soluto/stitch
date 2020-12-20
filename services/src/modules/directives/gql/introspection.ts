@@ -3,10 +3,11 @@ import { createHttpLink } from 'apollo-link-http';
 import { ObjectTypeDefinitionNode, parse, printSchema, StringValueNode } from 'graphql';
 import { introspectSchema } from 'graphql-tools';
 import { ApolloError } from 'apollo-server-core';
+import { ApolloLink } from 'apollo-link';
 import { setContext } from 'apollo-link-context';
 import { RetryLink } from 'apollo-link-retry';
 import { FastifyRequest } from 'fastify';
-import { ActiveDirectoryAuth, getAuthHeaders } from '../../upstreams';
+import { ActiveDirectoryAuth, applyUpstream } from '../../upstreams';
 import logger from '../../logger';
 import { ResourceGroup } from '../../resource-repository';
 
@@ -67,26 +68,32 @@ async function fetchRemoteGqlSchema(
   activeDirectoryAuth: ActiveDirectoryAuth
 ) {
   try {
-    const httpLink = createHttpLink({ uri: url, fetch: fetch as any });
-    const authHttpLink = setContext(async (_, context) => ({
-      headers: await getAuthHeaders(
-        resourceGroup,
-        activeDirectoryAuth,
-        new URL(url).host,
-        context?.graphqlContext?.request as FastifyRequest
-      ),
-    })).concat(httpLink);
-    const authHttpLinkWithRetry = new RetryLink({
-      delay: { max: 1000 },
-      attempts: {
-        max: 3,
-        retryIf(error) {
-          logger.warn({ error, url }, 'Failed fetching introspection query');
-          return !!error;
+    const link = ApolloLink.from([
+      new RetryLink({
+        delay: { max: 1000 },
+        attempts: {
+          max: 3,
+          retryIf(error) {
+            logger.warn({ error, url }, 'Failed fetching introspection query');
+            return !!error;
+          },
         },
-      },
-    }).concat(authHttpLink);
-    const remoteSchema = await introspectSchema(authHttpLinkWithRetry);
+      }),
+      setContext(async (_, context) => {
+        const requestParams = await applyUpstream(
+          {
+            url: new URL(url),
+          },
+          resourceGroup,
+          activeDirectoryAuth,
+          context?.graphqlContext?.request as FastifyRequest
+        );
+        return { ...requestParams, uri: requestParams.url };
+      }),
+      createHttpLink({ fetch: fetch as any }),
+    ]);
+
+    const remoteSchema = await introspectSchema(link);
     return printSchema(remoteSchema);
   } catch (err) {
     logger.error({ err, url }, `Introspection query to ${url} failed`);
