@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import { createHttpLink } from 'apollo-link-http';
-import { GraphQLSchema, printSchema } from 'graphql';
-import { introspectSchema, SchemaDirectiveVisitor } from 'graphql-tools';
+import { ObjectTypeDefinitionNode, parse, printSchema, StringValueNode } from 'graphql';
+import { introspectSchema } from 'graphql-tools';
 import { ApolloError } from 'apollo-server-core';
 import { setContext } from 'apollo-link-context';
 import { RetryLink } from 'apollo-link-retry';
@@ -15,39 +15,50 @@ export interface RemoteSchema {
   schema: string;
 }
 
-export async function updateRemoteGqlSchemas(
-  schema: GraphQLSchema,
-  resourceGroup: ResourceGroup,
-  activeDirectoryAuth: ActiveDirectoryAuth
-) {
-  const newSchemas = await fetchRemoteGqlSchemas(schema, resourceGroup, activeDirectoryAuth);
-  if (!newSchemas || newSchemas.length === 0) return;
-
-  if (!resourceGroup.remoteSchemas) {
-    resourceGroup.remoteSchemas = [];
-  }
-  resourceGroup.remoteSchemas.push(...newSchemas);
-}
-
-async function fetchRemoteGqlSchemas(
-  schema: GraphQLSchema,
-  resourceGroup: ResourceGroup,
-  activeDirectoryAuth: ActiveDirectoryAuth
-) {
-  const results: Record<string, SchemaDirectiveVisitor[]> = SchemaDirectiveVisitor.visitSchemaDirectives(schema, {
-    gql: GqlRegistryVisitor,
-  });
+export async function updateRemoteGqlSchemas(resourceGroup: ResourceGroup, activeDirectoryAuth: ActiveDirectoryAuth) {
   const knownRemoteGqlServers = new Set(resourceGroup.remoteSchemas?.map(rs => rs.url));
-  const gqlIntrospectUrls = results['gql']
-    .map(i => i.args.url)
-    .filter((url, idx, self) => !!url && !knownRemoteGqlServers.has(url) && self.indexOf(url) === idx) as string[];
-  const schemas = await Promise.all(
-    gqlIntrospectUrls.map(async url => ({
-      url,
-      schema: await fetchRemoteGqlSchema(url, resourceGroup, activeDirectoryAuth),
-    }))
-  );
-  return schemas;
+  const urls = new Set<string>();
+  for (const { schema } of resourceGroup.schemas) {
+    const typeDefs = parse(schema);
+    const objectTypeDefinitions = typeDefs.definitions.filter(
+      d => d.kind === 'ObjectTypeDefinition'
+    ) as ObjectTypeDefinitionNode[];
+
+    for (const { fields } of objectTypeDefinitions) {
+      if (!fields) continue;
+
+      for (const field of fields) {
+        const gqlDirectives = field.directives?.filter(d => d.name.value === 'gql');
+        if (!gqlDirectives) continue;
+
+        for (const gqlDirective of gqlDirectives) {
+          if (!gqlDirective.arguments) continue;
+
+          const urlArgument = gqlDirective.arguments!.find(a => a.name.value === 'url');
+          if (!urlArgument) continue;
+          const url = (urlArgument!.value as StringValueNode).value;
+
+          if (!knownRemoteGqlServers.has(url)) {
+            urls.add(url);
+          }
+        }
+      }
+    }
+
+    const gqlIntrospectUrls = Array.from(urls);
+    const newSchemas = await Promise.all(
+      gqlIntrospectUrls.map(async url => ({
+        url,
+        schema: await fetchRemoteGqlSchema(url, resourceGroup, activeDirectoryAuth),
+      }))
+    );
+    if (!newSchemas || newSchemas.length === 0) return;
+
+    if (!resourceGroup.remoteSchemas) {
+      resourceGroup.remoteSchemas = [];
+    }
+    resourceGroup.remoteSchemas.push(...newSchemas);
+  }
 }
 
 async function fetchRemoteGqlSchema(
@@ -81,9 +92,4 @@ async function fetchRemoteGqlSchema(
     logger.error({ err, url }, `Introspection query to ${url} failed`);
     throw new ApolloError(`Introspection query to ${url} failed`);
   }
-}
-
-class GqlRegistryVisitor extends SchemaDirectiveVisitor {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  visitFieldDefinition() {}
 }
