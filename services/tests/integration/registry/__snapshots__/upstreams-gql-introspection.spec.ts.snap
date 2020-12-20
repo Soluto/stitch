@@ -12,19 +12,13 @@ Object {
 `;
 
 exports[`Upstreams - Gql - Introspection Upstream with host and targetOrigin 1`] = `
-{
-  "errors": [
-    {
-      "name": "GraphQLError",
-      "message": "Introspection query to http://virtual-host/graphql failed",
-      "exception": {
-        "code": "INTERNAL_SERVER_ERROR"
-      }
-    }
-  ],
-  "data": {
-    "validateResourceGroup": null
-  }
+Object {
+  "data": Object {
+    "validateResourceGroup": Object {
+      "success": true,
+    },
+  },
+  "errors": undefined,
 }
 `;
 

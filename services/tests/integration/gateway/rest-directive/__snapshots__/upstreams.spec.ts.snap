@@ -20,10 +20,13 @@ Object {
 
 exports[`Rest - Upstreams Upstream with host and targetOrigin 1`] = `
 Object {
-  "data": null,
-  "errors": Array [
-    [GraphQLError: request to http://virtual-host/api/mock failed, reason: getaddrinfo ENOTFOUND virtual-host],
-  ],
+  "data": Object {
+    "createFoo": Object {
+      "id": "1",
+      "name": "BAR",
+    },
+  },
+  "errors": undefined,
   "extensions": undefined,
   "http": Object {
     "headers": Headers {

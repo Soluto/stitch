@@ -18,11 +18,9 @@ Object {
 exports[`Gql - Upstreams Upstream with host and targetOrigin 1`] = `
 Object {
   "data": Object {
-    "foo": null,
+    "foo": "FOO",
   },
-  "errors": Array [
-    [GraphQLError: request to http://virtual-host/graphql failed, reason: getaddrinfo ENOTFOUND virtual-host],
-  ],
+  "errors": undefined,
   "extensions": undefined,
   "http": Object {
     "headers": Headers {

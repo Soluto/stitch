@@ -1,20 +1,20 @@
 import { FastifyRequest } from 'fastify';
 import logger from '../../logger';
-import { ResourceGroup } from '../../resource-repository';
+import { Upstream, UpstreamClientCredentials } from '../../resource-repository';
 import { ActiveDirectoryAuth } from './active-directory-auth';
 
 export async function getAuthHeaders(
-  resourceGroup: ResourceGroup,
+  upstream: Upstream,
+  upstreamClientCredentials: UpstreamClientCredentials[],
   activeDirectoryAuth: ActiveDirectoryAuth,
-  targetHost: string,
   originalRequest?: Pick<FastifyRequest, 'headers'>
 ) {
   // Try AD auth
   // TODO: Store upstreams in map for quick lookup
-  const upstream = resourceGroup.upstreams.find(u => u.host === targetHost || u.sourceHosts?.includes(targetHost));
-  if (typeof upstream !== 'undefined' && upstream.auth) {
+
+  if (upstream.auth) {
     // TODO: Store upstreamClientCredentials in map for quick lookup
-    const credentials = resourceGroup.upstreamClientCredentials.find(
+    const credentials = upstreamClientCredentials.find(
       uc => uc.activeDirectory.authority === upstream.auth!.activeDirectory.authority
     );
     if (typeof credentials !== 'undefined') {

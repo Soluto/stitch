@@ -19,6 +19,25 @@ export async function applyUpstream(
   activeDirectoryAuth: ActiveDirectoryAuth,
   originalRequest?: Pick<FastifyRequest, 'headers'>
 ): Promise<RequestParams> {
-  const headers = await getAuthHeaders(resourceGroup, activeDirectoryAuth, requestParams.url.host, originalRequest);
+  const upstream = resourceGroup.upstreams.find(
+    u => u.host === requestParams.url.host || u.sourceHosts?.includes(requestParams.url.host)
+  );
+
+  if (!upstream) return requestParams;
+
+  // Authorization headers
+  const headers = await getAuthHeaders(
+    upstream,
+    resourceGroup.upstreamClientCredentials,
+    activeDirectoryAuth,
+    originalRequest
+  );
+
+  // Replace origin
+  if (upstream.targetOrigin) {
+    const url = requestParams.url;
+    requestParams.url = new URL(url.href.replace(url.origin, upstream.targetOrigin));
+  }
+
   return _.merge({}, requestParams, { headers });
 }
