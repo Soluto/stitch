@@ -34,34 +34,22 @@ function validateUpstreams(upstreams: Upstream[]) {
       continue;
     }
 
-    if (upstream.host) {
-      const existingUpstream = existingHosts.get(upstream.host);
-      if (typeof existingUpstream === 'undefined') {
-        existingHosts.set(upstream.host, upstream);
-      } else {
+    const validateHost = (host: string) => {
+      const existingUpstream = existingHosts.get(host);
+
+      if (typeof existingUpstream === 'undefined') existingHosts.set(host, upstream);
+      else {
         errors.push(
           new ApolloError('Duplicate host found on upstream', 'DUPLICATE_UPSTREAM_FOUND', {
-            host: upstream.host,
+            host,
             upstreams: [upstream.metadata, existingUpstream.metadata],
           })
         );
       }
-    }
-    if (upstream.sourceHosts) {
-      upstream.sourceHosts.forEach(sh => {
-        const existingUpstream = existingHosts.get(sh);
-        if (typeof existingUpstream === 'undefined') {
-          existingHosts.set(sh, upstream);
-        } else {
-          errors.push(
-            new ApolloError('Duplicate host found on upstream', 'DUPLICATE_UPSTREAM_FOUND', {
-              host: sh,
-              upstreams: [upstream.metadata, existingUpstream.metadata],
-            })
-          );
-        }
-      });
-    }
+    };
+
+    if (upstream.host) validateHost(upstream.host);
+    if (upstream.sourceHosts) upstream.sourceHosts.forEach(validateHost);
   }
 
   const existingResourceAuthorityPairs = new Map<string, Upstream>();
