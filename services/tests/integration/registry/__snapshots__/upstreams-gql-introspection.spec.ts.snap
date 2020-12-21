@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Upstreams - Gql - Introspection No upstreams 1`] = `
+Object {
+  "data": Object {
+    "validateResourceGroup": Object {
+      "success": true,
+    },
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`Upstreams - Gql - Introspection Upstream with host and targetOrigin 1`] = `
+Object {
+  "data": Object {
+    "validateResourceGroup": Object {
+      "success": true,
+    },
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`Upstreams - Gql - Introspection Upstream with host without targetOrigin 1`] = `
+Object {
+  "data": Object {
+    "validateResourceGroup": Object {
+      "success": true,
+    },
+  },
+  "errors": undefined,
+}
+`;

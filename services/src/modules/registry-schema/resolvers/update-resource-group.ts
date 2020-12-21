@@ -9,7 +9,7 @@ import PolicyAttachmentsGenerator from '../policy-attachments-generator';
 import resourceRepository from '../repository';
 import { ResourceGroupInput } from '../types';
 import { updateRemoteGqlSchemas } from '../../directives/gql';
-import { ActiveDirectoryAuth } from '../../upstreams/authentication';
+import { ActiveDirectoryAuth } from '../../upstreams';
 
 const singleton = pLimit(1);
 

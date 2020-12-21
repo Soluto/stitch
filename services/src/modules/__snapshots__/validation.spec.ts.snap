@@ -1,5 +1,57 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`validate host duplications throws on duplicate upstream host 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Duplicate host found on upstream",
+      "exception": {}
+    }
+  ],
+  "data": {}
+}
+`;
+
+exports[`validate host duplications throws on duplicate upstream host and sourceHosts 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Duplicate host found on upstream",
+      "exception": {}
+    }
+  ],
+  "data": {}
+}
+`;
+
+exports[`validate host duplications throws on upstream w/ host and sourceHosts 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Upstream should have either sourceHosts or host property",
+      "exception": {}
+    }
+  ],
+  "data": {}
+}
+`;
+
+exports[`validate host duplications throws on upstream w/o host and sourceHosts 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Upstream should have either sourceHosts or host property",
+      "exception": {}
+    }
+  ],
+  "data": {}
+}
+`;
+
 exports[`validateMetadataCharacters - Validation that namespaces and names contain only valid gql chars and dashes throws when namespace names contain invalid chars 1`] = `
 {
   "errors": [

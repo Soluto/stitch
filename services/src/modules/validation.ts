@@ -1,5 +1,6 @@
 import { ApolloError } from 'apollo-server-fastify';
 import { GraphQLError } from 'graphql';
+import logger from './logger';
 import { ResourceGroup, Upstream, Resource } from './resource-repository';
 
 // Valid graphql name with the addition of dashes (http://spec.graphql.org/June2018/#sec-Names)
@@ -13,21 +14,48 @@ function validateUpstreams(upstreams: Upstream[]) {
 
   const existingHosts = new Map<string, Upstream>();
   for (const upstream of upstreams) {
-    const existingUpstream = existingHosts.get(upstream.host);
-    if (typeof existingUpstream === 'undefined') {
-      existingHosts.set(upstream.host, upstream);
-    } else {
+    if (!upstream.host && !upstream.sourceHosts) {
       errors.push(
-        new ApolloError('Duplicate host found on upstream', 'DUPLICATE_UPSTREAM_FOUND', {
-          host: upstream.host,
-          upstreams: [upstream.metadata, existingUpstream.metadata],
+        new ApolloError('Upstream should have either sourceHosts or host property', 'INVALID_UPSTREAM_CONFIGURATION', {
+          metadata: upstream.metadata,
         })
       );
+      continue;
     }
+
+    if (upstream.host && upstream.sourceHosts) {
+      errors.push(
+        new ApolloError('Upstream should have either sourceHosts or host property', 'INVALID_UPSTREAM_CONFIGURATION', {
+          host: upstream.host,
+          sourceHosts: upstream.sourceHosts,
+          metadata: upstream.metadata,
+        })
+      );
+      continue;
+    }
+
+    const validateHost = (host: string) => {
+      const existingUpstream = existingHosts.get(host);
+
+      if (typeof existingUpstream === 'undefined') existingHosts.set(host, upstream);
+      else {
+        errors.push(
+          new ApolloError('Duplicate host found on upstream', 'DUPLICATE_UPSTREAM_FOUND', {
+            host,
+            upstreams: [upstream.metadata, existingUpstream.metadata],
+          })
+        );
+      }
+    };
+
+    if (upstream.host) validateHost(upstream.host);
+    if (upstream.sourceHosts) upstream.sourceHosts.forEach(validateHost);
   }
 
   const existingResourceAuthorityPairs = new Map<string, Upstream>();
   for (const upstream of upstreams) {
+    if (!upstream.auth) continue;
+
     const upstreamKey = JSON.stringify(upstream.auth.activeDirectory);
     const existingUpstream = existingResourceAuthorityPairs.get(upstreamKey);
     if (typeof existingUpstream === 'undefined') {
@@ -152,6 +180,7 @@ export function validateResourceGroupOrThrow(rg: ResourceGroup) {
   errors.push(...validateMetadataNameConflicts(rg));
 
   if (errors.length > 0) {
+    logger.warn({ errors }, 'Resource validation failed');
     throw new ApolloError('Resource validation failed', 'RESOURCE_VALIDATION_FAILURE', {
       errors: errors.map(err => (err instanceof GraphQLError ? err : new GraphQLError(err!.message))),
     });

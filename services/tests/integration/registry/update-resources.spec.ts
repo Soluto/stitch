@@ -123,7 +123,7 @@ describe('Update resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateSchemas: { success: true } });
-    expect(bucketContents.current).toMatchObject({ ...baseResourceGroup, schemas: [newSchema] });
+    expect(bucketContents.current).toMatchSnapshot();
   });
 
   it('updates a Schema using updateResourceGroup', async () => {
@@ -189,27 +189,35 @@ describe('Update resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateResourceGroup: { success: true } });
-    expect(bucketContents.current).toMatchObject({ ...baseResourceGroup, schemas: [newSchema] });
+    expect(bucketContents.current).toMatchSnapshot();
   });
 
   it('Upstream', async () => {
     const newUpstream = { ...upstream, ...upstreamUpdate };
+    const upstreamWithoutAuth: Upstream = {
+      metadata: { namespace: 'namespace', name: 'upstreamWithoutAuth' },
+      host: 'some-host',
+    };
+    const upstreamWithSourceHosts: Upstream = {
+      metadata: { namespace: 'namespace', name: 'upstreamWithSourceHosts' },
+      sourceHosts: ['some-host-2'],
+    };
     const response = await client.mutate({
       mutation: gql`
-        mutation CreateUpstream($upstream: UpstreamInput!) {
-          updateUpstreams(input: [$upstream]) {
+        mutation CreateUpstream($upstreams: [UpstreamInput!]!) {
+          updateUpstreams(input: $upstreams) {
             success
           }
         }
       `,
       variables: {
-        upstream: newUpstream,
+        upstreams: [newUpstream, upstreamWithoutAuth, upstreamWithSourceHosts],
       },
     });
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateUpstreams: { success: true } });
-    expect(bucketContents.current).toMatchObject({ ...baseResourceGroup, upstreams: [newUpstream] });
+    expect(bucketContents.current).toMatchSnapshot();
   });
 
   it('UpstreamClientCredentials', async () => {
@@ -236,10 +244,7 @@ describe('Update resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateUpstreamClientCredentials: { success: true } });
-    expect(bucketContents.current).toMatchObject({
-      ...baseResourceGroup,
-      upstreamClientCredentials: [newUpstreamClientCredentials],
-    });
+    expect(bucketContents.current).toMatchSnapshot();
   });
 
   it('updates an opa type policy', async () => {
@@ -261,7 +266,7 @@ describe('Update resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updatePolicies: { success: true } });
-    expect(bucketContents.current).toMatchObject({ ...baseResourceGroup, policies: [newPolicy] });
+    expect(bucketContents.current).toMatchSnapshot();
 
     const compiledFilename = 'namespace-name.wasm';
     const uncompiledPath = path.resolve(tmpPoliciesDir, 'namespace-name.rego');
@@ -298,7 +303,7 @@ describe('Update resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateResourceGroup: { success: true } });
-    expect(bucketContents.current).toMatchObject({ ...baseResourceGroup, policies: [newPolicy] });
+    expect(bucketContents.current).toMatchSnapshot();
 
     const compiledFilename = 'namespace-name.wasm';
     const uncompiledPath = path.resolve(tmpPoliciesDir, 'namespace-name.rego');

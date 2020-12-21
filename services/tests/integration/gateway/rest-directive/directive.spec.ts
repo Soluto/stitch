@@ -3,8 +3,8 @@ import * as Rx from 'rxjs';
 import { gql } from 'apollo-server-core';
 import { print, DocumentNode } from 'graphql';
 import * as nock from 'nock';
-import { createStitchGateway } from '../../../src/modules/gateway';
-import { Schema } from '../../../src/modules/resource-repository';
+import { createStitchGateway } from '../../../../src/modules/gateway';
+import { Schema } from '../../../../src/modules/resource-repository';
 
 interface TestCase {
   mock: () => nock.Scope;
@@ -284,7 +284,7 @@ const testCases: [string, TestCase][] = [
   ],
 ];
 
-describe.each(testCases)('Rest directive - %s', (_, { mock, schema, query, variables, skipMockIsDoneAssert }) => {
+describe.each(testCases)('Rest directive', (testName, { mock, schema, query, variables, skipMockIsDoneAssert }) => {
   let client: ApolloServerTestClient;
   let disposeServer: any;
   let nockScope: nock.Scope;
@@ -321,7 +321,7 @@ describe.each(testCases)('Rest directive - %s', (_, { mock, schema, query, varia
     nock.cleanAll();
   });
 
-  test('call qraphql', async () => {
+  test(testName, async () => {
     const response = await client.query({ query, variables }).catch(e => e.response);
     expect(response).toMatchSnapshot();
 
