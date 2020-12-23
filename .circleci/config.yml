@@ -16,6 +16,7 @@ jobs:
           docker-password: DOCKERHUB_PASSWORD
       - docker/build:
           image: soluto/stitch
+          docker-context: ./services
           path: ./services
           dockerfile: deployment/docker/Dockerfile
           tag: '$CIRCLE_TAG'
