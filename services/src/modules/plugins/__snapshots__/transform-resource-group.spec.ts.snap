@@ -29,3 +29,5 @@ Object {
   "upstreams": Array [],
 }
 `;
+
+exports[`Plugins: transformResourceGroup transformResourceGroup crashing 1`] = `[Error: Plugin "throw error" failed to execute "transformResourceGroup" with error: Error: Something bad happened]`;

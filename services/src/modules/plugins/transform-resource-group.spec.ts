@@ -57,11 +57,30 @@ const loadedPlugins: StitchPlugin[] = [
   },
 ];
 
+const loadedPluginsWithCrash: StitchPlugin[] = [
+  {
+    name: 'do-nothing',
+  },
+  {
+    name: 'throw error',
+    transformResourceGroup() {
+      throw new Error('Something bad happened');
+    },
+  },
+];
+
 describe('Plugins: transformResourceGroup', () => {
   test('transformResourceGroup', async () => {
     plugins.splice(0, plugins.length);
     plugins.push(...loadedPlugins);
     const result = await transformResourceGroup(resourceGroup);
+    expect(result).toMatchSnapshot();
+  });
+
+  test('transformResourceGroup crashing', async () => {
+    plugins.splice(0, plugins.length);
+    plugins.push(...loadedPluginsWithCrash);
+    const result = await transformResourceGroup(resourceGroup).catch(e => e);
     expect(result).toMatchSnapshot();
   });
 });

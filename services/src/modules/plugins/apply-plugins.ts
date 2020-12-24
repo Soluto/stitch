@@ -4,7 +4,7 @@ import { BaseSchema } from '../base-schema';
 import { pluginsDir, pluginsConfig } from '../config';
 import logger from '../logger';
 import { ResourceGroup } from '../resource-repository';
-import { StitchPlugin, ValueOrPromise } from './types';
+import { StitchPlugin } from './types';
 
 export const plugins: StitchPlugin[] = [];
 export let argumentInjectionGlobals: Record<string, unknown> = {};
@@ -45,21 +45,71 @@ export async function buildArgumentInjectionGlobals(): Promise<Record<string, un
   const globals = await plugins
     .filter(p => p.addArgumentInjectionGlobals)
     .reduce(async (resultPromise, curPlugin) => {
-      const resultGlobals = await resultPromise;
-      const curPluginGlobals = await curPlugin.addArgumentInjectionGlobals!();
-      return { ...resultGlobals, ...curPluginGlobals };
+      try {
+        logger.trace(
+          { plugin: curPlugin.name, method: 'addArgumentInjectionGlobals' },
+          `Applying addArgumentInjectionGlobals of ${curPlugin.name} plugin...`
+        );
+        const resultGlobals = await resultPromise;
+        const curPluginGlobals = await curPlugin.addArgumentInjectionGlobals!();
+
+        logger.trace(
+          { plugin: curPlugin.name, method: 'addArgumentInjectionGlobals' },
+          `addArgumentInjectionGlobals of ${curPlugin.name} plugin was applied successfully.`
+        );
+
+        return { ...resultGlobals, ...curPluginGlobals };
+      } catch (err) {
+        const message = `Plugin "${curPlugin.name}" failed to execute "addArgumentInjectionGlobals" with error: ${err}`;
+        logger.warn({ err, plugin: curPlugin.name, method: 'addArgumentInjectionGlobals' }, message);
+        throw new Error(message);
+      }
     }, Promise.resolve({}));
   return globals;
 }
 
 export async function transformResourceGroup(resourceGroup: ResourceGroup): Promise<ResourceGroup> {
-  return plugins
-    .filter(p => p.transformResourceGroup)
-    .reduce<ValueOrPromise<ResourceGroup>>(async (res, cur) => cur.transformResourceGroup!(await res), resourceGroup);
+  let rg: ResourceGroup = resourceGroup;
+  const pluginsToApply = plugins.filter(p => p.transformResourceGroup);
+  for (const curPlugin of pluginsToApply) {
+    try {
+      logger.trace(
+        { plugin: curPlugin.name, method: 'transformResourceGroup' },
+        `Applying transformResourceGroup of ${curPlugin.name} plugin...`
+      );
+      rg = await curPlugin.transformResourceGroup!(rg);
+      logger.trace(
+        { plugin: curPlugin.name, method: 'transformResourceGroup' },
+        `transformResourceGroup of ${curPlugin.name} plugin was applied successfully.`
+      );
+    } catch (err) {
+      const message = `Plugin "${curPlugin.name}" failed to execute "transformResourceGroup" with error: ${err}`;
+      logger.warn({ err, plugin: curPlugin.name, method: 'transformResourceGroup' }, message);
+      throw new Error(message);
+    }
+  }
+  return rg;
 }
 
 export async function transformBaseSchema(baseSchema: BaseSchema): Promise<BaseSchema> {
-  return plugins
-    .filter(p => p.transformBaseSchema)
-    .reduce<ValueOrPromise<BaseSchema>>(async (res, cur) => cur.transformBaseSchema!(await res), baseSchema);
+  let bs: BaseSchema = baseSchema;
+  const pluginsToApply = plugins.filter(p => p.transformBaseSchema);
+  for (const curPlugin of pluginsToApply) {
+    try {
+      logger.trace(
+        { plugin: curPlugin.name, method: 'transformBaseSchema' },
+        `Applying transformBaseSchema of ${curPlugin.name} plugin...`
+      );
+      bs = await curPlugin.transformBaseSchema!(bs);
+      logger.trace(
+        { plugin: curPlugin.name, method: 'transformBaseSchema' },
+        `transformBaseSchema of ${curPlugin.name} plugin was applied successfully.`
+      );
+    } catch (err) {
+      const message = `Plugin "${curPlugin.name}" failed to execute "transformBaseSchema" with error: ${err}`;
+      logger.warn({ err, plugin: curPlugin.name, method: 'transformBaseSchema' }, message);
+      throw new Error(message);
+    }
+  }
+  return bs;
 }
