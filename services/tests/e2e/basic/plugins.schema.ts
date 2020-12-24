@@ -1,7 +1,8 @@
 import { print } from 'graphql';
 import { gql } from 'apollo-server-core';
+import { Schema } from '../../../src/modules/resource-repository';
 
-export const schema = {
+export const schema: Schema = {
   metadata: {
     namespace: 'plugins',
     name: 'name',
@@ -19,6 +20,18 @@ export const schema = {
         @policy(namespace: "plugins", name: "whole-rg-policy")
       pl_new_foo: Point! @localResolver(value: { x: 1, y: 2 })
       pl_new_bar: String! @localResolver(value: "NEW BAR") @reverse
+    }
+  `),
+};
+
+export const schemaCrashesPlugin: Schema = {
+  metadata: {
+    namespace: 'plugins',
+    name: 'crash-plugin',
+  },
+  schema: print(gql`
+    type Query {
+      pl_crashing: String!
     }
   `),
 };
