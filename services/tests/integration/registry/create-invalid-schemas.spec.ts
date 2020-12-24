@@ -66,9 +66,7 @@ describe('Creation of invalid schemas', () => {
       },
     });
 
-    expect(response.errors).toHaveProperty([0, 'message'], 'Syntax Error: Expected Name, found <EOF>.');
-    expect(response.errors).toHaveLength(1);
-    expect(response.errors).not.toBeUndefined();
+    expect(response.errors).toMatchSnapshot();
   });
 
   it('Invalid directive arguments in schema gets rejected', async () => {
@@ -85,9 +83,7 @@ describe('Creation of invalid schemas', () => {
       },
     });
 
-    expect(response.errors).toHaveProperty([0, 'message'], 'Unknown argument "fakeArgument" on directive "@rest".');
-    expect(response.errors).toHaveLength(1);
-    expect(response.errors).not.toBeUndefined();
+    expect(response.errors).toMatchSnapshot();
   });
 
   it('Bad federation composition in schema gets rejected', async () => {
@@ -104,8 +100,6 @@ describe('Creation of invalid schemas', () => {
       },
     });
 
-    expect(response.errors).not.toBeUndefined();
-    expect(response.errors).toHaveLength(1);
-    expect(response.errors).toHaveProperty([0, 'message'], 'Federation validation failed');
+    expect(response.errors).toMatchSnapshot();
   });
 });

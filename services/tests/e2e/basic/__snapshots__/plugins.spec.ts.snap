@@ -9,3 +9,19 @@ Object {
   "pl_tar": "Hello, TAR!",
 }
 `;
+
+exports[`Plugins Plugin crashes 1`] = `
+{
+  "errors": [
+    {
+      "message": "Updated resources request failed: Error: Plugin \\"crashing.js\\" failed to execute \\"transformResourceGroup\\" with error: Error: Something bad happened",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "updateSchemas": null
+  }
+}
+`;

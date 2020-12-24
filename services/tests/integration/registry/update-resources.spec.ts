@@ -126,6 +126,32 @@ describe('Update resource', () => {
     expect(bucketContents.current).toMatchSnapshot();
   });
 
+  it('update a Schema with wrong input', async () => {
+    const wrongSchemaUpdate: Partial<Schema> = {
+      schema: print(gql`
+        type Query {
+          someFoo: Foo!
+        }
+      `),
+    };
+    const newSchema = { ...schema, ...wrongSchemaUpdate };
+    const response = await client.mutate({
+      mutation: gql`
+        mutation CreateSchema($schema: SchemaInput!) {
+          updateSchemas(input: [$schema]) {
+            success
+          }
+        }
+      `,
+      variables: {
+        schema: newSchema,
+      },
+    });
+
+    expect(response.errors).toBeDefined();
+    expect(bucketContents.current).toMatchSnapshot();
+  });
+
   it('updates a Schema using updateResourceGroup', async () => {
     const newSchema = { ...schema, ...schemaUpdate };
     const response = await client.mutate({

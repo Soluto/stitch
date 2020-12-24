@@ -24,3 +24,15 @@ export const schema2 = {
     }
   `),
 };
+
+export const schema3 = {
+  metadata: {
+    namespace: 'hello_world',
+    name: 'name',
+  },
+  schema: print(gql`
+    type Query {
+      foo: HLFoo!
+    }
+  `),
+};
