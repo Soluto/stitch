@@ -156,6 +156,75 @@ Object {
 }
 `;
 
+exports[`Update resource update a Schema with wrong input 1`] = `
+Object {
+  "policies": Array [
+    Object {
+      "args": Object {
+        "an": "String",
+        "another": "String!",
+      },
+      "code": "real rego code
+           with multiple
+           lines",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "query": Object {
+        "gql": "some another gql",
+        "variables": Object {
+          "c": "d",
+        },
+      },
+      "type": "opa",
+    },
+  ],
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "schema": "type Query {
+  something: String!
+}
+",
+    },
+  ],
+  "upstreamClientCredentials": Array [
+    Object {
+      "activeDirectory": Object {
+        "authority": "https://authority",
+        "clientId": "myClientId",
+        "clientSecret": "myClientSecret",
+      },
+      "authType": "ActiveDirectory",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+  "upstreams": Array [
+    Object {
+      "auth": Object {
+        "activeDirectory": Object {
+          "authority": "https://authority",
+          "resource": "someResource",
+        },
+        "type": "ActiveDirectory",
+      },
+      "host": "test.api",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+}
+`;
+
 exports[`Update resource updates a Schema 1`] = `
 Object {
   "policies": Array [
