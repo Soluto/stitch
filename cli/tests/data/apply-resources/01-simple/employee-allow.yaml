@@ -1,6 +1,6 @@
 kind: Policy
 metadata:
-  namespace: employee-ns
+  namespace: cli-tests-01
   name: employee-allow
 type: opa
 code: |

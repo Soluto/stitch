@@ -32,28 +32,33 @@ Uploaded successfully!
       this.log(`Dry run mode ON - No changes will be made to the registry`);
     }
 
-    const resourceTypesToSkip = flags['skip-resource-types']?.split(',');
-    const resourceGroup = await this.pathToResourceGroup(args.resourcesPath, resourceTypesToSkip);
-    const resourceCounts = Object.entries(resourceGroup).map(([key, value]) => ({ key, count: value?.length ?? 0 }));
+    try {
+      const resourceTypesToSkip = flags['skip-resource-types']?.split(',');
+      const resourceGroup = await this.pathToResourceGroup(args.resourcesPath, resourceTypesToSkip);
+      const resourceCounts = Object.entries(resourceGroup).map(([key, value]) => ({ key, count: value?.length ?? 0 }));
 
-    this.log(`${dryRun ? 'Verifying' : 'Uploading'} resources from ${args.resourcesPath}...`);
-    resourceCounts.forEach(({ key, count }) =>
-      this.log(`  ${key}: ${count}${resourceTypesToSkip?.includes(key) ? ' - Skipped' : ''}`)
-    );
+      this.log(`${dryRun ? 'Verifying' : 'Uploading'} resources from ${args.resourcesPath}...`);
+      resourceCounts.forEach(({ key, count }) =>
+        this.log(`  ${key}: ${count}${resourceTypesToSkip?.includes(key) ? ' - Skipped' : ''}`)
+      );
 
-    await uploadResourceGroup(
-      resourceGroup,
-      {
-        registryUrl: flags['registry-url'],
-        authorizationHeader: flags['authorization-header'],
-        dryRun,
-      },
-      {
-        timeout: flags.timeout,
-      }
-    );
+      await uploadResourceGroup(
+        resourceGroup,
+        {
+          registryUrl: flags['registry-url'],
+          authorizationHeader: flags['authorization-header'],
+          dryRun,
+        },
+        {
+          timeout: flags.timeout,
+        }
+      );
 
-    this.log(`Resources from ${args.resourcesPath} were ${dryRun ? 'verified' : 'uploaded'} successfully.`);
+      this.log(`Resources from ${args.resourcesPath} were ${dryRun ? 'verified' : 'uploaded'} successfully.`);
+    } catch (e) {
+      this.log(`${dryRun ? 'Verifying' : 'Uploading'} resources failed. ${e}`);
+      this.exit(1);
+    }
   }
 
   async pathToResourceGroup(filePath: string, resourceTypesToSkip?: string[]): Promise<ResourceGroupInput> {
@@ -101,7 +106,7 @@ Uploaded successfully!
             if (resource.schema) {
               rg.schemas!.push(resource);
             } else if (resource.schemaFiles) {
-              rg.schemas!.push(await buildStitchedSchema(resource));
+              rg.schemas!.push(await buildStitchedSchema(resource, path.dirname(filepath)));
             }
             continue;
           case 'Upstream':

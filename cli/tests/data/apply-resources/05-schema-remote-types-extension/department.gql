@@ -1,0 +1,14 @@
+type Query {
+  departments: [Department!]!
+  department(id: ID!): Department!
+}
+
+type Department {
+  id: ID!
+  name: String!
+  employees: [Employee!]!
+}
+
+extend type Employee {
+  department: Department!
+}

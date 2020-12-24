@@ -18,7 +18,7 @@ describe('Apply base policy', () => {
       'apply:base-policy',
       '--dry-run',
       '--registry-url=http://registry/graphql',
-      'tests/resources/base-policy.yaml',
+      'tests/data/base-policy/base-policy.yaml',
     ])
     .it('Verify', ctx => {
       expect(ctx.stdout).to.contain('was verified successfully');
@@ -33,7 +33,7 @@ describe('Apply base policy', () => {
       '--dry-run',
       '--registry-url=http://registry/graphql',
       '--timeout=50',
-      'tests/resources/base-policy.yaml',
+      'tests/data/base-policy/base-policy.yaml',
     ])
     .catch((e: Error) => expect(e.message).contains('network timeout at: http://registry/graphql'), {
       raiseIfNotThrown: true,

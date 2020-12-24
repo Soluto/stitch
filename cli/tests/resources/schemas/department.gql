@@ -1,4 +1,0 @@
-type Department {
-  id: ID!
-  name: String!
-}

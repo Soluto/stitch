@@ -1,0 +1,7 @@
+kind: Policy
+metadata:
+  namespace: cli-tests-02
+  name: employee-allow
+type: opa
+code: |
+  default allow = true

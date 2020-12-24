@@ -1,0 +1,9 @@
+type Query {
+  departments: [Department!]!
+  department(id: ID!): Department!
+}
+
+type Department {
+  id: ID!
+  name: String!
+}
