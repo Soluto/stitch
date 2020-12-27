@@ -1,0 +1,4 @@
+extend type Employee @key(field: ID) {
+  id: ID! @external
+  address: String
+}

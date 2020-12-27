@@ -1,7 +1,7 @@
 kind: Upstream
 metadata:
+  namespace: cli-tests-01
   name: employee-api
-  namespace: employee-ns
 host: 'employee-api.domain.com'
 auth:
   type: ActiveDirectory

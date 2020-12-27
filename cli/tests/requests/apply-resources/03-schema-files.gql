@@ -1,0 +1,16 @@
+type Query {
+  departments: [Department!]!
+  department(id: ID!): Department!
+  employees: [Employee!]!
+  employee(id: ID!): Employee!
+}
+
+type Department {
+  id: ID!
+  name: String!
+}
+
+type Employee {
+  id: ID!
+  name: String!
+}

@@ -1,0 +1,10 @@
+kind: Upstream
+metadata:
+  namespace: cli-tests-02
+  name: employee-api
+host: 'employee-api.domain.com'
+auth:
+  type: ActiveDirectory
+  activeDirectory:
+    authority: https://login.microsoftonline.com
+    resource: http://employee-api

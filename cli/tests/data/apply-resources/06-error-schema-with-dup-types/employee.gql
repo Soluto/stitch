@@ -1,0 +1,9 @@
+type Query {
+  employees: [Employee!]!
+  employee(id: ID!): Employee!
+}
+
+type Employee {
+  id: ID!
+  name: String!
+}

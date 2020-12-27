@@ -1,5 +1,0 @@
-type Organization {
-  id: ID!
-  name: String!
-  departments: [Department!]
-}

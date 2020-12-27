@@ -1,6 +1,6 @@
 kind: Schema
 metadata:
-  namespace: employee-ns
-  name: deployment
+  namespace: cli-tests-04
+  name: employee-api
 schemaFiles:
   - ./**/*.gql
