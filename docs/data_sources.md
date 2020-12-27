@@ -1,6 +1,6 @@
 # Data Source Directives
 
-All of these use Stitch's [parameter injection](./parameter_injection.md) syntax.
+All of these use Stitch's [arguments injection](./arguments_injection.md) syntax.
 
 ## `@rest`
 
@@ -156,7 +156,7 @@ When the `mergeStrategy` is set to `Merge` or `MergeDeep` the original resolver 
 
 ## @export
 
-See [Parameter Injection](./parameter_injection.md#exports) for details
+See [Arguments Injection](./arguments_injection.md#export) for details
 
 ## @stub (Deprecated, use @localResolver instead)
 
