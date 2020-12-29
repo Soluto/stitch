@@ -22,6 +22,13 @@ export default gql`
     policies: [PolicyInput!]
   }
 
+  input ResourceGroupMetadataInput {
+    schemas: [ResourceMetadataInput!]
+    upstreams: [ResourceMetadataInput!]
+    upstreamClientCredentials: [ResourceMetadataInput!]
+    policies: [ResourceMetadataInput!]
+  }
+
   type Query {
     validateResourceGroup(input: ResourceGroupInput!): Result
     validateSchemas(input: [SchemaInput!]!): Result
@@ -38,6 +45,13 @@ export default gql`
     updateUpstreamClientCredentials(input: [UpstreamClientCredentialsInput!]!): Result
     updatePolicies(input: [PolicyInput!]!): Result
     updateBasePolicy(input: BasePolicyInput!): Result
+
+    deleteResources(input: ResourceGroupMetadataInput!): Result
+    deleteSchemas(input: [ResourceMetadataInput!]!): Result
+    deleteUpstreams(input: [ResourceMetadataInput!]!): Result
+    deleteUpstreamClientCredentials(input: [ResourceMetadataInput!]!): Result
+    deletePolicies(input: [ResourceMetadataInput!]!): Result
+    deleteBasePolicy(input: Boolean!): Result
   }
 
   # Schemas

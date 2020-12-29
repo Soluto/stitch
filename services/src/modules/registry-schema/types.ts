@@ -7,6 +7,14 @@ export interface ResourceMetadataInput {
   name: string;
 }
 
+export interface ResourceGroupMetadataInput {
+  schemas?: ResourceMetadataInput[];
+  upstreams?: ResourceMetadataInput[];
+  upstreamClientCredentials?: ResourceMetadataInput[];
+  policies?: ResourceMetadataInput[];
+  basePolicy?: boolean;
+}
+
 export interface ResourceGroupInput {
   schemas?: SchemaInput[];
   upstreams?: UpstreamInput[];
