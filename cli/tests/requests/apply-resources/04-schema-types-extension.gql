@@ -1,3 +1,14 @@
+type Department {
+  id: ID!
+  name: String!
+  employees: [Employee!]!
+}
+
+type Employee {
+  id: ID!
+  name: String!
+}
+
 type Query {
   departments: [Department!]!
   department(id: ID!): Department!
@@ -5,14 +16,6 @@ type Query {
   employee(id: ID!): Employee!
 }
 
-type Department {
-  id: ID!
-  name: String!
-  employees: [Employee!]!
-}
-
 extend type Employee {
   department: Department!
-  id: ID!
-  name: String!
 }

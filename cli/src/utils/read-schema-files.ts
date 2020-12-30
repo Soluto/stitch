@@ -1,24 +1,7 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import * as globby from 'globby';
-import {
-  DocumentNode,
-  FieldDefinitionNode,
-  InputObjectTypeDefinitionNode,
-  InputObjectTypeExtensionNode,
-  InputValueDefinitionNode,
-  InterfaceTypeDefinitionNode,
-  InterfaceTypeExtensionNode,
-  NameNode,
-  ObjectTypeDefinitionNode,
-  ObjectTypeExtensionNode,
-  parse,
-  print,
-  TypeDefinitionNode,
-  TypeExtensionNode,
-  UnionTypeDefinitionNode,
-  UnionTypeExtensionNode,
-} from 'graphql';
+import { DocumentNode, Kind, ObjectTypeDefinitionNode, parse, print } from 'graphql';
 import * as R from 'ramda';
 import { ResourceMetadataInput, SchemaInput } from '../client';
 
@@ -38,151 +21,61 @@ export default async function ({ metadata, schemaFiles }: SchemaFilesInput, cwd:
   };
 }
 
-type DefOrExtNode = {
-  [K in keyof TypeDefinitionNode & keyof TypeExtensionNode]: TypeDefinitionNode[K] | TypeExtensionNode[K];
-};
+const rootObjectDefinitionTypes = ['Query', 'Mutation', 'Subscription'];
 
-function mergeSchemaDocuments(schemas: DocumentNode[]) {
-  const typeDefinitions = schemas.flatMap(s => s.definitions).map(d => d as DefOrExtNode);
-  const typeDefinitionsMap = new Map<string, DefOrExtNode>();
-  for (const nextTypeDef of typeDefinitions) {
-    const kind = nextTypeDef.kind.replace('Extension', 'Definition');
-    const typeDefKey = `${kind}||${nextTypeDef.name.value}`;
-    const prevTypeDef = typeDefinitionsMap.get(typeDefKey);
-    if (!prevTypeDef) {
-      typeDefinitionsMap.set(typeDefKey, nextTypeDef);
-      continue;
-    }
-    typeDefinitionsMap.set(typeDefKey, mergeTypeDefs(prevTypeDef, nextTypeDef));
-  }
-  return { kind: 'Document', definitions: Array.from(typeDefinitionsMap.values()) } as DocumentNode;
-}
+function mergeSchemaDocuments(schemas: DocumentNode[]): DocumentNode {
+  const allDefinitions = schemas.flatMap(s => s.definitions);
+  const definitionGroups = R.groupBy(d => d.kind, allDefinitions);
 
-function mergeTypeDefs(typeDefA: DefOrExtNode, typeDefB: DefOrExtNode): DefOrExtNode {
-  validateSameTypeDefs(typeDefA, typeDefB);
+  definitionGroups[Kind.OBJECT_TYPE_DEFINITION] = handleObjectTypeDefinitions(
+    definitionGroups[Kind.OBJECT_TYPE_DEFINITION] as ObjectTypeDefinitionNode[]
+  );
 
-  const directives = R.concat(typeDefA.directives || [], typeDefB.directives || []);
-  let result = {
-    ...R.clone(typeDefA),
-    directives,
+  const definitions = R.pipe(R.values, R.flatten)(definitionGroups);
+
+  return {
+    kind: 'Document',
+    definitions,
   };
-
-  if (hasFields(typeDefA) && hasFields(typeDefB)) {
-    const fields = mergeFields(
-      typeDefA.name.value,
-      ((typeDefA as DefOrExtNodeWithFields).fields || []) as Field[],
-      ((typeDefB as DefOrExtNodeWithFields).fields || []) as Field[]
-    );
-    result = R.assoc('fields', fields, result);
-  }
-
-  if (isUnionNode(typeDefA) && isUnionNode(typeDefB)) {
-    const types = R.unionWith(
-      R.equals,
-      (typeDefA as DefOrExtNodeWithTypes).types || [],
-      (typeDefB as DefOrExtNodeWithTypes).types || []
-    );
-    result = R.assoc('types', types, result);
-  }
-
-  if (isObjectNode(typeDefA) && isObjectNode(typeDefB)) {
-    const interfaces = R.unionWith(
-      R.equals,
-      (typeDefA as DefOrExtNodeWithInterfaces).interfaces || [],
-      (typeDefB as DefOrExtNodeWithInterfaces).interfaces || []
-    );
-    result = R.assoc('interfaces', interfaces, result);
-  }
-
-  if (typeDefB.kind.endsWith('Extension')) {
-    result = R.assoc('kind', typeDefB.kind, result);
-  }
-
-  return result;
 }
 
-type DefOrExtNodeWithFields =
-  | ObjectTypeDefinitionNode
-  | InterfaceTypeDefinitionNode
-  | InputObjectTypeDefinitionNode
-  | ObjectTypeExtensionNode
-  | InterfaceTypeExtensionNode
-  | InputObjectTypeExtensionNode;
+function handleObjectTypeDefinitions(objectTypeDefinitions: ObjectTypeDefinitionNode[]) {
+  if (!objectTypeDefinitions) return [];
+  const mergedTypes: ObjectTypeDefinitionNode[] = [];
+  rootObjectDefinitionTypes.forEach(rootType => handleRootType(rootType, objectTypeDefinitions, mergedTypes));
 
-function hasFields(x: DefOrExtNode) {
-  return [
-    'ObjectTypeDefinition',
-    'InterfaceTypeDefinition',
-    'InputObjectTypeDefinition',
-    'ObjectTypeExtension',
-    'InterfaceTypeExtension',
-    'InputObjectTypeExtension',
-  ].includes(x.kind);
-}
+  const uniqueObjectTypeDefinitions = objectTypeDefinitions
+    .filter(o => !rootObjectDefinitionTypes.includes(o.name.value))
+    .concat(mergedTypes);
 
-type DefOrExtNodeWithTypes = UnionTypeDefinitionNode | UnionTypeExtensionNode;
-
-function isUnionNode(x: DefOrExtNode) {
-  return x.kind === 'UnionTypeDefinition' || x.kind === 'UnionTypeExtension';
-}
-
-type DefOrExtNodeWithInterfaces = ObjectTypeDefinitionNode | ObjectTypeExtensionNode;
-
-function isObjectNode(x: DefOrExtNode) {
-  return x.kind === 'ObjectTypeDefinition' || x.kind === 'ObjectTypeExtension';
-}
-
-type Field = {
-  [K in keyof FieldDefinitionNode & keyof InputValueDefinitionNode]:
-    | FieldDefinitionNode[K]
-    | InputValueDefinitionNode[K];
-};
-
-function mergeFields(type: string, l: Field[], r: Field[]) {
-  return R.pipe(
-    R.groupBy((fieldDef: Field) => name(fieldDef)),
+  const dupObjects = R.pipe(
+    R.groupBy((o: ObjectTypeDefinitionNode) => o.name.value),
     R.values,
-    R.map(mergeSameFieldDefinitions(type)),
-    R.flatten
-  )([...l, ...r]);
+    R.find(objs => objs.length > 1)
+  )(uniqueObjectTypeDefinitions);
+
+  if (dupObjects) {
+    throw new Error(`Duplicate object type definitions: ${dupObjects[0].name.value}`);
+  }
+
+  return uniqueObjectTypeDefinitions;
 }
 
-function mergeSameFieldDefinitions(type: string) {
-  return function (fieldDefinitions: Field[]): Field[] {
-    if (fieldDefinitions.length === 0) return [];
-    if (fieldDefinitions.length === 1) return fieldDefinitions;
+function handleRootType(
+  typeName: string,
+  objectTypeDefinitions: ObjectTypeDefinitionNode[],
+  mergedTypes: ObjectTypeDefinitionNode[]
+) {
+  const rootTypes = objectTypeDefinitions.filter(o => o.name.value === typeName);
+  if (rootTypes?.length >= 1) {
+    mergedTypes.push(mergeObjectTypeDefinitions(rootTypes));
+  }
+}
 
-    const [fieldDefA, fieldDefB, ...rest] = fieldDefinitions;
-    validateSameFieldDefs(type, fieldDefA, fieldDefB);
-
-    const { directives, ...otherFields } = fieldDefA;
-    const fieldWithMergedDirectives = {
-      ...otherFields,
-      directives: R.uniq([...directives!, ...fieldDefB.directives!]),
-    };
-
-    return mergeSameFieldDefinitions(type)([fieldWithMergedDirectives, ...rest]);
+function mergeObjectTypeDefinitions(typeDefs: ObjectTypeDefinitionNode[]): ObjectTypeDefinitionNode {
+  if (typeDefs.length === 1) return typeDefs[0];
+  return {
+    ...typeDefs[0],
+    fields: typeDefs.flatMap(t => t.fields ?? []),
   };
-}
-
-function validateSameFieldDefs(type: string, fieldDefA: Field, fieldDefB: Field) {
-  const fieldDefWithNoDirectivesA = R.omit(['directives', 'loc'], fieldDefA);
-  const fieldDefWithNoDirectivesB = R.omit(['directives', 'loc'], fieldDefB);
-  if (!R.equals(fieldDefWithNoDirectivesA, fieldDefWithNoDirectivesB)) {
-    throw `Same field definition should be identical except for directives - type: ${type} field: ${name(fieldDefA)}`;
-  }
-}
-
-function validateSameTypeDefs(typeDefA: DefOrExtNode, typeDefB: DefOrExtNode) {
-  if (!typeDefA.kind.endsWith('Extension') && !typeDefB.kind.endsWith('Extension') && !isRootType(typeDefA)) {
-    throw `Same types should be extension one of another - kind: ${typeDefA.kind} name: ${name(typeDefA)}`;
-  }
-}
-
-function name(definition: { name: NameNode }): string {
-  return definition.name.value;
-}
-
-function isRootType(typeDef: DefOrExtNode) {
-  return ['Query', 'Mutation', 'Subscription'].includes(name(typeDef));
 }
