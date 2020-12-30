@@ -1,9 +1,10 @@
-import { applyResourceUpdates } from './updates';
+import { Resource } from '..';
+import { applyResourceUpdates } from './update';
 
 describe('applyResourceUpdates', () => {
   it('Inserts new resources', () => {
-    const existingResource = { metadata: { namespace: 'namespace', name: 'name' } };
-    const newResource = { metadata: { namespace: 'namespace2', name: 'name2' } };
+    const existingResource: Resource = { metadata: { namespace: 'namespace', name: 'name' } };
+    const newResource: Resource = { metadata: { namespace: 'namespace2', name: 'name2' } };
 
     const resources = applyResourceUpdates([existingResource], [newResource]);
     expect(resources).toHaveLength(2);
@@ -12,8 +13,8 @@ describe('applyResourceUpdates', () => {
   });
 
   it('Replaces existing resource when namespace/name matches', () => {
-    const existingResource = { metadata: { namespace: 'namespace', name: 'name' } };
-    const newResource = { ...existingResource };
+    const existingResource: Resource = { metadata: { namespace: 'namespace', name: 'name' } };
+    const newResource: Resource = { ...existingResource };
 
     const resources = applyResourceUpdates([existingResource], [newResource]);
     expect(resources).toHaveLength(1);

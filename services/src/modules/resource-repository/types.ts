@@ -25,6 +25,14 @@ export interface ResourceMetadata {
   name: string;
 }
 
+export interface ResourceGroupMetadata {
+  schemas: ResourceMetadata[];
+  upstreams: ResourceMetadata[];
+  upstreamClientCredentials: ResourceMetadata[];
+  policies: ResourceMetadata[];
+  basePolicy: boolean;
+}
+
 export interface Schema extends Resource {
   schema: string;
 }

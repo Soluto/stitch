@@ -1,15 +1,17 @@
 import { IResolvers } from 'graphql-tools';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
-import * as _ from 'lodash';
 import {
   BasePolicyInput,
   PolicyInput,
   ResourceGroupInput,
+  ResourceGroupMetadataInput,
+  ResourceMetadataInput,
   SchemaInput,
   UpstreamClientCredentialsInput,
   UpstreamInput,
 } from '../types';
 import handleUpdateResourceGroupRequest from './update-resource-group';
+import handleDeleteResourcesRequest from './delete-resources';
 
 const resolvers: IResolvers = {
   JSON: GraphQLJSON,
@@ -34,6 +36,7 @@ const resolvers: IResolvers = {
       handleUpdateResourceGroupRequest({ basePolicy: args.input }, context.activeDirectoryAuth, true),
   },
   Mutation: {
+    // Update
     updateResourceGroup: (_, args: { input: Partial<ResourceGroupInput> }, context) =>
       handleUpdateResourceGroupRequest(args.input, context.activeDirectoryAuth),
 
@@ -51,6 +54,24 @@ const resolvers: IResolvers = {
 
     updateBasePolicy: (_, args: { input: BasePolicyInput }, context) =>
       handleUpdateResourceGroupRequest({ basePolicy: args.input }, context.activeDirectoryAuth),
+
+    // Deletion
+    deleteResources: (_, args: { input: Partial<ResourceGroupMetadataInput> }) =>
+      handleDeleteResourcesRequest(args.input),
+
+    deleteSchemas: (_, args: { input: ResourceMetadataInput[] }) =>
+      handleDeleteResourcesRequest({ schemas: args.input }),
+
+    deleteUpstreams: (_, args: { input: ResourceMetadataInput[] }) =>
+      handleDeleteResourcesRequest({ upstreams: args.input }),
+
+    deleteUpstreamClientCredentials: (_, args: { input: ResourceMetadataInput[] }) =>
+      handleDeleteResourcesRequest({ upstreamClientCredentials: args.input }),
+
+    deletePolicies: (_, args: { input: ResourceMetadataInput[] }) =>
+      handleDeleteResourcesRequest({ policies: args.input }),
+
+    deleteBasePolicy: (_, args: { input: boolean }) => handleDeleteResourcesRequest({ basePolicy: args.input }),
   },
 };
 

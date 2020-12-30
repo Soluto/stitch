@@ -1,4 +1,4 @@
-import { ResourceGroup, Resource } from '.';
+import { ResourceGroup, Resource } from '..';
 
 export function applyResourceUpdates<TResource extends Resource>(
   resources: TResource[] = [],
@@ -27,7 +27,7 @@ export function applyResourceUpdates<TResource extends Resource>(
   return newResources;
 }
 
-export function applyResourceGroupUpdates(rg: ResourceGroup, update: Partial<ResourceGroup>): ResourceGroup {
+export default function applyResourceGroupUpdates(rg: ResourceGroup, update: Partial<ResourceGroup>): ResourceGroup {
   const newRg: ResourceGroup = { ...rg };
 
   if (typeof update.schemas !== 'undefined') {
