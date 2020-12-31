@@ -1,6 +1,11 @@
 // Importing directly from types because of a typescript or ts-jest bug that re-exported enums cause a runtime error for being undefined
 // https://github.com/kulshekhar/ts-jest/issues/281
-import { PolicyType, PolicyQueryVariables, PolicyArgsObject } from '../resource-repository/types';
+import {
+  PolicyType,
+  PolicyQueryVariables,
+  PolicyArgsObject,
+  PolicyArgsDefinitions,
+} from '../resource-repository/types';
 
 export interface ResourceMetadataInput {
   namespace: string;
@@ -66,7 +71,7 @@ export interface PolicyInput {
   type: PolicyType;
   shouldOverrideBasePolicy?: boolean;
   code: string;
-  args?: PolicyArgsObject;
+  args?: PolicyArgsDefinitions;
   query?: PolicyQueryInput;
 }
 

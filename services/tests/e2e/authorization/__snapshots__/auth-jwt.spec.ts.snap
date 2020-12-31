@@ -8,6 +8,16 @@ Object {
 }
 `;
 
+exports[`authorization allows access to a field based on a non-default argument 1`] = `
+Object {
+  "userIgnoreRole": Object {
+    "firstName": "John",
+    "lastName": "Smith",
+    "role": "normal",
+  },
+}
+`;
+
 exports[`authorization allows access to a field based on an argument using param injection from source 1`] = `
 Object {
   "userAdmin": Object {

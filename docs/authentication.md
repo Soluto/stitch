@@ -60,8 +60,11 @@ code: |
     input.args.aud == input.args.allowedAudience
   }
 args:
-  aud: String!
-  allowedAudience: String!
+  aud:
+    type: String!
+    default: '{jwt.aud}'
+  allowedAudience:
+    type: String!
 ```
 
 Base policy:
@@ -71,7 +74,6 @@ Base policy:
   "namespace": "infra",
   "name": "check_audience",
   "args": {
-    "aud": "{jwt.aud}",
     "allowedAudience": "<<< my audience >>>"
   }
 }

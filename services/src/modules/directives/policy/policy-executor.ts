@@ -112,22 +112,30 @@ export default class PolicyExecutor {
     const supportedPolicyArgs = ctx.policyDefinition.args;
     if (!supportedPolicyArgs) return;
 
-    return Object.keys(supportedPolicyArgs).reduce<PolicyArgsObject>((policyArgs, policyArgName) => {
-      if (ctx.policy?.args?.[policyArgName] === undefined) {
-        throw new Error(
-          `Missing arg ${policyArgName} for policy ${ctx.policy.name} in namespace ${ctx.policy.namespace}`
-        );
-      }
+    return Object.entries(supportedPolicyArgs).reduce<PolicyArgsObject>(
+      (policyArgs, [policyArgName, { default: defaultArg, optional = false }]) => {
+        let policyArgValue = ctx.policy?.args?.[policyArgName] ?? defaultArg;
 
-      let policyArgValue = ctx.policy.args[policyArgName];
-      if (typeof policyArgValue === 'string') {
-        const { source, gqlArgs: args, requestContext: context, info } = ctx;
-        policyArgValue = inject(policyArgValue, { source, args, context, info });
-      }
+        if (policyArgValue === undefined) {
+          if (!optional) {
+            throw new Error(
+              `Missing arg ${policyArgName} for policy ${ctx.policy.name} in namespace ${ctx.policy.namespace}`
+            );
+          }
 
-      policyArgs[policyArgName] = policyArgValue;
-      return policyArgs;
-    }, {});
+          policyArgValue = null;
+        }
+
+        if (typeof policyArgValue === 'string') {
+          const { source, gqlArgs: args, requestContext: context, info } = ctx;
+          policyArgValue = inject(policyArgValue, { source, args, context, info });
+        }
+
+        policyArgs[policyArgName] = policyArgValue;
+        return policyArgs;
+      },
+      {}
+    );
   }
 }
 

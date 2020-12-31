@@ -26,7 +26,10 @@ export const policies: PolicyDefinition[] = [
       }
     `,
     args: {
-      role: 'String',
+      role: {
+        type: 'String',
+        default: '{jwt?.role}',
+      },
     },
   },
   {
@@ -39,7 +42,9 @@ export const policies: PolicyDefinition[] = [
       }
     `,
     args: {
-      isActive: 'Boolean',
+      isActive: {
+        type: 'Boolean',
+      },
     },
   },
   {
@@ -53,7 +58,10 @@ export const policies: PolicyDefinition[] = [
       }
     `,
     args: {
-      isGuest: 'Boolean',
+      isGuest: {
+        type: 'Boolean',
+        default: '{jwt?.isGuest}',
+      },
     },
   },
   {
@@ -74,9 +82,7 @@ export const schema = {
       bp_bar: String
         @localResolver(value: "BAR")
         @policy(namespace: "auth_bp", name: "regular_policy", args: { isActive: "{jwt?.isActive}" })
-      bp_baz: String
-        @localResolver(value: "BAZ")
-        @policy(namespace: "auth_bp", name: "override_base_policy", args: { isGuest: "{jwt?.isGuest}" })
+      bp_baz: String @localResolver(value: "BAZ") @policy(namespace: "auth_bp", name: "override_base_policy")
       bp_taz: String @localResolver(value: "TAZ") @policy(namespace: "auth_bp", name: "public_policy")
     }
   `),

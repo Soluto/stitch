@@ -48,7 +48,7 @@ const policy: PolicyDefinition = {
   type: PolicyType.opa,
   code: `legit rego code`,
   args: {
-    userId: 'String',
+    userId: { type: 'String' },
   },
   query: {
     gql: print(gql`

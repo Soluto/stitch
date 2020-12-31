@@ -58,6 +58,11 @@ describe('authorization', () => {
     expect(response).toMatchSnapshot();
   });
 
+  it('allows access to a field based on a non-default argument', async () => {
+    const response = await gatewayClient.request(getUserQuery('userIgnoreRole')).catch(err => err.response);
+    expect(response).toMatchSnapshot();
+  });
+
   it('rejects access to a field based on JWT info when no JWT is sent', async () => {
     const response = await gatewayClient.request(arbitraryDataQuery).catch(err => err.response);
     expect(response).toMatchSnapshot();

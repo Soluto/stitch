@@ -39,7 +39,9 @@ Spec:
   type: js-expression
   code: { "result": (input.args.issuer === "abc.com") ? "allow" : "deny" }
   args:
-    issuer: String!
+    issuer:
+      type: String!
+      default: "{jwt.issuer}"
 ```
 
 The `args` are available to use on the input object.
@@ -56,8 +58,10 @@ Spec:
   type: js-expression
   code: { "result": (input.args.sub === input.args.userId) ? "allow" : "deny"}
   args:
-    userId: ID!
-    sub: ID!
+    userId:
+      type: ID!
+    sub:
+      type: ID!
 ```
 
 _Note the js-expression type is an example of a possible type and not planned to be implemented at this time._
@@ -77,8 +81,10 @@ Spec:
       input.args.userId == input.query.user.family.members[_].id
     }
   args:
-    userId: ID!
-    sub: ID!
+    userId:
+      type: ID!
+    sub:
+      type: ID!
   query:
     gql: |
       query ($sub: String!) {
@@ -112,8 +118,10 @@ Spec:
       input.args.userId == input.query.family.members[_].id
     }
   args:
-    userId: ID!
-    sub: ID!
+    userId:
+      type: ID!
+    sub:
+      type: ID!
 ```
 
 This example will always evaluate the graphql query, but generally this approach should be used when conditional side effect evaluation is needed
@@ -133,7 +141,8 @@ Spec:
           input.query.myUserPolicy == true
         }
     args:
-        userId: ID!
+        userId:
+          type: ID!
     query:
         gql: |
           query(userId: ID!) {
@@ -275,9 +284,12 @@ Spec:
       input.args.jwtClaims[input.args.claims[i]] == input.args.values[i]
     }
   args:
-    claims: [String]
-    values: [String]
-    jwtClaims: JSONObject
+    claims:
+      type: [String]
+    values:
+      type: [String]
+    jwtClaims:
+      type: JSONObject
 ```
 
 Usage:

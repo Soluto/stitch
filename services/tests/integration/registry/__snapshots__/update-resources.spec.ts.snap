@@ -5,8 +5,14 @@ Object {
   "policies": Array [
     Object {
       "args": Object {
-        "an": "String",
-        "another": "String!",
+        "an": Object {
+          "default": "{source.an}",
+          "optional": true,
+          "type": "String",
+        },
+        "another": Object {
+          "type": "String!",
+        },
       },
       "code": "real rego code
            with multiple
@@ -91,8 +97,14 @@ Object {
   "policies": Array [
     Object {
       "args": Object {
-        "an": "String",
-        "another": "String!",
+        "an": Object {
+          "default": "{source.an}",
+          "optional": true,
+          "type": "String",
+        },
+        "another": Object {
+          "type": "String!",
+        },
       },
       "code": "real rego code
            with multiple
@@ -161,8 +173,14 @@ Object {
   "policies": Array [
     Object {
       "args": Object {
-        "an": "String",
-        "another": "String!",
+        "an": Object {
+          "default": "{source.an}",
+          "optional": true,
+          "type": "String",
+        },
+        "another": Object {
+          "type": "String!",
+        },
       },
       "code": "real rego code
            with multiple
@@ -230,8 +248,14 @@ Object {
   "policies": Array [
     Object {
       "args": Object {
-        "an": "String",
-        "another": "String!",
+        "an": Object {
+          "default": "{source.an}",
+          "optional": true,
+          "type": "String",
+        },
+        "another": Object {
+          "type": "String!",
+        },
       },
       "code": "real rego code
            with multiple
@@ -300,8 +324,14 @@ Object {
   "policies": Array [
     Object {
       "args": Object {
-        "an": "String",
-        "another": "String!",
+        "an": Object {
+          "default": "{source.an}",
+          "optional": true,
+          "type": "String",
+        },
+        "another": Object {
+          "type": "String!",
+        },
       },
       "code": "real rego code
            with multiple
@@ -379,7 +409,9 @@ Object {
   "policies": Array [
     Object {
       "args": Object {
-        "just": "Int",
+        "just": Object {
+          "type": "Int",
+        },
       },
       "code": "changed code",
       "metadata": Object {
@@ -446,7 +478,9 @@ Object {
   "policies": Array [
     Object {
       "args": Object {
-        "just": "Int",
+        "just": Object {
+          "type": "Int",
+        },
       },
       "code": "changed code",
       "metadata": Object {

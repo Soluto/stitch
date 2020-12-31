@@ -4,6 +4,7 @@ import { Policy, LoadedPolicy } from '../directives/policy/types';
 export type PolicyAttachments = Record<string, LoadedPolicy>;
 export type PolicyQueryVariables = Record<string, unknown>;
 export type PolicyArgsObject = Record<string, unknown>;
+export type PolicyArgsDefinitions = Record<string, PolicyArgDefinition>;
 
 export interface ResourceGroup {
   schemas: Schema[];
@@ -62,9 +63,15 @@ export interface UpstreamClientCredentials extends Resource {
 export interface PolicyDefinition extends Resource {
   type: PolicyType;
   code: string;
-  args?: PolicyArgsObject;
+  args?: PolicyArgsDefinitions;
   query?: PolicyQuery;
   shouldOverrideBasePolicy?: boolean;
+}
+
+export interface PolicyArgDefinition {
+  type: string;
+  default?: string;
+  optional?: boolean;
 }
 
 export interface PolicyQuery {
