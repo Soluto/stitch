@@ -1,0 +1,27 @@
+type Order {
+  id: ID!
+  product: Product!
+  buyer: Person!
+  purchased: DateTime!
+  quantity: Int!
+}
+
+extend type Person {
+  orders: [Order!]
+}
+
+type Query {
+  orders: [Order!]
+  order(id: ID!): Order
+}
+
+input OrderInput {
+  product: ID!
+  buyer: ID!
+  purchased: DateTime!
+  quantity: Int!
+}
+
+type Mutation {
+  placeOrder(input: OrderInput!): Order
+}

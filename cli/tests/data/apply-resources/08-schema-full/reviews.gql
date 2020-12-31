@@ -1,0 +1,62 @@
+type Review {
+  id: ID!
+  product: Product!
+  title: String!
+  text: String
+  author: Person!
+}
+
+extend type Person @key(fields: "id") {
+  id: ID! @external
+
+  reviews: [Review!]
+}
+
+extend type Product {
+  reviews: [Review!]
+}
+
+type Query {
+  reviews: [Review!]
+  review(id: ID!): Review
+}
+
+input ReviewInput {
+  product: ID!
+  title: String!
+  text: String
+  author: ID!
+}
+
+type ReviewMutation {
+  id: ID!
+  edit(input: ReviewInput!): boolean!
+}
+
+type Mutation {
+  getReview(id: ID!): ReviewMutation
+  addReview(input: ReviewInput!): Review!
+  editReview(id: ID!, input: ReviewInput!): Review!
+  removeReview(id: ID!): boolean!
+}
+
+input ProductReviewInput {
+  title: String!
+  text: String
+  author: ID!
+}
+
+extend type ProductMutation {
+  addReview(input: ProductReviewInput!): Review!
+}
+
+input PersonReviewInput {
+  title: String!
+  text: String
+  product: ID!
+}
+
+extend type PersonMutation @key(fields: "id") {
+  id: ID! @external
+  addReview(input: PersonReviewInput!): Review!
+}
