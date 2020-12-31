@@ -1,0 +1,37 @@
+type Product {
+  id: ID!
+  name: String!
+  description: String
+  price: Int!
+  category: Category!
+}
+
+enum Category {
+  Clothing
+  HomeDesign
+  Toys
+}
+
+type Query {
+  products: [Product!]
+  product(id: ID!): Product
+}
+
+input ProductInput {
+  name: String!
+  description: String
+  price: Int!
+  category: Category!
+}
+
+type ProductMutation {
+  id: ID!
+  edit(input: ProductInput!): boolean!
+}
+
+type Mutation {
+  getProduct(id: ID!): ProductMutation
+  addProduct(input: ProductInput!): Product!
+  editProduct(id: ID!, input: ProductInput!): Product!
+  removeProduct(id: ID!): boolean
+}
