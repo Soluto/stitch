@@ -58,7 +58,9 @@ describe('Apply resources', () => {
 
   before(async () => {
     testCases = await fs.readdir(join(__dirname, './data/apply-resources'));
-    testCases.forEach(runTestCase);
+    for (const testCase of testCases) {
+      await runTestCase(testCase);
+    }
   });
 
   it("Workaround - mocha doesn't support async describe", () => {
