@@ -32,9 +32,8 @@ code: |
   }
 args:
   userRoles:
-    type: [String]
+    type: [String!]
     default: '{jwt.roles}'
-    optional: false
 ```
 
 Explanation:
@@ -51,9 +50,8 @@ Explanation:
 - **_args_**: Arguments mapping. The key is argument name, the value is the options for the argument. In this example the `userRole` argument gets the value of the `roles` claim from the request JWT by default. The argument can be given a different value when setting the policy on a field or object, which will override the default.
   The options for an argument are:
 
-  - `type`: The Graphql type of this argument
-  - `default`: The default value (argument injection supported) for the argument. Can be overridden when setting the policy on a field/object
-  - `optional`: Decides whether an error should be thrown when a value for this argument is missing. False by default, meaning an exception will be thrown if the argument is missing.
+  - `type`: The Graphql type of this argument. If the type is nullable type the argument is optional.
+  - `default`: The default value (argument injection supported) for the argument. Can be overridden when setting the policy on a field/object.
 
 ---
 

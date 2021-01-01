@@ -7,7 +7,6 @@ Object {
       "args": Object {
         "an": Object {
           "default": "{source.an}",
-          "optional": true,
           "type": "String",
         },
         "another": Object {
@@ -99,7 +98,6 @@ Object {
       "args": Object {
         "an": Object {
           "default": "{source.an}",
-          "optional": true,
           "type": "String",
         },
         "another": Object {
@@ -175,7 +173,6 @@ Object {
       "args": Object {
         "an": Object {
           "default": "{source.an}",
-          "optional": true,
           "type": "String",
         },
         "another": Object {
@@ -250,7 +247,6 @@ Object {
       "args": Object {
         "an": Object {
           "default": "{source.an}",
-          "optional": true,
           "type": "String",
         },
         "another": Object {
@@ -326,7 +322,6 @@ Object {
       "args": Object {
         "an": Object {
           "default": "{source.an}",
-          "optional": true,
           "type": "String",
         },
         "another": Object {
@@ -410,6 +405,7 @@ Object {
     Object {
       "args": Object {
         "just": Object {
+          "optional": false,
           "type": "Int",
         },
       },
@@ -479,6 +475,7 @@ Object {
     Object {
       "args": Object {
         "just": Object {
+          "optional": false,
           "type": "Int",
         },
       },
