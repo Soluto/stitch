@@ -62,7 +62,7 @@ code: |
 args:
   aud:
     type: String!
-    default: '{jwt.aud}'
+    default: '{jwt?.aud}'
   allowedAudience:
     type: String!
 ```

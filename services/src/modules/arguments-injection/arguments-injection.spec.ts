@@ -4,7 +4,7 @@ import { inject } from './arguments-injection';
 
 interface TestCase {
   input: unknown;
-  params: GraphQLFieldResolverParams<unknown, Pick<RequestContext, 'request' | 'exports' | 'request'>>
+  params: GraphQLFieldResolverParams<unknown, Pick<RequestContext, 'request' | 'exports' | 'request'>>;
   expected: unknown;
 }
 
@@ -62,7 +62,7 @@ const testCases: [string, TestCase][] = [
   [
     'From JWT',
     {
-      input: '{jwt.email}',
+      input: '{jwt?.email}',
       params: {
         source: null,
         args: {},

@@ -94,7 +94,7 @@ For example this plugin adds a base policy if one does not exist:
       namespace: 'ns',
       name: 'base',
       args: {
-        user: '{jwt.sub}',
+        user: '{jwt?.sub}',
       },
     }};
   }

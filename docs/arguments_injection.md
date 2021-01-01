@@ -177,7 +177,7 @@ query {
 ```graphql
 # Schema
 type Query {
-  foo: String! @localResolver(value: "{jwt.roles}") # foo field will be resolved to roles claim of the request JWT.
+  foo: String! @localResolver(value: "{jwt?.roles}") # foo field will be resolved to roles claim of the request JWT.
 }
 
 #Query
