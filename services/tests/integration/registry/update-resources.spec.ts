@@ -302,7 +302,7 @@ describe('Update resource', () => {
     expect(fs.unlink).toHaveBeenCalledWith(uncompiledPath);
     expect(fs.unlink).toHaveBeenCalledWith(compiledPath);
     expect(fs.readFile).toHaveBeenCalledWith(compiledPath);
-    expect(bucketContents.policyFiles).toEqual({ [compiledFilename]: 'compiled rego code' });
+    expect(bucketContents.policyFiles).toMatchSnapshot();
 
     const expectedCommand = `opa build -d ${uncompiledPath} -o ${compiledPath} 'data.policy = result'`;
     expect(mockedExec.mock.calls[0][0]).toBe(expectedCommand);
@@ -339,7 +339,7 @@ describe('Update resource', () => {
     expect(fs.unlink).toHaveBeenCalledWith(uncompiledPath);
     expect(fs.unlink).toHaveBeenCalledWith(compiledPath);
     expect(fs.readFile).toHaveBeenCalledWith(compiledPath);
-    expect(bucketContents.policyFiles).toEqual({ [compiledFilename]: 'compiled rego code' });
+    expect(bucketContents.policyFiles).toMatchSnapshot();
 
     const expectedCommand = `opa build -d ${uncompiledPath} -o ${compiledPath} 'data.policy = result'`;
     expect(mockedExec.mock.calls[0][0]).toBe(expectedCommand);

@@ -20,6 +20,11 @@ export class FileSystemResourceRepository extends ResourceRepository {
     await super.writePolicyAttachment(filename, content);
   }
 
+  async deletePolicyAttachment(filename: string): Promise<void> {
+    await this.initializePolicyAttachmentsFolder();
+    await super.deletePolicyAttachment(filename);
+  }
+
   async listPolicyAttachments() {
     await this.initializePolicyAttachmentsFolder();
     return super.listPolicyAttachments();

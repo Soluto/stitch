@@ -71,7 +71,6 @@ const policy: PolicyDefinition = {
     },
   },
 };
-const policyUpdate: Partial<PolicyDefinition> = { code: 'changed code', args: { just: { type: 'Int' } } };
 
 const baseResourceGroup: ResourceGroup = {
   schemas: [schema],
@@ -192,30 +191,32 @@ describe('Delete resource', () => {
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ deletePolicies: { success: true } });
     expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.policyFiles).toMatchSnapshot();
 
     mockFsForOpa.restore();
   });
 
-  it('deletes an opa type policy using updateResourceGroup', async () => {
+  it('deletes an opa type policy using deleteResources', async () => {
     mockFsForOpa.mock();
 
-    const newPolicy = { ...policy, ...policyUpdate };
+    const policyToDelete = policy.metadata;
     const response = await client.mutate({
       mutation: gql`
-        mutation UploadResources($resourceGroup: ResourceGroupInput!) {
-          updateResourceGroup(input: $resourceGroup) {
+        mutation DeleteResources($resources: ResourceGroupMetadataInput!) {
+          deleteResources(input: $resources) {
             success
           }
         }
       `,
       variables: {
-        resourceGroup: { policies: [newPolicy] },
+        resources: { policies: [policyToDelete] },
       },
     });
 
     expect(response.errors).toBeUndefined();
-    expect(response.data).toEqual({ updateResourceGroup: { success: true } });
+    expect(response.data).toEqual({ deleteResources: { success: true } });
     expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.policyFiles).toMatchSnapshot();
 
     mockFsForOpa.restore();
   });

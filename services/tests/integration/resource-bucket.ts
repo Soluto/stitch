@@ -44,6 +44,11 @@ export function mockResourceBucket(initialValue: ResourceGroup, initialPolicyFil
     .reply(200, (uri, body) => {
       const filename = getFilenameFromUri(uri);
       value.policyFiles[filename] = body as string;
+    })
+    .delete(new RegExp(`/${bucketName!}/${policiesKeyPrefix}.+`))
+    .reply(200, uri => {
+      const filename = getFilenameFromUri(uri);
+      delete value.policyFiles[filename];
     });
 
   return value;
