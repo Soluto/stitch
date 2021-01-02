@@ -18,7 +18,10 @@ export interface ResourceGroupMetadataInput {
   upstreamClientCredentials?: ResourceMetadataInput[];
   policies?: ResourceMetadataInput[];
   basePolicy?: boolean;
+  defaultUpstream?: boolean;
 }
+
+export type DefaultUpstreamInput = Omit<UpstreamInput, 'metadata' | 'host' | 'sourceHosts'>;
 
 export interface ResourceGroupInput {
   schemas?: SchemaInput[];
@@ -26,6 +29,7 @@ export interface ResourceGroupInput {
   upstreamClientCredentials?: UpstreamClientCredentialsInput[];
   policies?: PolicyInput[];
   basePolicy?: BasePolicyInput;
+  defaultUpstream?: DefaultUpstreamInput;
 }
 
 export interface SchemaInput {

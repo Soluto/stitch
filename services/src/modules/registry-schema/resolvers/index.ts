@@ -2,6 +2,7 @@ import { IResolvers } from 'graphql-tools';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
 import {
   BasePolicyInput,
+  DefaultUpstreamInput,
   PolicyInput,
   ResourceGroupInput,
   ResourceGroupMetadataInput,
@@ -34,6 +35,9 @@ const resolvers: IResolvers = {
 
     validateBasePolicy: (_, args: { input: BasePolicyInput }, context) =>
       handleUpdateResourceGroupRequest({ basePolicy: args.input }, context.activeDirectoryAuth, true),
+
+    validateDefaultUpstream: (_, args: { input: DefaultUpstreamInput }, context) =>
+      handleUpdateResourceGroupRequest({ defaultUpstream: args.input }, context.activeDirectoryAuth, true),
   },
   Mutation: {
     // Update
@@ -55,6 +59,9 @@ const resolvers: IResolvers = {
     updateBasePolicy: (_, args: { input: BasePolicyInput }, context) =>
       handleUpdateResourceGroupRequest({ basePolicy: args.input }, context.activeDirectoryAuth),
 
+    setDefaultUpstream: (_, args: { input: DefaultUpstreamInput }, context) =>
+      handleUpdateResourceGroupRequest({ defaultUpstream: args.input }, context.activeDirectoryAuth),
+
     // Deletion
     deleteResources: (_, args: { input: Partial<ResourceGroupMetadataInput> }, context) =>
       handleDeleteResourcesRequest(args.input, context.activeDirectoryAuth),
@@ -73,6 +80,9 @@ const resolvers: IResolvers = {
 
     deleteBasePolicy: (_, args: { input: boolean }, context) =>
       handleDeleteResourcesRequest({ basePolicy: args.input }, context.activeDirectoryAuth),
+
+    resetDefaultUpstream: (_, args: { input: boolean }) =>
+      handleDeleteResourcesRequest({ defaultUpstream: args.input }),
   },
 };
 

@@ -8,14 +8,15 @@ import * as nock from 'nock';
 import { beforeEachDispose } from '../before-each-dispose';
 import { app } from '../../../src/registry';
 import { mockResourceBucket } from '../resource-bucket';
-import { ResourceGroup } from '../../../src/modules/resource-repository';
 import {
+  DefaultUpstream,
   PolicyType,
   PolicyDefinition,
+  ResourceGroup,
   Schema,
   Upstream,
   UpstreamClientCredentials,
-} from '../../../src/modules/resource-repository/types';
+} from '../../../src/modules/resource-repository';
 import { tmpPoliciesDir } from '../../../src/modules/config';
 import mockFsForOpa from '../../helpers/mock-fs-for-opa';
 import { AuthType } from '../../../src/modules/registry-schema';
@@ -38,6 +39,16 @@ const upstream: Upstream = {
     type: AuthType.ActiveDirectory,
     activeDirectory: { authority: 'https://authority', resource: 'someResource' },
   },
+};
+
+const defaultUpstream: DefaultUpstream = {
+  targetOrigin: 'http://localhost:8080',
+  headers: [
+    {
+      name: 'x-api-client',
+      value: '{request?.headers?.["x-api-client"] ?? "Unknown"}',
+    },
+  ],
 };
 
 const upstreamClientCredentials: UpstreamClientCredentials = {
@@ -102,7 +113,7 @@ describe('Create resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateSchemas: { success: true } });
-    expect(bucketContents.current).toMatchObject({ ...baseResourceGroup, schemas: [schema] });
+    expect(bucketContents.current).toMatchSnapshot();
   });
 
   it('creates a Schema using updateResourceGroup', async () => {
@@ -121,7 +132,7 @@ describe('Create resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateResourceGroup: { success: true } });
-    expect(bucketContents.current).toMatchObject({ ...baseResourceGroup, schemas: [schema] });
+    expect(bucketContents.current).toMatchSnapshot();
   });
 
   it('Upstream', async () => {
@@ -140,7 +151,26 @@ describe('Create resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateUpstreams: { success: true } });
-    expect(bucketContents.current).toMatchObject({ ...baseResourceGroup, upstreams: [upstream] });
+    expect(bucketContents.current).toMatchSnapshot();
+  });
+
+  it('Default upstream', async () => {
+    const response = await client.mutate({
+      mutation: gql`
+        mutation SetDefaultUpstream($defaultUpstream: DefaultUpstreamInput!) {
+          setDefaultUpstream(input: $defaultUpstream) {
+            success
+          }
+        }
+      `,
+      variables: {
+        defaultUpstream,
+      },
+    });
+
+    expect(response.errors).toBeUndefined();
+    expect(response.data).toEqual({ setDefaultUpstream: { success: true } });
+    expect(bucketContents.current).toMatchSnapshot();
   });
 
   it('UpstreamClientCredentials', async () => {
@@ -159,10 +189,7 @@ describe('Create resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateUpstreamClientCredentials: { success: true } });
-    expect(bucketContents.current).toMatchObject({
-      ...baseResourceGroup,
-      upstreamClientCredentials: [upstreamClientCredentials],
-    });
+    expect(bucketContents.current).toMatchSnapshot();
   });
 
   it('creates an opa type policy', async () => {
@@ -183,7 +210,7 @@ describe('Create resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updatePolicies: { success: true } });
-    expect(bucketContents.current).toMatchObject({ ...baseResourceGroup, policies: [policy] });
+    expect(bucketContents.current).toMatchSnapshot();
 
     const compiledFilename = 'namespace-name.wasm';
     const uncompiledPath = path.resolve(tmpPoliciesDir, 'namespace-name.rego');
@@ -219,7 +246,7 @@ describe('Create resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateResourceGroup: { success: true } });
-    expect(bucketContents.current).toMatchObject({ ...baseResourceGroup, policies: [policy] });
+    expect(bucketContents.current).toMatchSnapshot();
 
     const compiledFilename = 'namespace-name.wasm';
     const uncompiledPath = path.resolve(tmpPoliciesDir, 'namespace-name.rego');

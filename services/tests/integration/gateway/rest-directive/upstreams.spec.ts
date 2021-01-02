@@ -4,11 +4,12 @@ import { gql } from 'apollo-server-core';
 import * as Rx from 'rxjs';
 import * as nock from 'nock';
 import { createStitchGateway } from '../../../../src/modules/gateway';
-import { ResourceGroup, Schema, Upstream } from '../../../../src/modules/resource-repository';
+import { DefaultUpstream, ResourceGroup, Schema, Upstream } from '../../../../src/modules/resource-repository';
 import { beforeEachDispose } from '../../before-each-dispose';
 
 interface TestCase {
   upstreams: Upstream[];
+  defaultUpstream?: DefaultUpstream;
   virtualHost?: string;
   headers?: Record<string, string>;
 }
@@ -78,9 +79,24 @@ const testCases: [string, TestCase][] = [
       headers: { ['x-api-client']: 'Stitch Default' },
     },
   ],
+  [
+    'Default upstream',
+    {
+      upstreams: [],
+      defaultUpstream: {
+        headers: [
+          {
+            name: 'x-api-client',
+            value: 'Stitch',
+          },
+        ],
+      },
+      headers: { ['x-api-client']: 'Stitch' },
+    },
+  ],
 ];
 
-describe.each(testCases)('Rest - Upstreams', (testCaseName, { upstreams, virtualHost, headers }) => {
+describe.each(testCases)('Rest - Upstreams', (testCaseName, { upstreams, defaultUpstream, virtualHost, headers }) => {
   let client: ApolloServerTestClient;
   const remoteServer = virtualHost ?? defaultRemoteServer;
 
@@ -119,6 +135,8 @@ describe.each(testCases)('Rest - Upstreams', (testCaseName, { upstreams, virtual
       upstreamClientCredentials: [],
       policies: [],
     };
+
+    if (defaultUpstream) resourceGroup.defaultUpstream = defaultUpstream;
 
     const stitch = createStitchGateway({
       resourceGroups: Rx.of(resourceGroup),

@@ -1,0 +1,166 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Create resource Default upstream 1`] = `
+Object {
+  "defaultUpstream": Object {
+    "headers": Array [
+      Object {
+        "name": "x-api-client",
+        "value": "{request?.headers?.[\\"x-api-client\\"] ?? \\"Unknown\\"}",
+      },
+    ],
+    "targetOrigin": "http://localhost:8080",
+  },
+  "policies": Array [],
+  "policyAttachments": Object {},
+  "schemas": Array [],
+  "upstreamClientCredentials": Array [],
+  "upstreams": Array [],
+}
+`;
+
+exports[`Create resource Upstream 1`] = `
+Object {
+  "policies": Array [],
+  "policyAttachments": Object {},
+  "schemas": Array [],
+  "upstreamClientCredentials": Array [],
+  "upstreams": Array [
+    Object {
+      "auth": Object {
+        "activeDirectory": Object {
+          "authority": "https://authority",
+          "resource": "someResource",
+        },
+        "type": "ActiveDirectory",
+      },
+      "host": "test.api",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+}
+`;
+
+exports[`Create resource UpstreamClientCredentials 1`] = `
+Object {
+  "policies": Array [],
+  "policyAttachments": Object {},
+  "schemas": Array [],
+  "upstreamClientCredentials": Array [
+    Object {
+      "activeDirectory": Object {
+        "authority": "https://authority",
+        "clientId": "myClientId",
+        "clientSecret": "myClientSecret",
+      },
+      "authType": "ActiveDirectory",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+  "upstreams": Array [],
+}
+`;
+
+exports[`Create resource creates a Schema 1`] = `
+Object {
+  "policies": Array [],
+  "policyAttachments": Object {},
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "schema": "type Query { something: String! }",
+    },
+  ],
+  "upstreamClientCredentials": Array [],
+  "upstreams": Array [],
+}
+`;
+
+exports[`Create resource creates a Schema using updateResourceGroup 1`] = `
+Object {
+  "policies": Array [],
+  "policyAttachments": Object {},
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "schema": "type Query { something: String! }",
+    },
+  ],
+  "upstreamClientCredentials": Array [],
+  "upstreams": Array [],
+}
+`;
+
+exports[`Create resource creates an opa type policy 1`] = `
+Object {
+  "policies": Array [
+    Object {
+      "args": Object {
+        "an": "String",
+        "another": "String!",
+      },
+      "code": "real rego code
+           with multiple
+           lines",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "query": Object {
+        "gql": "some gql",
+        "variables": Object {
+          "a": "b",
+        },
+      },
+      "type": "opa",
+    },
+  ],
+  "policyAttachments": Object {},
+  "schemas": Array [],
+  "upstreamClientCredentials": Array [],
+  "upstreams": Array [],
+}
+`;
+
+exports[`Create resource creates an opa type policy using updateResourceGroup 1`] = `
+Object {
+  "policies": Array [
+    Object {
+      "args": Object {
+        "an": "String",
+        "another": "String!",
+      },
+      "code": "real rego code
+           with multiple
+           lines",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "query": Object {
+        "gql": "some gql",
+        "variables": Object {
+          "a": "b",
+        },
+      },
+      "type": "opa",
+    },
+  ],
+  "policyAttachments": Object {},
+  "schemas": Array [],
+  "upstreamClientCredentials": Array [],
+  "upstreams": Array [],
+}
+`;

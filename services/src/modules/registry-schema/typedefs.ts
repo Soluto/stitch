@@ -36,6 +36,7 @@ export default gql`
     validateUpstreamClientCredentials(input: [UpstreamClientCredentialsInput!]!): Result
     validatePolicies(input: [PolicyInput!]!): Result
     validateBasePolicy(input: BasePolicyInput!): Result
+    validateDefaultUpstream(input: DefaultUpstreamInput!): Result
   }
 
   type Mutation {
@@ -45,6 +46,7 @@ export default gql`
     updateUpstreamClientCredentials(input: [UpstreamClientCredentialsInput!]!): Result
     updatePolicies(input: [PolicyInput!]!): Result
     updateBasePolicy(input: BasePolicyInput!): Result
+    setDefaultUpstream(input: DefaultUpstreamInput!): Result
 
     deleteResources(input: ResourceGroupMetadataInput!): Result
     deleteSchemas(input: [ResourceMetadataInput!]!): Result
@@ -52,6 +54,7 @@ export default gql`
     deleteUpstreamClientCredentials(input: [ResourceMetadataInput!]!): Result
     deletePolicies(input: [ResourceMetadataInput!]!): Result
     deleteBasePolicy(input: Boolean!): Result
+    resetDefaultUpstream(input: Boolean!): Result
   }
 
   # Schemas
@@ -88,6 +91,14 @@ export default gql`
 
   input UpstreamInput {
     metadata: ResourceMetadataInput!
+    host: String
+    sourceHosts: [String!]
+    targetOrigin: String
+    auth: AuthInput
+    headers: [UpstreamHeader!]
+  }
+
+  input DefaultUpstreamInput {
     host: String
     sourceHosts: [String!]
     targetOrigin: String

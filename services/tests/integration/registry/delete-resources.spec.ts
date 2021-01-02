@@ -77,6 +77,7 @@ const baseResourceGroup: ResourceGroup = {
   upstreams: [upstream],
   upstreamClientCredentials: [upstreamClientCredentials],
   policies: [policy],
+  defaultUpstream: { targetOrigin: 'http://localhost:8080' },
 };
 describe('Delete resource', () => {
   let client: ApolloServerTestClient;
@@ -147,6 +148,22 @@ describe('Delete resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ deleteUpstreams: { success: true } });
+    expect(bucketContents.current).toMatchSnapshot();
+  });
+
+  it('reset an Default Upstream', async () => {
+    const response = await client.mutate({
+      mutation: gql`
+        mutation ResetDefaultUpstreams {
+          resetDefaultUpstream(input: true) {
+            success
+          }
+        }
+      `,
+    });
+
+    expect(response.errors).toBeUndefined();
+    expect(response.data).toEqual({ resetDefaultUpstream: { success: true } });
     expect(bucketContents.current).toMatchSnapshot();
   });
 
