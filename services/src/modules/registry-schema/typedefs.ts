@@ -81,12 +81,18 @@ export default gql`
     resource: String!
   }
 
+  input UpstreamHeader {
+    name: String!
+    value: String!
+  }
+
   input UpstreamInput {
     metadata: ResourceMetadataInput!
     host: String
     sourceHosts: [String!]
     targetOrigin: String
     auth: AuthInput
+    headers: [UpstreamHeader!]
   }
 
   # Upstream client credentials

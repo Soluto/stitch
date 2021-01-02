@@ -1,5 +1,6 @@
 import { FastifyRequest } from 'fastify';
 import * as _ from 'lodash';
+import { injectArgs } from '../arguments-injection';
 import { ResourceGroup } from '../resource-repository';
 import { ActiveDirectoryAuth, getAuthHeaders } from './authentication';
 
@@ -24,6 +25,15 @@ export async function applyUpstream(
   );
 
   if (!upstream) return requestParams;
+
+  if (upstream.headers) {
+    if (!requestParams.headers) requestParams.headers = {};
+
+    for (const header of upstream.headers) {
+      const headerValue = injectArgs(header.value, { request: originalRequest }) as string;
+      requestParams.headers[header.name] = headerValue;
+    }
+  }
 
   // Authorization headers
   const headers = await getAuthHeaders(

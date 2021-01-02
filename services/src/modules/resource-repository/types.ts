@@ -49,6 +49,10 @@ export interface Upstream extends Resource {
       resource: string;
     };
   };
+  headers?: {
+    name: string;
+    value: string;
+  }[];
 }
 
 export interface UpstreamClientCredentials extends Resource {

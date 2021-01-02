@@ -10,7 +10,7 @@ import { beforeEachDispose } from '../../before-each-dispose';
 interface TestCase {
   upstreams: Upstream[];
   virtualHost?: string;
-  mockAuth?: boolean;
+  headers?: Record<string, string>;
 }
 
 const host = 'http://virtual-host';
@@ -42,16 +42,59 @@ const testCases: [string, TestCase][] = [
       virtualHost: 'http://virtual-host',
     },
   ],
+  [
+    'Upstream with headers',
+    {
+      upstreams: [
+        {
+          metadata: { namespace: 'upstreams', name: 'upsteam-3' },
+          host: new URL(defaultRemoteServer).host,
+          headers: [
+            {
+              name: 'x-api-client',
+              value: 'Stitch',
+            },
+          ],
+        },
+      ],
+      headers: { ['x-api-client']: 'Stitch' },
+    },
+  ],
+  [
+    'Upstream with headers from request',
+    {
+      upstreams: [
+        {
+          metadata: { namespace: 'upstreams', name: 'upsteam-3' },
+          host: new URL(defaultRemoteServer).host,
+          headers: [
+            {
+              name: 'x-api-client',
+              value: '{request?.headers?.["x-api-client"] ?? "Stitch Default"}',
+            },
+          ],
+        },
+      ],
+      headers: { ['x-api-client']: 'Stitch Default' },
+    },
+  ],
 ];
 
-describe.each(testCases)('Rest - Upstreams', (testCaseName, { upstreams, virtualHost }) => {
+describe.each(testCases)('Rest - Upstreams', (testCaseName, { upstreams, virtualHost, headers }) => {
   let client: ApolloServerTestClient;
   const remoteServer = virtualHost ?? defaultRemoteServer;
 
   beforeEachDispose(async () => {
-    nock(defaultRemoteServer)
-      .post('/api/mock', b => !!b.name)
-      .reply(200, (_, b: any) => ({ id: '1', name: b.name }));
+    let postMock = nock(defaultRemoteServer).post('/api/mock', b => !!b.name);
+
+    if (headers) {
+      postMock = Object.entries(headers).reduce(
+        (pm, [headerName, headerValue]) => pm.matchHeader(headerName, headerValue),
+        postMock
+      );
+    }
+
+    postMock.reply(200, (_, b: any) => ({ id: '1', name: b.name }));
 
     const schema: Schema = {
       metadata: {

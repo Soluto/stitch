@@ -49,6 +49,10 @@ export interface UpstreamInput {
     type: AuthType;
     activeDirectory: ActiveDirectoryAuthInput;
   };
+  headers?: {
+    name: string;
+    value: string;
+  }[];
 }
 
 export interface UpstreamClientCredentialsInput {

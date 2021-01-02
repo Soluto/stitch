@@ -18,6 +18,42 @@ Object {
 }
 `;
 
+exports[`Rest - Upstreams Upstream with headers 1`] = `
+Object {
+  "data": Object {
+    "createFoo": Object {
+      "id": "1",
+      "name": "BAR",
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Rest - Upstreams Upstream with headers from request 1`] = `
+Object {
+  "data": Object {
+    "createFoo": Object {
+      "id": "1",
+      "name": "BAR",
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
 exports[`Rest - Upstreams Upstream with host and targetOrigin 1`] = `
 Object {
   "data": Object {
