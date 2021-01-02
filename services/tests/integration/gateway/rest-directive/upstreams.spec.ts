@@ -71,7 +71,7 @@ const testCases: [string, TestCase][] = [
           headers: [
             {
               name: 'x-api-client',
-              value: '{request?.headers?.["x-api-client"] ?? "Stitch Default"}',
+              value: '{incomingRequest?.headers?.["x-api-client"] ?? "Stitch Default"}',
             },
           ],
         },

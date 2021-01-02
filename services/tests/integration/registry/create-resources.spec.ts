@@ -46,7 +46,7 @@ const defaultUpstream: DefaultUpstream = {
   headers: [
     {
       name: 'x-api-client',
-      value: '{request?.headers?.["x-api-client"] ?? "Unknown"}',
+      value: '{incomingRequest?.headers?.["x-api-client"] ?? "Unknown"}',
     },
   ],
 };

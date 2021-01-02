@@ -6,7 +6,7 @@ Object {
     "headers": Array [
       Object {
         "name": "x-api-client",
-        "value": "{request?.headers?.[\\"x-api-client\\"] ?? \\"Unknown\\"}",
+        "value": "{incomingRequest?.headers?.[\\"x-api-client\\"] ?? \\"Unknown\\"}",
       },
     ],
     "targetOrigin": "http://localhost:8080",

@@ -18,7 +18,7 @@ const defaultDefaultUpstream: DefaultUpstream = {
   headers: [
     {
       name: 'Authorization',
-      value: '{request?.headers?.["authorization"]}',
+      value: '{incomingRequest?.headers?.["authorization"]}',
     },
   ],
 };
@@ -38,7 +38,7 @@ export async function applyUpstream(
   requestParams: RequestParams,
   resourceGroup: ResourceGroup,
   activeDirectoryAuth: ActiveDirectoryAuth,
-  originalRequest?: Pick<FastifyRequest, 'headers'>
+  incomingRequest?: Partial<Pick<FastifyRequest, 'headers' | 'decodeJWT'>>
 ): Promise<RequestParams> {
   const upstream =
     resourceGroup.upstreams.find(
@@ -47,10 +47,16 @@ export async function applyUpstream(
 
   // Headers
   if (upstream.headers) {
+    // original outgoing request as build from directive arguments before upstream changes.
+    const outgoingRequest = _.cloneDeep(requestParams);
+
+    const jwt = incomingRequest?.decodeJWT?.();
+
     if (!requestParams.headers) requestParams.headers = {};
 
     for (const header of upstream.headers) {
-      const headerValue = injectArgs(header.value, { request: originalRequest }) as string;
+      const headerValue = injectArgs(header.value, { incomingRequest, outgoingRequest, jwt }) as string;
+      if (!headerValue) continue;
       requestParams.headers[header.name] = headerValue;
     }
   }
