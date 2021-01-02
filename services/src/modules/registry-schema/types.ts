@@ -44,8 +44,10 @@ interface ActiveDirectoryAuthInput {
 
 export interface UpstreamInput {
   metadata: ResourceMetadataInput;
-  host: string;
-  auth: {
+  host?: string;
+  sourceHosts?: string[];
+  targetOrigin?: string;
+  auth?: {
     type: AuthType;
     activeDirectory: ActiveDirectoryAuthInput;
   };
