@@ -56,22 +56,23 @@ const resolvers: IResolvers = {
       handleUpdateResourceGroupRequest({ basePolicy: args.input }, context.activeDirectoryAuth),
 
     // Deletion
-    deleteResources: (_, args: { input: Partial<ResourceGroupMetadataInput> }) =>
-      handleDeleteResourcesRequest(args.input),
+    deleteResources: (_, args: { input: Partial<ResourceGroupMetadataInput> }, context) =>
+      handleDeleteResourcesRequest(args.input, context.activeDirectoryAuth),
 
-    deleteSchemas: (_, args: { input: ResourceMetadataInput[] }) =>
-      handleDeleteResourcesRequest({ schemas: args.input }),
+    deleteSchemas: (_, args: { input: ResourceMetadataInput[] }, context) =>
+      handleDeleteResourcesRequest({ schemas: args.input }, context.activeDirectoryAuth),
 
-    deleteUpstreams: (_, args: { input: ResourceMetadataInput[] }) =>
-      handleDeleteResourcesRequest({ upstreams: args.input }),
+    deleteUpstreams: (_, args: { input: ResourceMetadataInput[] }, context) =>
+      handleDeleteResourcesRequest({ upstreams: args.input }, context.activeDirectoryAuth),
 
-    deleteUpstreamClientCredentials: (_, args: { input: ResourceMetadataInput[] }) =>
-      handleDeleteResourcesRequest({ upstreamClientCredentials: args.input }),
+    deleteUpstreamClientCredentials: (_, args: { input: ResourceMetadataInput[] }, context) =>
+      handleDeleteResourcesRequest({ upstreamClientCredentials: args.input }, context.activeDirectoryAuth),
 
-    deletePolicies: (_, args: { input: ResourceMetadataInput[] }) =>
-      handleDeleteResourcesRequest({ policies: args.input }),
+    deletePolicies: (_, args: { input: ResourceMetadataInput[] }, context) =>
+      handleDeleteResourcesRequest({ policies: args.input }, context.activeDirectoryAuth),
 
-    deleteBasePolicy: (_, args: { input: boolean }) => handleDeleteResourcesRequest({ basePolicy: args.input }),
+    deleteBasePolicy: (_, args: { input: boolean }, context) =>
+      handleDeleteResourcesRequest({ basePolicy: args.input }, context.activeDirectoryAuth),
   },
 };
 

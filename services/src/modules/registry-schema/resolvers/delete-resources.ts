@@ -9,10 +9,12 @@ import { transformResourceGroup as applyPluginForResourceGroup } from '../../plu
 import PolicyAttachmentsGenerator from '../policy-attachments-generator';
 import resourceRepository from '../repository';
 import { ResourceGroupMetadataInput } from '..';
+import { updateRemoteGqlSchemas } from '../../directives/gql';
+import { ActiveDirectoryAuth } from '../../upstreams';
 
 const singleton = pLimit(1);
 
-export default async function (deletions: ResourceGroupMetadataInput) {
+export default async function (deletions: ResourceGroupMetadataInput, activeDirectoryAuth: ActiveDirectoryAuth) {
   return singleton(async () => {
     logger.info(`Proceeding resources deletion request...`);
     const policyAttachments = new PolicyAttachmentsGenerator();
@@ -22,10 +24,11 @@ export default async function (deletions: ResourceGroupMetadataInput) {
       const existingPolicies = _.cloneDeep(resourceGroup.policies);
 
       const newRg = applyResourceGroupDeletions(resourceGroup, deletions);
-      const registryRg = _.cloneDeep(newRg);
 
       // TODO: In case of upstream deletion we should force refresh of remote schemas
-      //  updateRemoteGqlSchemas(newRg, activeDirectoryAuth);
+      updateRemoteGqlSchemas(newRg, activeDirectoryAuth);
+
+      const registryRg = _.cloneDeep(newRg);
 
       const gatewayRg = await applyPluginForResourceGroup(newRg);
       validateResourceGroupOrThrow(gatewayRg);
