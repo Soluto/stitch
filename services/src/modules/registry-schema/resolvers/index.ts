@@ -81,8 +81,8 @@ const resolvers: IResolvers = {
     deleteBasePolicy: (_, args: { input: boolean }, context) =>
       handleDeleteResourcesRequest({ basePolicy: args.input }, context.activeDirectoryAuth),
 
-    resetDefaultUpstream: (_, args: { input: boolean }) =>
-      handleDeleteResourcesRequest({ defaultUpstream: args.input }),
+    resetDefaultUpstream: (_, args: { input: boolean }, context) =>
+      handleDeleteResourcesRequest({ defaultUpstream: args.input }, context.activeDirectoryAuth),
   },
 };
 

@@ -1,0 +1,83 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Upstreams Add header 1`] = `
+Object {
+  "headers": Object {
+    "Content-Type": "application/json",
+    "Host": "maps.google.com",
+    "x-api-client": "upstream-tests",
+  },
+  "method": "POST",
+  "url": "https://maps.google.com/api/v1/get-location?city=TelAviv",
+}
+`;
+
+exports[`Upstreams Add header from incoming request 1`] = `
+Object {
+  "headers": Object {
+    "Content-Type": "application/json",
+    "Host": "maps.google.com",
+    "transactionId": "1",
+  },
+  "method": "POST",
+  "url": "https://maps.google.com/api/v1/get-location?city=TelAviv",
+}
+`;
+
+exports[`Upstreams Change url 1`] = `
+Object {
+  "headers": Object {
+    "Content-Type": "application/json",
+    "Host": "maps.google.com",
+  },
+  "method": "POST",
+  "url": "https://www.facebook.com/api/v1/get-location?city=TelAviv",
+}
+`;
+
+exports[`Upstreams Custom default upstream 1`] = `
+Object {
+  "headers": Object {
+    "Content-Type": "application/json",
+    "Host": "maps.google.com",
+    "authorization": "bearer s0mth1ng",
+  },
+  "method": "POST",
+  "url": "https://maps.google.com/api/v1/get-location?city=TelAviv",
+}
+`;
+
+exports[`Upstreams Custom default upstream and upstream 1`] = `
+Object {
+  "headers": Object {
+    "Content-Type": "application/json",
+    "Host": "maps.google.com",
+    "authorization": "BEARER S0MTH1NG",
+  },
+  "method": "POST",
+  "url": "https://maps.google.com/api/v1/get-location?city=TelAviv",
+}
+`;
+
+exports[`Upstreams Default default upstream 1`] = `
+Object {
+  "headers": Object {
+    "Authorization": "Bearer S0mTh1nG",
+    "Content-Type": "application/json",
+    "Host": "maps.google.com",
+  },
+  "method": "POST",
+  "url": "https://maps.google.com/api/v1/get-location?city=TelAviv",
+}
+`;
+
+exports[`Upstreams No upstream 1`] = `
+Object {
+  "headers": Object {
+    "Content-Type": "application/json",
+    "Host": "maps.google.com",
+  },
+  "method": "POST",
+  "url": "https://maps.google.com/api/v1/get-location?city=TelAviv",
+}
+`;

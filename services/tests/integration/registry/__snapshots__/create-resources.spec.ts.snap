@@ -108,8 +108,15 @@ Object {
   "policies": Array [
     Object {
       "args": Object {
-        "an": "String",
-        "another": "String!",
+        "an": Object {
+          "default": "{source.an}",
+          "optional": false,
+          "type": "String",
+        },
+        "another": Object {
+          "optional": false,
+          "type": "String!",
+        },
       },
       "code": "real rego code
            with multiple
@@ -139,8 +146,15 @@ Object {
   "policies": Array [
     Object {
       "args": Object {
-        "an": "String",
-        "another": "String!",
+        "an": Object {
+          "default": "{source.an}",
+          "optional": false,
+          "type": "String",
+        },
+        "another": Object {
+          "optional": false,
+          "type": "String!",
+        },
       },
       "code": "real rego code
            with multiple
