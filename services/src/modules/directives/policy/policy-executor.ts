@@ -114,7 +114,10 @@ export default class PolicyExecutor {
 
     return Object.entries(supportedPolicyArgs).reduce<PolicyArgsObject>(
       (policyArgs, [policyArgName, { default: defaultArg, optional = false }]) => {
-        let policyArgValue = ctx.policy?.args?.[policyArgName] ?? defaultArg;
+        const isPolicyArgProvided =
+          ctx.policy.args && Object.prototype.hasOwnProperty.call(ctx.policy.args, policyArgName);
+
+        let policyArgValue = isPolicyArgProvided ? ctx.policy.args?.[policyArgName] : defaultArg;
 
         if (policyArgValue === undefined) {
           if (!optional) {
