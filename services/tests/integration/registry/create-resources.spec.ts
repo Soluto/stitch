@@ -57,8 +57,8 @@ const policy: PolicyDefinition = {
            with multiple
            lines`,
   args: {
-    an: 'String',
-    another: 'String!',
+    an: { type: 'String', default: '{source.an}' },
+    another: { type: 'String!' },
   },
   query: {
     gql: 'some gql',

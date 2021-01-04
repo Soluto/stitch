@@ -76,8 +76,8 @@ const policy: PolicyDefinition = {
            with multiple
            lines`,
   args: {
-    an: 'String',
-    another: 'String!',
+    an: { type: 'String', default: '{source.an}' },
+    another: { type: 'String!' },
   },
   query: {
     gql: 'some another gql',
@@ -86,7 +86,7 @@ const policy: PolicyDefinition = {
     },
   },
 };
-const policyUpdate: Partial<PolicyDefinition> = { code: 'changed code', args: { just: 'Int' } };
+const policyUpdate: Partial<PolicyDefinition> = { code: 'changed code', args: { just: { type: 'Int' } } };
 
 const baseResourceGroup: ResourceGroup = {
   schemas: [schema],

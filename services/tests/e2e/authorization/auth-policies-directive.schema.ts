@@ -12,7 +12,7 @@ export const policies = [
       }
     `,
     args: {
-      argA: 'String',
+      argA: { type: 'String', default: '{args.argA}' },
     },
   },
   {
@@ -25,7 +25,7 @@ export const policies = [
       }
     `,
     args: {
-      argB: 'String',
+      argB: { type: 'String', default: '{args.argB}' },
     },
   },
 ];
@@ -37,19 +37,13 @@ export const schema = {
       pd_foo(argA: String!, argB: String!): String!
         @stub(value: "FOO")
         @policies(
-          policies: [
-            { namespace: "auth_policies", name: "isAlpha", args: { argA: "{args.argA}" } }
-            { namespace: "auth_policies", name: "isBeta", args: { argB: "{args.argB}" } }
-          ]
+          policies: [{ namespace: "auth_policies", name: "isAlpha" }, { namespace: "auth_policies", name: "isBeta" }]
           relation: OR
         )
       pd_bar(argA: String!, argB: String!): String!
         @stub(value: "FOO")
         @policies(
-          policies: [
-            { namespace: "auth_policies", name: "isAlpha", args: { argA: "{args.argA}" } }
-            { namespace: "auth_policies", name: "isBeta", args: { argB: "{args.argB}" } }
-          ]
+          policies: [{ namespace: "auth_policies", name: "isAlpha" }, { namespace: "auth_policies", name: "isBeta" }]
           relation: AND
         )
     }

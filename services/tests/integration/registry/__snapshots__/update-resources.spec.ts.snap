@@ -5,8 +5,13 @@ Object {
   "policies": Array [
     Object {
       "args": Object {
-        "an": "String",
-        "another": "String!",
+        "an": Object {
+          "default": "{source.an}",
+          "type": "String",
+        },
+        "another": Object {
+          "type": "String!",
+        },
       },
       "code": "real rego code
            with multiple
@@ -91,8 +96,13 @@ Object {
   "policies": Array [
     Object {
       "args": Object {
-        "an": "String",
-        "another": "String!",
+        "an": Object {
+          "default": "{source.an}",
+          "type": "String",
+        },
+        "another": Object {
+          "type": "String!",
+        },
       },
       "code": "real rego code
            with multiple
@@ -161,8 +171,13 @@ Object {
   "policies": Array [
     Object {
       "args": Object {
-        "an": "String",
-        "another": "String!",
+        "an": Object {
+          "default": "{source.an}",
+          "type": "String",
+        },
+        "another": Object {
+          "type": "String!",
+        },
       },
       "code": "real rego code
            with multiple
@@ -230,8 +245,13 @@ Object {
   "policies": Array [
     Object {
       "args": Object {
-        "an": "String",
-        "another": "String!",
+        "an": Object {
+          "default": "{source.an}",
+          "type": "String",
+        },
+        "another": Object {
+          "type": "String!",
+        },
       },
       "code": "real rego code
            with multiple
@@ -300,8 +320,13 @@ Object {
   "policies": Array [
     Object {
       "args": Object {
-        "an": "String",
-        "another": "String!",
+        "an": Object {
+          "default": "{source.an}",
+          "type": "String",
+        },
+        "another": Object {
+          "type": "String!",
+        },
       },
       "code": "real rego code
            with multiple
@@ -379,7 +404,10 @@ Object {
   "policies": Array [
     Object {
       "args": Object {
-        "just": "Int",
+        "just": Object {
+          "optional": false,
+          "type": "Int",
+        },
       },
       "code": "changed code",
       "metadata": Object {
@@ -446,7 +474,10 @@ Object {
   "policies": Array [
     Object {
       "args": Object {
-        "just": "Int",
+        "just": Object {
+          "optional": false,
+          "type": "Int",
+        },
       },
       "code": "changed code",
       "metadata": Object {

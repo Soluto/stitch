@@ -25,9 +25,6 @@ describe('Authorization - Base policy', () => {
   const basePolicy: Policy = {
     namespace: 'internal',
     name: 'base_policy',
-    args: {
-      role: '{jwt?.role}',
-    },
   };
 
   const defaultBasePolicy: Policy = {

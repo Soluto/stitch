@@ -12,7 +12,7 @@ export const policies = [
       }
     `,
     args: {
-      role: 'String',
+      role: { type: 'String', default: '{source.role}' },
     },
   },
   {
@@ -25,8 +25,8 @@ export const policies = [
       }
     `,
     args: {
-      allowedName: 'String',
-      jwtName: 'String',
+      allowedName: { type: 'String' },
+      jwtName: { type: 'String', default: '{jwt?.name}' },
     },
   },
 ];
@@ -42,7 +42,13 @@ export const schema = {
   schema: print(gql`
     type User {
       firstName: String
-      lastName: String @policy(namespace: "auth_jwt", name: "onlyAdmin", args: { role: "{source.role}" })
+      lastName: String @policy(namespace: "auth_jwt", name: "onlyAdmin")
+      role: String
+    }
+
+    type UserIgnoreRole {
+      firstName: String
+      lastName: String @policy(namespace: "auth_jwt", name: "onlyAdmin", args: { role: "admin" })
       role: String
     }
 
@@ -50,16 +56,14 @@ export const schema = {
       arbitraryField: String @policy(
         namespace: "auth_jwt",
         name: "jwtName",
-        args: {
-          jwtName: "{jwt?.name}",
-          allowedName: "Varg"
-        }
+        args: { allowedName: "Varg" }
       )
     }
 
     type Query {
       user: User! @localResolver(value: ${userQueryStub('normal')})
       userAdmin: User! @localResolver(value: ${userQueryStub('admin')})
+      userIgnoreRole: UserIgnoreRole! @localResolver(value: ${userQueryStub('normal')})
       arbitraryData: ArbitraryData! @localResolver(value: { arbitraryField: "arbitraryValue" })
     }
   `),

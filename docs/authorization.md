@@ -31,7 +31,9 @@ code: |
     input.args.userRoles[_] == "admin"
   }
 args:
-  userRoles: [String]
+  userRoles:
+    type: [String!]
+    default: '{jwt.roles}'
 ```
 
 Explanation:
@@ -45,7 +47,11 @@ Explanation:
   - `args`: derived from `@policy` directive arguments evaluation.
   - `query`: the result of `query` policy property execution. The query is executed on the Stitch schema without effect of authorization policies (a.k.a. admin privileges). See examples below.
 
-- **_args_**: Arguments mapping. The key is argument name. The value is argument Graphql type. In this example the `userRole` argument can get value of `roles` claim from request JWT. (See `@policy` directive definition below).
+- **_args_**: Arguments mapping. The key is argument name, the value is the options for the argument. In this example the `userRole` argument gets the value of the `roles` claim from the request JWT by default. The argument can be given a different value when setting the policy on a field or object, which will override the default.
+  The options for an argument are:
+
+  - `type`: The Graphql type of this argument. If the type is nullable type the argument is optional.
+  - `default`: The default value (argument injection supported) for the argument. Can be overridden when setting the policy on a field/object.
 
 ---
 
@@ -62,7 +68,8 @@ code: |
     input.query.user.roles[_] == "admin"
   }
 args:
-  userId: ID
+  userId:
+    type: ID
 query:
   gql: |
     query($id: ID!) {
@@ -112,7 +119,8 @@ code: |
     input.query.policy.another_ns___userIsActive.allow
   }
 args:
-  userId: ID
+  userId:
+    type: ID
 query:
   gql: |
     query($id: ID!) {
@@ -144,7 +152,7 @@ type User {
 }
 ```
 
-The policy is defined as in example 1 (See above).
+The policy is defined as in example 1 (See above). Note that since the policy definition has the same default value for the `userRoles` argument, the `args` parameter could have been omitted in this case.
 
 In the example above, the `roles` argument value is received by using the Argument Injection mechanism. In this example, it is received from the `roles` claim in the request's JWT.
 

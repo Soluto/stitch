@@ -112,22 +112,33 @@ export default class PolicyExecutor {
     const supportedPolicyArgs = ctx.policyDefinition.args;
     if (!supportedPolicyArgs) return;
 
-    return Object.keys(supportedPolicyArgs).reduce<PolicyArgsObject>((policyArgs, policyArgName) => {
-      if (ctx.policy?.args?.[policyArgName] === undefined) {
-        throw new Error(
-          `Missing arg ${policyArgName} for policy ${ctx.policy.name} in namespace ${ctx.policy.namespace}`
-        );
-      }
+    return Object.entries(supportedPolicyArgs).reduce<PolicyArgsObject>(
+      (policyArgs, [policyArgName, { default: defaultArg, optional = false }]) => {
+        const isPolicyArgProvided =
+          ctx.policy.args && Object.prototype.hasOwnProperty.call(ctx.policy.args, policyArgName);
 
-      let policyArgValue = ctx.policy.args[policyArgName];
-      if (typeof policyArgValue === 'string') {
-        const { source, gqlArgs: args, requestContext: context, info } = ctx;
-        policyArgValue = inject(policyArgValue, { source, args, context, info });
-      }
+        let policyArgValue = isPolicyArgProvided ? ctx.policy.args?.[policyArgName] : defaultArg;
 
-      policyArgs[policyArgName] = policyArgValue;
-      return policyArgs;
-    }, {});
+        if (policyArgValue === undefined) {
+          if (!optional) {
+            throw new Error(
+              `Missing arg ${policyArgName} for policy ${ctx.policy.name} in namespace ${ctx.policy.namespace}`
+            );
+          }
+
+          policyArgValue = null;
+        }
+
+        if (typeof policyArgValue === 'string') {
+          const { source, gqlArgs: args, requestContext: context, info } = ctx;
+          policyArgValue = inject(policyArgValue, { source, args, context, info });
+        }
+
+        policyArgs[policyArgName] = policyArgValue;
+        return policyArgs;
+      },
+      {}
+    );
   }
 }
 

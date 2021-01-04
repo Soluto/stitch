@@ -36,7 +36,7 @@ export const policies: PolicyDefinition[] = [
       }
     `,
     args: {
-      hireDate: 'Int',
+      hireDate: { type: 'Int' },
     },
   },
   {
@@ -53,8 +53,8 @@ export const policies: PolicyDefinition[] = [
       }
     `,
     args: {
-      departmentId: 'String',
-      hireDate: 'Int',
+      departmentId: { type: 'String', default: '{source.department.id}' },
+      hireDate: { type: 'Int', default: '{source.hireDate}' },
     },
     query: {
       gql: print(gql`
@@ -91,12 +91,7 @@ export const schema: Schema = {
       name: String
       hireDate: Int
       department: Department!
-      address: String
-        @policy(
-          namespace: "auth-with-query"
-          name: "notClassified"
-          args: { departmentId: "{source.department.id}", hireDate: "{source.hireDate}" }
-        )
+      address: String @policy(namespace: "auth-with-query", name: "notClassified")
     }
 
     type Query {

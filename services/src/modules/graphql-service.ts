@@ -59,7 +59,7 @@ export function createGraphQLService(config: { resourceGroups: Observable<Resour
 function buildPolicyGqlQuery(policy: PolicyDefinition): DocumentNode {
   const argStr = policy.args
     ? `(${Object.entries(policy.args)
-        .map(([argName, argType]) => `${argName}: ${argType}`)
+        .map(([argName, { type }]) => `${argName}: ${type}`)
         .join(',')})`
     : '';
 
