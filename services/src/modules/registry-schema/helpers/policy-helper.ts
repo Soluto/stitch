@@ -3,7 +3,7 @@ import { PolicyInput } from '..';
 import logger from '../../logger';
 import { PolicyArgDefinition } from '../../resource-repository';
 
-export default function (policies?: PolicyInput[]) {
+export function markOptionalPolicyArgs(policies?: PolicyInput[]) {
   policies?.forEach(p => {
     if (!p.args) return;
 

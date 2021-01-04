@@ -1,3 +1,1 @@
-import proceedPolicy from './policy-helper';
-
-export { proceedPolicy };
+export { markOptionalPolicyArgs } from './policy-helper';
