@@ -33,7 +33,7 @@ code: |
 args:
   userRoles:
     type: [String!]
-    default: '{jwt.roles}'
+    default: '{jwt?.roles}'
 ```
 
 Explanation:
@@ -148,7 +148,7 @@ So if in type `User` there is field `phone` that should be accessible for user w
 type User {
   id: ID!
   name: String!
-  phone: String @policy(namespace: "billing", name: "adminOnly", args: { userRoles: "{jwt.roles}" })
+  phone: String @policy(namespace: "billing", name: "adminOnly", args: { userRoles: "{jwt?.roles}" })
 }
 ```
 

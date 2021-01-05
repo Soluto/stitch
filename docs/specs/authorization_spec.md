@@ -41,11 +41,11 @@ Spec:
   args:
     issuer:
       type: String!
-      default: "{jwt.issuer}"
+      default: "{jwt?.issuer}"
 ```
 
 The `args` are available to use on the input object.
-`jwt` is available for parameter injection in args using `issuer: "{jwt.issuer}"`
+`jwt` is available for parameter injection in args using `issuer: "{jwt?.iss}"`
 
 ### Policy that allows access only if the subject matches the provided userId argument:
 
@@ -163,7 +163,7 @@ type User {
   ID: ID!
   Picture: String @policy-some-ns-public
   Friends: [User] @policy-some-ns-abc-user
-  Email: String @policy-some-ns-my-user(userId: "{source.UserId}", sub: "{jwt.sub}")
+  Email: String @policy-some-ns-my-user(userId: "{source.UserId}", sub: "{jwt?.sub}")
   NickName: @policy-some-ns-my-user-family(userId: "{source.UserId}")
 }
 ```
@@ -297,6 +297,6 @@ Usage:
 ```gql
 type User {
   ID: ID!
-  Picture: String @policy-some-ns-has-claims(claims:["issuer", "sub"], values: ["soluto.com", "{source.UserId}"], jwtClaims: "{jwt.claims}")
+  Picture: String @policy-some-ns-has-claims(claims:["issuer", "sub"], values: ["soluto.com", "{source.UserId}"], jwtClaims: "{jwt?.claims}")
 }
 ```
