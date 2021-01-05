@@ -116,3 +116,40 @@ Object {
 `;
 
 exports[`Introspection 5. Error from remote graphql server 1`] = `[Error: Introspection query to http://remote-gql-test-5/graphql failed]`;
+
+exports[`Introspection 6. One known, one unknown and one removed graphql servers 1`] = `
+Object {
+  "policies": Array [],
+  "remoteSchemas": Array [
+    Object {
+      "schema": "type Query {
+  bar: String
+}
+",
+      "url": "http://remote-gql-test-6-1/graphql",
+    },
+    Object {
+      "schema": "type Query {
+  bar: String
+}
+",
+      "url": "http://remote-gql-test-6-2/graphql",
+    },
+  ],
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "schema-6",
+        "namespace": "ns",
+      },
+      "schema": "type Query {
+  foo: String! @gql(url: \\"http://remote-gql-test-6-1/graphql\\", fieldName: \\"foo\\")
+  bar: String! @gql(url: \\"http://remote-gql-test-6-2/graphql\\", fieldName: \\"bar\\")
+}
+",
+    },
+  ],
+  "upstreamClientCredentials": Array [],
+  "upstreams": Array [],
+}
+`;

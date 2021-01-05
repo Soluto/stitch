@@ -25,9 +25,11 @@ export default async function (updates: ResourceGroupInput, activeDirectoryAuth:
       const existingPolicies = _.cloneDeep(resourceGroup.policies);
 
       const newRg = applyResourceGroupUpdates(resourceGroup, updates);
-      const registryRg = _.cloneDeep(newRg);
 
+      // TODO: In case of upstream deletion we should force refresh of remote schemas
       await updateRemoteGqlSchemas(newRg, activeDirectoryAuth);
+
+      const registryRg = _.cloneDeep(newRg);
 
       const gatewayRg = await applyPluginForResourceGroup(newRg);
       validateResourceGroupOrThrow(gatewayRg);

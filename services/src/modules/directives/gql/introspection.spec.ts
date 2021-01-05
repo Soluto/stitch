@@ -156,6 +156,57 @@ const testCases: [string, TestCase][] = [
       },
     },
   ],
+  [
+    '6. One known, one unknown and one removed graphql servers',
+    {
+      resourceGroupPart: {
+        schemas: [
+          {
+            metadata: { namespace: 'ns', name: 'schema-6' },
+            schema: print(gql`
+              type Query {
+                foo: String! @gql(url: "http://remote-gql-test-6-1/graphql", fieldName: "foo")
+                bar: String! @gql(url: "http://remote-gql-test-6-2/graphql", fieldName: "bar")
+              }
+            `),
+          },
+        ],
+        remoteSchemas: [
+          {
+            schema: print(gql`
+              type Query {
+                bar: String
+              }
+            `),
+            url: 'http://remote-gql-test-6-1/graphql',
+          },
+          {
+            schema: print(gql`
+              type Query {
+                oldBar: String
+              }
+            `),
+            url: 'http://remote-gql-test-6-3/graphql',
+          },
+        ],
+      },
+      remoteServers: {
+        ['http://remote-gql-test-6-1/graphql']: {
+          shouldBeSkipped: true,
+        },
+        ['http://remote-gql-test-6-2/graphql']: {
+          schema: gql`
+            type Query {
+              bar: String
+            }
+          `,
+        },
+        ['http://remote-gql-test-6-3/graphql']: {
+          shouldBeSkipped: true,
+        },
+      },
+    },
+  ],
 ];
 
 const mockResponse = (host: string, remoteSchema?: DocumentNode, responseCode = 200) =>
