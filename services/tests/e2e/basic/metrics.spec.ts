@@ -85,6 +85,8 @@ describe('Metrics', () => {
     const body = await response.text();
     const metrics = body.split('\n');
     const sampleMetric = metrics.find(m => m.startsWith('nodejs_version_info'));
-    expect(sampleMetric).toMatchSnapshot();
+    expect(sampleMetric).toBeDefined();
+    const majorVersion = /major="(\d+)"/g.exec(sampleMetric!);
+    expect(majorVersion?.[1]).toEqual('14');
   });
 });

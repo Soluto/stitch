@@ -8,5 +8,3 @@ graphql_resolver_duration_seconds_bucket{le="X",parentType: MetricsFoo,fieldName
 graphql_resolver_duration_seconds_sum{parentType: MetricsFoo,fieldName: baz,status: success} Y
 graphql_resolver_duration_seconds_count{parentType: MetricsFoo,fieldName: baz,status: success} Y
 `;
-
-exports[`Metrics Registry metrics 1`] = `"nodejs_version_info{version=\\"v14.15.3\\",major=\\"14\\",minor=\\"15\\",patch=\\"3\\"} 1"`;
