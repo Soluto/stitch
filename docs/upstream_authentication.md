@@ -55,11 +55,15 @@ Properties:
 
 `auth`: _(optional)_ Allows to build `Authorization` header. For example using _Client Credentials_ flow.
 
-`headers`: _(optional)_ Allows to add or replace headers in outgoing request. Argument injection mechanism is available.
+`headers`: _(optional)_ Allows to add or replace headers in outgoing request. Argument injection mechanism is available. Unlike argument injection in `@rest` directive `url`, `query` or `header` parameters or `@policy` directive `args` parameter the data sources are different. There are 3 data sources available for injection:
+
+- `incomingRequest` - the request object sent to Stitch
+- `jwt` - decoded JWT from `incomingRequest`'s `Authorization` header
+- `outgoingRequest` - the request object built by `@rest` or `@gql` directives before application of upstream
 
 ## Default Upstream
 
-There is option to set one default upstream to the whole deployment. This default upstream will be applied unless specific upstream wasn't found for the request host (TODO: `extendDefaultUpstream` property???). This can be useful to add some headers to all outgoing requests or to redirect all requests to proxy server.
+There is option to set one default upstream to the whole deployment. This default upstream will be applied unless specific upstream wasn't found for the request host. This can be useful to add some headers to all outgoing requests or to redirect all requests to proxy server.
 
 If neither upstream nor default upstream is set for the `@rest` or `@gql` directive's `url`, the incoming request's `Authorization` header will be copied to outgoing request.
 

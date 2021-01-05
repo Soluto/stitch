@@ -99,8 +99,6 @@ export default gql`
   }
 
   input DefaultUpstreamInput {
-    host: String
-    sourceHosts: [String!]
     targetOrigin: String
     auth: AuthInput
     headers: [UpstreamHeader!]
