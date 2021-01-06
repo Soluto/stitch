@@ -469,6 +469,12 @@ Object {
 }
 `;
 
+exports[`Update resource updates an opa type policy 2`] = `
+Object {
+  "namespace-name.wasm": "compiled rego code",
+}
+`;
+
 exports[`Update resource updates an opa type policy using updateResourceGroup 1`] = `
 Object {
   "policies": Array [
@@ -536,5 +542,11 @@ Object {
       },
     },
   ],
+}
+`;
+
+exports[`Update resource updates an opa type policy using updateResourceGroup 2`] = `
+Object {
+  "namespace-name.wasm": "compiled rego code",
 }
 `;

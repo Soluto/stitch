@@ -23,6 +23,10 @@ export class FileSystemStorage implements Storage {
     await fs.writeFile(filePath, content);
   }
 
+  async deleteFile(filePath: string): Promise<void> {
+    await fs.unlink(filePath);
+  }
+
   async listFiles(folderPath: string): Promise<listFilesItem[]> {
     const filenames = await fs.readdir(folderPath);
     const limit = pLimit(10);

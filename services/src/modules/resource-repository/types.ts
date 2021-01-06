@@ -90,6 +90,7 @@ export interface IResourceRepository {
   fetchLatest(): Promise<FetchLatestResult>;
   update(rg: ResourceGroup, options?: UpdateOptions): Promise<void>;
   writePolicyAttachment(filename: string, content: Buffer): Promise<void>;
+  deletePolicyAttachment(filename: string): Promise<void>;
 }
 
 enum AuthType {

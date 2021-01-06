@@ -1,5 +1,6 @@
 import * as path from 'path';
 import pLimit from 'p-limit';
+import * as _ from 'lodash';
 import { Storage, listFilesItem } from '../storage';
 import { getWasmPolicy } from '../directives/policy/opa';
 import { FetchLatestResult, ResourceGroup, IResourceRepository, PolicyAttachments, UpdateOptions } from '.';
@@ -50,6 +51,11 @@ export class ResourceRepository implements IResourceRepository {
     await this.storage.writeFile(filePath, content);
   }
 
+  async deletePolicyAttachment(filename: string): Promise<void> {
+    const filePath = path.join(this.policyAttachmentsFolderPath, filename);
+    await this.storage.deleteFile(filePath);
+  }
+
   protected async refreshPolicyAttachments() {
     if (this.isRegistry) return;
     const newRefreshedAt = new Date();
@@ -63,6 +69,13 @@ export class ResourceRepository implements IResourceRepository {
       for (const { filename, content } of newAttachments) {
         this.policyAttachments.attachments[filename] = await getWasmPolicy(content);
       }
+    }
+
+    const allNewFilePaths = allAttachments.map(a => path.basename(a.filePath));
+    const allCurrentFilePaths = Object.keys(this.policyAttachments.attachments);
+    const deletedAttachments = _.differenceWith(allCurrentFilePaths, allNewFilePaths, _.isEqual);
+    for (const deletedAttachment of deletedAttachments) {
+      delete this.policyAttachments.attachments[deletedAttachment];
     }
 
     this.policyAttachments.refreshedAt = newRefreshedAt;

@@ -1,11 +1,11 @@
-import * as AWS from 'aws-sdk';
+import { S3 } from 'aws-sdk';
 import { Storage, FileStats, listFilesItem } from '.';
 
 export class S3Storage implements Storage {
-  protected s3: AWS.S3;
+  protected s3: S3;
 
   constructor(bucket: string, endpoint: string, accessKeyId?: string, secretAccessKey?: string) {
-    this.s3 = new AWS.S3({
+    this.s3 = new S3({
       params: { Bucket: bucket },
       endpoint,
       accessKeyId,
@@ -16,7 +16,7 @@ export class S3Storage implements Storage {
   }
 
   async fileStats(filePath: string): Promise<FileStats> {
-    const stats = await this.s3.headObject({ Key: filePath } as any).promise();
+    const stats = await this.s3.headObject({ Key: filePath } as S3.HeadObjectRequest).promise();
 
     if (!stats.LastModified) throw new Error(`s3 key ${filePath} does not exist`);
     return { lastModified: stats.LastModified };
@@ -34,9 +34,9 @@ export class S3Storage implements Storage {
     filePath: string,
     options: { asString?: boolean; etag?: string } = {}
   ): Promise<{ content: Buffer | string; etag?: string }> {
-    const getParams: Partial<AWS.S3.GetObjectRequest> = { Key: filePath };
+    const getParams: Partial<S3.GetObjectRequest> = { Key: filePath };
     if (options.etag) getParams.IfNoneMatch = options.etag;
-    const res = await this.s3.getObject(getParams as any).promise();
+    const res = await this.s3.getObject(getParams as S3.GetObjectRequest).promise();
 
     if (!res.Body) throw new Error(`s3 key ${filePath} does not exist`);
 
@@ -45,7 +45,11 @@ export class S3Storage implements Storage {
   }
 
   async writeFile(filePath: string, content: string | Buffer): Promise<void> {
-    await this.s3.putObject({ Key: filePath, Body: content } as any).promise();
+    await this.s3.putObject({ Key: filePath, Body: content } as S3.PutObjectRequest).promise();
+  }
+
+  async deleteFile(filePath: string): Promise<void> {
+    await this.s3.deleteObject({ Key: filePath } as S3.DeleteObjectRequest).promise();
   }
 
   async listFiles(folderPath: string): Promise<listFilesItem[]> {
@@ -54,13 +58,13 @@ export class S3Storage implements Storage {
     let continuationToken;
 
     while (isTruncated) {
-      const params: Partial<AWS.S3.Types.ListObjectsV2Request> = {
+      const params: Partial<S3.Types.ListObjectsV2Request> = {
         MaxKeys: 1000,
         Prefix: folderPath,
       };
       if (continuationToken) params.ContinuationToken = continuationToken;
 
-      const listResults = await this.s3.listObjectsV2(params as any).promise();
+      const listResults = await this.s3.listObjectsV2(params as S3.ListObjectsV2Request).promise();
       const keys = listResults.Contents || [];
       const newAttachments: listFilesItem[] = keys.map(k => ({
         filePath: k.Key!,

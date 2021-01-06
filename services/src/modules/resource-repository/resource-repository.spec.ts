@@ -68,12 +68,14 @@ describe('refreshPolicyAttachments', () => {
     const needsUpdatingAttachmentOld = { evaluate: () => [] };
     const needsUpdatingAttachmentUpdated = { evaluate: () => [] };
     const newFileAttachment = { evaluate: () => [] };
+    const deletedAttachment = { evaluate: () => [] };
 
     repo['policyAttachments'] = {
       refreshedAt: minutesAgo(5),
       attachments: {
         upToDateFile: upToDateAttachment,
         needsUpdating: needsUpdatingAttachmentOld,
+        delete: deletedAttachment,
       },
     };
 
@@ -131,6 +133,7 @@ describe('refreshPolicyAttachments', () => {
 const MockStorage = jest.fn(() => ({
   fileStats: jest.fn(),
   writeFile: jest.fn(),
+  deleteFile: jest.fn(),
   listFiles: jest.fn(),
   readFile: jest.fn(),
 }));

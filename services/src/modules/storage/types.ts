@@ -1,6 +1,7 @@
 export interface Storage {
   fileStats(filePath: string): Promise<FileStats>;
   writeFile(filePath: string, content: string | Buffer): Promise<void>;
+  deleteFile(filePath: string): Promise<void>;
   listFiles(folderPath: string): Promise<listFilesItem[]>;
 
   readFile(filePath: string): Promise<{ content: Buffer }>;

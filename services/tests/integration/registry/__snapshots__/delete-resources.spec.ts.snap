@@ -49,6 +49,8 @@ Object {
 }
 `;
 
+exports[`Delete resource delete an opa type policy 2`] = `Object {}`;
+
 exports[`Delete resource deletes a Schema 1`] = `
 Object {
   "policies": Array [
@@ -295,30 +297,9 @@ Object {
 }
 `;
 
-exports[`Delete resource deletes an opa type policy using updateResourceGroup 1`] = `
+exports[`Delete resource deletes an opa type policy using deleteResources 1`] = `
 Object {
-  "policies": Array [
-    Object {
-      "args": Object {
-        "just": Object {
-          "optional": false,
-          "type": "Int",
-        },
-      },
-      "code": "changed code",
-      "metadata": Object {
-        "name": "name",
-        "namespace": "namespace",
-      },
-      "query": Object {
-        "gql": "some another gql",
-        "variables": Object {
-          "c": "d",
-        },
-      },
-      "type": "opa",
-    },
-  ],
+  "policies": Array [],
   "policyAttachments": Object {},
   "schemas": Array [
     Object {
@@ -364,3 +345,5 @@ Object {
   ],
 }
 `;
+
+exports[`Delete resource deletes an opa type policy using deleteResources 2`] = `Object {}`;
