@@ -2,6 +2,9 @@
 
 exports[`Delete resource delete an opa type policy 1`] = `
 Object {
+  "defaultUpstream": Object {
+    "targetOrigin": "http://localhost:8080",
+  },
   "policies": Array [],
   "policyAttachments": Object {},
   "schemas": Array [
@@ -53,6 +56,9 @@ exports[`Delete resource delete an opa type policy 2`] = `Object {}`;
 
 exports[`Delete resource deletes a Schema 1`] = `
 Object {
+  "defaultUpstream": Object {
+    "targetOrigin": "http://localhost:8080",
+  },
   "policies": Array [
     Object {
       "args": Object {
@@ -116,6 +122,9 @@ Object {
 
 exports[`Delete resource deletes a Schema using deleteResources 1`] = `
 Object {
+  "defaultUpstream": Object {
+    "targetOrigin": "http://localhost:8080",
+  },
   "policies": Array [
     Object {
       "args": Object {
@@ -179,6 +188,9 @@ Object {
 
 exports[`Delete resource deletes an Upstream 1`] = `
 Object {
+  "defaultUpstream": Object {
+    "targetOrigin": "http://localhost:8080",
+  },
   "policies": Array [
     Object {
       "args": Object {
@@ -238,6 +250,9 @@ Object {
 
 exports[`Delete resource deletes an UpstreamClientCredentials 1`] = `
 Object {
+  "defaultUpstream": Object {
+    "targetOrigin": "http://localhost:8080",
+  },
   "policies": Array [
     Object {
       "args": Object {
@@ -299,6 +314,9 @@ Object {
 
 exports[`Delete resource deletes an opa type policy using deleteResources 1`] = `
 Object {
+  "defaultUpstream": Object {
+    "targetOrigin": "http://localhost:8080",
+  },
   "policies": Array [],
   "policyAttachments": Object {},
   "schemas": Array [
@@ -347,3 +365,77 @@ Object {
 `;
 
 exports[`Delete resource deletes an opa type policy using deleteResources 2`] = `Object {}`;
+
+exports[`Delete resource reset an Default Upstream 1`] = `
+Object {
+  "policies": Array [
+    Object {
+      "args": Object {
+        "an": Object {
+          "type": "String",
+        },
+        "another": Object {
+          "type": "String!",
+        },
+      },
+      "code": "real rego code
+           with multiple
+           lines",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "query": Object {
+        "gql": "some another gql",
+        "variables": Object {
+          "c": "d",
+        },
+      },
+      "type": "opa",
+    },
+  ],
+  "policyAttachments": Object {},
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "schema": "type Query {
+  something: String!
+}
+",
+    },
+  ],
+  "upstreamClientCredentials": Array [
+    Object {
+      "activeDirectory": Object {
+        "authority": "https://authority",
+        "clientId": "myClientId",
+        "clientSecret": "myClientSecret",
+      },
+      "authType": "ActiveDirectory",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+  "upstreams": Array [
+    Object {
+      "auth": Object {
+        "activeDirectory": Object {
+          "authority": "https://authority",
+          "resource": "someResource",
+        },
+        "type": "ActiveDirectory",
+      },
+      "host": "test.api",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+}
+`;

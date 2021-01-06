@@ -14,6 +14,7 @@ export interface ResourceGroup {
   // policyAttachments are compiled from the Rego code in opa policies, they are not directly modified by users
   policyAttachments?: PolicyAttachments;
   basePolicy?: Policy;
+  defaultUpstream?: DefaultUpstream;
   remoteSchemas?: RemoteSchema[];
 }
 
@@ -32,6 +33,7 @@ export interface ResourceGroupMetadata {
   upstreamClientCredentials: ResourceMetadata[];
   policies: ResourceMetadata[];
   basePolicy: boolean;
+  defaultUpstream: boolean;
 }
 
 export interface Schema extends Resource {
@@ -49,7 +51,13 @@ export interface Upstream extends Resource {
       resource: string;
     };
   };
+  headers?: {
+    name: string;
+    value: string;
+  }[];
 }
+
+export type DefaultUpstream = Omit<Upstream, 'metadata' | 'host' | 'sourceHosts'>;
 
 export interface UpstreamClientCredentials extends Resource {
   authType: AuthType;

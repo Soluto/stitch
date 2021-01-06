@@ -53,5 +53,9 @@ export default function applyResourceGroupUpdates(rg: ResourceGroup, update: Par
     newRg.basePolicy = update.basePolicy;
   }
 
+  if (typeof update.defaultUpstream !== 'undefined') {
+    newRg.defaultUpstream = update.defaultUpstream;
+  }
+
   return newRg;
 }
