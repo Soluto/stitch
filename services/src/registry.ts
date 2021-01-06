@@ -21,7 +21,7 @@ export const app = new ApolloServer({
   introspection: config.enableGraphQLIntrospection,
 });
 
-async function run() {
+export async function createServer() {
   await opaHelper.initializeForRegistry();
 
   logger.info('Stitch registry booting up...');
@@ -32,6 +32,11 @@ async function run() {
     .register(jwtDecoderPlugin)
     .register(app.createHandler({ path: '/graphql' }))
     .register(fastifyMetrics, { endpoint: '/metrics' });
+
+  return server;
+}
+
+async function runServer(server: fastify.FastifyInstance) {
   const address = await server.listen(config.httpPort, '0.0.0.0');
   logger.info({ address }, 'Stitch registry started');
 
@@ -41,5 +46,6 @@ async function run() {
 
 // Only run when file is being executed, not when being imported
 if (require.main === module) {
-  run();
+  // eslint-disable-next-line promise/catch-or-return
+  createServer().then(runServer);
 }

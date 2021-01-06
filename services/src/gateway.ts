@@ -16,7 +16,7 @@ import {
 } from './modules/authentication';
 import { loadPlugins } from './modules/plugins';
 
-async function run() {
+export async function createServer() {
   logger.info('Stitch gateway booting up...');
 
   await loadPlugins();
@@ -48,6 +48,15 @@ async function run() {
     app.addHook('onRequest', app.auth([jwtAuthStrategy, anonymousAuthStrategy]));
   });
 
+  app.get('/health', {}, (_, reply) => {
+    reply.status(200).send('OK');
+  });
+
+  logger.info('Stitch gateway is ready to start');
+  return { app, dispose };
+}
+
+async function runServer(app: fastify.FastifyInstance, dispose: () => Promise<void>) {
   const address = await app.listen(config.httpPort, '0.0.0.0');
   logger.info({ address }, 'Stitch gateway started');
 
@@ -57,5 +66,6 @@ async function run() {
 
 // Only run when file is being executed, not when being imported
 if (require.main === module) {
-  run();
+  // eslint-disable-next-line promise/catch-or-return
+  createServer().then(({ app, dispose }) => runServer(app, dispose));
 }
