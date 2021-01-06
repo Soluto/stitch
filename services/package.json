@@ -2,10 +2,10 @@
   "name": "stitch",
   "version": "1.0.0",
   "scripts": {
-    "test": "jest --config jest.config.js",
+    "test": "jest --ci --config jest.config.js",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand --config jest.config.js",
-    "test:e2e": "jest --runInBand --config jest.config.e2e.js",
-    "test:full": "jest --config jest.config.full.js",
+    "test:e2e": "jest --ci --runInBand --config jest.config.e2e.js",
+    "test:full": "jest --ci --config jest.config.full.js",
     "build": "tsc",
     "build:dev": "tsc --watch",
     "start:gateway:watch": "ts-node-dev src/gateway.ts",
