@@ -28,7 +28,8 @@ function decodeRequestJwt(this: FastifyRequest) {
   try {
     const authHeader = this.headers.authorization;
     if (!authHeader) return;
-    const authToken = String(authHeader).split(' ')[1];
+    const [authScheme, authToken] = String(authHeader).split(' ');
+    if (authScheme != 'Bearer') return;
     const maybeDecodedJWT = decode(authToken, { complete: true, json: true }) as DecodedJWT | null;
     if (maybeDecodedJWT) {
       this._decodedJWT = maybeDecodedJWT;

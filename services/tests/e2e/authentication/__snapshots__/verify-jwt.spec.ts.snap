@@ -20,6 +20,15 @@ exports[`Authentication - Verify JWT Authority without discovery endpoint: gatew
 \\"***** END OUTPUT CAPTURE *****"
 `;
 
+exports[`Authentication - Verify JWT Invalid Authentication Scheme 1`] = `
+Object {
+  "error": "Unauthorized",
+  "message": "Unauthorized",
+  "status": 401,
+  "statusCode": 401,
+}
+`;
+
 exports[`Authentication - Verify JWT Invalid JWT 1`] = `
 Object {
   "error": "Unauthorized",

@@ -8,6 +8,7 @@ import * as opaHelper from './modules/opa-helper';
 import { handleSignals, handleUncaughtErrors } from './modules/shutdown-handler';
 import { loadPlugins } from './modules/plugins';
 import { ActiveDirectoryAuth } from './modules/upstreams';
+import { jwtDecoderPlugin } from './modules/authentication';
 
 export const app = new ApolloServer({
   typeDefs,
@@ -27,7 +28,10 @@ async function run() {
   await loadPlugins();
 
   const server = fastify();
-  server.register(app.createHandler({ path: '/graphql' })).register(fastifyMetrics, { endpoint: '/metrics' });
+  server
+    .register(jwtDecoderPlugin)
+    .register(app.createHandler({ path: '/graphql' }))
+    .register(fastifyMetrics, { endpoint: '/metrics' });
   const address = await server.listen(config.httpPort, '0.0.0.0');
   logger.info({ address }, 'Stitch registry started');
 

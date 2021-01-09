@@ -2,6 +2,7 @@ import { gql } from 'apollo-server-core';
 import { DocumentNode, graphqlSync, print } from 'graphql';
 import { makeExecutableSchema } from 'graphql-tools';
 import * as nock from 'nock';
+import { RegistryRequestContext } from '../../registry-schema';
 import { ResourceGroup } from '../../resource-repository';
 import { ActiveDirectoryAuth } from '../../upstreams/authentication';
 import { updateRemoteGqlSchemas } from './introspection';
@@ -252,7 +253,11 @@ describe('Introspection', () => {
     };
 
     try {
-      await updateRemoteGqlSchemas(resourceGroup, new ActiveDirectoryAuth());
+      const context: RegistryRequestContext = {
+        activeDirectoryAuth: new ActiveDirectoryAuth(),
+        request: {} as any,
+      };
+      await updateRemoteGqlSchemas(resourceGroup, context);
 
       httpCallMocks.forEach(httpCallMock => expect(httpCallMock[0].isDone()).toBe(httpCallMock[1]));
 
