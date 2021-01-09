@@ -6,14 +6,7 @@ import * as config from './modules/config';
 import logger from './modules/logger';
 import { handleSignals, handleUncaughtErrors } from './modules/shutdown-handler';
 import { createStitchGateway } from './modules/gateway';
-import {
-  pollForUpdates,
-  S3ResourceRepository,
-  FileSystemResourceRepository,
-  ResourceRepository,
-  CompositeResourceRepository,
-  IResourceRepository,
-} from './modules/resource-repository';
+import { getResourceRepository, pollForUpdates } from './modules/resource-repository';
 import {
   getSecret,
   jwtAuthStrategy,
@@ -60,28 +53,6 @@ async function run() {
 
   handleSignals(dispose);
   handleUncaughtErrors();
-}
-
-function getResourceRepository(): IResourceRepository {
-  const repositories: ResourceRepository[] = [];
-
-  if (config.useS3ResourceRepository) {
-    repositories.push(S3ResourceRepository.fromEnvironment());
-  }
-
-  if (config.useFileSystemResourceRepository) {
-    repositories.push(FileSystemResourceRepository.fromEnvironment());
-  }
-
-  switch (repositories.length) {
-    case 0:
-      logger.fatal('Must enable at least one resource repository');
-      throw new Error('Must enable at least one resource repository');
-    case 1:
-      return repositories[0];
-    default:
-      return new CompositeResourceRepository(repositories);
-  }
 }
 
 // Only run when file is being executed, not when being imported

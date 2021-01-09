@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as opaHelper from '../../opa-helper';
 import logger from '../../logger';
-import { PolicyType, ResourceMetadata, ResourceRepository } from '../../resource-repository';
+import { PolicyType, ResourceMetadata, IResourceRepository } from '../../resource-repository';
 import resourceRepository from '../repository';
 import { ResourceMetadataInput, PolicyInput } from '../types';
 
@@ -66,12 +66,12 @@ const policyAttachmentStrategies = {
         );
       }
     },
-    saveToRepo: async (resourceRepository: ResourceRepository, attachment: TempLocalPolicyAttachment) => {
+    saveToRepo: async (resourceRepository: IResourceRepository, attachment: TempLocalPolicyAttachment) => {
       const compiledRego = await opaHelper.readLocalRegoFile(attachment.path);
       const filename = opaHelper.getCompiledFilename(attachment.metadata);
       await resourceRepository.writePolicyAttachment(filename, compiledRego);
     },
-    removeFromRepo: async (resourceRepository: ResourceRepository, metadata: ResourceMetadata) => {
+    removeFromRepo: async (resourceRepository: IResourceRepository, metadata: ResourceMetadata) => {
       const filename = opaHelper.getCompiledFilename(metadata);
       await resourceRepository.deletePolicyAttachment(filename);
     },

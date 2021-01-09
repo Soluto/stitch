@@ -3,6 +3,10 @@ process.env.S3_RESOURCE_OBJECT_KEY = 'stitch-gateway.json';
 process.env.S3_REGISTRY_RESOURCE_OBJECT_KEY = 'stitch-registry.json';
 process.env.S3_ENDPOINT = 'http://test.s3';
 process.env.S3_POLICY_ATTACHMENTS_KEY_PREFIX = 'policyAttachments/';
+
+process.env.USE_S3_RESOURCE_REPOSITORY = 'true';
+process.env.USE_FS_RESOURCE_REPOSITORY = 'false';
+
 process.env.AWS_ACCESS_KEY_ID = 'something';
 process.env.AWS_SECRET_ACCESS_KEY = 'something';
 process.env.LOG_LEVEL = 'fatal';

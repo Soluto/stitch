@@ -1,3 +1,3 @@
-import { S3ResourceRepository } from '../resource-repository';
+import { getResourceRepository } from '../resource-repository';
 
-export default S3ResourceRepository.fromEnvironment({ isRegistry: true });
+export default getResourceRepository({ isRegistry: true });
