@@ -26,6 +26,10 @@ export default function getResourceRepository(options?: { isRegistry: boolean })
     case 1:
       return repositories[0];
     default:
+      if (options?.isRegistry) {
+        logger.fatal('Registry cannot have more than one resource repository');
+        throw new Error('Registry cannot have more than one resource repository');
+      }
       return new CompositeResourceRepository(repositories);
   }
 }
