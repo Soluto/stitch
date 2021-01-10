@@ -58,6 +58,14 @@ describe('Authentication - Verify JWT', () => {
     expect(logs).toMatchSnapshot('gateway logs');
   });
 
+  test('Invalid Authentication Scheme', async () => {
+    const credentials = Buffer.from('user:pwd').toString('base64');
+    gatewayClient.setHeader('Authorization', `Basic ${credentials}`);
+
+    const result = await gatewayClient.request(query).catch(e => e.response);
+    expect(result).toMatchSnapshot();
+  });
+
   test('Unknown issuer', async () => {
     const accessToken = await getInvalidToken({ issuer: 'http://microsoft.com' });
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);

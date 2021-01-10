@@ -6,18 +6,18 @@ import { ApolloError } from 'apollo-server-core';
 import { ApolloLink } from 'apollo-link';
 import { setContext } from 'apollo-link-context';
 import { RetryLink } from 'apollo-link-retry';
-import { FastifyRequest } from 'fastify';
 import * as _ from 'lodash';
-import { ActiveDirectoryAuth, applyUpstream } from '../../upstreams';
+import { applyUpstream } from '../../upstreams';
 import logger from '../../logger';
 import { ResourceGroup } from '../../resource-repository';
+import { RegistryRequestContext } from '../../registry-schema';
 
 export interface RemoteSchema {
   url: string;
   schema: string;
 }
 
-export async function updateRemoteGqlSchemas(resourceGroup: ResourceGroup, activeDirectoryAuth: ActiveDirectoryAuth) {
+export async function updateRemoteGqlSchemas(resourceGroup: ResourceGroup, context: RegistryRequestContext) {
   const knownRemoteGqlServers = new Set(resourceGroup.remoteSchemas?.map(rs => rs.url));
   const unusedRemoteSchemas = new Set(knownRemoteGqlServers);
   const urls = new Set<string>();
@@ -54,7 +54,7 @@ export async function updateRemoteGqlSchemas(resourceGroup: ResourceGroup, activ
     const newSchemas = await Promise.all(
       gqlIntrospectUrls.map(async url => ({
         url,
-        schema: await fetchRemoteGqlSchema(url, resourceGroup, activeDirectoryAuth),
+        schema: await fetchRemoteGqlSchema(url, resourceGroup, context),
       }))
     );
     if (!newSchemas || newSchemas.length === 0) return;
@@ -68,11 +68,7 @@ export async function updateRemoteGqlSchemas(resourceGroup: ResourceGroup, activ
   }
 }
 
-async function fetchRemoteGqlSchema(
-  url: string,
-  resourceGroup: ResourceGroup,
-  activeDirectoryAuth: ActiveDirectoryAuth
-) {
+async function fetchRemoteGqlSchema(url: string, resourceGroup: ResourceGroup, context: RegistryRequestContext) {
   try {
     const link = ApolloLink.from([
       new RetryLink({
@@ -85,14 +81,14 @@ async function fetchRemoteGqlSchema(
           },
         },
       }),
-      setContext(async (_, context) => {
+      setContext(async () => {
         const requestParams = await applyUpstream(
           {
             url: new URL(url),
           },
           resourceGroup,
-          activeDirectoryAuth,
-          context?.graphqlContext?.request as FastifyRequest
+          context.activeDirectoryAuth,
+          context.request
         );
         return { ...requestParams, uri: requestParams.url };
       }),

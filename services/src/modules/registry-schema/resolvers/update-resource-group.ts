@@ -6,16 +6,16 @@ import { createSchemaConfig } from '../../graphql-service';
 import { applyResourceGroupUpdates } from '../../resource-repository';
 import { validateResourceGroupOrThrow } from '../../validation';
 import { transformResourceGroup as applyPluginForResourceGroup } from '../../plugins';
-import { PolicyAttachmentsHelper } from '../helpers';
+import { PolicyAttachmentsHelper, markOptionalPolicyArgs } from '../helpers';
 import resourceRepository from '../repository';
 import { ResourceGroupInput } from '../types';
 import { updateRemoteGqlSchemas } from '../../directives/gql';
-import { ActiveDirectoryAuth } from '../../upstreams';
-import { markOptionalPolicyArgs } from '../helpers';
+
+import { RegistryRequestContext } from '..';
 
 const singleton = pLimit(1);
 
-export default async function (updates: ResourceGroupInput, activeDirectoryAuth: ActiveDirectoryAuth, dryRun = false) {
+export default async function (updates: ResourceGroupInput, context: RegistryRequestContext, dryRun = false) {
   return singleton(async () => {
     logger.info(`Proceeding ${dryRun ? 'validate' : 'update'} resources request...`);
     const policyAttachments = new PolicyAttachmentsHelper();
@@ -27,7 +27,7 @@ export default async function (updates: ResourceGroupInput, activeDirectoryAuth:
       const newRg = applyResourceGroupUpdates(resourceGroup, updates);
 
       // TODO: In case of upstream deletion we should force refresh of remote schemas
-      await updateRemoteGqlSchemas(newRg, activeDirectoryAuth);
+      await updateRemoteGqlSchemas(newRg, context);
 
       const registryRg = _.cloneDeep(newRg);
 
