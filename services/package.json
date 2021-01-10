@@ -4,6 +4,7 @@
   "scripts": {
     "test": "jest --ci --config jest.config.js",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand --config jest.config.js",
+    "test:blackbox": "jest --ci --runInBand --config jest.config.blackbox.js",
     "test:e2e": "jest --ci --runInBand --config jest.config.e2e.js",
     "test:full": "jest --ci --config jest.config.full.js",
     "build": "tsc",

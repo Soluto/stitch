@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Upstream for gql introspection query should add headers from incoming request headers and jwt claims to outgoing request 1`] = `
+Object {
+  "updateSchemas": Object {
+    "success": true,
+  },
+}
+`;
