@@ -61,6 +61,40 @@ Properties:
 - `jwt` - decoded JWT from `incomingRequest`'s `Authorization` header
 - `outgoingRequest` - the request object built by `@rest` or `@gql` directives before application of upstream
 
+`isTemplate`: _(optional)_ if true the upstream may be used as template for other upstreams. So it doesn't have to have `host` or `sourceHosts` properties.
+
+`templateFrom`: _(optional)_ If this property is set the upstream will be based on the template upstream. Upstream's properties will replace the base one's. See example:
+
+```yaml
+kind: Upstream
+metadata:
+  name: users-api
+  namespace: users-team
+fromTemplate:
+  name: x-api-client-header
+  namespace: infra-team
+host: 'organizations.example.com' # deprecated
+sourceHosts:
+  - 'users-api'
+auth:
+  type: ActiveDirectory
+  activeDirectory:
+    authority: <active directory authority url>
+    resource: <active directory resource id>
+
+kind: Upstream
+metadata:
+  name: x-api-client-header
+  namespace: infra-team
+isTemplate: true
+headers:
+  name: x-api-client
+  value: '{incomingRequest?.headers?.["x-api-client"]'
+
+```
+
+`users-api` upstream is based on `x-api-client-header` upstream template. So when it will be applied it also will affect `x-api-client` header. Template upstream can be based on other template upstream. Circular references is not allowed.
+
 ## Default Upstream
 
 There is option to set one default upstream to the whole deployment. This default upstream will be applied unless specific upstream wasn't found for the request host. This can be useful to add some headers to all outgoing requests or to redirect all requests to proxy server.

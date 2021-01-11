@@ -41,6 +41,8 @@ export interface Schema extends Resource {
 }
 
 export interface Upstream extends Resource {
+  fromTemplate?: ResourceMetadata;
+  isTemplate?: boolean;
   host?: string;
   sourceHosts?: string[];
   targetOrigin?: string;

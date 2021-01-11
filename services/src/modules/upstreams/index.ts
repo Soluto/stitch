@@ -1,7 +1,7 @@
 import { FastifyRequest } from 'fastify';
 import * as _ from 'lodash';
 import { injectArgs } from '../arguments-injection';
-import { DefaultUpstream, ResourceGroup, Upstream } from '../resource-repository';
+import { DefaultUpstream, ResourceGroup, ResourceMetadata, Upstream } from '../resource-repository';
 import { ActiveDirectoryAuth, getAuthHeaders } from './authentication';
 
 export { ActiveDirectoryAuth };
@@ -41,9 +41,8 @@ export async function applyUpstream(
   incomingRequest?: Partial<Pick<FastifyRequest, 'headers' | 'decodeJWT'>>
 ): Promise<RequestParams> {
   const upstream =
-    resourceGroup.upstreams.find(
-      u => u.host === requestParams.url.host || u.sourceHosts?.includes(requestParams.url.host)
-    ) ?? toUpstream(resourceGroup.defaultUpstream ?? defaultDefaultUpstream);
+    getUpstream(requestParams.url.host, resourceGroup.upstreams) ??
+    toUpstream(resourceGroup.defaultUpstream ?? defaultDefaultUpstream);
 
   // Headers
   if (upstream.headers) {
@@ -71,4 +70,24 @@ export async function applyUpstream(
   }
 
   return _.merge({}, requestParams, { headers });
+}
+
+function getUpstream(host: string, upstreams: Upstream[]) {
+  const upstream = upstreams.find(u => u.host === host || u.sourceHosts?.includes(host));
+  if (!upstream) return;
+
+  if (upstream.fromTemplate) {
+    const upstreamTemplate = getUpstreamTemplate(upstream.fromTemplate, upstreams);
+    return { ...upstreamTemplate, ...upstream };
+  }
+  return upstream;
+}
+
+function getUpstreamTemplate(metadata: ResourceMetadata, upstreams: Upstream[]): Upstream | undefined {
+  const upstream = upstreams.find(u => _.isEqual(u.metadata, metadata));
+  if (upstream?.fromTemplate) {
+    const upstreamTemplate = getUpstreamTemplate(upstream.fromTemplate, upstreams);
+    return { ...upstreamTemplate, ...upstream };
+  }
+  return upstream;
 }
