@@ -1,6 +1,6 @@
-import GraphQLErrorSerializer from '../../tests/utils/graphql-error-serializer';
-import { validateResourceGroupOrThrow } from './validation';
-import { ResourceGroup, PolicyType } from './resource-repository';
+import GraphQLErrorSerializer from '../../../../tests/utils/graphql-error-serializer';
+import { ResourceGroup, PolicyType } from '../../resource-repository';
+import { validateResourceGroupOrThrow } from '.';
 
 beforeAll(() => {
   expect.addSnapshotSerializer(GraphQLErrorSerializer);
@@ -150,6 +150,92 @@ describe('validate host duplications', () => {
       { metadata: { namespace: 'ns', name: 'u1' }, host: 'server-1' },
       { metadata: { namespace: 'ns', name: 'u12' }, sourceHosts: ['server-1', 'server-2'] }
     );
+
+    try {
+      validateResourceGroupOrThrow(rg);
+    } catch (err) {
+      expect(err).toMatchSnapshot();
+    }
+  });
+});
+
+describe('validate base upstream', () => {
+  let rg: ResourceGroup;
+
+  beforeEach(() => {
+    rg = {
+      schemas: [],
+      upstreams: [],
+      upstreamClientCredentials: [],
+      policies: [],
+    };
+  });
+
+  it('throws for non-existent base upstream', () => {
+    rg.upstreams.push({
+      metadata: { namespace: 'ns', name: 'u1' },
+      fromTemplate: { namespace: 'ns', name: 'base' },
+      sourceHosts: ['server-1'],
+    });
+
+    try {
+      validateResourceGroupOrThrow(rg);
+    } catch (err) {
+      expect(err).toMatchSnapshot();
+    }
+  });
+
+  it('throws for non-existent ancestor upstream', () => {
+    rg.upstreams.push({
+      metadata: { namespace: 'ns', name: 'son' },
+      fromTemplate: { namespace: 'ns', name: 'father' },
+      sourceHosts: ['server-1'],
+    });
+    rg.upstreams.push({
+      metadata: { namespace: 'ns', name: 'father' },
+      fromTemplate: { namespace: 'ns', name: 'grandfather' },
+      headers: [{ name: 'x-api-client', value: 'incomingRequest?.headers?.["x-api-client"]' }],
+    });
+
+    try {
+      validateResourceGroupOrThrow(rg);
+    } catch (err) {
+      expect(err).toMatchSnapshot();
+    }
+  });
+
+  it('throws for circular base upstream reference', () => {
+    rg.upstreams.push({
+      metadata: { namespace: 'ns', name: 'u1' },
+      fromTemplate: { namespace: 'ns', name: 'u1' },
+      sourceHosts: ['server-1'],
+    });
+
+    try {
+      validateResourceGroupOrThrow(rg);
+    } catch (err) {
+      expect(err).toMatchSnapshot();
+    }
+  });
+
+  it('throws for circular base upstream reference - 2', () => {
+    rg.upstreams.push({
+      metadata: { namespace: 'ns', name: 'son' },
+      fromTemplate: { namespace: 'ns', name: 'father' },
+      sourceHosts: ['server-1'],
+    });
+    rg.upstreams.push({
+      metadata: { namespace: 'ns', name: 'father' },
+      fromTemplate: { namespace: 'ns', name: 'grandfather' },
+      isTemplate: true,
+      headers: [{ name: 'x-api-client', value: '{incomingRequest?.headers?.["x-api-client"]}' }],
+    });
+    rg.upstreams.push({
+      metadata: { namespace: 'ns', name: 'grandfather' },
+      fromTemplate: { namespace: 'ns', name: 'son' },
+      isTemplate: true,
+      headers: [{ name: 'issuer', value: '{jwt?.payload?.iss}' }],
+    });
 
     try {
       validateResourceGroupOrThrow(rg);

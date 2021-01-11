@@ -1,5 +1,77 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`validate base upstream throws for circular base upstream reference - 2 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Upstream circular reference",
+      "exception": {}
+    },
+    {
+      "name": "GraphQLError",
+      "message": "Upstream circular reference",
+      "exception": {}
+    },
+    {
+      "name": "GraphQLError",
+      "message": "Upstream circular reference",
+      "exception": {}
+    }
+  ],
+  "data": {}
+}
+`;
+
+exports[`validate base upstream throws for circular base upstream reference 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Upstream circular reference",
+      "exception": {}
+    }
+  ],
+  "data": {}
+}
+`;
+
+exports[`validate base upstream throws for non-existent ancestor upstream 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Upstream has non-existent upstream template",
+      "exception": {}
+    },
+    {
+      "name": "GraphQLError",
+      "message": "Upstream has non-existent upstream template",
+      "exception": {}
+    },
+    {
+      "name": "GraphQLError",
+      "message": "Upstream should have either sourceHosts or host property or to be a template",
+      "exception": {}
+    }
+  ],
+  "data": {}
+}
+`;
+
+exports[`validate base upstream throws for non-existent base upstream 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Upstream has non-existent upstream template",
+      "exception": {}
+    }
+  ],
+  "data": {}
+}
+`;
+
 exports[`validate host duplications throws on duplicate upstream host 1`] = `
 {
   "errors": [
@@ -44,7 +116,7 @@ exports[`validate host duplications throws on upstream w/o host and sourceHosts 
   "errors": [
     {
       "name": "GraphQLError",
-      "message": "Upstream should have either sourceHosts or host property",
+      "message": "Upstream should have either sourceHosts or host property or to be a template",
       "exception": {}
     }
   ],
