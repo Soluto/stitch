@@ -48,6 +48,8 @@ interface ActiveDirectoryAuthInput {
 
 export interface UpstreamInput {
   metadata: ResourceMetadataInput;
+  fromTemplate?: ResourceMetadataInput;
+  isTemplate?: boolean;
   host?: string;
   sourceHosts?: string[];
   targetOrigin?: string;

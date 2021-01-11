@@ -4,7 +4,7 @@ import { GraphQLError } from 'graphql';
 import logger from '../../logger';
 import { createSchemaConfig } from '../../graphql-service';
 import { applyResourceGroupUpdates } from '../../resource-repository';
-import { validateResourceGroupOrThrow } from '../../validation';
+import { validateResourceGroupOrThrow } from '../validation';
 import { transformResourceGroup as applyPluginForResourceGroup } from '../../plugins';
 import { PolicyAttachmentsHelper, markOptionalPolicyArgs } from '../helpers';
 import resourceRepository from '../repository';

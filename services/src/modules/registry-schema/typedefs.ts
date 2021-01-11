@@ -91,6 +91,8 @@ export default gql`
 
   input UpstreamInput {
     metadata: ResourceMetadataInput!
+    fromTemplate: ResourceMetadataInput
+    isTemplate: Boolean
     host: String
     sourceHosts: [String!]
     targetOrigin: String
