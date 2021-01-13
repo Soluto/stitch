@@ -1,7 +1,8 @@
 import { ApolloError } from 'apollo-server-fastify';
 import { GraphQLError } from 'graphql';
-import logger from './logger';
-import { ResourceGroup, Upstream, Resource } from './resource-repository';
+import * as _ from 'lodash';
+import logger from '../../logger';
+import { ResourceGroup, Upstream, Resource } from '../../resource-repository';
 
 // Valid graphql name with the addition of dashes (http://spec.graphql.org/June2018/#sec-Names)
 const validNameRegex = /^[A-Z_a-z-][\w-]*$/;
@@ -182,7 +183,7 @@ export function validateResourceGroupOrThrow(rg: ResourceGroup) {
   if (errors.length > 0) {
     logger.warn({ errors }, 'Resource validation failed');
     throw new ApolloError('Resource validation failed', 'RESOURCE_VALIDATION_FAILURE', {
-      errors: errors.map(err => (err instanceof GraphQLError ? err : new GraphQLError(err!.message))),
+      errors: errors.map(e => _.pick(e, 'name', 'message', 'extensions')),
     });
   }
 }

@@ -1,6 +1,6 @@
-import GraphQLErrorSerializer from '../../tests/utils/graphql-error-serializer';
-import { validateResourceGroupOrThrow } from './validation';
-import { ResourceGroup, PolicyType } from './resource-repository';
+import GraphQLErrorSerializer from '../../../../tests/utils/graphql-error-serializer';
+import { ResourceGroup, PolicyType } from '../../resource-repository';
+import { validateResourceGroupOrThrow } from '.';
 
 beforeAll(() => {
   expect.addSnapshotSerializer(GraphQLErrorSerializer);
