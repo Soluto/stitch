@@ -33,7 +33,7 @@ async function runTestCase(testCaseName: string) {
       test
         .stdout()
         .command(commandArgs(testCaseName))
-        .catch('EEXIT: 1')
+        .catch(e => e.message.startsWith('Verifying resources failed'))
         .end('run command with error', ctx => {
           ctx.stdout.includes('Verifying resources failed');
         });
