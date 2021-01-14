@@ -2,22 +2,18 @@
 
 exports[`Creation of invalid schemas Bad federation composition in schema gets rejected 1`] = `
 Array [
-  [GraphQLError: Updated resources request failed: Error: Federation validation failed],
+  [GraphQLError: Federation validation failed],
 ]
 `;
 
 exports[`Creation of invalid schemas Invalid SDL in schema gets rejected 1`] = `
 Array [
-  [GraphQLError: Updated resources request failed: Syntax Error: Expected Name, found <EOF>.
-
-GraphQL request:1:33
-1 | type Query { something: String! 
-  |                                 ^],
+  [GraphQLError: Syntax Error: Expected Name, found <EOF>.],
 ]
 `;
 
 exports[`Creation of invalid schemas Invalid directive arguments in schema gets rejected 1`] = `
 Array [
-  [GraphQLError: Updated resources request failed: Error: Unknown argument "fakeArgument" on directive "@rest".],
+  [GraphQLError: Unknown argument "fakeArgument" on directive "@rest".],
 ]
 `;

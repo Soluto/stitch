@@ -1,16 +1,14 @@
 import pLimit from 'p-limit';
 import * as _ from 'lodash';
-import { GraphQLError } from 'graphql';
 import logger from '../../logger';
 import { createSchemaConfig } from '../../graphql-service';
 import { applyResourceGroupUpdates } from '../../resource-repository';
-import { validateResourceGroupOrThrow } from '../../validation';
+import { validateResourceGroupOrThrow } from '../validation';
 import { transformResourceGroup as applyPluginForResourceGroup } from '../../plugins';
 import { PolicyAttachmentsHelper, markOptionalPolicyArgs } from '../helpers';
 import resourceRepository from '../repository';
 import { ResourceGroupInput } from '../types';
 import { updateRemoteGqlSchemas } from '../../directives/gql';
-
 import { RegistryRequestContext } from '..';
 
 const singleton = pLimit(1);
@@ -53,7 +51,7 @@ export default async function (updates: ResourceGroupInput, context: RegistryReq
     } catch (err) {
       const message = `${dryRun ? 'Validate' : 'Updated'} resources request failed: ${err}`;
       logger.error({ err }, message);
-      throw new GraphQLError(message);
+      throw err;
     } finally {
       await policyAttachments.cleanup();
     }
