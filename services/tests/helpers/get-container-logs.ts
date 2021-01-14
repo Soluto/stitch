@@ -73,7 +73,7 @@ export async function startContainerOutputCapture(container: string) {
     return (
       result
         .substring(startCapturePosition, endCapturePosition)
-        .replace(/\[\d\d:\d\d:\d\d]/g, '[hh:mm:ss]')
+        .replace(/\[\d\d:\d\d:\d\d\.\d\d\d]/g, '[hh:mm:ss.ms]')
         .replace(/\n.+\| /g, '\n')
         // eslint-disable-next-line no-control-regex
         .replace(/\u001B[();?[]{0,2}(;?\d)*./g, '')

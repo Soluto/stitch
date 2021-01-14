@@ -8,13 +8,13 @@ Object {
 
 exports[`Authentication - Verify JWT Authority without discovery endpoint: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
-[hh:mm:ss] TRACE: JWK found
+[hh:mm:ss.ms] TRACE: JWK found
     authority: \\"http://authority-without-discrovery-endpoint\\"
-[hh:mm:ss] TRACE: JWT verified
+[hh:mm:ss.ms] TRACE: JWT verified
     issuer: \\"http://localhost:8070\\"
-[hh:mm:ss] TRACE: Started to handle request
+[hh:mm:ss.ms] TRACE: Started to handle request
     query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
-[hh:mm:ss] TRACE: Finished to handle request
+[hh:mm:ss.ms] TRACE: Finished to handle request
     query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
     durationMs: XXX
 \\"***** END OUTPUT CAPTURE *****"
@@ -40,10 +40,10 @@ Object {
 
 exports[`Authentication - Verify JWT Invalid JWT: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
-[hh:mm:ss] DEBUG: New authority received. Creating new JWKs client...
+[hh:mm:ss.ms] DEBUG: New authority received. Creating new JWKs client...
     authority: \\"http://authority-without-discrovery-endpoint\\"
     jwksUri: \\"http://oidc-server-mock:8070/.well-known/openid-configuration/jwks\\"
-[hh:mm:ss] ERROR: Failed to get JWK for request token.
+[hh:mm:ss.ms] ERROR: Failed to get JWK for request token.
     err: {
       \\"type\\": \\"SigningKeyNotFoundError\\",
       \\"message\\": \\"Unable to find a signing key that matches 'C1B59DF60057CFB292C4E36CCE329615'\\",
@@ -53,7 +53,7 @@ exports[`Authentication - Verify JWT Invalid JWT: gateway logs 1`] = `
     }
     authority: \\"http://authority-without-discrovery-endpoint\\"
     jwksUri: \\"http://oidc-server-mock:8070/.well-known/openid-configuration/jwks\\"
-[hh:mm:ss] DEBUG: Failed to verify request JWT
+[hh:mm:ss.ms] DEBUG: Failed to verify request JWT
     err: {
       \\"type\\": \\"SigningKeyNotFoundError\\",
       \\"message\\": \\"Unable to find a signing key that matches 'C1B59DF60057CFB292C4E36CCE329615'\\",
@@ -73,13 +73,13 @@ Object {
 
 exports[`Authentication - Verify JWT Second call with valid JWT - JWKs caching: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
-[hh:mm:ss] TRACE: JWK found
+[hh:mm:ss.ms] TRACE: JWK found
     authority: \\"http://oidc-server-mock:8060\\"
-[hh:mm:ss] TRACE: JWT verified
+[hh:mm:ss.ms] TRACE: JWT verified
     issuer: \\"http://localhost:8060\\"
-[hh:mm:ss] TRACE: Started to handle request
+[hh:mm:ss.ms] TRACE: Started to handle request
     query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
-[hh:mm:ss] TRACE: Finished to handle request
+[hh:mm:ss.ms] TRACE: Finished to handle request
     query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
     durationMs: XXX
 \\"***** END OUTPUT CAPTURE *****"
@@ -96,7 +96,7 @@ Object {
 
 exports[`Authentication - Verify JWT Unexpected audience: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
-[hh:mm:ss] DEBUG: Unexpected audience
+[hh:mm:ss.ms] DEBUG: Unexpected audience
     issuer: \\"http://localhost:8070\\"
     audience: \\"Stitch Other\\"
 \\"***** END OUTPUT CAPTURE *****"
@@ -113,7 +113,7 @@ Object {
 
 exports[`Authentication - Verify JWT Unknown issuer: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
-[hh:mm:ss] DEBUG: Unknown issuer
+[hh:mm:ss.ms] DEBUG: Unknown issuer
     issuer: \\"http://microsoft.com\\"
 \\"***** END OUTPUT CAPTURE *****"
 `;
@@ -126,16 +126,16 @@ Object {
 
 exports[`Authentication - Verify JWT Valid JWT: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
-[hh:mm:ss] DEBUG: New authority received. Creating new JWKs client...
+[hh:mm:ss.ms] DEBUG: New authority received. Creating new JWKs client...
     authority: \\"http://oidc-server-mock:8060\\"
     jwksUri: \\"http://oidc-server-mock:8060/.well-known/openid-configuration/jwks\\"
-[hh:mm:ss] TRACE: JWK found
+[hh:mm:ss.ms] TRACE: JWK found
     authority: \\"http://oidc-server-mock:8060\\"
-[hh:mm:ss] TRACE: JWT verified
+[hh:mm:ss.ms] TRACE: JWT verified
     issuer: \\"http://localhost:8060\\"
-[hh:mm:ss] TRACE: Started to handle request
+[hh:mm:ss.ms] TRACE: Started to handle request
     query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
-[hh:mm:ss] TRACE: Finished to handle request
+[hh:mm:ss.ms] TRACE: Finished to handle request
     query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
     durationMs: XXX
 \\"***** END OUTPUT CAPTURE *****"

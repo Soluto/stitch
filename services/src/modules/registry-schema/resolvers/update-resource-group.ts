@@ -69,8 +69,6 @@ export default async function (updates: ResourceGroupInput, context: RegistryReq
       Object.entries(updates).map(([k, v]) => [k, v ? (Array.isArray(v) ? v.length : 1) : 0])
     );
     logger.info(summary, `Resources were ${dryRun ? 'validated' : 'updated'}`);
-
-    logger.trace('...');
     return { success: true };
   });
 }
