@@ -11,7 +11,7 @@ const devLoggerConfig: pino.LoggerOptions = {
   level: 'trace',
   prettyPrint: {
     colorize: true,
-    translateTime: 'HH:MM:ss',
+    translateTime: 'HH:MM:ss.l',
     ignore: 'pid,hostname',
   },
 };
