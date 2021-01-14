@@ -1,0 +1,8 @@
+kind: Schema
+metadata:
+  namespace: cli-tests
+  name: dummy
+schema: |
+  type Query {
+    foo: String!
+  }

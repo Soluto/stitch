@@ -56,8 +56,7 @@ Uploaded successfully!
 
       this.log(`Resources from ${args.resourcesPath} were ${dryRun ? 'verified' : 'uploaded'} successfully.`);
     } catch (e) {
-      this.log(`${dryRun ? 'Verifying' : 'Uploading'} resources failed. ${e}`);
-      this.exit(1);
+      this.error(`${dryRun ? 'Verifying' : 'Uploading'} resources failed. ${e}`, { ...e, exit: true });
     }
   }
 
