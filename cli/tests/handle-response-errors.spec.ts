@@ -1,6 +1,6 @@
 /* eslint-disable promise/catch-or-return */
 import { join } from 'path';
-import { expect, FancyTypes, test } from '@oclif/test';
+import { FancyTypes, test } from '@oclif/test';
 import * as nock from 'nock';
 
 interface TestCase {
@@ -72,6 +72,18 @@ testCases.forEach(testCase => {
       .nock('http://registry', nockCb(testCase.statusCode, testCase.responseBody))
       .stdout()
       .command(commandArgs)
+      .catch(e => e.message.startsWith('Verifying resources failed'))
+      .end('run command with error', ctx => {
+        ctx.stdout.includes('Verifying resources failed');
+        ctx.stdout.includes(JSON.stringify(testCase.responseBody));
+      });
+  });
+
+  describe('Response errors - timeout', () => {
+    test
+      .nock('http://registry', api => api.post('/graphql').delayConnection(200))
+      .stdout()
+      .command(commandArgs.concat('--timeout=100'))
       .catch(e => e.message.startsWith('Verifying resources failed'))
       .end('run command with error', ctx => {
         ctx.stdout.includes('Verifying resources failed');

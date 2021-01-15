@@ -78,13 +78,7 @@ export async function uploadResourceGroup(
 
   const query = options.dryRun ? ValidateResourceGroupQuery : UploadResourceGroupMutation;
 
-  try {
-    const data = await registryClient.request<{ result: boolean }>(query, { resourceGroup: rg });
-    console.log(data.result);
-  } catch (err) {
-    console.log('FAILURE');
-    throw err;
-  }
+  return registryClient.request<{ result: { success: boolean } }>(query, { resourceGroup: rg });
 }
 
 export async function uploadBasePolicy(
@@ -100,13 +94,7 @@ export async function uploadBasePolicy(
 
   const query = options.dryRun ? ValidateBasePolicyQuery : UploadBasePolicyMutation;
 
-  try {
-    const data = await registryClient.request<{ result: boolean }>(query, { basePolicy });
-    console.log(data.result);
-  } catch (err) {
-    console.log('FAILURE');
-    throw err;
-  }
+  return registryClient.request<{ result: { success: boolean } }>(query, { basePolicy });
 }
 
 export * from './types';

@@ -8,6 +8,7 @@ const commandArgs = (testCaseName: string) => [
   '--dry-run',
   '--registry-url=http://registry/graphql',
   '--skip-resource-types=upstreams,upstreamClientCredentials',
+  '--verbose',
   join(__dirname, './data/apply-resources', testCaseName),
 ];
 
@@ -21,7 +22,7 @@ const nockCb = (testCaseName: string) => (api: FancyTypes.NockScope) =>
     })
     .reply(200, {
       data: {
-        validateResourceGroup: {
+        result: {
           success: true,
         },
       },

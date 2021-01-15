@@ -1,4 +1,0 @@
-type Employee {
-  id: ID!
-  department: Department!
-}

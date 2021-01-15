@@ -1,24 +1,39 @@
 import { promises as fs } from 'fs';
-import { join } from 'path';
+import { dirname, join, resolve } from 'path';
 import * as globby from 'globby';
 import { DocumentNode, Kind, ObjectTypeDefinitionNode, parse, print } from 'graphql';
 import * as R from 'ramda';
-import { ResourceMetadataInput, SchemaInput } from '../client';
+import { ResourceMetadataInput, SchemaInput } from '../../client';
 
-interface SchemaFilesInput {
+interface SchemaResourceInput {
   metadata: ResourceMetadataInput;
-  schemaFiles: string[];
+  schema?: string;
+  schemaFiles?: string[];
 }
 
-export default async function ({ metadata, schemaFiles }: SchemaFilesInput, cwd: string): Promise<SchemaInput> {
-  const files = await globby(schemaFiles, { cwd });
-  const fileContents = await Promise.all(files.map(f => fs.readFile(join(cwd, f), { encoding: 'utf8' })));
-  const schemas = fileContents.map(file => parse(file));
+export default async function (schemaResource: SchemaResourceInput, resourceFile: string): Promise<SchemaInput> {
+  const schemaStrList: string[] = [];
+  if (schemaResource.schema) {
+    schemaStrList.push(schemaResource.schema);
+  }
+
+  if (schemaResource.schemaFiles) {
+    const fileContents = await loadSchemaFiles(schemaResource.schemaFiles, resourceFile);
+    schemaStrList.push(...fileContents);
+  }
+
+  const schemas = schemaStrList.map(s => parse(s));
   const schema = print(mergeSchemaDocuments(schemas));
   return {
-    metadata,
+    metadata: schemaResource.metadata,
     schema,
   };
+}
+
+async function loadSchemaFiles(schemaFiles: string[], resourceFile: string): Promise<string[]> {
+  const cwd = resolve(dirname(resourceFile));
+  const files = await globby(schemaFiles, { cwd });
+  return Promise.all(files.map(f => fs.readFile(join(cwd, f), { encoding: 'utf8' })));
 }
 
 const rootObjectDefinitionTypes = ['Query', 'Mutation', 'Subscription'];

@@ -1,9 +1,0 @@
-type Query {
-  employees: [Employee!]!
-  employee(id: ID!): Employee!
-}
-
-extend type Employee {
-  id: ID!
-  name: String!
-}

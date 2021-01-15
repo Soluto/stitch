@@ -1,9 +1,10 @@
-import { promises as fs } from 'fs';
-import * as path from 'path';
 import { Command, flags } from '@oclif/command';
-import { safeLoadAll } from 'js-yaml';
 import { ResourceGroupInput, uploadResourceGroup } from '../../client';
-import buildStitchedSchema from '../../utils/read-schema-files';
+import listResourceFiles from '../../utils/list-resource-files';
+import readResourceFile from '../../utils/read-resource-file';
+import getEnvInfo from '../../utils/get-env-info';
+
+const printListItem = (f: string) => `  - ${f}`;
 
 export default class ApplyResources extends Command {
   static description = 'Apply resources';
@@ -20,13 +21,17 @@ Uploaded successfully!
     'authorization-header': flags.string({ required: false, description: 'Custom authorization header' }),
     'skip-resource-types': flags.string({ required: false, description: 'Resource types to skip' }),
     timeout: flags.integer({ required: false, default: 10000, description: 'Request timeout' }),
+    verbose: flags.boolean({ required: false, default: false, description: 'Verbose mode' }),
   };
 
   static args = [{ name: 'resourcesPath', required: true }];
 
+  private verboseMode = false;
+
   async run() {
     const { args, flags } = this.parse(ApplyResources);
     const dryRun = flags['dry-run'];
+    this.verboseMode = flags['verbose'];
 
     if (dryRun) {
       this.log(`Dry run mode ON - No changes will be made to the registry`);
@@ -34,15 +39,19 @@ Uploaded successfully!
 
     try {
       const resourceTypesToSkip = flags['skip-resource-types']?.split(',');
+
+      this.log(`Looking for resources at ${args.resourcesPath}...`);
       const resourceGroup = await this.pathToResourceGroup(args.resourcesPath, resourceTypesToSkip);
       const resourceCounts = Object.entries(resourceGroup).map(([key, value]) => ({ key, count: value?.length ?? 0 }));
-
-      this.log(`${dryRun ? 'Verifying' : 'Uploading'} resources from ${args.resourcesPath}...`);
+      this.log('The following resources found:');
       resourceCounts.forEach(({ key, count }) =>
         this.log(`  ${key}: ${count}${resourceTypesToSkip?.includes(key) ? ' - Skipped' : ''}`)
       );
 
-      await uploadResourceGroup(
+      this.log(`${dryRun ? 'Verifying' : 'Uploading'} resources...`);
+      const {
+        result: { success },
+      } = await uploadResourceGroup(
         resourceGroup,
         {
           registryUrl: flags['registry-url'],
@@ -54,59 +63,48 @@ Uploaded successfully!
         }
       );
 
-      this.log(`Resources from ${args.resourcesPath} were ${dryRun ? 'verified' : 'uploaded'} successfully.`);
+      if (success) {
+        this.log(`Resources from ${args.resourcesPath} were ${dryRun ? 'verified' : 'uploaded'} successfully.`);
+      } else {
+        throw new Error('Something went wrong');
+      }
     } catch (e) {
-      this.error(`${dryRun ? 'Verifying' : 'Uploading'} resources failed. ${e}`, { ...e, exit: true });
+      this.error(
+        `${dryRun ? 'Verifying' : 'Uploading'} resources failed. ${e}
+
+          ${getEnvInfo(this.config, 'apply:resources')}`,
+        { ...e, exit: true }
+      );
     }
   }
 
   async pathToResourceGroup(filePath: string, resourceTypesToSkip?: string[]): Promise<ResourceGroupInput> {
-    const fileStats = await fs.stat(filePath);
-
-    if (fileStats.isFile() && filePath.toLocaleLowerCase().endsWith('yaml')) {
-      const fileContentsBuf = await fs.readFile(filePath);
-      const contents = safeLoadAll(fileContentsBuf.toString());
-      return this.resourcesToResourceGroup({ [filePath]: contents }, resourceTypesToSkip);
-    }
-
-    if (fileStats.isDirectory()) {
-      const dir = await fs.readdir(filePath);
-
-      const subRgs = await Promise.all(dir.map(subPath => this.pathToResourceGroup(path.join(filePath, subPath))));
-      const resultRg = subRgs.reduce(
-        (rg, subRg) => ({
-          schemas: safeConcat(rg.schemas, subRg.schemas),
-          upstreams: safeConcat(rg.upstreams, subRg.upstreams),
-          upstreamClientCredentials: safeConcat(rg.upstreamClientCredentials, subRg.upstreamClientCredentials),
-          policies: safeConcat(rg.policies, subRg.policies),
-        }),
-        { schemas: [], upstreams: [], upstreamClientCredentials: [], policies: [] }
-      );
-
-      return resultRg;
-    }
-
-    // This should only happen with weird symlinks etc
-    return { schemas: [], upstreams: [], upstreamClientCredentials: [], policies: [] };
-  }
-
-  async resourcesToResourceGroup(files: { [filepath: string]: any[] }, resourceTypesToSkip?: string[]) {
     const rg: ResourceGroupInput = { schemas: [], upstreams: [], upstreamClientCredentials: [], policies: [] };
 
-    for (const filepath in files) {
-      const resources = files[filepath];
-      for (const resourceWithKind of resources) {
-        const { kind, ...resource } = resourceWithKind;
-        if (resourceTypesToSkip?.includes(kind)) continue;
-        // We don't bother validating the resources, since GraphQL provides a strong enough validation
-        // Client-side validation can be added later on to not require a server hop
+    const resourceFiles = await listResourceFiles(filePath);
+    this.trace(`Found ${resourceFiles.length} resource files:\n${resourceFiles.map(printListItem).join('\n')}`);
+
+    this.trace('Loading resources...');
+    for (const resourceFile of resourceFiles) {
+      this.trace(`  Loading resources from ${resourceFile}...`);
+      const resourceMap = await readResourceFile(resourceFile, resourceTypesToSkip);
+      this.trace('  The following resources loaded:');
+      Object.entries(resourceMap).forEach(([kind, resources]) =>
+        this.trace('  ' + printListItem(`${kind}: ${resources?.length ?? 0}`))
+      );
+      this.addToResourceGroup(resourceMap, rg);
+    }
+
+    return rg;
+  }
+
+  async addToResourceGroup(resourceMap: { [kind: string]: any[] }, rg: ResourceGroupInput) {
+    for (const kind in resourceMap) {
+      const resourceList = resourceMap[kind];
+      for (const resource of resourceList) {
         switch (kind) {
           case 'Schema':
-            if (resource.schema) {
-              rg.schemas!.push(resource);
-            } else if (resource.schemaFiles) {
-              rg.schemas!.push(await buildStitchedSchema(resource, path.dirname(filepath)));
-            }
+            rg.schemas!.push(resource);
             continue;
           case 'Upstream':
             rg.upstreams!.push(resource);
@@ -118,16 +116,16 @@ Uploaded successfully!
             rg.policies!.push(resource);
             continue;
           default:
-            this.log('Unknown resource kind', filepath);
+            this.log('Unknown resource kind', kind);
             continue;
         }
       }
     }
-
-    return rg;
   }
-}
 
-function safeConcat<T>(...arrays: (T[] | null | undefined)[]) {
-  return ([] as T[]).concat(...arrays.filter(Array.isArray).map(a => a!));
+  async trace(message?: string, ...args: any[]) {
+    if (this.verboseMode) {
+      this.log(message, ...args);
+    }
+  }
 }

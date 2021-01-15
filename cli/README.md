@@ -27,7 +27,7 @@ schemaFiles:
   - ./**/*.gql
 ```
 
-This option will be used only when there is no `schema` property defined.
+Or both `schema` and `schemaFiles` properties can be defined. In this case `schema` property value will be considered as content of additional file.
 
 ```yaml
 kind: Upstream
@@ -73,9 +73,12 @@ args:
 
 <!-- commands -->
 
-- [`stitch apply:base-policy RESOURCEPATH`](#stitch-applybase-policy-resourcepath)
-- [`stitch apply:resources RESOURCESPATH`](#stitch-applyresources-resourcespath)
-- [`stitch help [COMMAND]`](#stitch-help-command)
+- [Stitch CLI](#stitch-cli)
+  - [Resources](#resources)
+  - [Commands](#commands)
+  - [`stitch apply:base-policy RESOURCEPATH`](#stitch-applybase-policy-resourcepath)
+  - [`stitch apply:resources RESOURCESPATH`](#stitch-applyresources-resourcespath)
+  - [`stitch help [COMMAND]`](#stitch-help-command)
 
 ## `stitch apply:base-policy RESOURCEPATH`
 

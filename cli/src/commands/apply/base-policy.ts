@@ -2,6 +2,7 @@ import { promises as fs } from 'fs';
 import { safeLoad } from 'js-yaml';
 import Command, { flags } from '@oclif/command';
 import { BasePolicyInput, uploadBasePolicy } from '../../client';
+import getEnvInfo from '../../utils/get-env-info';
 
 export default class ApplyBasePolicy extends Command {
   static description = 'Apply base policy';
@@ -30,22 +31,37 @@ export default class ApplyBasePolicy extends Command {
       this.log(`Dry run mode ON - No changes will be made to the registry`);
     }
 
-    this.log(`${dryRun ? 'Verifying' : 'Uploading'} base policy from ${args.resourcePath}...`);
-    const basePolicyContent = await fs.readFile(args.resourcePath, { encoding: 'utf8' });
-    const basePolicy = safeLoad(basePolicyContent) as BasePolicyInput;
+    try {
+      this.log(`${dryRun ? 'Verifying' : 'Uploading'} base policy from ${args.resourcePath}...`);
+      const basePolicyContent = await fs.readFile(args.resourcePath, { encoding: 'utf8' });
+      const basePolicy = safeLoad(basePolicyContent) as BasePolicyInput;
 
-    await uploadBasePolicy(
-      basePolicy,
-      {
-        registryUrl: flags['registry-url'],
-        authorizationHeader: flags['authorization-header'],
-        dryRun,
-      },
-      {
-        timeout: flags.timeout,
+      const {
+        result: { success },
+      } = await uploadBasePolicy(
+        basePolicy,
+        {
+          registryUrl: flags['registry-url'],
+          authorizationHeader: flags['authorization-header'],
+          dryRun,
+        },
+        {
+          timeout: flags.timeout,
+        }
+      );
+
+      if (success) {
+        this.log(`Base policy from ${args.resourcePath} was ${dryRun ? 'verified' : 'uploaded'} successfully.`);
+      } else {
+        throw new Error('Something went wrong');
       }
-    );
+    } catch (e) {
+      this.error(
+        `${dryRun ? 'Verifying' : 'Uploading'} of base policy failed. ${e}
 
-    this.log(`Base policy from ${args.resourcePath} was ${dryRun ? 'verified' : 'uploaded'} successfully.`);
+          ${getEnvInfo(this.config, 'apply:base-policy')}`,
+        { ...e, exit: true }
+      );
+    }
   }
 }
