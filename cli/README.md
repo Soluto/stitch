@@ -73,12 +73,9 @@ args:
 
 <!-- commands -->
 
-- [Stitch CLI](#stitch-cli)
-  - [Resources](#resources)
-  - [Commands](#commands)
-  - [`stitch apply:base-policy RESOURCEPATH`](#stitch-applybase-policy-resourcepath)
-  - [`stitch apply:resources RESOURCESPATH`](#stitch-applyresources-resourcespath)
-  - [`stitch help [COMMAND]`](#stitch-help-command)
+- [`stitch apply:base-policy RESOURCEPATH`](#stitch-applybase-policy-resourcepath)
+- [`stitch apply:resources RESOURCESPATH`](#stitch-applyresources-resourcespath)
+- [`stitch help [COMMAND]`](#stitch-help-command)
 
 ## `stitch apply:base-policy RESOURCEPATH`
 
@@ -100,7 +97,7 @@ EXAMPLE
          Uploaded successfully!
 ```
 
-_See code: [src/commands/apply/base-policy.ts](https://github.com/Soluto/stitch/blob/v0.0.11/src/commands/apply/base-policy.ts)_
+_See code: [src/commands/apply/base-policy.ts](https://github.com/Soluto/stitch/blob/v0.0.14/src/commands/apply/base-policy.ts)_
 
 ## `stitch apply:resources RESOURCESPATH`
 
@@ -116,13 +113,14 @@ OPTIONS
   --registry-url=registry-url                  (required) Url of the registry
   --skip-resource-types=skip-resource-types    Resource types to skip
   --timeout=timeout                            [default: 10000] Request timeout
+  --verbose                                    Verbose mode
 
 EXAMPLE
   $ stitch apply:resources schema.gql
   Uploaded successfully!
 ```
 
-_See code: [src/commands/apply/resources.ts](https://github.com/Soluto/stitch/blob/v0.0.11/src/commands/apply/resources.ts)_
+_See code: [src/commands/apply/resources.ts](https://github.com/Soluto/stitch/blob/v0.0.14/src/commands/apply/resources.ts)_
 
 ## `stitch help [COMMAND]`
 

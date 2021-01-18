@@ -10,5 +10,6 @@ export default function (config: IConfig, command: string) {
     Platform:       ${config.platform}
     Architecture:   ${config.arch}
     Shell:          ${config.shell}
+    CWD:            ${process.cwd()}
   `;
 }
