@@ -7,7 +7,7 @@ describe('Apply base policy', () => {
     .nock('http://registry', api =>
       api.post('/graphql').reply(200, {
         data: {
-          validateBasePolicy: {
+          result: {
             success: true,
           },
         },

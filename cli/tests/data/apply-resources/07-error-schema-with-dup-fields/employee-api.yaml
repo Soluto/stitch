@@ -1,6 +1,0 @@
-kind: Schema
-metadata:
-  namespace: cli-tests-07
-  name: employee-api
-schemaFiles:
-  - ./**/*.gql
