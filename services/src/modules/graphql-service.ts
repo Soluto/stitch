@@ -9,6 +9,7 @@ import getBaseSchema from './base-schema';
 import logger from './logger';
 import { ActiveDirectoryAuth } from './upstreams';
 import { PolicyExecutor } from './directives/policy';
+import { pluginsResolvers, pluginsSdl } from './plugins';
 
 export function createGraphQLService(config: { resourceGroups: Observable<ResourceGroup> }) {
   let currentSchemaConfig: GraphQLServiceConfig;
@@ -64,11 +65,11 @@ function buildPolicyGqlQuery(policy: PolicyDefinition): DocumentNode {
     : '';
 
   return gql`
-        extend type Policy {
-            ${getPolicyQueryName(policy.metadata)}${argStr}: PolicyResult!
-              @policyQuery(namespace: "${policy.metadata.namespace}", name: "${policy.metadata.name}")
-        }
-        `;
+    extend type Policy {
+        ${getPolicyQueryName(policy.metadata)}${argStr}: PolicyResult!
+          @policyQuery(namespace: "${policy.metadata.namespace}", name: "${policy.metadata.name}")
+    }
+  `;
 }
 
 export async function createSchemaConfig(resourceGroup: ResourceGroup): Promise<GraphQLServiceConfig> {
@@ -77,11 +78,12 @@ export async function createSchemaConfig(resourceGroup: ResourceGroup): Promise<
 
   const schemaTypeDefs = schemas.map(s => [`${s.metadata.namespace}/${s.metadata.name}`, parse(s.schema)]);
   const policyQueryTypeDefs = policies.map(p => [getPolicyQueryName(p.metadata), buildPolicyGqlQuery(p)]);
+  const pluginsTypeDefs = ['plugins', pluginsSdl];
   const baseSchema = await getBaseSchema();
   const schema = buildSchemaFromFederatedTypeDefs({
-    typeDefs: Object.fromEntries([...schemaTypeDefs, ...policyQueryTypeDefs]),
+    typeDefs: Object.fromEntries([...schemaTypeDefs, ...policyQueryTypeDefs, pluginsTypeDefs]),
     baseTypeDefs: baseSchema.typeDefs,
-    resolvers: { ...baseSchema.resolvers },
+    resolvers: { ...baseSchema.resolvers, ...pluginsResolvers },
     schemaDirectives: baseSchema.directives,
     schemaDirectivesContext: { resourceGroup },
   });

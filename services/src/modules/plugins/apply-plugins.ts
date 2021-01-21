@@ -16,7 +16,8 @@ export async function loadPlugins() {
   await Promise.all(
     pluginList.map(async name => {
       try {
-        const pluginImport = await import(join(pluginsDir!, name));
+        const pluginPath = join(pluginsDir!, name);
+        const pluginImport = await import(pluginPath);
         const plugin: Partial<Omit<StitchPlugin, 'name'>> =
           typeof pluginImport === 'function' ? await pluginImport.call() : pluginImport;
 
@@ -24,8 +25,10 @@ export async function loadPlugins() {
           await plugin.configure(pluginsConfig?.[name]);
         }
 
-        plugins.push({ name, ...plugin });
-        logger.info({ name }, `Plugin ${name} has been loaded successfully.`);
+        const version = await getPluginVersion(pluginPath);
+
+        plugins.push({ name, version, ...plugin });
+        logger.info({ name }, `Plugin ${name}@${version} has been loaded successfully.`);
       } catch (err) {
         logger.error({ err, name }, 'Failed to load plugin');
         throw err;
@@ -112,4 +115,15 @@ export async function transformBaseSchema(baseSchema: BaseSchema): Promise<BaseS
     }
   }
   return bs;
+}
+
+async function getPluginVersion(path: string) {
+  try {
+    const pJsonPath = join(path, 'package.json');
+    const pJsonContent = await fs.readFile(pJsonPath, { encoding: 'utf8' });
+    const pJson = JSON.parse(pJsonContent);
+    return (pJson.version ?? 'N/A') as string;
+  } catch {
+    return 'N/A';
+  }
 }
