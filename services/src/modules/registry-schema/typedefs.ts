@@ -11,7 +11,72 @@ export default gql`
     version: String!
   }
 
-  # General
+  # General types
+  type ResourceMetadata {
+    namespace: String!
+    name: String!
+  }
+
+  interface Resource {
+    metadata: ResourceMetadata!
+  }
+
+  type Schema implements Resource {
+    metadata: ResourceMetadata!
+    schema: String!
+  }
+
+  type Upstream implements Resource {
+    metadata: ResourceMetadata!
+    host: String
+    sourceHosts: [String!]
+    targetOrigin: String
+    auth: Auth
+    headers: [UpstreamHeader!]
+  }
+
+  type UpstreamHeader {
+    name: String!
+    value: String!
+  }
+
+  type Auth {
+    type: AuthType!
+    activeDirectory: ActiveDirectoryAuth!
+  }
+
+  type ActiveDirectoryAuth {
+    authority: String!
+    resource: String!
+  }
+
+  type DefaultUpstream {
+    targetOrigin: String
+    auth: Auth
+    headers: [UpstreamHeader!]
+  }
+
+  type PolicyQuery {
+    gql: String!
+    variables: JSONObject
+  }
+
+  type Policy implements Resource {
+    metadata: ResourceMetadata!
+    type: PolicyType!
+    shouldOverrideBasePolicy: Boolean
+    code: String!
+    args: JSONObject
+    query: PolicyQuery
+  }
+
+  type BasePolicy {
+    namespace: String!
+    name: String!
+    args: JSONObject
+  }
+
+  # General Inputs
 
   input ResourceMetadataInput {
     namespace: String!
@@ -38,6 +103,14 @@ export default gql`
 
   type Query {
     plugins: [PluginMetadata!]!
+    schema(metadata: ResourceMetadataInput!, fromGatewayResources: Boolean): Schema
+    schemas(fromGatewayResources: Boolean): [Schema!]!
+    upstream(metadata: ResourceMetadataInput!, fromGatewayResources: Boolean): Upstream
+    upstreams(fromGatewayResources: Boolean): [Upstream!]!
+    defaultUpstream(fromGatewayResources: Boolean): DefaultUpstream
+    policy(metadata: ResourceMetadataInput!, fromGatewayResources: Boolean): Policy
+    policies(fromGatewayResources: Boolean): [Policy!]!
+    basePolicy(fromGatewayResources: Boolean): BasePolicy
 
     validateResourceGroup(input: ResourceGroupInput!): Result
     validateSchemas(input: [SchemaInput!]!): Result
@@ -93,7 +166,7 @@ export default gql`
     resource: String!
   }
 
-  input UpstreamHeader {
+  input UpstreamHeaderInput {
     name: String!
     value: String!
   }
@@ -104,13 +177,13 @@ export default gql`
     sourceHosts: [String!]
     targetOrigin: String
     auth: AuthInput
-    headers: [UpstreamHeader!]
+    headers: [UpstreamHeaderInput!]
   }
 
   input DefaultUpstreamInput {
     targetOrigin: String
     auth: AuthInput
-    headers: [UpstreamHeader!]
+    headers: [UpstreamHeaderInput!]
   }
 
   # Upstream client credentials

@@ -6,7 +6,7 @@ import { applyResourceGroupUpdates } from '../../resource-repository';
 import { validateResourceGroupOrThrow } from '../validation';
 import { transformResourceGroup as applyPluginsForResourceGroup } from '../../plugins';
 import { PolicyAttachmentsHelper, markOptionalPolicyArgs } from '../helpers';
-import resourceRepository from '../repository';
+import getResourceRepository from '../repository';
 import { ResourceGroupInput } from '../types';
 import { updateRemoteGqlSchemas } from '../../directives/gql';
 import { RegistryRequestContext } from '..';
@@ -17,6 +17,7 @@ export default async function (updates: ResourceGroupInput, context: RegistryReq
   return singleton(async () => {
     logger.info(`Proceeding ${dryRun ? 'validate' : 'update'} resources request...`);
     const policyAttachments = new PolicyAttachmentsHelper();
+    const resourceRepository = getResourceRepository();
 
     try {
       logger.trace('Fetching latest resource group...');
