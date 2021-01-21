@@ -1,6 +1,6 @@
 # Logging
 
-Stitch uses [`pino`](https://github.com/pinojs/pino) logger. The logger default configuration can be finded [here](../services/src/modules/logger.ts).
+Stitch uses [`pino`](https://github.com/pinojs/pino) logger. The logger default configuration can be found [here](../services/src/modules/logger.ts).
 
 Custom configuration can be provided using `LOGGER_CONFIGURATION` environment variable.
 

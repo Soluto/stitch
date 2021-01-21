@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as envVar from 'env-var';
-import * as pino from 'pino';
+import { LoggerOptions } from 'pino';
 import { AuthenticationConfig } from './authentication/types';
 
 const envVarExt = envVar.from(process.env, {
@@ -57,4 +57,4 @@ export const knownApolloDirectives = envVarExt
   .default(defaultKnownApolloDirectives)
   .asSet();
 
-export const loggerConfiguration = envVar.get('LOGGER_CONFIGURATION').asJsonObject() as pino.LoggerOptions;
+export const loggerConfiguration = envVar.get('LOGGER_CONFIGURATION').default({}).asJsonObject() as LoggerOptions;
