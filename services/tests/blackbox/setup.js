@@ -13,3 +13,5 @@ process.env.AUTHENTICATION_CONFIGURATION = JSON.stringify({
     publicPaths: ['/metrics', '/.well-known/apollo/server-health', '/graphql'],
   },
 });
+
+process.env.LOGGER_CONFIGURATION = JSON.stringify({ redact: ['errors[*].extensions'] });

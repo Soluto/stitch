@@ -1,5 +1,5 @@
 import * as pino from 'pino';
-import { logLevel, nodeEnv } from './config';
+import { logLevel, nodeEnv, loggerConfiguration } from './config';
 
 const loggerConfig: pino.LoggerOptions = {
   level: logLevel.toLowerCase(),
@@ -16,4 +16,8 @@ const devLoggerConfig: pino.LoggerOptions = {
   },
 };
 
-export default pino({ ...loggerConfig, ...(nodeEnv !== 'production' ? devLoggerConfig : {}) });
+export default pino({
+  ...loggerConfig,
+  ...(nodeEnv !== 'production' ? devLoggerConfig : {}),
+  ...loggerConfiguration,
+});

@@ -34,7 +34,7 @@ function capturingStdWrite(
   return true;
 }
 
-function startCaptureOutput() {
+export function startCaptureOutput() {
   const originalProcessStdoutWrite = process.stdout.write;
   const originalProcessStderrWrite = process.stderr.write;
   output = '';
