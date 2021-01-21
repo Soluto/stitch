@@ -42,6 +42,23 @@ describe('Plugins', () => {
     await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
   });
 
+  test('List plugins', async () => {
+    const query = print(gql`
+      query {
+        plugins {
+          name
+          version
+        }
+      }
+    `);
+
+    const registryResponse = await registryClient.request(query);
+    expect(registryResponse).toMatchSnapshot('registry');
+
+    const gatewayResponse = await gatewayClient.request(query);
+    expect(gatewayResponse).toMatchSnapshot('gateway');
+  });
+
   test('Setup schema', async () => {
     const schemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {
       schema: schema,

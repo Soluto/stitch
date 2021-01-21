@@ -11,6 +11,7 @@ import {
   UpstreamClientCredentialsInput,
   UpstreamInput,
 } from '../types';
+import { getPlugins } from '../../plugins';
 import handleUpdateResourceGroupRequest from './update-resource-group';
 import handleDeleteResourcesRequest from './delete-resources';
 
@@ -18,6 +19,8 @@ const resolvers: IResolvers = {
   JSON: GraphQLJSON,
   JSONObject: GraphQLJSONObject,
   Query: {
+    plugins: () => getPlugins(),
+
     validateResourceGroup: (_, args: { input: Partial<ResourceGroupInput> }, context) =>
       handleUpdateResourceGroupRequest(args.input, context, true),
 

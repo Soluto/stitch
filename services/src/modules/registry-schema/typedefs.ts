@@ -4,6 +4,13 @@ export default gql`
   scalar JSON
   scalar JSONObject
 
+  # Types
+
+  type PluginMetadata {
+    name: String!
+    version: String!
+  }
+
   # General
 
   input ResourceMetadataInput {
@@ -30,6 +37,8 @@ export default gql`
   }
 
   type Query {
+    plugins: [PluginMetadata!]!
+
     validateResourceGroup(input: ResourceGroupInput!): Result
     validateSchemas(input: [SchemaInput!]!): Result
     validateUpstreams(input: [UpstreamInput!]!): Result

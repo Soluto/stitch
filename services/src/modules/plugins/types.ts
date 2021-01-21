@@ -6,6 +6,8 @@ export type ValueOrPromise<T> = T | Promise<T>;
 export interface StitchPlugin {
   name: string;
 
+  version: string;
+
   configure?(options?: unknown): ValueOrPromise<void>;
 
   addArgumentInjectionGlobals?(): ValueOrPromise<Record<string, unknown>>;

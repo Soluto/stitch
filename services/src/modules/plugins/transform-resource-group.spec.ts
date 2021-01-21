@@ -24,21 +24,25 @@ const resourceGroup: ResourceGroup = {
 const loadedPlugins: StitchPlugin[] = [
   {
     name: 'rename-name',
+    version: 'N/A',
     transformResourceGroup(rg: ResourceGroup) {
       return _.set(rg, 'schemas[0].metadata.name', 'new-name');
     },
   },
   {
     name: 'rename-namespace',
+    version: 'N/A',
     transformResourceGroup(rg: ResourceGroup) {
       return _.set(rg, 'schemas[0].metadata.namespace', 'new-ns');
     },
   },
   {
     name: 'do-nothing',
+    version: 'N/A',
   },
   {
     name: 'transform-resource-group',
+    version: 'N/A',
     transformResourceGroup(resourceGroup: ResourceGroup) {
       return {
         ...resourceGroup,
@@ -60,9 +64,11 @@ const loadedPlugins: StitchPlugin[] = [
 const loadedPluginsWithCrash: StitchPlugin[] = [
   {
     name: 'do-nothing',
+    version: 'N/A',
   },
   {
     name: 'throw error',
+    version: 'N/A',
     transformResourceGroup() {
       throw new Error('Something bad happened');
     },
