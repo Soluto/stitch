@@ -2,7 +2,7 @@ import { ApolloServer } from 'apollo-server-fastify';
 import * as fastify from 'fastify';
 import * as fastifyMetrics from 'fastify-metrics';
 import * as config from './modules/config';
-import { resolvers, typeDefs } from './modules/registry-schema';
+import { RegistryRequestContext, resolvers, typeDefs } from './modules/registry-schema';
 import logger from './modules/logger';
 import * as opaHelper from './modules/opa-helper';
 import { handleSignals, handleUncaughtErrors } from './modules/shutdown-handler';
@@ -13,8 +13,12 @@ import { jwtDecoderPlugin } from './modules/authentication';
 export const app = new ApolloServer({
   typeDefs,
   resolvers,
-  context: {
-    activeDirectoryAuth: new ActiveDirectoryAuth(),
+  context(request: fastify.FastifyRequest) {
+    const ctx: RegistryRequestContext = {
+      request,
+      activeDirectoryAuth: new ActiveDirectoryAuth(),
+    };
+    return ctx;
   },
   tracing: config.enableGraphQLTracing,
   playground: config.enableGraphQLPlayground,
