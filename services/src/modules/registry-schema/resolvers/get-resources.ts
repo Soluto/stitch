@@ -46,3 +46,13 @@ export async function getResource(
       throw new Error('Invalid option');
   }
 }
+
+export async function getRemoteSchemas() {
+  const { resourceGroup } = await getResourceRepository(false).fetchLatest();
+  return resourceGroup.remoteSchemas ?? [];
+}
+
+export async function getRemoteSchema(url: string) {
+  const { resourceGroup } = await getResourceRepository(false).fetchLatest();
+  return resourceGroup.remoteSchemas?.find(s => s.url === url);
+}

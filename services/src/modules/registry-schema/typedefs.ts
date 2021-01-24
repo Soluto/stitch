@@ -76,6 +76,11 @@ export default gql`
     args: JSONObject
   }
 
+  type RemoteSchema {
+    url: String!
+    schema: String!
+  }
+
   # General Inputs
 
   input ResourceMetadataInput {
@@ -111,6 +116,9 @@ export default gql`
     policy(metadata: ResourceMetadataInput!, fromGatewayResources: Boolean): Policy
     policies(fromGatewayResources: Boolean): [Policy!]!
     basePolicy(fromGatewayResources: Boolean): BasePolicy
+
+    remoteSchemas: [RemoteSchema!]!
+    remoteSchema(url: String!): RemoteSchema
 
     validateResourceGroup(input: ResourceGroupInput!): Result
     validateSchemas(input: [SchemaInput!]!): Result

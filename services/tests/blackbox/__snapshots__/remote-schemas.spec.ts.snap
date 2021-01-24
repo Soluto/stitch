@@ -1,0 +1,81 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Remote Schemas Add schema with @gql directive 1`] = `
+Object {
+  "updateSchemas": Object {
+    "success": true,
+  },
+}
+`;
+
+exports[`Remote Schemas Delete the schema with @gql directive 1`] = `
+Object {
+  "deleteSchemas": Object {
+    "success": true,
+  },
+}
+`;
+
+exports[`Remote Schemas Query empty resource group: remote schema 1`] = `
+Object {
+  "remoteSchema": null,
+}
+`;
+
+exports[`Remote Schemas Query empty resource group: remote schemas 1`] = `
+Object {
+  "remoteSchemas": Array [],
+}
+`;
+
+exports[`Remote Schemas Query resource group after deletion: remote schema 1`] = `
+Object {
+  "remoteSchema": Object {
+    "schema": "type Query {
+  foo: String
+}
+",
+    "url": "http://remote-server/graphql",
+  },
+}
+`;
+
+exports[`Remote Schemas Query resource group after deletion: remote schemas 1`] = `
+Object {
+  "remoteSchemas": Array [
+    Object {
+      "schema": "type Query {
+  foo: String
+}
+",
+      "url": "http://remote-server/graphql",
+    },
+  ],
+}
+`;
+
+exports[`Remote Schemas Query resource group: remote schema 1`] = `
+Object {
+  "remoteSchema": Object {
+    "schema": "type Query {
+  foo: String
+}
+",
+    "url": "http://remote-server/graphql",
+  },
+}
+`;
+
+exports[`Remote Schemas Query resource group: remote schemas 1`] = `
+Object {
+  "remoteSchemas": Array [
+    Object {
+      "schema": "type Query {
+  foo: String
+}
+",
+      "url": "http://remote-server/graphql",
+    },
+  ],
+}
+`;

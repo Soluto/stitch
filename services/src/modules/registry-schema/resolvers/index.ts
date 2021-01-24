@@ -16,7 +16,7 @@ import { ResourceMetadata } from '../../resource-repository';
 import { getPlugins } from '../../plugins';
 import handleUpdateResourceGroupRequest from './update-resource-group';
 import handleDeleteResourcesRequest from './delete-resources';
-import { getResource, getResourcesByType } from './get-resources';
+import { getRemoteSchema, getRemoteSchemas, getResource, getResourcesByType } from './get-resources';
 
 const resolvers: IResolvers = {
   JSON: GraphQLJSON,
@@ -46,6 +46,9 @@ const resolvers: IResolvers = {
 
     basePolicy: (_, args: { fromGatewayResources?: boolean }) =>
       getResourcesByType(ResourceType.BasePolicy, args.fromGatewayResources),
+
+    remoteSchemas: getRemoteSchemas,
+    remoteSchema: (_, args: { url: string }) => getRemoteSchema(args.url),
 
     validateResourceGroup: (_, args: { input: Partial<ResourceGroupInput> }, context) =>
       handleUpdateResourceGroupRequest(args.input, context, true),
