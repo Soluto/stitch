@@ -1,26 +1,19 @@
 import * as _ from 'lodash';
-import { ResourceType } from '..';
-import { ResourceMetadata } from '../../resource-repository';
+import { ResourceType } from '../types';
+import { ResourceGroup, ResourceMetadata } from '../../resource-repository';
 import getResourceRepository from '../repository';
+
+const resourcesByType: Record<ResourceType, (rg: ResourceGroup) => unknown> = {
+  [ResourceType.Schema]: rg => rg.schemas,
+  [ResourceType.Upstream]: rg => rg.upstreams,
+  [ResourceType.DefaultUpstream]: rg => rg.defaultUpstream,
+  [ResourceType.Policy]: rg => rg.policies,
+  [ResourceType.BasePolicy]: rg => rg.basePolicy,
+};
 
 export async function getResourcesByType(resourceType: ResourceType, fromGatewayResources = false) {
   const { resourceGroup } = await getResourceRepository(!fromGatewayResources).fetchLatest();
-  switch (resourceType) {
-    case ResourceType.Schema:
-      return resourceGroup.schemas;
-
-    case ResourceType.Upstream:
-      return resourceGroup.upstreams;
-
-    case ResourceType.DefaultUpstream:
-      return resourceGroup.defaultUpstream;
-
-    case ResourceType.Policy:
-      return resourceGroup.policies;
-
-    case ResourceType.BasePolicy:
-      return resourceGroup.basePolicy;
-  }
+  return resourcesByType[resourceType](resourceGroup);
 }
 
 export async function getResource(
@@ -28,23 +21,11 @@ export async function getResource(
   resourceMetadata: ResourceMetadata,
   fromGatewayResources = false
 ) {
-  const { resourceGroup } = await getResourceRepository(!fromGatewayResources).fetchLatest();
-  switch (resourceType) {
-    case ResourceType.Schema:
-      return resourceGroup.schemas.find(({ metadata }) => _.isEqual(metadata, resourceMetadata));
-
-    case ResourceType.Upstream:
-      return resourceGroup.upstreams.find(({ metadata }) => _.isEqual(metadata, resourceMetadata));
-
-    case ResourceType.DefaultUpstream:
-      throw new Error('Invalid option');
-
-    case ResourceType.Policy:
-      return resourceGroup.policies.find(({ metadata }) => _.isEqual(metadata, resourceMetadata));
-
-    case ResourceType.BasePolicy:
-      throw new Error('Invalid option');
+  const resources = await getResourcesByType(resourceType, fromGatewayResources);
+  if (!Array.isArray(resources)) {
+    throw new TypeError('Invalid option');
   }
+  return resources.find(({ metadata }) => _.isEqual(metadata, resourceMetadata));
 }
 
 export async function getRemoteSchemas() {
@@ -53,6 +34,6 @@ export async function getRemoteSchemas() {
 }
 
 export async function getRemoteSchema(url: string) {
-  const { resourceGroup } = await getResourceRepository(false).fetchLatest();
-  return resourceGroup.remoteSchemas?.find(s => s.url === url);
+  const remoteSchemas = await getRemoteSchemas();
+  return remoteSchemas.find(s => s.url === url);
 }
