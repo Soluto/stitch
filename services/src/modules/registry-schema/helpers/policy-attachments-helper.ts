@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as opaHelper from '../../opa-helper';
 import logger from '../../logger';
 import { PolicyType, ResourceMetadata, IResourceRepository } from '../../resource-repository';
-import resourceRepository from '../repository';
+import getResourceRepository from '../repository';
 import { ResourceMetadataInput, PolicyInput } from '../types';
 
 type TempLocalPolicyAttachment = { metadata: ResourceMetadataInput; path: string; type: PolicyType };
@@ -34,6 +34,7 @@ export default class PolicyAttachmentsHelper {
   }
 
   async writeToRepo() {
+    const resourceRepository = getResourceRepository();
     for (const attachment of this.policyAttachmentsToSave) {
       await policyAttachmentStrategies[attachment.type].saveToRepo(resourceRepository, attachment);
     }

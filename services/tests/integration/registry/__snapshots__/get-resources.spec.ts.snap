@@ -1,0 +1,174 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Get resources base policy 1`] = `
+Object {
+  "data": Object {
+    "basePolicy": Object {
+      "args": Object {
+        "another": "Hey",
+      },
+      "name": "policy1",
+      "namespace": "get-resource",
+    },
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`Get resources default upstream 1`] = `
+Object {
+  "data": Object {
+    "defaultUpstream": Object {
+      "auth": null,
+      "headers": Array [
+        Object {
+          "name": "foo",
+        },
+      ],
+    },
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`Get resources policies 1`] = `
+Object {
+  "data": Object {
+    "policies": Array [
+      Object {
+        "code": "real rego code
+           with multiple
+           lines",
+        "metadata": Object {
+          "name": "policy1",
+          "namespace": "get-resource",
+        },
+      },
+      Object {
+        "code": "real rego code
+           with multiple
+           lines",
+        "metadata": Object {
+          "name": "policy2",
+          "namespace": "get-resource",
+        },
+      },
+    ],
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`Get resources policy 1`] = `
+Object {
+  "data": Object {
+    "policy": Object {
+      "code": "real rego code
+           with multiple
+           lines",
+      "metadata": Object {
+        "name": "policy1",
+        "namespace": "get-resource",
+      },
+    },
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`Get resources schema 1`] = `
+Object {
+  "data": Object {
+    "schema": Object {
+      "metadata": Object {
+        "name": "schema1",
+        "namespace": "get-resource",
+      },
+      "schema": "type Query {
+  foo: String!
+}
+",
+    },
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`Get resources schemas 1`] = `
+Object {
+  "data": Object {
+    "schemas": Array [
+      Object {
+        "metadata": Object {
+          "name": "schema1",
+          "namespace": "get-resource",
+        },
+        "schema": "type Query {
+  foo: String!
+}
+",
+      },
+      Object {
+        "metadata": Object {
+          "name": "schema2",
+          "namespace": "get-resource",
+        },
+        "schema": "type Query {
+  bar: String!
+}
+",
+      },
+    ],
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`Get resources upstream 1`] = `
+Object {
+  "data": Object {
+    "upstream": Object {
+      "headers": null,
+      "metadata": Object {
+        "name": "upstream1",
+        "namespace": "get-resource",
+      },
+    },
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`Get resources upstreams 1`] = `
+Object {
+  "data": Object {
+    "upstreams": Array [
+      Object {
+        "headers": null,
+        "host": "test.api",
+        "metadata": Object {
+          "name": "upstream1",
+          "namespace": "get-resource",
+        },
+        "sourceHosts": null,
+      },
+      Object {
+        "headers": Array [
+          Object {
+            "name": "x-api-client",
+          },
+        ],
+        "host": null,
+        "metadata": Object {
+          "name": "upstream2",
+          "namespace": "get-resource",
+        },
+        "sourceHosts": Array [
+          "test2.api",
+        ],
+      },
+    ],
+  },
+  "errors": undefined,
+}
+`;

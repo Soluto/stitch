@@ -12,6 +12,14 @@ export interface ResourceMetadataInput {
   name: string;
 }
 
+export enum ResourceType {
+  Schema,
+  Upstream,
+  DefaultUpstream,
+  Policy,
+  BasePolicy,
+}
+
 export interface ResourceGroupMetadataInput {
   schemas?: ResourceMetadataInput[];
   upstreams?: ResourceMetadataInput[];

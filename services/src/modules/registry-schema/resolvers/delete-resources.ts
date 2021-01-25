@@ -7,7 +7,7 @@ import { applyResourceGroupDeletions } from '../../resource-repository';
 import { validateResourceGroupOrThrow } from '../validation';
 import { transformResourceGroup as applyPluginForResourceGroup } from '../../plugins';
 import { PolicyAttachmentsHelper } from '../helpers';
-import resourceRepository from '../repository';
+import getResourceRepository from '../repository';
 import { RegistryRequestContext, ResourceGroupMetadataInput } from '..';
 import { updateRemoteGqlSchemas } from '../../directives/gql';
 
@@ -17,6 +17,7 @@ export default async function (deletions: ResourceGroupMetadataInput, context: R
   return singleton(async () => {
     logger.info(`Proceeding resources deletion request...`);
     const policyAttachments = new PolicyAttachmentsHelper();
+    const resourceRepository = getResourceRepository();
 
     try {
       logger.trace('Fetching latest resource group...');

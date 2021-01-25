@@ -7,19 +7,48 @@ import {
   ResourceGroupInput,
   ResourceGroupMetadataInput,
   ResourceMetadataInput,
+  ResourceType,
   SchemaInput,
   UpstreamClientCredentialsInput,
   UpstreamInput,
 } from '../types';
+import { ResourceMetadata } from '../../resource-repository';
 import { getPlugins } from '../../plugins';
 import handleUpdateResourceGroupRequest from './update-resource-group';
 import handleDeleteResourcesRequest from './delete-resources';
+import { getRemoteSchema, getRemoteSchemas, getResource, getResourcesByType } from './get-resources';
 
 const resolvers: IResolvers = {
   JSON: GraphQLJSON,
   JSONObject: GraphQLJSONObject,
   Query: {
     plugins: () => getPlugins(),
+    schema: (_, args: { metadata: ResourceMetadata; fromGatewayResources?: boolean }) =>
+      getResource(ResourceType.Schema, args.metadata, args.fromGatewayResources),
+
+    schemas: (_, args: { fromGatewayResources?: boolean }) =>
+      getResourcesByType(ResourceType.Schema, args.fromGatewayResources),
+
+    upstream: (_, args: { metadata: ResourceMetadata; fromGatewayResources?: boolean }) =>
+      getResource(ResourceType.Upstream, args.metadata, args.fromGatewayResources),
+
+    upstreams: (_, args: { fromGatewayResources?: boolean }) =>
+      getResourcesByType(ResourceType.Upstream, args.fromGatewayResources),
+
+    defaultUpstream: (_, args: { fromGatewayResources?: boolean }) =>
+      getResourcesByType(ResourceType.DefaultUpstream, args.fromGatewayResources),
+
+    policy: (_, args: { metadata: ResourceMetadata; fromGatewayResources?: boolean }) =>
+      getResource(ResourceType.Policy, args.metadata, args.fromGatewayResources),
+
+    policies: (_, args: { fromGatewayResources?: boolean }) =>
+      getResourcesByType(ResourceType.Policy, args.fromGatewayResources),
+
+    basePolicy: (_, args: { fromGatewayResources?: boolean }) =>
+      getResourcesByType(ResourceType.BasePolicy, args.fromGatewayResources),
+
+    remoteSchemas: getRemoteSchemas,
+    remoteSchema: (_, args: { url: string }) => getRemoteSchema(args.url),
 
     validateResourceGroup: (_, args: { input: Partial<ResourceGroupInput> }, context) =>
       handleUpdateResourceGroupRequest(args.input, context, true),

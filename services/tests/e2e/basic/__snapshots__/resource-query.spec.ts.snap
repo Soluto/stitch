@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Basic flow Add policy and query 1`] = `
+Object {
+  "code": "default allow = false",
+}
+`;
+
+exports[`Basic flow Add policy and query 2`] = `
+Object {
+  "code": "default allow = false",
+}
+`;
+
+exports[`Basic flow Get gateway resource added by plugin 1`] = `
+Object {
+  "code": "
+    default allow = true
+  ",
+}
+`;
