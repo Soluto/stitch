@@ -34,6 +34,12 @@ services:
               },
               "description": "OpenId provider without discovery endpoint",
               "authenticatedPaths": ["/graphql"]
+            },
+            "http://localhost:8071": {
+              "authority": "http://discovery-endpoint-does-not-exist",
+              "audience": "Stitch Gateway",
+              "description": "OpenId provider without discovery endpoint",
+              "authenticatedPaths": ["/graphql"]
             }
           },
           "anonymous": {
@@ -85,7 +91,7 @@ services:
     image: soluto/oidc-server-mock:0.3.0
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:8060;http://+:8070
+      ASPNETCORE_URLS: http://+:8060;http://+:8070;http://+:8071
       SERVER_OPTIONS_PATH: /config/server-options.json
       API_SCOPES_PATH: /config/api-scopes.json
       API_RESOURCES_PATH: /config/api-resources.json
@@ -96,3 +102,4 @@ services:
     ports:
       - 8060:8060
       - 8070:8070
+      - 8071:8071

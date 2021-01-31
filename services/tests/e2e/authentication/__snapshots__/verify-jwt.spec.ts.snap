@@ -65,6 +65,45 @@ exports[`Authentication - Verify JWT Invalid JWT: gateway logs 1`] = `
 \\"***** END OUTPUT CAPTURE *****"
 `;
 
+exports[`Authentication - Verify JWT JWK uri is not resolved 1`] = `
+Object {
+  "error": "Unauthorized",
+  "message": "Unauthorized",
+  "status": 401,
+  "statusCode": 401,
+}
+`;
+
+exports[`Authentication - Verify JWT JWK uri is not resolved: gateway logs 1`] = `
+"**** START OUTPUT CAPTURE *****\\"
+[hh:mm:ss.ms] DEBUG: New authority received. Creating new JWKs client...
+    authority: \\"http://discovery-endpoint-does-not-exist\\"
+[hh:mm:ss.ms] ERROR: Failed to get JWK config.
+    err: {
+      \\"type\\": \\"Error\\",
+      \\"message\\": \\"Failed to retrieve jwksUri for http://discovery-endpoint-does-not-exist from undefined\\",
+      \\"stack\\":
+          Error: Failed to retrieve jwksUri for http://discovery-endpoint-does-not-exist from undefined
+    }
+    issuerConfig: {
+      \\"authority\\": \\"http://discovery-endpoint-does-not-exist\\",
+      \\"audience\\": \\"Stitch Gateway\\",
+      \\"description\\": \\"OpenId provider without discovery endpoint\\",
+      \\"authenticatedPaths\\": [
+        \\"/graphql\\"
+      ]
+    }
+[hh:mm:ss.ms] DEBUG: Failed to verify request JWT
+    err: {
+      \\"type\\": \\"Error\\",
+      \\"message\\": \\"Failed to retrieve jwksUri for http://discovery-endpoint-does-not-exist from undefined\\",
+      \\"stack\\":
+          Error: Failed to retrieve jwksUri for http://discovery-endpoint-does-not-exist from undefined
+    }
+    issuer: \\"http://localhost:8071\\"
+\\"***** END OUTPUT CAPTURE *****"
+`;
+
 exports[`Authentication - Verify JWT Second call with valid JWT - JWKs caching 1`] = `
 Object {
   "jwt_foo": "FOO",
