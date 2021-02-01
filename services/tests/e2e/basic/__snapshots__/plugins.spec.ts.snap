@@ -139,7 +139,7 @@ exports[`Plugins Plugin crashes 1`] = `
     }
   ],
   "data": {
-    "updateSchemas": null
+    "result": null
   }
 }
 `;

@@ -17,7 +17,7 @@ exports[`Basic flow Send wrong schema 1`] = `
     }
   ],
   "data": {
-    "updateSchemas": null
+    "result": null
   }
 }
 `;

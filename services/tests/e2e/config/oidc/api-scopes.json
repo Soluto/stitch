@@ -1,5 +1,8 @@
 [
   {
     "Name": "stitch-gateway"
+  },
+  {
+    "Name": "some-rest-service"
   }
 ]

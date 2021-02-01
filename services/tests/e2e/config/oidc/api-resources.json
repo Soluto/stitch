@@ -2,5 +2,9 @@
   {
     "Name": "Stitch Gateway",
     "Scopes": ["stitch-gateway"]
+  },
+  {
+    "Name": "Some REST service",
+    "Scopes": ["some-rest-service"]
   }
 ]

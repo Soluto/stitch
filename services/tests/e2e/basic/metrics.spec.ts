@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 import { GraphQLClient } from 'graphql-request';
 import PrometheusMetricsSerializer from '../../utils/prometheus-metrics-serializer';
 import { getToken } from '../../helpers/get-token';
-import { UpdateSchemasMutationResponse, createSchemaMutation } from '../../helpers/registry-request-builder';
+import { RegistryMutationResponse, updateSchemasMutation } from '../../helpers/registry-request-builder';
 import { sleep } from '../../helpers/utility';
 import { schema1, schema2 } from './metrics.schema';
 
@@ -36,10 +36,10 @@ describe('Metrics', () => {
   });
 
   test('Setup schema', async () => {
-    const updateSchemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {
+    const updateSchemaResponse = await registryClient.request<RegistryMutationResponse>(updateSchemasMutation, {
       schema: schema1,
     });
-    expect(updateSchemaResponse.updateSchemas.success).toBeTruthy();
+    expect(updateSchemaResponse.result.success).toBeTruthy();
 
     // Wait for gateway to update
     await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
@@ -58,10 +58,10 @@ describe('Metrics', () => {
   });
 
   test('Change schema', async () => {
-    const updateSchemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {
+    const updateSchemaResponse = await registryClient.request<RegistryMutationResponse>(updateSchemasMutation, {
       schema: schema2,
     });
-    expect(updateSchemaResponse.updateSchemas.success).toBeTruthy();
+    expect(updateSchemaResponse.result.success).toBeTruthy();
 
     // Wait for gateway to update
     await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);

@@ -5,7 +5,7 @@ import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { getToken } from '../../helpers/get-token';
 import { ResourceMetadataInput } from '../../../src/modules/registry-schema';
 import { PolicyDefinition, PolicyType } from '../../../src/modules/resource-repository';
-import { createPolicyMutation, CreatePolicyMutationResponse } from '../../helpers/registry-request-builder';
+import { RegistryMutationResponse, updatePoliciesMutation } from '../../helpers/registry-request-builder';
 import { sleep } from '../../helpers/utility';
 
 const gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
@@ -52,10 +52,10 @@ describe('Basic flow', () => {
       },
     ];
 
-    const updateResponse = await registryClient.request<CreatePolicyMutationResponse>(createPolicyMutation, {
+    const updateResponse = await registryClient.request<RegistryMutationResponse>(updatePoliciesMutation, {
       policies,
     });
-    expect(updateResponse.updatePolicies.success).toBeTruthy();
+    expect(updateResponse.result.success).toBeTruthy();
 
     // Wait for gateway to update before next tests
     await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
