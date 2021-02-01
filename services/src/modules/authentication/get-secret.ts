@@ -59,17 +59,24 @@ export default async function getSecret(
     return;
   }
 
-  const { authority, jwksConfig } = issuerConfig;
-  const jwkClient = await getJwkClient(authority, jwksConfig);
+  try {
+    const { authority, jwksConfig } = issuerConfig;
+    const jwkClient = await getJwkClient(authority, jwksConfig);
 
-  jwkClient.getSigningKey(kid, (err, key) => {
-    if (err) {
-      logger.error({ err, authority, jwksUri: jwksConfig?.jwksUri }, 'Failed to get JWK for request token.');
-      // eslint-disable-next-line unicorn/no-useless-undefined
-      cb(err, undefined);
-      return;
-    }
-    logger.trace({ authority }, 'JWK found');
-    cb(null, key.getPublicKey());
-  });
+    jwkClient.getSigningKey(kid, (err, key) => {
+      if (err) {
+        logger.error({ err, authority, jwksUri: jwksConfig?.jwksUri }, 'Failed to get JWK for request token.');
+        // eslint-disable-next-line unicorn/no-useless-undefined
+        cb(err, undefined);
+        return;
+      }
+      logger.trace({ authority }, 'JWK found');
+      cb(null, key.getPublicKey());
+    });
+  } catch (err) {
+    logger.error({ err, issuerConfig }, 'Failed to get JWK config.');
+    // eslint-disable-next-line unicorn/no-useless-undefined
+    cb(err, undefined);
+    return;
+  }
 }

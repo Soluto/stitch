@@ -92,6 +92,19 @@ describe('Authentication - Verify JWT', () => {
     expect(logs).toMatchSnapshot('gateway logs');
   });
 
+  test('JWK uri is not resolved', async () => {
+    const accessToken = await getToken({ tokenEndpoint: 'http://localhost:8071/connect/token' });
+    gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
+
+    const endContainerOutputCapture = await startContainerOutputCapture('gateway');
+    const result = await gatewayClient.request(query).catch(e => e.response);
+    expect(result).toMatchSnapshot();
+
+    const captureResult = await endContainerOutputCapture();
+    const logs = formatLogs(captureResult);
+    expect(logs).toMatchSnapshot('gateway logs');
+  });
+
   test('Second call with valid JWT - JWKs caching', async () => {
     const accessToken = await getToken();
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
