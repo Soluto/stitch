@@ -59,6 +59,7 @@ describe('Default default upstream', () => {
   afterAll(async () => {
     await dispose();
     await fs.unlink(process.env.FS_RESOURCE_REPOSITORY_PATH!);
+    nock.cleanAll();
   });
 
   test('should pass authorization header from incoming request to outgoing one', async () => {
