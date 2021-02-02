@@ -29,7 +29,7 @@ export class GqlDirective extends SchemaDirectiveVisitor {
             url: new URL(url),
           },
           this.context.resourceGroup,
-          this.context.activeDirectoryAuth,
+          context?.graphqlContext?.activeDirectoryAuth,
           context?.graphqlContext?.request as FastifyRequest
         );
         return { ...requestParams, uri: requestParams.url };
