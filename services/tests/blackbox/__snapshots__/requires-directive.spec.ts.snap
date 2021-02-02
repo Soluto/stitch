@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`@requires directive Make query 1`] = `
+Object {
+  "baz": Object {
+    "bar": "BAR TAZ BAR",
+  },
+}
+`;
