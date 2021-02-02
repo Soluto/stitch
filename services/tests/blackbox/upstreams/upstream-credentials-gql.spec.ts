@@ -6,26 +6,29 @@ import { FastifyInstance } from 'fastify';
 import { makeExecutableSchema } from 'graphql-tools';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { createServer as createGateway } from '../../../src/gateway';
-import { ResourceGroup, Schema, Upstream } from '../../../src/modules/resource-repository';
-import { getInvalidToken } from '../../helpers/get-token';
+import { ResourceGroup, Schema, Upstream, UpstreamClientCredentials } from '../../../src/modules/resource-repository';
 import { RemoteSchema } from '../../../src/modules/directives/gql';
+import { AuthType } from '../../../src/modules/registry-schema';
 
-describe('Upstream for @gql directive', () => {
+describe('UpstreamCredentials for @gql directive', () => {
   const remoteServer = 'http://remote-server';
-  const xApiClient = 'frontend-app';
-  const jwtIssuer = 'https://oidc-provider';
+  const oidcProvider = 'http://oidc-provider';
+  const tokenEndpointPath = '/oauth2/token';
+  const access_token = `JWT for ${remoteServer}`;
+
+  const clientId = 'stitch-client-id';
+  const clientSecret = 'stitch-client-secret';
 
   let app: FastifyInstance;
   let dispose: () => Promise<void>;
 
   let remoteServerScope: nock.Scope;
 
-  let token: string;
+  let oidcProviderDiscoveryScope: nock.Scope;
+  let oidcProviderTokenScope: nock.Scope;
 
   beforeAll(async () => {
     expect.addSnapshotSerializer(GraphQLErrorSerializer);
-
-    token = await getInvalidToken({ issuer: jwtIssuer });
 
     const remoteSchema = makeExecutableSchema({
       typeDefs: gql`
@@ -40,10 +43,20 @@ describe('Upstream for @gql directive', () => {
       },
     });
 
+    const basicAuthBase64 = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+
+    oidcProviderDiscoveryScope = nock(oidcProvider)
+      .get('/.well-known/oauth-authorization-server')
+      .reply(200, { token_endpoint: `${oidcProvider}${tokenEndpointPath}` });
+
+    oidcProviderTokenScope = nock(oidcProvider)
+      .post(tokenEndpointPath)
+      .matchHeader('authorization', `Basic ${basicAuthBase64}`)
+      .reply(200, { access_token });
+
     remoteServerScope = nock(remoteServer)
       .post('/graphql')
-      .matchHeader('x-jwt-issuer', jwtIssuer)
-      .matchHeader('x-api-client', xApiClient)
+      .matchHeader('authorization', `Bearer ${access_token}`)
       .reply(200, (_, body: any) =>
         graphqlSync({
           schema: remoteSchema,
@@ -56,7 +69,7 @@ describe('Upstream for @gql directive', () => {
     const schema: Schema = {
       metadata: {
         namespace: 'blackbox',
-        name: 'upstream-for-gql',
+        name: 'upstream-credentials-gql',
       },
       schema: print(gql`
         type Query {
@@ -68,19 +81,29 @@ describe('Upstream for @gql directive', () => {
     const upstream: Upstream = {
       metadata: {
         namespace: 'blackbox',
-        name: 'upstream-for-gql',
+        name: 'upstream-credentials-gql',
       },
       sourceHosts: [new URL(remoteServer).host],
-      headers: [
-        {
-          name: 'x-api-client',
-          value: '{incomingRequest?.headers?.["x-api-client"]}',
+      auth: {
+        type: AuthType.ActiveDirectory,
+        activeDirectory: {
+          authority: oidcProvider,
+          resource: 'remote-graphql-service-scope',
         },
-        {
-          name: 'x-jwt-issuer',
-          value: '{jwt?.payload?.iss}',
-        },
-      ],
+      },
+    };
+
+    const upstreamCredentials: UpstreamClientCredentials = {
+      metadata: {
+        namespace: 'blackbox',
+        name: 'upstream-credentials-gql',
+      },
+      authType: AuthType.ActiveDirectory,
+      activeDirectory: {
+        authority: oidcProvider,
+        clientId,
+        clientSecret,
+      },
     };
 
     const remoteSchemaResource: RemoteSchema = {
@@ -91,7 +114,7 @@ describe('Upstream for @gql directive', () => {
     const resources: ResourceGroup = {
       schemas: [schema],
       upstreams: [upstream],
-      upstreamClientCredentials: [],
+      upstreamClientCredentials: [upstreamCredentials],
       policies: [],
       remoteSchemas: [remoteSchemaResource],
     };
@@ -120,15 +143,13 @@ describe('Upstream for @gql directive', () => {
       method: 'POST',
       url: '/graphql',
       payload,
-      headers: {
-        authorization: `Bearer ${token}`,
-        ['x-api-client']: xApiClient,
-      },
     });
 
     expect(response.statusCode).toEqual(200);
     expect(response.json().data).toMatchSnapshot();
 
+    expect(oidcProviderDiscoveryScope.isDone()).toBeTruthy();
+    expect(oidcProviderTokenScope.isDone()).toBeTruthy();
     expect(remoteServerScope.isDone()).toBeTruthy();
   });
 });

@@ -10,8 +10,8 @@ export interface TokenOptions {
 }
 
 const defaultGetTokenOptions: TokenOptions = {
-  clientId: 'gateway-client-id',
-  clientSecret: 'gateway-client-secret',
+  clientId: 'e2e-client-id',
+  clientSecret: 'e2e-client-secret',
   scope: 'stitch-gateway',
   tokenEndpoint: 'http://localhost:8060/connect/token',
 };
@@ -43,7 +43,7 @@ export interface InvalidTokenOptions {
 }
 
 const defaultInvalidTokenOptions: InvalidTokenOptions = {
-  clientId: 'gateway-client-id',
+  clientId: 'e2e-client-id',
   scope: ['stitch-gateway'],
   issuer: 'http://localhost:8070',
   audience: 'Stitch Gateway',

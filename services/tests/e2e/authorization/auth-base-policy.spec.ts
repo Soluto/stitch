@@ -1,12 +1,10 @@
 import { GraphQLClient } from 'graphql-request';
 import { sleep } from '../../helpers/utility';
 import {
-  createSchemaMutation,
-  createPolicyMutation,
-  UpdateSchemasMutationResponse,
-  CreatePolicyMutationResponse,
-  UpdateBasePolicyMutationResponse,
-  createBasePolicyMutation,
+  RegistryMutationResponse,
+  updateBasePolicyMutation,
+  updatePoliciesMutation,
+  updateSchemasMutation,
 } from '../../helpers/registry-request-builder';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { Policy } from '../../../src/modules/directives/policy/types';
@@ -35,32 +33,30 @@ describe('Authorization - Base policy', () => {
   beforeAll(async () => {
     expect.addSnapshotSerializer(GraphQLErrorSerializer);
 
-    const policiesResponse: CreatePolicyMutationResponse = await registryClient.request(createPolicyMutation, {
+    const policiesResponse = await registryClient.request<RegistryMutationResponse>(updatePoliciesMutation, {
       policies,
     });
-    expect(policiesResponse.updatePolicies.success).toBeTruthy();
+    expect(policiesResponse.result.success).toBeTruthy();
 
-    const schemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {
+    const schemaResponse = await registryClient.request<RegistryMutationResponse>(updateSchemasMutation, {
       schema,
     });
-    expect(schemaResponse.updateSchemas.success).toBeTruthy();
+    expect(schemaResponse.result.success).toBeTruthy();
 
-    const basePolicyResponse: UpdateBasePolicyMutationResponse = await registryClient.request(
-      createBasePolicyMutation,
-      { basePolicy }
-    );
-    expect(basePolicyResponse.updateBasePolicy.success).toBeTruthy();
+    const basePolicyResponse = await registryClient.request<RegistryMutationResponse>(updateBasePolicyMutation, {
+      basePolicy,
+    });
+    expect(basePolicyResponse.result.success).toBeTruthy();
 
     // Wait for gateway to update before next tests
     await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
   });
 
   afterAll(async () => {
-    const basePolicyResponse: UpdateBasePolicyMutationResponse = await registryClient.request(
-      createBasePolicyMutation,
-      { basePolicy: defaultBasePolicy }
-    );
-    expect(basePolicyResponse.updateBasePolicy.success).toBeTruthy();
+    const basePolicyResponse = await registryClient.request<RegistryMutationResponse>(updateBasePolicyMutation, {
+      basePolicy: defaultBasePolicy,
+    });
+    expect(basePolicyResponse.result.success).toBeTruthy();
 
     // Wait for gateway to update before next tests
     await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);

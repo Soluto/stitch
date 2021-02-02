@@ -80,6 +80,7 @@ describe('Upstream headers', () => {
   afterAll(async () => {
     await dispose();
     await fs.unlink(process.env.FS_RESOURCE_REPOSITORY_PATH!);
+    nock.cleanAll();
   });
 
   test('should add headers from incoming request headers and jwt claims to outgoing request', async () => {

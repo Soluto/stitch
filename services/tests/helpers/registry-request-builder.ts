@@ -1,50 +1,40 @@
 import { gql } from 'apollo-server-core';
 import { print } from 'graphql';
-import { Schema } from '../../src/modules/resource-repository';
 
-export const createPolicyMutation = print(gql`
-  mutation CreatePolicy($policies: [PolicyInput!]!) {
-    updatePolicies(input: $policies) {
+export const updatePoliciesMutation = print(gql`
+  mutation UpdatePolicies($policies: [PolicyInput!]!) {
+    result: updatePolicies(input: $policies) {
       success
     }
   }
 `);
 
-export const createSchemaMutation = print(gql`
-  mutation CreateSchema($schema: SchemaInput!) {
-    updateSchemas(input: [$schema]) {
+export const updateSchemasMutation = print(gql`
+  mutation UpdateSchemas($schema: SchemaInput!) {
+    result: updateSchemas(input: [$schema]) {
       success
     }
   }
 `);
 
-export const createBasePolicyMutation = print(gql`
+export const updateBasePolicyMutation = print(gql`
   mutation UpdateBasePolicy($basePolicy: BasePolicyInput!) {
-    updateBasePolicy(input: $basePolicy) {
+    result: updateBasePolicy(input: $basePolicy) {
       success
     }
   }
 `);
 
-export const emptySchema = (schema: Schema): Schema => ({
-  metadata: schema.metadata,
-  schema: '',
-});
+export const updateResourceGroupMutation = print(gql`
+  mutation UpdateResourceGroupMutation($resourceGroup: ResourceGroupInput!) {
+    result: updateResourceGroup(input: $resourceGroup) {
+      success
+    }
+  }
+`);
 
-export interface CreatePolicyMutationResponse {
-  updatePolicies: {
-    success: boolean;
-  };
-}
-
-export interface UpdateSchemasMutationResponse {
-  updateSchemas: {
-    success: boolean;
-  };
-}
-
-export interface UpdateBasePolicyMutationResponse {
-  updateBasePolicy: {
+export interface RegistryMutationResponse {
+  result: {
     success: boolean;
   };
 }

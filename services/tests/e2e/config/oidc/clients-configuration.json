@@ -4,6 +4,15 @@
     "ClientSecrets": ["gateway-client-secret"],
     "Description": "Stitch gateway calling API",
     "AllowedGrantTypes": ["client_credentials"],
+    "AllowedScopes": ["some-rest-service"],
+    "ClientClaimsPrefix": "",
+    "Claims": []
+  },
+  {
+    "ClientId": "e2e-client-id",
+    "ClientSecrets": ["e2e-client-secret"],
+    "Description": "Stitch gateway calling API",
+    "AllowedGrantTypes": ["client_credentials"],
     "AllowedScopes": ["stitch-gateway"],
     "ClientClaimsPrefix": "",
     "Claims": []
@@ -11,7 +20,7 @@
   {
     "Description": "JWT pass none of policies",
     "ClientId": "e2e-base-policy-1-client-id",
-    "ClientSecrets": ["gateway-client-secret"],
+    "ClientSecrets": ["e2e-client-secret"],
     "AllowedGrantTypes": ["client_credentials"],
     "AllowedScopes": ["stitch-gateway"],
     "ClientClaimsPrefix": "",
@@ -24,7 +33,7 @@
   {
     "Description": "JWT pass all policies",
     "ClientId": "e2e-base-policy-2-client-id",
-    "ClientSecrets": ["gateway-client-secret"],
+    "ClientSecrets": ["e2e-client-secret"],
     "AllowedGrantTypes": ["client_credentials"],
     "AllowedScopes": ["stitch-gateway"],
     "ClientClaimsPrefix": "",
@@ -37,7 +46,7 @@
   {
     "Description": "JWT pass only base policy",
     "ClientId": "e2e-base-policy-3-client-id",
-    "ClientSecrets": ["gateway-client-secret"],
+    "ClientSecrets": ["e2e-client-secret"],
     "AllowedGrantTypes": ["client_credentials"],
     "AllowedScopes": ["stitch-gateway"],
     "ClientClaimsPrefix": "",
@@ -50,7 +59,7 @@
   {
     "Description": "JWT pass only regular policy",
     "ClientId": "e2e-base-policy-4-client-id",
-    "ClientSecrets": ["gateway-client-secret"],
+    "ClientSecrets": ["e2e-client-secret"],
     "AllowedGrantTypes": ["client_credentials"],
     "AllowedScopes": ["stitch-gateway"],
     "ClientClaimsPrefix": "",
@@ -63,7 +72,7 @@
   {
     "Description": "JWT pass only override policy",
     "ClientId": "e2e-base-policy-5-client-id",
-    "ClientSecrets": ["gateway-client-secret"],
+    "ClientSecrets": ["e2e-client-secret"],
     "AllowedGrantTypes": ["client_credentials"],
     "AllowedScopes": ["stitch-gateway"],
     "ClientClaimsPrefix": "",
@@ -76,7 +85,7 @@
   {
     "Description": "JWT pass base and regular policy",
     "ClientId": "e2e-base-policy-6-client-id",
-    "ClientSecrets": ["gateway-client-secret"],
+    "ClientSecrets": ["e2e-client-secret"],
     "AllowedGrantTypes": ["client_credentials"],
     "AllowedScopes": ["stitch-gateway"],
     "ClientClaimsPrefix": "",
@@ -89,7 +98,7 @@
   {
     "Description": "JWT pass regular and override policy",
     "ClientId": "e2e-base-policy-7-client-id",
-    "ClientSecrets": ["gateway-client-secret"],
+    "ClientSecrets": ["e2e-client-secret"],
     "AllowedGrantTypes": ["client_credentials"],
     "AllowedScopes": ["stitch-gateway"],
     "ClientClaimsPrefix": "",
@@ -102,7 +111,7 @@
   {
     "Description": "Allows access to a field based on JWT info",
     "ClientId": "e2e-jwt-allowed-client-id",
-    "ClientSecrets": ["gateway-client-secret"],
+    "ClientSecrets": ["e2e-client-secret"],
     "AllowedGrantTypes": ["client_credentials"],
     "AllowedScopes": ["stitch-gateway"],
     "ClientClaimsPrefix": "",
@@ -115,7 +124,7 @@
   {
     "Description": "Rejects access to a field based on JWT info",
     "ClientId": "e2e-jwt-disallowed-client-id",
-    "ClientSecrets": ["gateway-client-secret"],
+    "ClientSecrets": ["e2e-client-secret"],
     "AllowedGrantTypes": ["client_credentials"],
     "AllowedScopes": ["stitch-gateway"],
     "ClientClaimsPrefix": "",

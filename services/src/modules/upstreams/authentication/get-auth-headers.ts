@@ -7,9 +7,6 @@ export async function getAuthHeaders(
   upstreamClientCredentials: UpstreamClientCredentials[],
   activeDirectoryAuth: ActiveDirectoryAuth
 ) {
-  // Try AD auth
-  // TODO: Store upstreams in map for quick lookup
-
   if (!upstream.auth) return;
 
   // TODO: Store upstreamClientCredentials in map for quick lookup
@@ -18,6 +15,10 @@ export async function getAuthHeaders(
   );
   if (!credentials) return;
 
+  logger.trace(
+    { authority: credentials.activeDirectory.authority },
+    `Upstream credentials found for authority: ${credentials.activeDirectory.authority}. Acquiring auth token...`
+  );
   try {
     const token = await activeDirectoryAuth.getToken(
       credentials.activeDirectory.authority,
@@ -25,7 +26,7 @@ export async function getAuthHeaders(
       credentials.activeDirectory.clientSecret,
       upstream.auth.activeDirectory.resource
     );
-
+    logger.trace({ authority: credentials.activeDirectory.authority }, 'Auth token has been acquired successfully.');
     return {
       Authorization: `Bearer ${token}`,
     };

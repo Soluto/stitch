@@ -1,7 +1,7 @@
 import { GraphQLClient } from 'graphql-request';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { sleep } from '../../helpers/utility';
-import { UpdateSchemasMutationResponse, createSchemaMutation } from '../../helpers/registry-request-builder';
+import { RegistryMutationResponse, updateSchemasMutation } from '../../helpers/registry-request-builder';
 import { getToken, getInvalidToken } from '../../helpers/get-token';
 import { startContainerOutputCapture } from '../../helpers/get-container-logs';
 import { schema, query } from './verify-jwt.schema';
@@ -22,10 +22,10 @@ describe('Authentication - Verify JWT', () => {
   });
 
   test('Setup policies', async () => {
-    const schemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {
+    const schemaResponse = await registryClient.request<RegistryMutationResponse>(updateSchemasMutation, {
       schema,
     });
-    expect(schemaResponse.updateSchemas.success).toBeTruthy();
+    expect(schemaResponse.result.success).toBeTruthy();
 
     // Wait for gateway to update before next tests
     await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);

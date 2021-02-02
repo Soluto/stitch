@@ -3,11 +3,7 @@ import { gql } from 'apollo-server-core';
 import { GraphQLClient } from 'graphql-request';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { sleep } from '../../helpers/utility';
-import {
-  createSchemaMutation,
-  UpdateSchemasMutationResponse,
-  emptySchema,
-} from '../../helpers/registry-request-builder';
+import { RegistryMutationResponse, updateSchemasMutation } from '../../helpers/registry-request-builder';
 import { getToken } from '../../helpers/get-token';
 import { schema, schemaCrashesPlugin } from './plugins.schema';
 
@@ -32,16 +28,6 @@ describe('Plugins', () => {
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
   });
 
-  afterAll(async () => {
-    const schemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {
-      schema: emptySchema(schema),
-    });
-    expect(schemaResponse.updateSchemas.success).toBeTruthy();
-
-    // Wait for gateway to update before next tests
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
-  });
-
   test('List plugins', async () => {
     const query = print(gql`
       query {
@@ -60,10 +46,10 @@ describe('Plugins', () => {
   });
 
   test('Setup schema', async () => {
-    const schemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {
+    const schemaResponse = await registryClient.request<RegistryMutationResponse>(updateSchemasMutation, {
       schema: schema,
     });
-    expect(schemaResponse.updateSchemas.success).toBeTruthy();
+    expect(schemaResponse.result.success).toBeTruthy();
 
     // Wait for gateway to update
     await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
@@ -76,7 +62,7 @@ describe('Plugins', () => {
 
   test('Plugin crashes', async () => {
     const result = await registryClient
-      .request(createSchemaMutation, {
+      .request<RegistryMutationResponse>(updateSchemasMutation, {
         schema: schemaCrashesPlugin,
       })
       .catch(e => e.response);

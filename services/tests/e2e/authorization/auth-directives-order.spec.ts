@@ -2,11 +2,9 @@ import { print } from 'graphql';
 import { GraphQLClient } from 'graphql-request';
 import { gql } from 'apollo-server-core';
 import {
-  emptySchema,
-  createSchemaMutation,
-  CreatePolicyMutationResponse,
-  createPolicyMutation,
-  UpdateSchemasMutationResponse,
+  RegistryMutationResponse,
+  updatePoliciesMutation,
+  updateSchemasMutation,
 } from '../../helpers/registry-request-builder';
 import { sleep } from '../../helpers/utility';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
@@ -27,26 +25,16 @@ describe('Authorization - Policy directive order', () => {
     expect.addSnapshotSerializer(GraphQLErrorSerializer);
   });
 
-  afterAll(async () => {
-    const schemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {
-      schema: emptySchema(schema),
-    });
-    expect(schemaResponse.updateSchemas.success).toBeTruthy();
-
-    // Wait for gateway to update before next tests
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
-  });
-
   test('Setup policies', async () => {
-    const policyResponse: CreatePolicyMutationResponse = await registryClient.request(createPolicyMutation, {
+    const policyResponse = await registryClient.request<RegistryMutationResponse>(updatePoliciesMutation, {
       policies,
     });
-    expect(policyResponse.updatePolicies.success).toBeTruthy();
+    expect(policyResponse.result.success).toBeTruthy();
 
-    const schemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {
+    const schemaResponse = await registryClient.request<RegistryMutationResponse>(updateSchemasMutation, {
       schema,
     });
-    expect(schemaResponse.updateSchemas.success).toBeTruthy();
+    expect(schemaResponse.result.success).toBeTruthy();
 
     // Wait for gateway to update before next tests
     await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);

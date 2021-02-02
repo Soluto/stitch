@@ -1,11 +1,9 @@
 import { GraphQLClient } from 'graphql-request';
 import { sleep } from '../../helpers/utility';
 import {
-  createSchemaMutation,
-  createPolicyMutation,
-  emptySchema,
-  CreatePolicyMutationResponse,
-  UpdateSchemasMutationResponse,
+  RegistryMutationResponse,
+  updatePoliciesMutation,
+  updateSchemasMutation,
 } from '../../helpers/registry-request-builder';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { getToken } from '../../helpers/get-token';
@@ -57,26 +55,16 @@ describe('Policies directive', () => {
     gatewayClient.setHeader('Authorization', `Bearer ${defaultAccessToken}`);
   });
 
-  afterAll(async () => {
-    const schemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {
-      schema: emptySchema(schema),
-    });
-    expect(schemaResponse.updateSchemas.success).toBeTruthy();
-
-    // Wait for gateway to update before next tests
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
-  });
-
   test('Setup policies', async () => {
-    const policyResponse: CreatePolicyMutationResponse = await registryClient.request(createPolicyMutation, {
+    const policyResponse = await registryClient.request<RegistryMutationResponse>(updatePoliciesMutation, {
       policies,
     });
-    expect(policyResponse.updatePolicies.success).toBeTruthy();
+    expect(policyResponse.result.success).toBeTruthy();
 
-    const schemaResponse: UpdateSchemasMutationResponse = await registryClient.request(createSchemaMutation, {
+    const schemaResponse = await registryClient.request<RegistryMutationResponse>(updateSchemasMutation, {
       schema,
     });
-    expect(schemaResponse.updateSchemas.success).toBeTruthy();
+    expect(schemaResponse.result.success).toBeTruthy();
 
     // Wait for gateway to update before next tests
     await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
