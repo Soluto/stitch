@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import { createHttpLink } from 'apollo-link-http';
-import { ObjectTypeDefinitionNode, parse, printSchema, StringValueNode } from 'graphql';
+import { ObjectTypeDefinitionNode, ObjectTypeExtensionNode, parse, printSchema, StringValueNode } from 'graphql';
 import { introspectSchema } from 'graphql-tools';
 import { ApolloError } from 'apollo-server-core';
 import { ApolloLink } from 'apollo-link';
@@ -24,8 +24,8 @@ export async function updateRemoteGqlSchemas(resourceGroup: ResourceGroup, conte
   for (const { schema } of resourceGroup.schemas) {
     const typeDefs = parse(schema);
     const objectTypeDefinitions = typeDefs.definitions.filter(
-      d => d.kind === 'ObjectTypeDefinition'
-    ) as ObjectTypeDefinitionNode[];
+      d => d.kind === 'ObjectTypeDefinition' || d.kind === 'ObjectTypeExtension'
+    ) as (ObjectTypeDefinitionNode | ObjectTypeExtensionNode)[];
 
     for (const { fields } of objectTypeDefinitions) {
       if (!fields) continue;
@@ -49,23 +49,23 @@ export async function updateRemoteGqlSchemas(resourceGroup: ResourceGroup, conte
         }
       }
     }
-
-    const gqlIntrospectUrls = Array.from(urls);
-    const newSchemas = await Promise.all(
-      gqlIntrospectUrls.map(async url => ({
-        url,
-        schema: await fetchRemoteGqlSchema(url, resourceGroup, context),
-      }))
-    );
-    if (!newSchemas || newSchemas.length === 0) return;
-
-    if (!resourceGroup.remoteSchemas) {
-      resourceGroup.remoteSchemas = [];
-    }
-    resourceGroup.remoteSchemas.push(...newSchemas);
-
-    _.remove(resourceGroup.remoteSchemas, rs => unusedRemoteSchemas.has(rs.url));
   }
+
+  const gqlIntrospectUrls = Array.from(urls);
+  const newSchemas = await Promise.all(
+    gqlIntrospectUrls.map(async url => ({
+      url,
+      schema: await fetchRemoteGqlSchema(url, resourceGroup, context),
+    }))
+  );
+  if (!newSchemas || newSchemas.length === 0) return;
+
+  if (!resourceGroup.remoteSchemas) {
+    resourceGroup.remoteSchemas = [];
+  }
+  resourceGroup.remoteSchemas.push(...newSchemas);
+
+  _.remove(resourceGroup.remoteSchemas, rs => unusedRemoteSchemas.has(rs.url));
 }
 
 async function fetchRemoteGqlSchema(url: string, resourceGroup: ResourceGroup, context: RegistryRequestContext) {
