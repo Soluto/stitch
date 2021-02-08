@@ -5,6 +5,8 @@
 import {
   DocumentNode,
   visit,
+  EnumValueDefinitionNode,
+  EnumTypeDefinitionNode,
   FieldDefinitionNode,
   ASTNode,
   InterfaceTypeDefinitionNode,
@@ -22,7 +24,6 @@ import { composeAndValidate } from '@apollo/federation';
 import { ApolloError } from 'apollo-server-core';
 import createTypeResolvers from './implicit-type-resolver';
 import { knownApolloDirectives } from './config';
-
 interface DirectiveVisitors {
   [directiveName: string]: typeof SchemaDirectiveVisitor;
 }
@@ -37,6 +38,8 @@ interface FederatedSchemaBase {
 
 type DirectivesUsagesByObjectName = Record<string, DirectiveNode[]>;
 type DirectivesUsagesByObjectAndFieldNames = Record<string, Record<string, DirectiveNode[]>>;
+type DirectivesUsagesByEnumName = Record<string, Record<string, DirectiveNode>>;
+type DirectivesUsagesByEnumNameAndValue = Record<string, Record<string, Record<string, DirectiveNode>>>;
 
 export function buildSchemaFromFederatedTypeDefs({
   typeDefs,
@@ -49,13 +52,19 @@ export function buildSchemaFromFederatedTypeDefs({
 
   // Remove non-federation directives from SDL, save them aside
   const serviceDefinitions = Object.entries(typeDefs).map(([name, originalTypeDef]) => {
-    const { objectTypeDirectivesUsages, fieldDefinitionDirectivesUsages, typeDef } = collectAndRemoveCustomDirectives(
-      originalTypeDef
-    );
+    const {
+      objectTypeDirectivesUsages,
+      fieldDefinitionDirectivesUsages,
+      enumTypeDirectivesUsages,
+      enumValueDirectivesUsages,
+      typeDef,
+    } = collectAndRemoveCustomDirectives(originalTypeDef);
 
     return {
       objectTypeDirectivesUsages,
       fieldDefinitionDirectivesUsages,
+      enumTypeDirectivesUsages,
+      enumValueDirectivesUsages,
       typeDefs: concatAST([baseTypeDefs, typeDef]),
       name,
       url: `https://stitch/${name}`,
@@ -75,12 +84,21 @@ export function buildSchemaFromFederatedTypeDefs({
   const objectTypeDirectives = mergeObjectTypeDirectivesUsages(
     serviceDefinitions.map(sd => sd.objectTypeDirectivesUsages)
   );
-  const fieldDefinitionDirectivesUsages = mergeFieldDefinitionDirectivesUsages(
+  const fieldDefinitionDirectives = mergeFieldDefinitionDirectivesUsages(
     serviceDefinitions.map(sd => sd.fieldDefinitionDirectivesUsages)
   );
+
+  const enumTypeDirectives = mergeEnumTypeDirectivesUsages(serviceDefinitions.map(sd => sd.enumTypeDirectivesUsages));
+
+  const enumValueDirectives = mergeEnumValueDirectivesUsages(
+    serviceDefinitions.map(sd => sd.enumValueDirectivesUsages)
+  );
+
   const fullTypeDefWithDirectives = addDirectivesToTypeDefs(
     objectTypeDirectives,
-    fieldDefinitionDirectivesUsages,
+    fieldDefinitionDirectives,
+    enumTypeDirectives,
+    enumValueDirectives,
     fullTypeDefWithoutDirectives
   );
 
@@ -103,6 +121,8 @@ export function buildSchemaFromFederatedTypeDefs({
 function addDirectivesToTypeDefs(
   objectTypeDirectives: DirectivesUsagesByObjectName,
   fieldDefinitionDirectives: DirectivesUsagesByObjectAndFieldNames,
+  enumTypeDirectives: DirectivesUsagesByEnumName,
+  enumValueDirectives: DirectivesUsagesByEnumNameAndValue,
   typeDef: DocumentNode
 ): DocumentNode {
   return visit(typeDef, {
@@ -134,12 +154,42 @@ function addDirectivesToTypeDefs(
       const existingDirectives = node.directives ?? [];
       return { ...node, directives: [...existingDirectives, ...fieldDirectives] };
     },
+
+    EnumTypeDefinition(node) {
+      const enumDirectives = enumTypeDirectives[node.name.value];
+
+      if (!enumDirectives || Object.keys(enumDirectives).length === 0) {
+        return;
+      }
+
+      const existingDirectives = node.directives ?? [];
+      return { ...node, directives: [...existingDirectives, ...Object.values(enumDirectives)] };
+    },
+
+    EnumValueDefinition(node, _key, _parent, _path, ancestors) {
+      const enumNode = ancestors[ancestors.length - 1] as ASTNode;
+      if (!isEnumTypeDefinitionNode(enumNode)) {
+        throw new Error(`Expected EnumTypeDefinitionNode, found ${enumNode.kind}`);
+      }
+
+      const enumValDirectives =
+        enumValueDirectives[enumNode.name.value] && enumValueDirectives[enumNode.name.value][node.name.value];
+
+      if (!enumValDirectives || Object.keys(enumValDirectives).length === 0) {
+        return;
+      }
+
+      const existingDirectives = node.directives ?? [];
+      return { ...node, directives: [...existingDirectives, ...Object.values(enumValDirectives)] };
+    },
   });
 }
 
 export function collectAndRemoveCustomDirectives(typeDef: DocumentNode) {
   const objectTypeDirectivesUsages: DirectivesUsagesByObjectName = {};
   const fieldDefinitionDirectivesUsages: DirectivesUsagesByObjectAndFieldNames = {};
+  const enumTypeDirectivesUsages: DirectivesUsagesByEnumName = {};
+  const enumValueDirectivesUsages: DirectivesUsagesByEnumNameAndValue = {};
 
   const typeDefWithoutDirectives = visit(typeDef, {
     Directive(node, _key, _parent, _path, ancestors) {
@@ -155,6 +205,19 @@ export function collectAndRemoveCustomDirectives(typeDef: DocumentNode) {
           objectTypeDirectivesUsages[objectName] = [];
         }
         objectTypeDirectivesUsages[objectName].push(node);
+
+        return null;
+      }
+
+      if (isEnumTypeDefinitionNode(objectNode)) {
+        const enumName = objectNode.name.value;
+
+        if (!(enumName in enumTypeDirectivesUsages)) {
+          enumTypeDirectivesUsages[enumName] = {};
+        }
+        if (!(node.name.value in enumTypeDirectivesUsages[enumName])) {
+          enumTypeDirectivesUsages[enumName][node.name.value] = node;
+        }
 
         return null;
       }
@@ -181,15 +244,53 @@ export function collectAndRemoveCustomDirectives(typeDef: DocumentNode) {
 
         return null;
       }
+
+      if (isEnumTypeDefinitionNode(objectNode)) {
+        const enumValueNode = ancestors[ancestors.length - 1] as ASTNode;
+        if (!isEnumValueDefinitionNode(enumValueNode)) {
+          throw new Error(`Expected EnumValueDefinitionNode, found ${enumValueNode.kind}`);
+        }
+
+        const enumName = objectNode.name.value;
+        const enumValueName = enumValueNode.name.value;
+
+        if (!(enumName in enumValueDirectivesUsages)) {
+          enumValueDirectivesUsages[enumName] = {};
+        }
+
+        if (!(enumValueName in enumValueDirectivesUsages[enumName])) {
+          enumValueDirectivesUsages[enumName][enumValueName] = {};
+        }
+
+        if (!(node.name.value in enumValueDirectivesUsages[enumName][enumValueName])) {
+          enumValueDirectivesUsages[enumName][enumValueName][node.name.value] = node;
+        }
+
+        return null;
+      }
       throw new Error(`Expected {Object,Interface}Type{Definition,Extension}Node, found ${objectNode.kind}`);
     },
   }) as DocumentNode;
 
-  return { objectTypeDirectivesUsages, fieldDefinitionDirectivesUsages, typeDef: typeDefWithoutDirectives };
+  return {
+    objectTypeDirectivesUsages,
+    fieldDefinitionDirectivesUsages,
+    enumTypeDirectivesUsages,
+    enumValueDirectivesUsages,
+    typeDef: typeDefWithoutDirectives,
+  };
 }
 
 function isFieldDefinitionNode(node: ASTNode): node is FieldDefinitionNode {
   return node.kind === 'FieldDefinition';
+}
+
+function isEnumTypeDefinitionNode(node: ASTNode): node is EnumTypeDefinitionNode {
+  return node.kind === 'EnumTypeDefinition';
+}
+
+function isEnumValueDefinitionNode(node: ASTNode): node is EnumValueDefinitionNode {
+  return node.kind === 'EnumValueDefinition';
 }
 
 type ObjectOrInterfaceDefinitionOrExtension =
@@ -243,6 +344,49 @@ function mergeFieldDefinitionDirectivesUsages(dus: DirectivesUsagesByObjectAndFi
         }
 
         result[objectName][fieldName].push(...usages);
+      }
+    }
+  }
+
+  return result;
+}
+
+function mergeEnumTypeDirectivesUsages(dus: DirectivesUsagesByEnumName[]) {
+  const result: DirectivesUsagesByEnumName = {};
+
+  for (const du of dus) {
+    for (const objectName in du) {
+      const usages = du[objectName];
+
+      if (!(objectName in result)) {
+        result[objectName] = {};
+      }
+
+      result[objectName] = usages;
+    }
+  }
+
+  return result;
+}
+
+function mergeEnumValueDirectivesUsages(dus: DirectivesUsagesByEnumNameAndValue[]) {
+  const result: DirectivesUsagesByEnumNameAndValue = {};
+
+  for (const du of dus) {
+    for (const objectName in du) {
+      const fields = du[objectName];
+      for (const fieldName in fields) {
+        const usages = fields[fieldName];
+
+        if (!(objectName in result)) {
+          result[objectName] = {};
+        }
+
+        if (!(fieldName in result[objectName])) {
+          result[objectName][fieldName] = {};
+        }
+
+        result[objectName][fieldName] = usages;
       }
     }
   }

@@ -2,6 +2,7 @@ import { concatAST } from 'graphql';
 import { SchemaDirectiveVisitor } from 'graphql-tools';
 import { sdl as stubSdl, StubDirective } from './stub';
 import { sdl as localResolverSdl, LocalResolverDirective } from './local-resolver';
+import { sdl as enumResolverSdl, EnumValueDirective, EnumResolverDirective } from './enum-resolver';
 import { sdl as restSdl, RestDirective } from './rest';
 import { sdl as gqlSdl, GqlDirective } from './gql';
 import { sdl as exportSdl, ExportDirective } from './export';
@@ -27,6 +28,8 @@ export const directiveMap: { [visitorName: string]: typeof SchemaDirectiveVisito
   policies: PoliciesDirective,
   policyQuery: PolicyQueryDirective,
   localResolver: LocalResolverDirective,
+  enumResolver: EnumResolverDirective,
+  enumValue: EnumValueDirective,
 };
 
 export const sdl = concatAST([
@@ -39,6 +42,7 @@ export const sdl = concatAST([
   policiesSdl,
   policyQuerySdl,
   localResolverSdl,
+  enumResolverSdl,
 ]);
 
 export { policyScalarResolvers, policyBaseSdl };

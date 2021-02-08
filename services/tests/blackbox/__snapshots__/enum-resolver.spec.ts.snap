@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`@enumResolver directive Make query 1`] = `
+Object {
+  "bar": "Bar",
+  "baz": true,
+  "taz": true,
+}
+`;
