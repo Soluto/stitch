@@ -2,7 +2,7 @@ import { VM } from 'vm2';
 import { argumentInjectionGlobals } from '../plugins';
 
 const exprStart = /{/g;
-const fullCapture = /(^{[^{]+}$)|(^{{.+}}$)/g;
+const fullCapture = /(^{[^{]+}$)|(^{{.+}}$|^{\[.+]}$)/g;
 
 function evaluate<T>(template: string, data?: Record<string, unknown>): T {
   try {

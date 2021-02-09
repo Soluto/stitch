@@ -71,11 +71,27 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'Return value if not valid',
+    'Array builder',
+    {
+      template: '{[ { foo, bar } ]}',
+      data: { foo: 'Foo', bar: 'Bar' },
+      expected: [{ foo: 'Foo', bar: 'Bar' }],
+    },
+  ],
+  [
+    'Return value if not valid (object)',
     {
       template: '{{ foo, bar }',
       data: { foo: 'Foo', bar: 'Bar' },
       expected: '{{ foo, bar }',
+    },
+  ],
+  [
+    'Return value if not valid (array)',
+    {
+      template: '{[] { foo }}',
+      data: { foo: 'Foo' },
+      expected: '{[] { foo }}',
     },
   ],
 ];
