@@ -9,6 +9,7 @@ const loggerConfig: pino.LoggerOptions = {
 
 const devLoggerConfig: pino.LoggerOptions = {
   level: 'trace',
+  timestamp: true,
   prettyPrint: {
     colorize: true,
     translateTime: 'HH:MM:ss.l',
