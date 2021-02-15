@@ -13,7 +13,7 @@ declare module '../context' {
 
 function injectTemplate<T = unknown>(
   template: string,
-  params: GraphQLFieldResolverParams<unknown, Pick<RequestContext, 'exports' | 'request'> | undefined>,
+  params: GraphQLFieldResolverParams<unknown, Pick<RequestContext, 'exports' | 'request'> | undefined>
 ): T {
   const { source, args, context, info } = params;
   const data = {
@@ -24,6 +24,7 @@ function injectTemplate<T = unknown>(
     isAnonymousAccess: context?.request?.isAnonymousAccess?.(),
     exports: info && context && getExportsProxy(context.exports, info?.parentType, source as Record<string, unknown>),
     vars: info?.variableValues,
+    info,
   };
 
   return evaluate<T>(template, data);
@@ -31,7 +32,7 @@ function injectTemplate<T = unknown>(
 
 export function inject(
   input: unknown,
-  params: GraphQLFieldResolverParams<unknown, Pick<RequestContext, 'exports' | 'request'> | undefined>,
+  params: GraphQLFieldResolverParams<unknown, Pick<RequestContext, 'exports' | 'request'> | undefined>
 ): unknown {
   if (typeof input === 'string') return injectTemplate(input, params);
 

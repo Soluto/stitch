@@ -36,6 +36,19 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
+    'From info',
+    {
+      input: '{info["schema"]}',
+      params: {
+        source: null,
+        args: {},
+        context: {} as any,
+        info: ({ schema: 'some-schema' } as unknown) as any,
+      },
+      expected: 'some-schema',
+    },
+  ],
+  [
     'From headers',
     {
       input: '{headers["x-client-id"]}',
