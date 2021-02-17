@@ -1,5 +1,5 @@
 {
-  "version": "0.0.14",
+  "version": "0.0.15",
   "commands": {
     "apply:base-policy": {
       "id": "apply:base-policy",
@@ -87,6 +87,45 @@
         }
       },
       "args": [{ "name": "resourcesPath", "required": true }]
+    },
+    "refresh:remote-schema": {
+      "id": "refresh:remote-schema",
+      "description": "Refresh remote schema",
+      "pluginName": "stitch-cli",
+      "pluginType": "core",
+      "aliases": [],
+      "examples": [
+        "$ stitch refresh:remote-schema http://remote-graphql-server/graphql\nRemote schema refreshed successfully!\n"
+      ],
+      "flags": {
+        "registry-url": {
+          "name": "registry-url",
+          "type": "option",
+          "description": "Url of the registry",
+          "required": true
+        },
+        "authorization-header": {
+          "name": "authorization-header",
+          "type": "option",
+          "description": "Custom authorization header",
+          "required": false
+        },
+        "timeout": {
+          "name": "timeout",
+          "type": "option",
+          "description": "Request timeout",
+          "required": false,
+          "default": 10000
+        },
+        "verbose": {
+          "name": "verbose",
+          "type": "boolean",
+          "description": "Verbose mode",
+          "required": false,
+          "allowNo": false
+        }
+      },
+      "args": [{ "name": "remoteServerUrl", "required": true }]
     }
   }
 }
