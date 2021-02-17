@@ -14,6 +14,7 @@ The argument expression can be dependent on several sources:
 - Request headers
 - Field arguments
 - Parent fields
+- Resolver info param
 - Ancestor's fields exported higher in query result tree
 - GraphQL query variables
 - `isAnonymousAccess()` method that returns `true` if the HTTP request has no `Authorization` header. Otherwise returns `false`.
@@ -116,6 +117,22 @@ query {
 
 > rootValue: `{ bar: 'bar' }`
 > Result: `{ foo: 'bar' }`
+
+#### Info
+
+```graphql
+# Schema
+type Query {
+  foo: String! @localResolver(value: "{info.path.key}")
+}
+
+#Query
+query {
+  foo
+}
+```
+
+> Result: `{ foo: 'foo' }`
 
 #### Variable
 
