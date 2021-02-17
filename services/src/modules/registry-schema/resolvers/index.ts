@@ -17,6 +17,7 @@ import { getPlugins } from '../../plugins';
 import handleUpdateResourceGroupRequest from './update-resource-group';
 import handleDeleteResourcesRequest from './delete-resources';
 import { getRemoteSchema, getRemoteSchemas, getResource, getResourcesByType } from './get-resources';
+import refreshRemoteSchema from './refresh-remote-schema';
 
 const resolvers: IResolvers = {
   JSON: GraphQLJSON,
@@ -115,6 +116,8 @@ const resolvers: IResolvers = {
 
     resetDefaultUpstream: (_, args: { input: boolean }, context) =>
       handleDeleteResourcesRequest({ defaultUpstream: args.input }, context),
+
+    refreshRemoteSchema: (_, args: { url: string }, context) => refreshRemoteSchema(args.url, context),
   },
 };
 

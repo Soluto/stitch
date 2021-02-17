@@ -145,6 +145,8 @@ export default gql`
     deletePolicies(input: [ResourceMetadataInput!]!): Result
     deleteBasePolicy(input: Boolean!): Result
     resetDefaultUpstream(input: Boolean!): Result
+
+    refreshRemoteSchema(url: String!): Result
   }
 
   # Schemas
