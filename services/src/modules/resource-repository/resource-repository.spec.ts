@@ -2,6 +2,7 @@ import * as path from 'path';
 import { Storage } from '../storage';
 import { getWasmPolicy } from '../directives/policy/opa';
 import { minutesAgo } from '../../../tests/helpers/utility';
+import { mockLoadedPolicy } from '../../../tests/helpers/opa-utility';
 import { ResourceRepository } from '.';
 
 let repo: ResourceRepository;
@@ -33,14 +34,14 @@ describe('shouldRefreshPolicyAttachment', () => {
   });
 
   it('returns true if this is the first refresh for this process', () => {
-    repo['policyAttachments'].attachments['file'] = { evaluate: () => [] };
+    repo['policyAttachments'].attachments['file'] = mockLoadedPolicy();
 
     const result = shouldRefreshPolicyAttachment({ filePath: 'file', lastModified: minutesAgo(5) });
     expect(result).toBe(true);
   });
 
   it('returns true if the attachment was last updated after the last refresh', () => {
-    repo['policyAttachments'].attachments['file'] = { evaluate: () => [] };
+    repo['policyAttachments'].attachments['file'] = mockLoadedPolicy();
     repo['policyAttachments'].refreshedAt = minutesAgo(5);
 
     const result = shouldRefreshPolicyAttachment({ filePath: 'file', lastModified: new Date() });
@@ -48,7 +49,7 @@ describe('shouldRefreshPolicyAttachment', () => {
   });
 
   it('returns false if the attachment was last updated before the last refresh', () => {
-    repo['policyAttachments'].attachments['file'] = { evaluate: () => [] };
+    repo['policyAttachments'].attachments['file'] = mockLoadedPolicy();
     repo['policyAttachments'].refreshedAt = new Date();
 
     const result = shouldRefreshPolicyAttachment({ filePath: 'file', lastModified: minutesAgo(5) });
@@ -64,11 +65,11 @@ describe('refreshPolicyAttachments', () => {
   });
 
   it('refreshes the local copy of all policy attachments that should be refreshed', async () => {
-    const upToDateAttachment = { evaluate: () => [] };
-    const needsUpdatingAttachmentOld = { evaluate: () => [] };
-    const needsUpdatingAttachmentUpdated = { evaluate: () => [] };
-    const newFileAttachment = { evaluate: () => [] };
-    const deletedAttachment = { evaluate: () => [] };
+    const upToDateAttachment = mockLoadedPolicy();
+    const needsUpdatingAttachmentOld = mockLoadedPolicy();
+    const needsUpdatingAttachmentUpdated = mockLoadedPolicy();
+    const newFileAttachment = mockLoadedPolicy();
+    const deletedAttachment = mockLoadedPolicy();
 
     repo['policyAttachments'] = {
       refreshedAt: minutesAgo(5),

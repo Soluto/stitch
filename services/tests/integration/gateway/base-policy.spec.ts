@@ -6,9 +6,8 @@ import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { createStitchGateway } from '../../../src/modules/gateway';
 import { ResourceGroup, PolicyDefinition, PolicyType } from '../../../src/modules/resource-repository';
 import { beforeEachDispose } from '../before-each-dispose';
-import { Policy, LoadedPolicy } from '../../../src/modules/directives/policy/types';
-
-const createPolicyAttachment = (allow: boolean): LoadedPolicy => ({ evaluate: () => [{ result: { allow } }] });
+import { Policy } from '../../../src/modules/directives/policy/types';
+import { mockLoadedPolicy } from '../../helpers/opa-utility';
 
 const policies: PolicyDefinition[] = [
   {
@@ -51,8 +50,8 @@ const testCases: [string, ResourceGroup & { etag: string }][] = [
       basePolicy,
       policies,
       policyAttachments: {
-        ['internal-base_policy.wasm']: createPolicyAttachment(false),
-        ['ns-field_policy.wasm']: createPolicyAttachment(true),
+        ['internal-base_policy.wasm']: mockLoadedPolicy(false),
+        ['ns-field_policy.wasm']: mockLoadedPolicy(true),
       },
       upstreams: [],
       upstreamClientCredentials: [],
@@ -79,8 +78,8 @@ const testCases: [string, ResourceGroup & { etag: string }][] = [
       basePolicy,
       policies,
       policyAttachments: {
-        ['internal-base_policy.wasm']: createPolicyAttachment(true),
-        ['ns-field_policy.wasm']: createPolicyAttachment(false),
+        ['internal-base_policy.wasm']: mockLoadedPolicy(true),
+        ['ns-field_policy.wasm']: mockLoadedPolicy(false),
       },
       upstreams: [],
       upstreamClientCredentials: [],
@@ -107,8 +106,8 @@ const testCases: [string, ResourceGroup & { etag: string }][] = [
       basePolicy,
       policies,
       policyAttachments: {
-        ['internal-base_policy.wasm']: createPolicyAttachment(true),
-        ['ns-override_base_policy.wasm']: createPolicyAttachment(true),
+        ['internal-base_policy.wasm']: mockLoadedPolicy(true),
+        ['ns-override_base_policy.wasm']: mockLoadedPolicy(true),
       },
       upstreams: [],
       upstreamClientCredentials: [],
@@ -135,8 +134,8 @@ const testCases: [string, ResourceGroup & { etag: string }][] = [
       basePolicy,
       policies,
       policyAttachments: {
-        ['internal-base_policy.wasm']: createPolicyAttachment(false),
-        ['ns-override_base_policy.wasm']: createPolicyAttachment(true),
+        ['internal-base_policy.wasm']: mockLoadedPolicy(false),
+        ['ns-override_base_policy.wasm']: mockLoadedPolicy(true),
       },
       upstreams: [],
       upstreamClientCredentials: [],

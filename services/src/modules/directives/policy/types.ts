@@ -1,4 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql';
+import { loadPolicy } from '@open-policy-agent/opa-wasm';
 import {
   PolicyDefinition,
   ResourceMetadata,
@@ -55,7 +56,11 @@ export type PolicyCacheKey = {
   args?: PolicyArgsObject;
 };
 
-// Temporary until opa-wasm package adds types
-export interface LoadedPolicy {
-  evaluate: (input: Record<string, unknown>) => any[];
+// Unwrap the type that a Promise contains
+type Await<T> = T extends {
+  then(onfulfilled?: (value: infer U) => unknown): unknown;
 }
+  ? U
+  : T;
+
+export type LoadedPolicy = Await<ReturnType<typeof loadPolicy>>;

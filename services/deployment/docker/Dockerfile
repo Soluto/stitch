@@ -5,7 +5,7 @@ FROM base as dependencies
 RUN apt-get update && apt-get install -y \
   curl \
   && rm -rf /var/lib/apt/lists/*
-RUN curl -L -o /bin/opa https://github.com/open-policy-agent/opa/releases/download/v0.19.1/opa_linux_amd64
+RUN curl -L -o /bin/opa https://github.com/open-policy-agent/opa/releases/download/v0.26.0/opa_linux_amd64
 COPY package.json package-lock.json ./
 RUN npm ci --only=production
 COPY . .
