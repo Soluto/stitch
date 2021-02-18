@@ -109,7 +109,6 @@ export async function refreshRemoteSchema(
   url: string,
   options: {
     registryUrl: string;
-    dryRun?: boolean;
     authorizationHeader?: string;
   },
   clientOptions: Partial<RequestInit>
