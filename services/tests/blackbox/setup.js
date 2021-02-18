@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 process.env.NODE_ENV = 'test';
 
 process.env.RESOURCE_UPDATE_INTERVAL = '400';
@@ -15,3 +17,9 @@ process.env.AUTHENTICATION_CONFIGURATION = JSON.stringify({
 });
 
 process.env.LOGGER_CONFIGURATION = JSON.stringify({ redact: ['errors[*].extensions'] });
+
+const resourceDir = './tests/blackbox/resources';
+
+if (!fs.existsSync(resourceDir)) {
+  fs.mkdirSync(resourceDir);
+}

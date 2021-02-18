@@ -8,6 +8,7 @@ module.exports = {
       testTimeout: 60000,
       testMatch: ['<rootDir>/tests/blackbox/**/*.spec.ts'],
       testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/'],
+      runner: '<rootDir>/tests/blackbox/jest-blackbox-runner.js',
     },
   ],
 };
