@@ -4,7 +4,12 @@ import * as path from 'path';
 import { mocked } from 'ts-jest/utils';
 import mockFsForOpa from '../../tests/helpers/mock-fs-for-opa';
 import { tmpPoliciesDir } from './config';
-import { getTmpFilePaths, prepareCompiledRegoFile, normalizeRegoCodePackage } from './opa-helper';
+import {
+  getTmpFilePaths,
+  prepareCompiledRegoFile,
+  normalizeRegoCodePackage,
+  getOpaBuildWasmCommand,
+} from './opa-helper';
 
 jest.mock('child_process', () => ({
   exec: jest.fn((_, cb) => cb()),
@@ -35,7 +40,7 @@ describe('prepareCompiledRegoFile', () => {
     expect(fs.writeFile).toHaveBeenCalledWith(uncompiledPath, regoCode);
     expect(fs.unlink).toHaveBeenCalledWith(uncompiledPath);
 
-    const expectedCommand = `opa build -d ${uncompiledPath} -o ${compiledPath} 'data.policy = result'`;
+    const expectedCommand = getOpaBuildWasmCommand(uncompiledPath, compiledPath);
     expect(mockedExec.mock.calls[0][0]).toBe(expectedCommand);
 
     mockFsForOpa.restore();

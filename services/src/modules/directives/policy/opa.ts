@@ -1,9 +1,8 @@
-// @ts-ignore TODO: remove when type definitions will be included in opa-wasm package
-import * as Rego from '@open-policy-agent/opa-wasm';
+import { loadPolicy } from '@open-policy-agent/opa-wasm';
 import logger from '../../logger';
 import { getCompiledFilename } from '../../opa-helper';
 import { PolicyArgsObject } from '../../resource-repository';
-import { PolicyEvaluationContext, PolicyEvaluationResult, LoadedPolicy, QueryResults } from './types';
+import { PolicyEvaluationContext, PolicyEvaluationResult, QueryResults } from './types';
 
 export function evaluate(ctx: PolicyEvaluationContext): PolicyEvaluationResult {
   const filename = getCompiledFilename({ namespace: ctx.namespace, name: ctx.name });
@@ -15,13 +14,11 @@ export function evaluate(ctx: PolicyEvaluationContext): PolicyEvaluationResult {
   const input = getInput(ctx);
   const result = policy.evaluate(input)?.[0]?.result;
 
-  return { done: true, allow: result?.allow };
+  return { done: true, allow: result };
 }
 
-// TODO: change "LoadedPolicy" type when type definitions will be included in opa-wasm package
-export async function getWasmPolicy(wasm: Buffer): Promise<LoadedPolicy> {
-  const rego = new Rego();
-  return rego.load_policy(wasm);
+export async function getWasmPolicy(wasm: Buffer) {
+  return loadPolicy(wasm);
 }
 
 function getInput(ctx: PolicyEvaluationContext): PolicyOpaInput {

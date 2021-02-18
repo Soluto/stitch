@@ -20,6 +20,7 @@ import {
 import { tmpPoliciesDir } from '../../../src/modules/config';
 import mockFsForOpa from '../../helpers/mock-fs-for-opa';
 import { AuthType } from '../../../src/modules/registry-schema';
+import { getOpaBuildWasmCommand } from '../../../src/modules/opa-helper';
 
 jest.mock('child_process', () => ({
   exec: jest.fn((_, cb) => cb()),
@@ -222,7 +223,7 @@ describe('Create resource', () => {
     expect(fs.readFile).toHaveBeenCalledWith(compiledPath);
     expect(bucketContents.policyFiles).toEqual({ [compiledFilename]: 'compiled rego code' });
 
-    const expectedCommand = `opa build -d ${uncompiledPath} -o ${compiledPath} 'data.policy = result'`;
+    const expectedCommand = getOpaBuildWasmCommand(uncompiledPath, compiledPath);
     expect(mockedExec.mock.calls[0][0]).toBe(expectedCommand);
 
     mockFsForOpa.restore();
@@ -258,7 +259,7 @@ describe('Create resource', () => {
     expect(fs.readFile).toHaveBeenCalledWith(compiledPath);
     expect(bucketContents.policyFiles).toEqual({ [compiledFilename]: 'compiled rego code' });
 
-    const expectedCommand = `opa build -d ${uncompiledPath} -o ${compiledPath} 'data.policy = result'`;
+    const expectedCommand = getOpaBuildWasmCommand(uncompiledPath, compiledPath);
     expect(mockedExec.mock.calls[0][0]).toBe(expectedCommand);
 
     mockFsForOpa.restore();

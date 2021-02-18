@@ -8,6 +8,7 @@ import { createStitchGateway } from '../../../src/modules/gateway';
 import { PolicyExecutor } from '../../../src/modules/directives/policy';
 import { beforeEachDispose } from '../before-each-dispose';
 import { getCompiledFilename } from '../../../src/modules/opa-helper';
+import { mockLoadedPolicy } from '../../helpers/opa-utility';
 
 jest.mock('../../../src/modules/directives/policy/opa', () => ({
   evaluate: jest.fn(() => ({ done: true, allow: true })),
@@ -70,7 +71,7 @@ const resourceGroup: ResourceGroup = {
   upstreamClientCredentials: [],
   policies: [policy],
   policyAttachments: {
-    [getCompiledFilename(policy.metadata)]: { evaluate: () => [{ result: { allow: true } }] },
+    [getCompiledFilename(policy.metadata)]: mockLoadedPolicy(true),
   },
 };
 

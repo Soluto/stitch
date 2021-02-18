@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@apollo/federation": "^0.16.10",
-    "@open-policy-agent/opa-wasm": "^1.1.0",
+    "@open-policy-agent/opa-wasm": "^1.2.0",
     "@types/lodash": "^4.14.159",
     "@types/node-rsa": "^1.0.0",
     "apollo-datasource-rest": "^0.9.3",

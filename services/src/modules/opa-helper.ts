@@ -15,12 +15,19 @@ export async function initializeForRegistry() {
   await fs.mkdir(config.tmpPoliciesDir, { recursive: true });
 }
 
+export const getOpaBuildWasmCommand = (uncompiledPath: string, compiledPath: string) => `
+  opa build -t wasm -e policy/allow ${uncompiledPath} && \\
+  tar -xzf ./bundle.tar.gz /policy.wasm && \\
+  mv ./policy.wasm ${compiledPath} && \\
+  rm -f ./bundle.tar.gz
+`;
+
 export async function prepareCompiledRegoFile(resourceMetadata: ResourceMetadata, inputRegoCode: string) {
   const regoCode = normalizeRegoCodePackage(inputRegoCode);
   const { uncompiledPath, compiledPath } = getTmpFilePaths(resourceMetadata);
   await fs.writeFile(uncompiledPath, regoCode);
 
-  const compileCommand = `opa build -d ${uncompiledPath} -o ${compiledPath} 'data.policy = result'`;
+  const compileCommand = getOpaBuildWasmCommand(uncompiledPath, compiledPath);
   try {
     await exec(compileCommand);
   } catch (err) {
