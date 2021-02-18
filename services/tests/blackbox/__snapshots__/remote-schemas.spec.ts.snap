@@ -8,6 +8,30 @@ Object {
 }
 `;
 
+exports[`Remote Schemas Add schema with @gql directive: gateway resource group 1`] = `
+Array [
+  Object {
+    "schema": "type Query {
+  foo: String
+}
+",
+    "url": "http://remote-server/graphql",
+  },
+]
+`;
+
+exports[`Remote Schemas Add schema with @gql directive: registry resource group 1`] = `
+Array [
+  Object {
+    "schema": "type Query {
+  foo: String
+}
+",
+    "url": "http://remote-server/graphql",
+  },
+]
+`;
+
 exports[`Remote Schemas Delete the schema with @gql directive 1`] = `
 Object {
   "deleteSchemas": Object {
@@ -32,7 +56,7 @@ exports[`Remote Schemas Query resource group after deletion: remote schema 1`] =
 Object {
   "remoteSchema": Object {
     "schema": "type Query {
-  foo: String
+  foo: Int
 }
 ",
     "url": "http://remote-server/graphql",
@@ -45,12 +69,24 @@ Object {
   "remoteSchemas": Array [
     Object {
       "schema": "type Query {
-  foo: String
+  foo: Int
 }
 ",
       "url": "http://remote-server/graphql",
     },
   ],
+}
+`;
+
+exports[`Remote Schemas Query resource group again: remote schema 1`] = `
+Object {
+  "remoteSchema": Object {
+    "schema": "type Query {
+  foo: Int
+}
+",
+    "url": "http://remote-server/graphql",
+  },
 }
 `;
 
@@ -77,5 +113,69 @@ Object {
       "url": "http://remote-server/graphql",
     },
   ],
+}
+`;
+
+exports[`Remote Schemas Refresh remote schema 1`] = `
+Object {
+  "refreshRemoteSchema": Object {
+    "success": true,
+  },
+}
+`;
+
+exports[`Remote Schemas Refresh remote schema: gateway resource group 1`] = `
+Array [
+  Object {
+    "schema": "type Query {
+  foo: Int
+}
+",
+    "url": "http://remote-server/graphql",
+  },
+]
+`;
+
+exports[`Remote Schemas Refresh remote schema: registry resource group 1`] = `
+Array [
+  Object {
+    "schema": "type Query {
+  foo: Int
+}
+",
+    "url": "http://remote-server/graphql",
+  },
+]
+`;
+
+exports[`Remote Schemas Try to refresh remote schema for non-exiting url 1`] = `
+{
+  "errors": [
+    {
+      "message": "Remote schema refresh request failed: Error: Unknown url: http://does-not-exist",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "refreshRemoteSchema": null
+  }
+}
+`;
+
+exports[`Remote Schemas Try to refresh remote schema when there is no remote schemas at all 1`] = `
+{
+  "errors": [
+    {
+      "message": "Remote schema refresh request failed: Error: Unknown url: http://remote-server/graphql",
+      "exception": {
+        "code": "INTERNAL_SERVER_ERROR"
+      }
+    }
+  ],
+  "data": {
+    "refreshRemoteSchema": null
+  }
 }
 `;

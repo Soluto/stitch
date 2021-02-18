@@ -51,6 +51,14 @@ const ValidateBasePolicyQuery = gql`
   }
 `;
 
+const RefreshRemoteSchemaMutation = gql`
+  mutation RefreshRemoteSchemaMutation($url: String!) {
+    result: refreshRemoteSchema(url: $url) {
+      success
+    }
+  }
+`;
+
 function initClient(
   options: { registryUrl: string; dryRun?: boolean; authorizationHeader?: string },
   clientOptions: Partial<RequestInit>
@@ -95,6 +103,21 @@ export async function uploadBasePolicy(
   const query = options.dryRun ? ValidateBasePolicyQuery : UploadBasePolicyMutation;
 
   return registryClient.request<{ result: { success: boolean } }>(query, { basePolicy });
+}
+
+export async function refreshRemoteSchema(
+  url: string,
+  options: {
+    registryUrl: string;
+    authorizationHeader?: string;
+  },
+  clientOptions: Partial<RequestInit>
+) {
+  const registryClient = initClient(options, clientOptions);
+
+  const query = RefreshRemoteSchemaMutation;
+
+  return registryClient.request<{ result: { success: boolean } }>(query, { url });
 }
 
 export * from './types';

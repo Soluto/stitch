@@ -68,7 +68,7 @@ export async function updateRemoteGqlSchemas(resourceGroup: ResourceGroup, conte
   _.remove(resourceGroup.remoteSchemas, rs => unusedRemoteSchemas.has(rs.url));
 }
 
-async function fetchRemoteGqlSchema(url: string, resourceGroup: ResourceGroup, context: RegistryRequestContext) {
+export async function fetchRemoteGqlSchema(url: string, resourceGroup: ResourceGroup, context: RegistryRequestContext) {
   try {
     const link = ApolloLink.from([
       new RetryLink({
