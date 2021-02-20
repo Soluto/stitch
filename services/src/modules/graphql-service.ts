@@ -1,14 +1,14 @@
-import { Unsubscriber, GraphQLServiceConfig, SchemaChangeCallback, gql } from 'apollo-server-core';
-import { parse, execute, DocumentNode } from 'graphql';
+import { Unsubscriber, GraphQLServiceConfig, SchemaChangeCallback } from 'apollo-server-core';
+import { parse, execute } from 'graphql';
 import { Observable, Subscription } from 'rxjs';
 import { shareReplay, map, mergeMap, take, tap, catchError, skip } from 'rxjs/operators';
 import type { GraphQLRequestContextExecutionDidStart } from 'apollo-server-types';
-import { ResourceGroup, PolicyDefinition, Schema, ResourceMetadata } from './resource-repository';
+import { ResourceGroup, Schema } from './resource-repository';
 import { buildSchemaFromFederatedTypeDefs } from './build-federated-schema';
 import getBaseSchema from './base-schema';
 import logger from './logger';
 import { ActiveDirectoryAuth } from './upstreams';
-import { PolicyExecutor } from './directives/policy';
+import { PolicyExecutor, policyFieldSdl, buildPolicyQueryTypeDef } from './directives/policy';
 import { pluginsResolvers, pluginsSdl } from './plugins';
 
 export function createGraphQLService(config: { resourceGroups: Observable<ResourceGroup> }) {
@@ -57,31 +57,17 @@ export function createGraphQLService(config: { resourceGroups: Observable<Resour
   };
 }
 
-function buildPolicyGqlQuery(policy: PolicyDefinition): DocumentNode {
-  const argStr = policy.args
-    ? `(${Object.entries(policy.args)
-        .map(([argName, { type }]) => `${argName}: ${type}`)
-        .join(',')})`
-    : '';
-
-  return gql`
-    extend type Policy {
-        ${getPolicyQueryName(policy.metadata)}${argStr}: PolicyResult!
-          @policyQuery(namespace: "${policy.metadata.namespace}", name: "${policy.metadata.name}")
-    }
-  `;
-}
-
 export async function createSchemaConfig(resourceGroup: ResourceGroup): Promise<GraphQLServiceConfig> {
-  const schemas = resourceGroup.schemas.length === 0 ? [defaultSchema] : [initialSchema, ...resourceGroup.schemas];
+  const schemas = resourceGroup.schemas.length === 0 ? [defaultSchema] : resourceGroup.schemas;
   const policies = resourceGroup.policies ?? [];
 
   const schemaTypeDefs = schemas.map(s => [`${s.metadata.namespace}/${s.metadata.name}`, parse(s.schema)]);
-  const policyQueryTypeDefs = policies.map(p => [getPolicyQueryName(p.metadata), buildPolicyGqlQuery(p)]);
+  const policyQueryTypeDefs = policies.map(p => buildPolicyQueryTypeDef(p));
   const pluginsTypeDefs = ['plugins', pluginsSdl];
+  const policyTypeDefs = ['policy', policyFieldSdl];
   const baseSchema = await getBaseSchema();
   const schema = buildSchemaFromFederatedTypeDefs({
-    typeDefs: Object.fromEntries([...schemaTypeDefs, ...policyQueryTypeDefs, pluginsTypeDefs]),
+    typeDefs: Object.fromEntries([...schemaTypeDefs, ...policyQueryTypeDefs, policyTypeDefs, pluginsTypeDefs]),
     baseTypeDefs: baseSchema.typeDefs,
     resolvers: { ...baseSchema.resolvers, ...pluginsResolvers },
     schemaDirectives: baseSchema.directives,
@@ -109,30 +95,10 @@ export async function createSchemaConfig(resourceGroup: ResourceGroup): Promise<
   };
 }
 
-function getPolicyQueryName({ namespace, name }: ResourceMetadata) {
-  return `${namespace}___${name}`.replace(/-/g, '_');
-}
-
 const defaultSchema: Schema = {
   metadata: { namespace: 'internal', name: 'default' },
   schema: 'type Query { default: String! @localResolver(value: "default") }',
 };
-
-const initialSchema: Schema = {
-  metadata: {
-    namespace: 'internal',
-    name: '__initial__',
-  },
-  schema: `
-    type Query {
-        policy: Policy! @localResolver(value: {
-            default: {
-                allow: true
-            }
-        })
-    }`,
-};
-
 declare module './context' {
   interface RequestContext {
     resourceGroup: ResourceGroup;

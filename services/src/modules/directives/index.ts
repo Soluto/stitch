@@ -11,6 +11,7 @@ import {
   policyBaseSdl,
   policySdl,
   policiesSdl,
+  policyFieldSdl,
   policyQuerySdl,
   PolicyDirective,
   PoliciesDirective,
@@ -45,4 +46,4 @@ export const sdl = concatAST([
   enumResolverSdl,
 ]);
 
-export { policyScalarResolvers, policyBaseSdl };
+export { policyScalarResolvers, policyBaseSdl, policyFieldSdl };

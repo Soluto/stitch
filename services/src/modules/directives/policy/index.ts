@@ -4,9 +4,11 @@ import { sdl as policySdl, PolicyDirective } from './policy';
 import { sdl as policiesSdl, PoliciesDirective, resolvers as policyScalarResolvers } from './policies';
 import { sdl as policyQuerySdl, PolicyQueryDirective } from './policy-query';
 import PolicyExecutor from './policy-executor';
+import { buildPolicyQueryTypeDef } from './policy-query-helper';
 import { Policy, LoadedPolicy } from './types';
 
 export {
+  buildPolicyQueryTypeDef,
   PolicyExecutor,
   policySdl,
   policiesSdl,
@@ -31,5 +33,11 @@ export const policyBaseSdl = gql`
 
   type Policy {
     default: PolicyResult!
+  }
+`;
+
+export const policyFieldSdl = gql`
+  type Query {
+    policy: Policy! @localResolver(value: { default: { allow: true } })
   }
 `;
