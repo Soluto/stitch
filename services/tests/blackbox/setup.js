@@ -20,6 +20,4 @@ process.env.LOGGER_CONFIGURATION = JSON.stringify({ redact: ['errors[*].extensio
 
 const resourceDir = './tests/blackbox/resources';
 
-if (!fs.existsSync(resourceDir)) {
-  fs.mkdirSync(resourceDir);
-}
+fs.mkdirSync(resourceDir, { recursive: true });
