@@ -1,7 +1,8 @@
+import { gql } from 'apollo-server-core';
 import { graphql } from 'graphql';
 import { injectArgs } from '../../arguments-injection';
 import { RequestContext } from '../../context';
-import { PolicyQueryVariables, PolicyArgsObject } from '../../resource-repository';
+import { PolicyQueryVariables, PolicyArgsObject, PolicyDefinition, ResourceMetadata } from '../../resource-repository';
 import { PolicyDirectiveExecutionContext, QueryResults } from './types';
 
 export async function getQueryResult(
@@ -39,6 +40,28 @@ async function executeQuery(
 
   const gqlResult = await graphql(ctx.info.schema, gql, undefined, requestContext, variables);
   return gqlResult.data || undefined;
+}
+
+function getPolicyQueryName({ namespace, name }: ResourceMetadata) {
+  return `${namespace}___${name}`.replace(/-/g, '_');
+}
+
+export function buildPolicyQueryTypeDef(policy: PolicyDefinition) {
+  const argStr = policy.args
+    ? `(${Object.entries(policy.args)
+        .map(([argName, { type }]) => `${argName}: ${type}`)
+        .join(',')})`
+    : '';
+
+  const policyQueryName = getPolicyQueryName(policy.metadata);
+
+  const policyQueryTypeDef = gql`
+    extend type Policy {
+        ${policyQueryName}${argStr}: PolicyResult!
+          @policyQuery(namespace: "${policy.metadata.namespace}", name: "${policy.metadata.name}")
+    }
+  `;
+  return [policyQueryName, policyQueryTypeDef];
 }
 
 declare module '../../context' {

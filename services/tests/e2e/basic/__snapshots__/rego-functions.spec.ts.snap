@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Rego Functions count 1`] = `
+Object {
+  "policy": Object {
+    "e2e_rego_functions___count": Object {
+      "allow": true,
+    },
+  },
+}
+`;
