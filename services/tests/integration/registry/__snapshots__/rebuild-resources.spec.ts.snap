@@ -1,0 +1,298 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Rebuild resource group rebuild resources - dry run: after 1`] = `
+Object {
+  "policies": Array [
+    Object {
+      "args": Object {
+        "an": Object {
+          "default": "{source.an}",
+          "type": "String",
+        },
+        "another": Object {
+          "type": "String!",
+        },
+      },
+      "code": "real rego code
+           with multiple
+           lines",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "query": Object {
+        "gql": "some another gql",
+        "variables": Object {
+          "c": "d",
+        },
+      },
+      "type": "opa",
+    },
+  ],
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "schema": "type Query {
+  oldSomething: String!
+}
+",
+    },
+  ],
+  "upstreamClientCredentials": Array [
+    Object {
+      "activeDirectory": Object {
+        "authority": "https://authority",
+        "clientId": "myClientId",
+        "clientSecret": "myClientSecret",
+      },
+      "authType": "ActiveDirectory",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+  "upstreams": Array [
+    Object {
+      "auth": Object {
+        "activeDirectory": Object {
+          "authority": "https://authority",
+          "resource": "someResource",
+        },
+        "type": "ActiveDirectory",
+      },
+      "host": "test.api",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+}
+`;
+
+exports[`Rebuild resource group rebuild resources - dry run: before 1`] = `
+Object {
+  "policies": Array [
+    Object {
+      "args": Object {
+        "an": Object {
+          "default": "{source.an}",
+          "type": "String",
+        },
+        "another": Object {
+          "type": "String!",
+        },
+      },
+      "code": "real rego code
+           with multiple
+           lines",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "query": Object {
+        "gql": "some another gql",
+        "variables": Object {
+          "c": "d",
+        },
+      },
+      "type": "opa",
+    },
+  ],
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "schema": "type Query {
+  oldSomething: String!
+}
+",
+    },
+  ],
+  "upstreamClientCredentials": Array [
+    Object {
+      "activeDirectory": Object {
+        "authority": "https://authority",
+        "clientId": "myClientId",
+        "clientSecret": "myClientSecret",
+      },
+      "authType": "ActiveDirectory",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+  "upstreams": Array [
+    Object {
+      "auth": Object {
+        "activeDirectory": Object {
+          "authority": "https://authority",
+          "resource": "someResource",
+        },
+        "type": "ActiveDirectory",
+      },
+      "host": "test.api",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+}
+`;
+
+exports[`Rebuild resource group rebuild resources: after 1`] = `
+Object {
+  "policies": Array [
+    Object {
+      "args": Object {
+        "an": Object {
+          "default": "{source.an}",
+          "type": "String",
+        },
+        "another": Object {
+          "type": "String!",
+        },
+      },
+      "code": "real rego code
+           with multiple
+           lines",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "query": Object {
+        "gql": "some another gql",
+        "variables": Object {
+          "c": "d",
+        },
+      },
+      "type": "opa",
+    },
+  ],
+  "policyAttachments": Object {},
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "schema": "type Query {
+  something: String!
+}
+",
+    },
+  ],
+  "upstreamClientCredentials": Array [
+    Object {
+      "activeDirectory": Object {
+        "authority": "https://authority",
+        "clientId": "myClientId",
+        "clientSecret": "myClientSecret",
+      },
+      "authType": "ActiveDirectory",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+  "upstreams": Array [
+    Object {
+      "auth": Object {
+        "activeDirectory": Object {
+          "authority": "https://authority",
+          "resource": "someResource",
+        },
+        "type": "ActiveDirectory",
+      },
+      "host": "test.api",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+}
+`;
+
+exports[`Rebuild resource group rebuild resources: before 1`] = `
+Object {
+  "policies": Array [
+    Object {
+      "args": Object {
+        "an": Object {
+          "default": "{source.an}",
+          "type": "String",
+        },
+        "another": Object {
+          "type": "String!",
+        },
+      },
+      "code": "real rego code
+           with multiple
+           lines",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "query": Object {
+        "gql": "some another gql",
+        "variables": Object {
+          "c": "d",
+        },
+      },
+      "type": "opa",
+    },
+  ],
+  "schemas": Array [
+    Object {
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+      "schema": "type Query {
+  oldSomething: String!
+}
+",
+    },
+  ],
+  "upstreamClientCredentials": Array [
+    Object {
+      "activeDirectory": Object {
+        "authority": "https://authority",
+        "clientId": "myClientId",
+        "clientSecret": "myClientSecret",
+      },
+      "authType": "ActiveDirectory",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+  "upstreams": Array [
+    Object {
+      "auth": Object {
+        "activeDirectory": Object {
+          "authority": "https://authority",
+          "resource": "someResource",
+        },
+        "type": "ActiveDirectory",
+      },
+      "host": "test.api",
+      "metadata": Object {
+        "name": "name",
+        "namespace": "namespace",
+      },
+    },
+  ],
+}
+`;

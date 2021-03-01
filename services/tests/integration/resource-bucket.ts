@@ -2,7 +2,11 @@ import * as nock from 'nock';
 import * as xml2js from 'xml2js';
 import { ResourceGroup } from '../../src/modules/resource-repository';
 
-export function mockResourceBucket(initialValue: ResourceGroup, initialPolicyFiles: MockPolicyFiles = {}) {
+export function mockResourceBucket(
+  initialValue: ResourceGroup,
+  initialPolicyFiles: MockPolicyFiles = {},
+  initialGatewayValue?: ResourceGroup
+) {
   const s3endpoint = process.env.S3_ENDPOINT;
   const bucketName = process.env.S3_RESOURCE_BUCKET_NAME;
   const objectKey = process.env.S3_RESOURCE_OBJECT_KEY;
@@ -10,7 +14,11 @@ export function mockResourceBucket(initialValue: ResourceGroup, initialPolicyFil
   const policiesKeyPrefix = process.env.S3_POLICY_ATTACHMENTS_KEY_PREFIX;
   const policiesPrefixQueryParamRegex = `prefix=${encodeURIComponent(policiesKeyPrefix!)}.*`;
   const queryParamsSeparatorRegex = '?.*';
-  const value = { current: initialValue, policyFiles: initialPolicyFiles, currentRegistry: initialValue };
+  const value = {
+    current: initialGatewayValue ?? initialValue,
+    policyFiles: initialPolicyFiles,
+    currentRegistry: initialValue,
+  };
 
   nock(s3endpoint!)
     .persist()
