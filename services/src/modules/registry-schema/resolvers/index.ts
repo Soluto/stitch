@@ -14,6 +14,7 @@ import {
 } from '../types';
 import { ResourceMetadata } from '../../resource-repository';
 import { getPlugins } from '../../plugins';
+import rebuildResourceGroup from './rebuild-resource-group';
 import handleUpdateResourceGroupRequest from './update-resource-group';
 import handleDeleteResourcesRequest from './delete-resources';
 import { getRemoteSchema, getRemoteSchemas, getResource, getResourcesByType } from './get-resources';
@@ -73,6 +74,8 @@ const resolvers: IResolvers = {
       handleUpdateResourceGroupRequest({ defaultUpstream: args.input }, context, true),
   },
   Mutation: {
+    rebuildResourceGroup: (_, args: { dryRun: boolean }, context) => rebuildResourceGroup(context, args.dryRun),
+
     // Update
     updateResourceGroup: (_, args: { input: Partial<ResourceGroupInput> }, context) =>
       handleUpdateResourceGroupRequest(args.input, context),

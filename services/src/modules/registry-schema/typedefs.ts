@@ -130,6 +130,8 @@ export default gql`
   }
 
   type Mutation {
+    rebuildResourceGroup(dryRun: Boolean = false): Result
+
     updateResourceGroup(input: ResourceGroupInput!): Result
     updateSchemas(input: [SchemaInput!]!): Result
     updateUpstreams(input: [UpstreamInput!]!): Result
