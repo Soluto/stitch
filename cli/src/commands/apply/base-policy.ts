@@ -59,7 +59,7 @@ export default class ApplyBasePolicy extends Command {
       this.error(
         `${dryRun ? 'Verifying' : 'Uploading'} of base policy failed. ${e}
 
-          ${getEnvInfo(this.config, 'apply:base-policy')}`,
+          ${getEnvInfo(this.config, 'apply:base-policy', flags['registry-url'], flags['authorization-header'])}`,
         { ...e, exit: true }
       );
     }
