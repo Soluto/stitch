@@ -3,6 +3,7 @@ import pLimit from 'p-limit';
 import * as _ from 'lodash';
 import { Storage, listFilesItem } from '../storage';
 import { getWasmPolicy } from '../directives/policy/opa';
+import buildResourcesMetadata from './resource-metadata';
 import { FetchLatestResult, ResourceGroup, IResourceRepository, PolicyAttachments, UpdateOptions } from '.';
 
 export class ResourceRepository implements IResourceRepository {
@@ -42,8 +43,13 @@ export class ResourceRepository implements IResourceRepository {
     const defaultOptions = { registry: false };
     const { registry } = { ...defaultOptions, ...options };
     const resourceFilePath = registry ? this.registryResourceFilePath! : this.resourceFilePath;
+    const resourceFileContent = JSON.stringify(resources);
 
-    await this.storage.writeFile(resourceFilePath, JSON.stringify(resources));
+    const resourceMetadataFilePath = `${resourceFilePath.split('.').slice(0, -1).join('.')}-metadata.json`;
+    const resourceMetadata = await buildResourcesMetadata(resources, resourceFileContent, options);
+
+    await this.storage.writeFile(resourceFilePath, resourceFileContent);
+    await this.storage.writeFile(resourceMetadataFilePath, resourceMetadata);
   }
 
   async writePolicyAttachment(filename: string, content: Buffer): Promise<void> {

@@ -1,5 +1,6 @@
 import { RemoteSchema } from '../directives/gql';
 import { Policy, LoadedPolicy } from '../directives/policy/types';
+import { PluginMetadata } from '../plugins/types';
 
 export type PolicyAttachments = Record<string, LoadedPolicy>;
 export type PolicyQueryVariables = Record<string, unknown>;
@@ -107,4 +108,10 @@ enum AuthType {
 
 export enum PolicyType {
   opa = 'opa',
+}
+
+export interface ResourcesMetadata {
+  checksum: string;
+  summary: Record<string, number>;
+  plugins?: PluginMetadata[];
 }

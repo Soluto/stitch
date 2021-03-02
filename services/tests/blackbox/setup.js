@@ -5,7 +5,11 @@ process.env.NODE_ENV = 'test';
 process.env.RESOURCE_UPDATE_INTERVAL = '400';
 process.env.FS_RESOURCE_REPOSITORY_PATH = './tests/blackbox/resources/resources-gateway.json';
 process.env.FS_REGISTRY_RESOURCE_REPOSITORY_PATH = './tests/blackbox/resources/resources-registry.json';
+
 process.env.FS_REPOSITORY_POLICY_ATTACHMENTS_FOLDER_PATH = './tests/blackbox/resources/policy-attachments';
+
+process.env.FS_RESOURCE_METADATA_PATH = './tests/blackbox/resources/resources-gateway-metadata.json';
+process.env.FS_REGISTRY_RESOURCE_METADATA_PATH = './tests/blackbox/resources/resources-registry-metadata.json';
 
 process.env.USE_S3_RESOURCE_REPOSITORY = 'false';
 process.env.USE_FS_RESOURCE_REPOSITORY = 'true';

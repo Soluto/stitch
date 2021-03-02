@@ -3,6 +3,11 @@ import { ResourceGroup } from '../resource-repository';
 
 export type ValueOrPromise<T> = T | Promise<T>;
 
+export interface PluginMetadata {
+  name: string;
+  version: string;
+}
+
 export interface StitchPlugin {
   name: string;
 

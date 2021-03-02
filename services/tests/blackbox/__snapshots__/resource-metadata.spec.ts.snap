@@ -1,0 +1,77 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Resource metadata Check metadata files 1`] = `
+"{
+    \\"checksum\\": \\"83d4b8c0a958a17fc6ba922b99476413\\",
+    \\"summary\\": {
+        \\"schemas\\": 1,
+        \\"upstreams\\": 0,
+        \\"upstreamClientCredentials\\": 0,
+        \\"policies\\": 0,
+        \\"remoteSchemas\\": 0,
+        \\"policyAttachments\\": 1
+    }
+}"
+`;
+
+exports[`Resource metadata Check metadata files 2`] = `
+"{
+    \\"checksum\\": \\"83d4b8c0a958a17fc6ba922b99476413\\",
+    \\"summary\\": {
+        \\"schemas\\": 1,
+        \\"upstreams\\": 0,
+        \\"upstreamClientCredentials\\": 0,
+        \\"policies\\": 0,
+        \\"remoteSchemas\\": 0,
+        \\"policyAttachments\\": 1
+    },
+    \\"plugins\\": [
+        {
+            \\"name\\": \\"First\\",
+            \\"version\\": \\"0.1.0\\"
+        },
+        {
+            \\"name\\": \\"Second\\",
+            \\"version\\": \\"1.2.3\\"
+        }
+    ]
+}"
+`;
+
+exports[`Resource metadata Check metadata files again 1`] = `
+"{
+    \\"checksum\\": \\"0c798a1f566dc58d635e503363121e05\\",
+    \\"summary\\": {
+        \\"schemas\\": 2,
+        \\"upstreams\\": 0,
+        \\"upstreamClientCredentials\\": 0,
+        \\"policies\\": 0,
+        \\"remoteSchemas\\": 0,
+        \\"policyAttachments\\": 1
+    }
+}"
+`;
+
+exports[`Resource metadata Check metadata files again 2`] = `
+"{
+    \\"checksum\\": \\"0c798a1f566dc58d635e503363121e05\\",
+    \\"summary\\": {
+        \\"schemas\\": 2,
+        \\"upstreams\\": 0,
+        \\"upstreamClientCredentials\\": 0,
+        \\"policies\\": 0,
+        \\"remoteSchemas\\": 0,
+        \\"policyAttachments\\": 1
+    },
+    \\"plugins\\": [
+        {
+            \\"name\\": \\"First\\",
+            \\"version\\": \\"0.1.0\\"
+        },
+        {
+            \\"name\\": \\"Second\\",
+            \\"version\\": \\"1.2.3\\"
+        }
+    ]
+}"
+`;

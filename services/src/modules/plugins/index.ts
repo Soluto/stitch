@@ -9,6 +9,7 @@ import {
   transformResourceGroup,
   transformBaseSchema,
 } from './apply-plugins';
+import { PluginMetadata } from './types';
 
 export {
   argumentInjectionGlobals,
@@ -18,7 +19,7 @@ export {
   transformBaseSchema,
 };
 
-export function getPlugins() {
+export function getPlugins(): PluginMetadata[] {
   return _.sortBy(
     plugins.map(({ name, version }) => ({ name, version })),
     ['name']
