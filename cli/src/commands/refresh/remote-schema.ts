@@ -50,7 +50,7 @@ Remote schema refreshed successfully!
       this.error(
         `Refresh remote schema failed. ${e}
 
-          ${getEnvInfo(this.config, 'refresh:remote-schema')}`,
+          ${getEnvInfo(this.config, 'refresh:remote-schema', flags['registry-url'], flags['authorization-header'])}`,
         { ...e, exit: true }
       );
     }

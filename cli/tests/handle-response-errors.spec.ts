@@ -9,6 +9,10 @@ interface TestCase {
   responseBody: nock.Body;
 }
 
+const registryUrl = new URL('http://registry.some-domain.com/graphql');
+const authorizationHeader = 'Bearer ABCDEFGHIJKLMNOP';
+const sanitizedAuthHeader = 'Bearer ABC**********NOP';
+
 const testCases: TestCase[] = [
   {
     name: 'InternalServerError',
@@ -58,18 +62,19 @@ const testCases: TestCase[] = [
 const commandArgs = [
   'apply:resources',
   '--dry-run',
-  '--registry-url=http://registry/graphql',
+  `--registry-url=${registryUrl.href}`,
+  `--authorization-header=${authorizationHeader}`,
   '--skip-resource-types=upstreams,upstreamClientCredentials',
   join(__dirname, './data/dummy.yaml'),
 ];
 
 const nockCb = (statusCode: number, responseBody: nock.Body) => (api: FancyTypes.NockScope) =>
-  api.post('/graphql').reply(statusCode, responseBody);
+  api.post(registryUrl.pathname).reply(statusCode, responseBody);
 
 testCases.forEach(testCase => {
   describe(`Response errors - ${testCase.name}`, () => {
     test
-      .nock('http://registry', nockCb(testCase.statusCode, testCase.responseBody))
+      .nock(registryUrl.origin, nockCb(testCase.statusCode, testCase.responseBody))
       .stdout()
       .command(commandArgs)
       .catch(e => e.message.startsWith('Verifying resources failed'))
@@ -81,13 +86,15 @@ testCases.forEach(testCase => {
 
   describe('Response errors - timeout', () => {
     test
-      .nock('http://registry', api => api.post('/graphql').delayConnection(200))
+      .nock(registryUrl.origin, api => api.post(registryUrl.pathname).delayConnection(200))
       .stdout()
       .command(commandArgs.concat('--timeout=100'))
       .catch(e => e.message.startsWith('Verifying resources failed'))
       .end('run command with error', ctx => {
         ctx.stdout.includes('Verifying resources failed');
         ctx.stdout.includes(JSON.stringify(testCase.responseBody));
+        ctx.stdout.includes(`RegistryUrl:    ${registryUrl.href}}`);
+        ctx.stdout.includes(`Authorization:    ${sanitizedAuthHeader}}`);
       });
   });
 });

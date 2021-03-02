@@ -72,7 +72,7 @@ Uploaded successfully!
       this.error(
         `${dryRun ? 'Verifying' : 'Uploading'} resources failed. ${e}
 
-          ${getEnvInfo(this.config, 'apply:resources')}`,
+          ${getEnvInfo(this.config, 'apply:resources', flags['registry-url'], flags['authorization-header'])}`,
         { ...e, exit: true }
       );
     }
