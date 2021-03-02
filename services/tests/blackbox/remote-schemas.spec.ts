@@ -111,6 +111,9 @@ describe('Remote Schemas', () => {
     await dispose();
     await fs.unlink(process.env.FS_RESOURCE_REPOSITORY_PATH!);
     await fs.unlink(process.env.FS_REGISTRY_RESOURCE_REPOSITORY_PATH!);
+
+    await fs.unlink(process.env.FS_RESOURCE_METADATA_PATH!);
+    await fs.unlink(process.env.FS_REGISTRY_RESOURCE_METADATA_PATH!);
   });
 
   test('Query empty resource group', async () => {
