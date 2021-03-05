@@ -6,7 +6,7 @@
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand --config jest.config.js",
     "test:blackbox": "jest --ci --runInBand --config jest.config.blackbox.js",
     "test:e2e": "jest --ci --runInBand --config jest.config.e2e.js",
-    "test:full": "jest --ci --config jest.config.full.js",
+    "test:full": "NODE_OPTIONS=--max_old_space_size=4096 jest --ci --config jest.config.full.js",
     "build": "tsc",
     "build:dev": "tsc --watch",
     "start:gateway:watch": "ts-node-dev src/gateway.ts",
