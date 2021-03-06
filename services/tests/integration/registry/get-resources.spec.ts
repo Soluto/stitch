@@ -115,7 +115,7 @@ describe('Get resources', () => {
   beforeEach(() => {
     client = createTestClient(app);
     const initialPolicyFiles = { 'namespace-name.wasm': 'old compiled code' };
-    mockResourceBucket(baseResourceGroup, initialPolicyFiles);
+    mockResourceBucket({ registry: baseResourceGroup, policyFiles: initialPolicyFiles });
   });
 
   afterEach(() => {

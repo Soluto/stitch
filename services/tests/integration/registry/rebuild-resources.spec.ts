@@ -2,7 +2,7 @@ import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing'
 import { gql } from 'apollo-server-core';
 import { print } from 'graphql';
 import { app } from '../../../src/registry';
-import { mockResourceBucket } from '../resource-bucket';
+import { MockResourceBucket, mockResourceBucket } from '../resource-bucket';
 import { ResourceGroup } from '../../../src/modules/resource-repository';
 import {
   PolicyType,
@@ -81,14 +81,18 @@ const baseResourceGroup: ResourceGroup = {
 
 describe('Rebuild resource group', () => {
   let client: ApolloServerTestClient;
-  let bucketContents: { current: ResourceGroup; policyFiles: { [name: string]: string } };
+  let bucketContents: MockResourceBucket;
 
   beforeAll(() => {
     client = createTestClient(app);
     const initialPolicyFiles = { 'namespace-name.wasm': 'old compiled code' };
-    bucketContents = mockResourceBucket(baseResourceGroup, initialPolicyFiles, {
-      ...baseResourceGroup,
-      schemas: [oldSchema],
+    bucketContents = mockResourceBucket({
+      registry: baseResourceGroup,
+      gateway: {
+        ...baseResourceGroup,
+        schemas: [oldSchema],
+      },
+      policyFiles: initialPolicyFiles,
     });
   });
 
@@ -97,7 +101,7 @@ describe('Rebuild resource group', () => {
   });
 
   it('rebuild resources - dry run', async () => {
-    expect(bucketContents.current).toMatchSnapshot('before');
+    expect(bucketContents.gateway).toMatchSnapshot('before');
 
     const response = await client.mutate({
       mutation: gql`
@@ -111,11 +115,11 @@ describe('Rebuild resource group', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ result: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot('after');
+    expect(bucketContents.gateway).toMatchSnapshot('after');
   });
 
   it('rebuild resources', async () => {
-    expect(bucketContents.current).toMatchSnapshot('before');
+    expect(bucketContents.gateway).toMatchSnapshot('before');
 
     const response = await client.mutate({
       mutation: gql`
@@ -129,6 +133,6 @@ describe('Rebuild resource group', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ result: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot('after');
+    expect(bucketContents.gateway).toMatchSnapshot('after');
   });
 });
