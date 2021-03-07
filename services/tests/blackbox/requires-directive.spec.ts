@@ -121,6 +121,9 @@ describe('@requires directive', () => {
     nock.cleanAll();
     await fs.unlink(process.env.FS_RESOURCE_REPOSITORY_PATH!);
     await fs.unlink(process.env.FS_REGISTRY_RESOURCE_REPOSITORY_PATH!);
+
+    await fs.unlink(process.env.FS_RESOURCE_METADATA_PATH!);
+    await fs.unlink(process.env.FS_REGISTRY_RESOURCE_METADATA_PATH!);
   });
 
   test('Add schemas with @gql directive', async () => {

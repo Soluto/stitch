@@ -51,12 +51,7 @@ describe.each(testCases)('Upstreams - Gql - Introspection', (testCaseName, { ups
 
   beforeAll(() => {
     expect.addSnapshotSerializer(GraphQLErrorSerializer);
-    mockResourceBucket({
-      schemas: [],
-      upstreams: [],
-      upstreamClientCredentials: [],
-      policies: [],
-    });
+    mockResourceBucket();
   });
 
   beforeEach(async () => {

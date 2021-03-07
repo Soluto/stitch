@@ -4,7 +4,7 @@ import { print } from 'graphql';
 import * as nock from 'nock';
 import { beforeEachDispose } from '../before-each-dispose';
 import { app } from '../../../src/registry';
-import { mockResourceBucket } from '../resource-bucket';
+import { MockResourceBucket, mockResourceBucket } from '../resource-bucket';
 import { ResourceGroup } from '../../../src/modules/resource-repository';
 import {
   PolicyType,
@@ -81,12 +81,12 @@ const baseResourceGroup: ResourceGroup = {
 };
 describe('Delete resource', () => {
   let client: ApolloServerTestClient;
-  let bucketContents: { current: ResourceGroup; policyFiles: { [name: string]: string } };
+  let bucketContents: MockResourceBucket;
 
   beforeEachDispose(() => {
     client = createTestClient(app);
     const initialPolicyFiles = { 'namespace-name.wasm': 'old compiled code' };
-    bucketContents = mockResourceBucket(baseResourceGroup, initialPolicyFiles);
+    bucketContents = mockResourceBucket({ registry: baseResourceGroup, policyFiles: initialPolicyFiles });
 
     return () => nock.cleanAll();
   });
@@ -108,7 +108,7 @@ describe('Delete resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ deleteSchemas: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
   });
 
   it('deletes a Schema using deleteResources', async () => {
@@ -128,7 +128,7 @@ describe('Delete resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ deleteResources: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
   });
 
   it('deletes an Upstream', async () => {
@@ -148,7 +148,7 @@ describe('Delete resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ deleteUpstreams: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
   });
 
   it('reset an Default Upstream', async () => {
@@ -164,7 +164,7 @@ describe('Delete resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ resetDefaultUpstream: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
   });
 
   it('deletes an UpstreamClientCredentials', async () => {
@@ -185,7 +185,7 @@ describe('Delete resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ deleteUpstreamClientCredentials: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
   });
 
   it('delete an opa type policy', async () => {
@@ -207,7 +207,7 @@ describe('Delete resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ deletePolicies: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
     expect(bucketContents.policyFiles).toMatchSnapshot();
 
     mockFsForOpa.restore();
@@ -232,7 +232,7 @@ describe('Delete resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ deleteResources: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
     expect(bucketContents.policyFiles).toMatchSnapshot();
 
     mockFsForOpa.restore();

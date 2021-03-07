@@ -7,7 +7,7 @@ import { mocked } from 'ts-jest/utils';
 import * as nock from 'nock';
 import { beforeEachDispose } from '../before-each-dispose';
 import { app } from '../../../src/registry';
-import { mockResourceBucket } from '../resource-bucket';
+import { MockResourceBucket, mockResourceBucket } from '../resource-bucket';
 import {
   DefaultUpstream,
   PolicyType,
@@ -89,11 +89,11 @@ const baseResourceGroup: ResourceGroup = {
 
 describe('Create resource', () => {
   let client: ApolloServerTestClient;
-  let bucketContents: { current: ResourceGroup; policyFiles: { [name: string]: string } };
+  let bucketContents: MockResourceBucket;
 
   beforeEachDispose(() => {
     client = createTestClient(app);
-    bucketContents = mockResourceBucket(baseResourceGroup);
+    bucketContents = mockResourceBucket({ registry: baseResourceGroup });
 
     return () => nock.cleanAll();
   });
@@ -114,7 +114,7 @@ describe('Create resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateSchemas: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
   });
 
   it('creates a Schema using updateResourceGroup', async () => {
@@ -133,7 +133,7 @@ describe('Create resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateResourceGroup: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
   });
 
   it('Upstream', async () => {
@@ -152,7 +152,7 @@ describe('Create resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateUpstreams: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
   });
 
   it('Default upstream', async () => {
@@ -171,7 +171,7 @@ describe('Create resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ setDefaultUpstream: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
   });
 
   it('UpstreamClientCredentials', async () => {
@@ -190,7 +190,7 @@ describe('Create resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateUpstreamClientCredentials: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
   });
 
   it('creates an opa type policy', async () => {
@@ -211,7 +211,7 @@ describe('Create resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updatePolicies: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
 
     const compiledFilename = 'namespace-name.wasm';
     const uncompiledPath = path.resolve(tmpPoliciesDir, 'namespace-name.rego');
@@ -247,7 +247,7 @@ describe('Create resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateResourceGroup: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
 
     const compiledFilename = 'namespace-name.wasm';
     const uncompiledPath = path.resolve(tmpPoliciesDir, 'namespace-name.rego');

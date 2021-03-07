@@ -9,7 +9,7 @@ import * as nock from 'nock';
 import { makeExecutableSchema } from 'graphql-tools';
 import { beforeEachDispose } from '../before-each-dispose';
 import { app } from '../../../src/registry';
-import { mockResourceBucket } from '../resource-bucket';
+import { MockResourceBucket, mockResourceBucket } from '../resource-bucket';
 import { ResourceGroup } from '../../../src/modules/resource-repository';
 import {
   PolicyType,
@@ -97,12 +97,12 @@ const baseResourceGroup: ResourceGroup = {
 };
 describe('Update resource', () => {
   let client: ApolloServerTestClient;
-  let bucketContents: { current: ResourceGroup; policyFiles: { [name: string]: string } };
+  let bucketContents: MockResourceBucket;
 
   beforeEachDispose(() => {
     client = createTestClient(app);
     const initialPolicyFiles = { 'namespace-name.wasm': 'old compiled code' };
-    bucketContents = mockResourceBucket(baseResourceGroup, initialPolicyFiles);
+    bucketContents = mockResourceBucket({ registry: baseResourceGroup, policyFiles: initialPolicyFiles });
 
     return () => nock.cleanAll();
   });
@@ -124,7 +124,7 @@ describe('Update resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateSchemas: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
   });
 
   it('update a Schema with wrong input', async () => {
@@ -150,7 +150,7 @@ describe('Update resource', () => {
     });
 
     expect(response.errors).toBeDefined();
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
   });
 
   it('updates a Schema using updateResourceGroup', async () => {
@@ -170,7 +170,7 @@ describe('Update resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateResourceGroup: { success: true } });
-    expect(bucketContents.current).toMatchObject({ ...baseResourceGroup, schemas: [newSchema] });
+    expect(bucketContents.gateway).toMatchObject({ ...baseResourceGroup, schemas: [newSchema] });
   });
 
   it('updates a Schema with @gql directive', async () => {
@@ -216,7 +216,7 @@ describe('Update resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateResourceGroup: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
   });
 
   it('Upstream', async () => {
@@ -244,7 +244,7 @@ describe('Update resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateUpstreams: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
   });
 
   it('UpstreamClientCredentials', async () => {
@@ -271,7 +271,7 @@ describe('Update resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateUpstreamClientCredentials: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
   });
 
   it('updates an opa type policy', async () => {
@@ -293,7 +293,7 @@ describe('Update resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updatePolicies: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
 
     const compiledFilename = 'namespace-name.wasm';
     const uncompiledPath = path.resolve(tmpPoliciesDir, 'namespace-name.rego');
@@ -330,7 +330,7 @@ describe('Update resource', () => {
 
     expect(response.errors).toBeUndefined();
     expect(response.data).toEqual({ updateResourceGroup: { success: true } });
-    expect(bucketContents.current).toMatchSnapshot();
+    expect(bucketContents.gateway).toMatchSnapshot();
 
     const compiledFilename = 'namespace-name.wasm';
     const uncompiledPath = path.resolve(tmpPoliciesDir, 'namespace-name.rego');

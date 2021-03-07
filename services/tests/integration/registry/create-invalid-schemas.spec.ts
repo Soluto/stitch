@@ -47,7 +47,7 @@ describe('Creation of invalid schemas', () => {
 
   beforeEachDispose(() => {
     client = createTestClient(app);
-    mockResourceBucket(baseResourceGroup);
+    mockResourceBucket({ registry: baseResourceGroup });
 
     return () => nock.cleanAll();
   });
