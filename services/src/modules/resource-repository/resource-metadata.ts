@@ -26,5 +26,5 @@ export default function buildResourcesMetadata(
     result.plugins = getPlugins();
   }
 
-  return JSON.stringify(result, undefined, 4);
+  return JSON.stringify(result, undefined, 2);
 }
