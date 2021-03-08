@@ -26,6 +26,6 @@ jobs:
           file: deployment/docker/Dockerfile
           tags: | 
             ghcr.io/${{ github.repository_owner }}/stitch:latest
-            ghcr.io/${{ github.repository_owner }}/stitch:${{ steps.get_version.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/stitch:${{ steps.get_version.outputs.version-without-v }}
           labels: |
             org.opencontainers.image.source=${{ github.event.repository.html_url }}
