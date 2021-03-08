@@ -1,0 +1,42 @@
+name: Push new image version
+
+on:
+  create:
+    tags:
+      - v*
+
+jobs:
+  build_push:
+    name: Build And Push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Login to GHCR
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.ORG_CR_WRITER_USER }}
+          password: ${{ secrets.ORG_CR_WRITER_PASSWORD }}
+
+      - id: get_version
+        name: Format docker image tag
+        uses: battila7/get-version-action@v2
+
+      - id: repository_owner
+        name: Format repository owner
+        uses: ASzc/change-string-case-action@v1
+        with:
+          string: ${{ github.repository_owner }}
+
+      - name: Build and push new docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./services
+          push: true
+          file: ./services/deployment/docker/Dockerfile
+          tags: |
+            ghcr.io/${{ steps.repository_owner.outputs.lowercase }}/stitch:latest
+            ghcr.io/${{ steps.repository_owner.outputs.lowercase }}/stitch:${{ steps.get_version.outputs.version-without-v }}
+          labels: |
+            org.opencontainers.image.source=${{ github.event.repository.html_url }}
