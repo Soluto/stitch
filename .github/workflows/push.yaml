@@ -27,7 +27,7 @@ jobs:
         with:
           context: ./services
           push: true
-          file: deployment/docker/Dockerfile
+          file: ./deployment/docker/Dockerfile
           tags: | 
             ghcr.io/${{ steps.repository_owner.outputs.lowercase }}/stitch:latest
             ghcr.io/${{ steps.repository_owner.outputs.lowercase }}/stitch:${{ steps.get_version.outputs.version-without-v }}
