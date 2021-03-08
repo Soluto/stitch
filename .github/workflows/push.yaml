@@ -10,6 +10,7 @@ jobs:
     name: 'Build And Push'
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Login to GHCR
         uses: docker/login-action@v1
         with:
