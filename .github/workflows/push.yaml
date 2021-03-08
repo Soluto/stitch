@@ -29,7 +29,7 @@ jobs:
           push: true
           file: deployment/docker/Dockerfile
           tags: | 
-            ghcr.io/${{ steps.repository_owner.otuputs.lowercase }}/stitch:latest
-            ghcr.io/${{ steps.repository_owner.otuputs.lowercase }}/stitch:${{ steps.get_version.outputs.version-without-v }}
+            ghcr.io/${{ steps.repository_owner.outputs.lowercase }}/stitch:latest
+            ghcr.io/${{ steps.repository_owner.outputs.lowercase }}/stitch:${{ steps.get_version.outputs.version-without-v }}
           labels: |
             org.opencontainers.image.source=${{ github.event.repository.html_url }}
