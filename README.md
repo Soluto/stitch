@@ -32,7 +32,6 @@ Use the Tiltfile/docker-compose.yml located in `deployment/dev` to get a local e
 ### CI & Versioning
 
 - Tests run on all pull requests
-- When merging to master, CI will publish soluto/stitch:\$commit_sha and soluto/stitch:latest
-- When pushing a version tag to the repo, CI will pick it up and create a docker image from the tagged commit tagged as the git tag. I.E. pushing v7.0 tag will create soluto/stitch:v7.0
+- When pushing a new version tag to the repo, CI will pick it up and create a docker image from the tagged commit tagged as the git tag. I.E. pushing v0.7.0 tag will create `ghcr.io/soluto/stitch:0.7.0` image and also `ghrc.io/soluto/stitch:latest`.
 
 [![Stitch](https://circleci.com/gh/Soluto/stitch.svg?style=svg)](https://circleci.com/gh/Soluto/stitch)
