@@ -8,6 +8,7 @@ import {
   buildArgumentInjectionGlobals,
   transformResourceGroup,
   transformBaseSchema,
+  transformApolloServerPlugins,
 } from './apply-plugins';
 import { PluginMetadata } from './types';
 
@@ -17,6 +18,7 @@ export {
   buildArgumentInjectionGlobals,
   transformResourceGroup,
   transformBaseSchema,
+  transformApolloServerPlugins,
 };
 
 export function getPlugins(): PluginMetadata[] {

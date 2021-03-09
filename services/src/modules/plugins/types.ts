@@ -1,3 +1,4 @@
+import { PluginDefinition } from 'apollo-server-core';
 import { BaseSchema } from '../base-schema';
 import { ResourceGroup } from '../resource-repository';
 
@@ -20,4 +21,6 @@ export interface StitchPlugin {
   transformResourceGroup?(resourceGroup: ResourceGroup): ValueOrPromise<ResourceGroup>;
 
   transformBaseSchema?(baseSchema: BaseSchema): ValueOrPromise<BaseSchema>;
+
+  transformApolloServerPlugins?(plugins: PluginDefinition[]): PluginDefinition[];
 }
