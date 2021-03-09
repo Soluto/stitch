@@ -79,6 +79,19 @@ describe('Metrics', () => {
     ).toBeTruthy();
   });
 
+  test('Parsing errors metric', async () => {
+    await gatewayClient.request('wrong query');
+
+    const response = await fetch(gatewayMetricsEndpoint);
+    expect(response.ok).toBeTruthy();
+    const body = await response.text();
+    const metrics = body.split('\n');
+    console.log(
+      '=====',
+      metrics.some(m => m.startsWith('graphql_request_parsing_errors'))
+    );
+  });
+
   test('Registry metrics', async () => {
     const response = await fetch(registryMetricsEndpoint);
     expect(response.ok).toBeTruthy();

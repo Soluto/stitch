@@ -2,13 +2,17 @@ import {
   ApolloServerPlugin,
   GraphQLRequestContextWillSendResponse,
   GraphQLFieldResolverParams,
+  GraphQLRequestListenerParsingDidEnd,
+  GraphQLRequestListenerValidationDidEnd,
 } from 'apollo-server-plugin-base';
 import { FastifyInstance } from 'fastify';
-import { Histogram } from 'prom-client';
+import { Histogram, Counter } from 'prom-client';
 import { knownApolloDirectives } from '../config';
 
 let requestDurationHistogram: Histogram<string> | undefined;
 let resolverDurationHistogram: Histogram<string> | undefined;
+let requestParsingErrorCounter: Counter<string> | undefined;
+let requestValidationErrorCounter: Counter<string> | undefined;
 
 export function createMetricsPlugin(fastifyInstance: Pick<FastifyInstance, 'metrics'>): ApolloServerPlugin {
   return {
@@ -25,10 +29,34 @@ export function createMetricsPlugin(fastifyInstance: Pick<FastifyInstance, 'metr
         help: 'resolver duration in seconds',
         labelNames: ['parentType', 'fieldName', 'status'],
       });
+
+      requestParsingErrorCounter = new promClient.Counter({
+        name: 'graphql_request_parsing_errors',
+        help: 'request query parsing errors',
+      });
+
+      requestValidationErrorCounter = new promClient.Counter({
+        name: 'graphql_request_validation_errors',
+        help: 'request query validation errors',
+      });
     },
     requestDidStart() {
       const endResponseTimer = requestDurationHistogram?.startTimer();
       return {
+        parsingDidStart(): GraphQLRequestListenerParsingDidEnd {
+          return (err?: Error) => {
+            if (err) {
+              requestParsingErrorCounter?.inc(1);
+            }
+          };
+        },
+        validationDidStart(): GraphQLRequestListenerValidationDidEnd {
+          return (err?: ReadonlyArray<Error>) => {
+            if (err && err?.length > 0) {
+              requestValidationErrorCounter?.inc(1);
+            }
+          };
+        },
         willSendResponse(willSendResponseContext: GraphQLRequestContextWillSendResponse<unknown>) {
           const {
             response: { errors },
