@@ -70,7 +70,7 @@ services:
       - ./config/plugins:/plugins:ro
 
   minio:
-    image: minio/minio
+    image: minio/minio:RELEASE.2021-03-04T00-53-13Z
     ports:
       - 9000:9000
     entrypoint: sh
@@ -88,7 +88,7 @@ services:
 
   oidc-server-mock:
     container_name: oidc-server-mock
-    image: soluto/oidc-server-mock:0.3.0
+    image: ghcr.io/soluto/oidc-server-mock:0.4.0
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8060;http://+:8070;http://+:8071

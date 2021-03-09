@@ -1,0 +1,21 @@
+{
+  "name": "transform-apollo-server-plugins",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist",
+  "scripts": {
+    "prepare": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "peerDependencies": {
+    "apollo-server-core": "^2.21.1",
+    "apollo-server-plugin-base": "^0.10.4"
+  },
+  "devDependencies": {
+    "apollo-server-core": "^2.21.1",
+    "apollo-server-plugin-base": "^0.10.4",
+    "typescript": "^4.1.2"
+  }
+}

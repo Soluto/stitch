@@ -10,6 +10,12 @@ Object {
 }
 `;
 
+exports[`Plugins Check transformApolloServerPlugins plugin 1`] = `
+Object {
+  "pl_foo": "SUCCESS!",
+}
+`;
+
 exports[`Plugins List plugins: gateway 1`] = `
 Object {
   "plugins": Array [
@@ -52,6 +58,10 @@ Object {
     Object {
       "name": "single-file.js",
       "version": "N/A",
+    },
+    Object {
+      "name": "transform-apollo-server-plugins",
+      "version": "1.0.0",
     },
     Object {
       "name": "transform-base-schema",
@@ -111,6 +121,10 @@ Object {
     Object {
       "name": "single-file.js",
       "version": "N/A",
+    },
+    Object {
+      "name": "transform-apollo-server-plugins",
+      "version": "1.0.0",
     },
     Object {
       "name": "transform-base-schema",

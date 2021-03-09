@@ -60,6 +60,16 @@ describe('Plugins', () => {
     expect(response).toMatchSnapshot();
   });
 
+  test('Check transformApolloServerPlugins plugin', async () => {
+    const pluginsQuery = print(gql`
+      query TransformApolloServerPluginsOperation {
+        pl_foo
+      }
+    `);
+    const response = await gatewayClient.request(pluginsQuery);
+    expect(response).toMatchSnapshot();
+  });
+
   test('Plugin crashes', async () => {
     const result = await registryClient
       .request<RegistryMutationResponse>(updateSchemasMutation, {
