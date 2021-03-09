@@ -73,6 +73,27 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
+    'Source multiline',
+    {
+      typeDefs: gql`
+        type Query {
+          foo: SomeType!
+            @localResolver(
+              value: {
+                field3: """
+                {
+                  source.bar
+                }
+                """
+              }
+              mergeStrategy: Merge
+            )
+        }
+      `,
+      rootValue: { bar: 'bar' },
+    },
+  ],
+  [
     'Variable',
     {
       typeDefs: gql`
@@ -323,8 +344,9 @@ describe.each(testCases)(
     const testCommand = only ? test.only : test;
 
     testCommand(testCase, async () => {
-      const response = await client.query({ query, variables });
-      expect(response.data).toEqual(expected);
+      const { data, errors } = await client.query({ query, variables });
+      expect(errors).toBeUndefined();
+      expect(data).toEqual(expected);
     });
   }
 );
