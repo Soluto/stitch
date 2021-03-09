@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
+import { PluginDefinition } from 'apollo-server-core';
 import { BaseSchema } from '../base-schema';
 import { pluginsDir, pluginsConfig } from '../config';
 import logger from '../logger';
@@ -115,6 +116,29 @@ export async function transformBaseSchema(baseSchema: BaseSchema): Promise<BaseS
     }
   }
   return bs;
+}
+
+export function transformApolloServerPlugins(baseApolloServerPlugins: PluginDefinition[]): PluginDefinition[] {
+  let apolloServerPlugins: PluginDefinition[] = baseApolloServerPlugins;
+  const pluginsToApply = plugins.filter(p => p.transformApolloServerPlugins);
+  for (const curPlugin of pluginsToApply) {
+    try {
+      logger.trace(
+        { plugin: curPlugin.name, method: 'transformApolloServerPlugins' },
+        `Applying transformApolloServerPlugins of ${curPlugin.name} plugin...`
+      );
+      apolloServerPlugins = curPlugin.transformApolloServerPlugins!(apolloServerPlugins);
+      logger.trace(
+        { plugin: curPlugin.name, method: 'transformApolloServerPlugins' },
+        `transformApolloServerPlugins of ${curPlugin.name} plugin was applied successfully.`
+      );
+    } catch (err) {
+      const message = `Plugin "${curPlugin.name}" failed to execute "transformApolloServerPlugins" with error: ${err}`;
+      logger.warn({ err, plugin: curPlugin.name, method: 'transformApolloServerPlugins' }, message);
+      throw new Error(message);
+    }
+  }
+  return apolloServerPlugins;
 }
 
 async function getPluginVersion(path: string) {

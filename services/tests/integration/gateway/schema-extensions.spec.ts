@@ -87,7 +87,7 @@ describe('Schema Extensions', () => {
 
     const stitch = createStitchGateway({
       resourceGroups: Rx.of(resourceGroup),
-      fastifyInstance: { metrics: undefined as any },
+      fastifyInstance: { metrics: undefined as any } as any,
     });
     client = createTestClient(stitch.server);
 
