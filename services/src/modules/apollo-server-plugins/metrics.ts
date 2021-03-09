@@ -31,12 +31,12 @@ export function createMetricsPlugin(fastifyInstance: Pick<FastifyInstance, 'metr
       });
 
       requestParsingErrorCounter = new promClient.Counter({
-        name: 'graphql_request_parsing_errors',
+        name: 'graphql_request_parsing_errors_count',
         help: 'request query parsing errors',
       });
 
       requestValidationErrorCounter = new promClient.Counter({
-        name: 'graphql_request_validation_errors',
+        name: 'graphql_request_validation_errors_count',
         help: 'request query validation errors',
       });
     },

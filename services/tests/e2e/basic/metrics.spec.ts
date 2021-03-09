@@ -80,16 +80,28 @@ describe('Metrics', () => {
   });
 
   test('Parsing errors metric', async () => {
-    await gatewayClient.request('wrong query');
+    await expect(gatewayClient.request('wrong query')).rejects.toMatchSnapshot();
 
     const response = await fetch(gatewayMetricsEndpoint);
     expect(response.ok).toBeTruthy();
     const body = await response.text();
     const metrics = body.split('\n');
-    console.log(
-      '=====',
-      metrics.some(m => m.startsWith('graphql_request_parsing_errors'))
-    );
+    expect(metrics.some(m => m === 'graphql_request_parsing_errors_count 1')).toBeTruthy();
+  });
+
+  test('Validation errors metric', async () => {
+    const query = print(gql`
+      query {
+        wrong
+      }
+    `);
+    await expect(gatewayClient.request(query)).rejects.toMatchSnapshot();
+
+    const response = await fetch(gatewayMetricsEndpoint);
+    expect(response.ok).toBeTruthy();
+    const body = await response.text();
+    const metrics = body.split('\n');
+    expect(metrics.some(m => m === 'graphql_request_validation_errors_count 1')).toBeTruthy();
   });
 
   test('Registry metrics', async () => {
