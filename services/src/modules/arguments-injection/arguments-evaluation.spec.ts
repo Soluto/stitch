@@ -63,6 +63,14 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
+    'Object builder multiline',
+    {
+      template: ' \n {{ \n foo, \n bar }} \n ',
+      data: { foo: 'Foo', bar: 'Bar' },
+      expected: { foo: 'Foo', bar: 'Bar' },
+    },
+  ],
+  [
     'Object with serialized object as property',
     {
       template: '{{ foo, bar, baz: "{ \\"foo\\": \\"FOO\\", \\"bar\\": { \\"baz\\": \\"BAZ\\" } }" }}',
