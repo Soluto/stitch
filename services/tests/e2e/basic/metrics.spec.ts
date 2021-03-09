@@ -17,6 +17,13 @@ const registryClient = new GraphQLClient(`${registryBaseUrl}/graphql`);
 const gatewayMetricsEndpoint = `${gatewayBaseUrl}/metrics`;
 const registryMetricsEndpoint = `${registryBaseUrl}/metrics`;
 
+async function getMetrics(endpoint: string) {
+  const response = await fetch(endpoint);
+  expect(response.ok).toBeTruthy();
+  const body = await response.text();
+  return body.split('\n');
+}
+
 describe('Metrics', () => {
   const query = print(gql`
     query {
@@ -49,10 +56,7 @@ describe('Metrics', () => {
   });
 
   test('Check metrics', async () => {
-    const response = await fetch(gatewayMetricsEndpoint);
-    expect(response.ok).toBeTruthy();
-    const body = await response.text();
-    const metrics = body.split('\n');
+    const metrics = await getMetrics(gatewayMetricsEndpoint);
     const graphqlMetrics = metrics.filter(m => m.includes('graphql_'));
     expect(graphqlMetrics).toMatchSnapshot();
   });
@@ -68,10 +72,7 @@ describe('Metrics', () => {
   });
 
   test('Check metrics again', async () => {
-    const response = await fetch(gatewayMetricsEndpoint);
-    expect(response.ok).toBeTruthy();
-    const body = await response.text();
-    const metrics = body.split('\n');
+    const metrics = await getMetrics(gatewayMetricsEndpoint);
     expect(
       metrics.some(
         m => m === 'graphql_resolver_duration_seconds_count{parentType="MetricsFoo",fieldName="baz",status="success"} 1'
@@ -82,10 +83,7 @@ describe('Metrics', () => {
   test('Parsing errors metric', async () => {
     await expect(gatewayClient.request('wrong query')).rejects.toMatchSnapshot();
 
-    const response = await fetch(gatewayMetricsEndpoint);
-    expect(response.ok).toBeTruthy();
-    const body = await response.text();
-    const metrics = body.split('\n');
+    const metrics = await getMetrics(gatewayMetricsEndpoint);
     expect(metrics.some(m => m === 'graphql_request_parsing_errors_count 1')).toBeTruthy();
   });
 
@@ -97,18 +95,12 @@ describe('Metrics', () => {
     `);
     await expect(gatewayClient.request(query)).rejects.toMatchSnapshot();
 
-    const response = await fetch(gatewayMetricsEndpoint);
-    expect(response.ok).toBeTruthy();
-    const body = await response.text();
-    const metrics = body.split('\n');
+    const metrics = await getMetrics(gatewayMetricsEndpoint);
     expect(metrics.some(m => m === 'graphql_request_validation_errors_count 1')).toBeTruthy();
   });
 
   test('Registry metrics', async () => {
-    const response = await fetch(registryMetricsEndpoint);
-    expect(response.ok).toBeTruthy();
-    const body = await response.text();
-    const metrics = body.split('\n');
+    const metrics = await getMetrics(registryMetricsEndpoint);
     const sampleMetric = metrics.find(m => m.startsWith('nodejs_version_info'));
     expect(sampleMetric).toBeDefined();
     const majorVersion = /major="(\d+)"/g.exec(sampleMetric!);
