@@ -136,4 +136,21 @@ export function transformBaseSchema(baseSchema: BaseSchema): BaseSchema {
 }
 ```
 
+## transformApolloServerPlugins
+
+Allows to add or remove [Apollo Server Plugins](https://www.apollographql.com/docs/apollo-server/integrations/plugins/).
+
+The function receives the default system plugin collection. It should return plugin collection as well.
+
+For exampe:
+
+```typescript
+export function transformApolloServerPlugins(plugins: PluginDefinition[]): PluginDefinition[] {
+  const plugin: ApolloServerPlugin = {
+    // Plugin code here
+  };
+  return [...plugins, plugin];
+}
+```
+
 There are some more plugins examples [here](https://github.com/Soluto/stitch/tree/master/services/tests/e2e/config/plugins).
