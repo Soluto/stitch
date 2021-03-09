@@ -10,7 +10,8 @@
     "build": "tsc",
     "build:dev": "tsc --watch",
     "start:gateway:watch": "ts-node-dev src/gateway.ts",
-    "start:registry:watch": "ts-node-dev src/registry.ts"
+    "start:registry:watch": "ts-node-dev src/registry.ts",
+    "type-check": "tsc --noEmit"
   },
   "license": "ISC",
   "engines": {
