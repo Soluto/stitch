@@ -7,10 +7,9 @@ const fullCapture = /(^{[^{]+}$)|(^{{.+}}$|^{\[.+]}$)/gs;
 function evaluate<T>(template: string, data?: Record<string, unknown>): T {
   try {
     const vm = new VM().setGlobal('globals', argumentInjectionGlobals).setGlobals(data);
-    const fullMatchTemplate = template.trim();
-    const fullMatch = fullMatchTemplate.match(fullCapture);
+    const fullMatch = template.match(fullCapture);
     if (fullMatch) {
-      return vm.run(`(function evaluate() { return ${fullMatchTemplate.slice(1, -1)}; })()`);
+      return vm.run(`(function evaluate() { return ${template.slice(1, -1).trim()}; })()`);
     }
 
     const expression = template.replace(exprStart, '${');

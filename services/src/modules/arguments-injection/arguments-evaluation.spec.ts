@@ -65,7 +65,7 @@ const testCases: [string, TestCase][] = [
   [
     'Object builder multiline',
     {
-      template: ' \n {{ \n foo, \n bar }} \n ',
+      template: '{{ \n foo, \n bar \n }}',
       data: { foo: 'Foo', bar: 'Bar' },
       expected: { foo: 'Foo', bar: 'Bar' },
     },
