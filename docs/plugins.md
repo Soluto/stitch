@@ -9,7 +9,7 @@ Plugins allow extending Stitch functionality. Plugin can modify the resource gro
 Stitch loads plugins from a specific location that can be configured by the environment variable `PLUGINS_DIR`.
 Each file or folder at the root level is loaded. It can be a single javascript file, a directory containing `index.js` file, or a directory with a `package.json` file that has the `main` property.
 
-The plugin file cannot require npm modules. It should export one of the following:
+Plugin should export one of the following:
 
 1. An object implementing the StitchPlugin interface (see below)
 2. A promise to the object as described in (1)
@@ -80,7 +80,7 @@ query {
 
 Result: `{ foo: "__HELLO__" }`.
 
-## transformResourceGroup
+### transformResourceGroup
 
 Allows transforming the resource group. This transformation is done every time the resource group is changed by a mutation call to the Registry service.
 
@@ -101,7 +101,7 @@ For example this plugin adds a base policy if one does not exist:
 }
 ```
 
-## transformBaseSchema
+### transformBaseSchema
 
 Allow to transform the base schema. This method can modify the scalars and directives definitions.
 
@@ -136,13 +136,13 @@ export function transformBaseSchema(baseSchema: BaseSchema): BaseSchema {
 }
 ```
 
-## transformApolloServerPlugins
+### transformApolloServerPlugins
 
 Allows to add or remove [Apollo Server Plugins](https://www.apollographql.com/docs/apollo-server/integrations/plugins/).
 
 The function receives the default system plugin collection. It should return plugin collection as well.
 
-For exampe:
+For example:
 
 ```typescript
 export function transformApolloServerPlugins(plugins: PluginDefinition[]): PluginDefinition[] {
@@ -154,3 +154,20 @@ export function transformApolloServerPlugins(plugins: PluginDefinition[]): Plugi
 ```
 
 There are some more plugins examples [here](https://github.com/Soluto/stitch/tree/master/services/tests/e2e/config/plugins).
+
+## Runtime information
+
+- Currently running plugins can be queried from each service (Gateway and Registry) using the following query:
+
+  ```graphql
+  query {
+    plugins {
+      name
+      version
+    }
+  }
+  ```
+
+- On resource group update Registry stores the names and versions of plugins at that moment as a part of resource group metadata.
+
+> Resource group metadata is stored in separate files named `gateway-metadata.json` and `registry-metadata.json`.
