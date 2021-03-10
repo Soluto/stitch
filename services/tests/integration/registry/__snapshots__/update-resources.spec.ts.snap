@@ -2,6 +2,7 @@
 
 exports[`Update resource Upstream 1`] = `
 Object {
+  "plugin": Object {},
   "policies": Array [
     Object {
       "args": Object {
@@ -93,6 +94,7 @@ Object {
 
 exports[`Update resource UpstreamClientCredentials 1`] = `
 Object {
+  "plugin": Object {},
   "policies": Array [
     Object {
       "args": Object {
@@ -242,6 +244,7 @@ Object {
 
 exports[`Update resource updates a Schema 1`] = `
 Object {
+  "plugin": Object {},
   "policies": Array [
     Object {
       "args": Object {
@@ -317,6 +320,7 @@ Object {
 
 exports[`Update resource updates a Schema with @gql directive 1`] = `
 Object {
+  "plugin": Object {},
   "policies": Array [
     Object {
       "args": Object {
@@ -401,6 +405,7 @@ Object {
 
 exports[`Update resource updates an opa type policy 1`] = `
 Object {
+  "plugin": Object {},
   "policies": Array [
     Object {
       "args": Object {
@@ -477,6 +482,7 @@ Object {
 
 exports[`Update resource updates an opa type policy using updateResourceGroup 1`] = `
 Object {
+  "plugin": Object {},
   "policies": Array [
     Object {
       "args": Object {

@@ -17,6 +17,7 @@ export interface ResourceGroup {
   basePolicy?: Policy;
   defaultUpstream?: DefaultUpstream;
   remoteSchemas?: RemoteSchema[];
+  pluginsData?: Record<string, any>;
 }
 
 export interface Resource {

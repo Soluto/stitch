@@ -20,6 +20,7 @@ export const schema: Schema = {
         @policy(namespace: "plugins", name: "whole-rg-policy")
       pl_new_foo: Point! @localResolver(value: { x: 1, y: 2 })
       pl_new_bar: String! @localResolver(value: "NEW BAR") @reverse
+      pl_new_data: String! @localResolver(value: "{plugins.foo}")
     }
   `),
 };
