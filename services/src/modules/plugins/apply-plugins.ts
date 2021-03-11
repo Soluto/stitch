@@ -73,7 +73,7 @@ export async function buildArgumentInjectionGlobals(): Promise<Record<string, un
 }
 
 export async function transformResourceGroup(resourceGroup: ResourceGroup): Promise<ResourceGroup> {
-  let rg: ResourceGroup = resourceGroup;
+  let rg: ResourceGroup = { ...resourceGroup, pluginsData: {} };
   const pluginsToApply = plugins.filter(p => p.transformResourceGroup);
   for (const curPlugin of pluginsToApply) {
     try {

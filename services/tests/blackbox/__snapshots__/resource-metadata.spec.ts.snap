@@ -16,14 +16,15 @@ exports[`Resource metadata Check metadata files 1`] = `
 
 exports[`Resource metadata Check metadata files 2`] = `
 "{
-  \\"checksum\\": \\"83d4b8c0a958a17fc6ba922b99476413\\",
+  \\"checksum\\": \\"0ea9e8d688ca6f7bc46eb8cee9071a40\\",
   \\"summary\\": {
     \\"schemas\\": 1,
     \\"upstreams\\": 0,
     \\"upstreamClientCredentials\\": 0,
     \\"policies\\": 0,
     \\"remoteSchemas\\": 0,
-    \\"policyAttachments\\": 1
+    \\"policyAttachments\\": 1,
+    \\"pluginsData\\": 1
   },
   \\"plugins\\": [
     {
@@ -54,14 +55,15 @@ exports[`Resource metadata Check metadata files again 1`] = `
 
 exports[`Resource metadata Check metadata files again 2`] = `
 "{
-  \\"checksum\\": \\"0c798a1f566dc58d635e503363121e05\\",
+  \\"checksum\\": \\"9ea80e577c5cb0df653380727e0e4325\\",
   \\"summary\\": {
     \\"schemas\\": 2,
     \\"upstreams\\": 0,
     \\"upstreamClientCredentials\\": 0,
     \\"policies\\": 0,
     \\"remoteSchemas\\": 0,
-    \\"policyAttachments\\": 1
+    \\"policyAttachments\\": 1,
+    \\"pluginsData\\": 1
   },
   \\"plugins\\": [
     {

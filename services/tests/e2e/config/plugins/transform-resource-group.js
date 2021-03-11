@@ -24,6 +24,8 @@ module.exports = {
       newRg.policies.push(wholeRgPolicy);
     }
 
+    newRg.pluginsData = { ...rg.pluginsData, foo: 'bar' };
+
     return newRg;
   },
 };

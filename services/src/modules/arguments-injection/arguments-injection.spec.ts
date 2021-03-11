@@ -4,7 +4,10 @@ import { inject } from './arguments-injection';
 
 interface TestCase {
   input: unknown;
-  params: GraphQLFieldResolverParams<unknown, Pick<RequestContext, 'request' | 'exports' | 'request'>>;
+  params: GraphQLFieldResolverParams<
+    unknown,
+    Pick<RequestContext, 'request' | 'exports' | 'request' | 'resourceGroup'>
+  >;
   expected: unknown;
 }
 
@@ -56,6 +59,7 @@ const testCases: [string, TestCase][] = [
         source: null,
         args: {},
         context: {
+          resourceGroup: {} as any,
           request: {
             isAnonymousAccess: () => false,
             headers: {
@@ -80,6 +84,7 @@ const testCases: [string, TestCase][] = [
         source: null,
         args: {},
         context: {
+          resourceGroup: {} as any,
           request: {
             isAnonymousAccess: () => false,
             headers: {},
@@ -106,6 +111,7 @@ const testCases: [string, TestCase][] = [
         source: null,
         args: {},
         context: {
+          resourceGroup: {} as any,
           request: {
             isAnonymousAccess: () => true,
             headers: {},

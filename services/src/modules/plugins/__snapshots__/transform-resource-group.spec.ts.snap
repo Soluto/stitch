@@ -2,6 +2,7 @@
 
 exports[`Plugins: transformResourceGroup transformResourceGroup 1`] = `
 Object {
+  "pluginsData": Object {},
   "policies": Array [
     Object {
       "code": "REGO code",

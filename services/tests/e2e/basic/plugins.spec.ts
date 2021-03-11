@@ -18,6 +18,7 @@ describe('Plugins', () => {
       pl_tar
       pl_new_foo
       pl_new_bar
+      pl_new_data
     }
   `);
 

@@ -150,6 +150,7 @@ Object {
 
 exports[`Rebuild resource group rebuild resources: after 1`] = `
 Object {
+  "pluginsData": Object {},
   "policies": Array [
     Object {
       "args": Object {
