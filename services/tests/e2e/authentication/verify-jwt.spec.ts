@@ -4,7 +4,7 @@ import { sleep } from '../../helpers/utility';
 import { RegistryMutationResponse, updateSchemasMutation } from '../../helpers/registry-request-builder';
 import { getToken, getInvalidToken } from '../../helpers/get-token';
 import { startContainerOutputCapture } from '../../helpers/get-container-logs';
-import { schema, query } from './verify-jwt.schema';
+import { schema, query, variables } from './verify-jwt.schema';
 
 const formatLogs = (logs: string) =>
   logs
@@ -37,7 +37,7 @@ describe('Authentication - Verify JWT', () => {
 
     const endContainerOutputCapture = await startContainerOutputCapture('gateway');
     await sleep(50); // wait a bit longer for output capture
-    const result = await gatewayClient.request(query);
+    const result = await gatewayClient.request(query, variables);
     expect(result).toMatchSnapshot();
 
     const captureResult = await endContainerOutputCapture();
@@ -50,7 +50,7 @@ describe('Authentication - Verify JWT', () => {
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
 
     const endContainerOutputCapture = await startContainerOutputCapture('gateway');
-    const result = await gatewayClient.request(query).catch(e => e.response);
+    const result = await gatewayClient.request(query, variables).catch(e => e.response);
     expect(result).toMatchSnapshot();
 
     const captureResult = await endContainerOutputCapture();
@@ -62,7 +62,7 @@ describe('Authentication - Verify JWT', () => {
     const credentials = Buffer.from('user:pwd').toString('base64');
     gatewayClient.setHeader('Authorization', `Basic ${credentials}`);
 
-    const result = await gatewayClient.request(query).catch(e => e.response);
+    const result = await gatewayClient.request(query, variables).catch(e => e.response);
     expect(result).toMatchSnapshot();
   });
 
@@ -71,7 +71,7 @@ describe('Authentication - Verify JWT', () => {
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
 
     const endContainerOutputCapture = await startContainerOutputCapture('gateway');
-    const result = await gatewayClient.request(query).catch(e => e.response);
+    const result = await gatewayClient.request(query, variables).catch(e => e.response);
     expect(result).toMatchSnapshot();
 
     const captureResult = await endContainerOutputCapture();
@@ -84,7 +84,7 @@ describe('Authentication - Verify JWT', () => {
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
 
     const endContainerOutputCapture = await startContainerOutputCapture('gateway');
-    const result = await gatewayClient.request(query).catch(e => e.response);
+    const result = await gatewayClient.request(query, variables).catch(e => e.response);
     expect(result).toMatchSnapshot();
 
     const captureResult = await endContainerOutputCapture();
@@ -97,7 +97,7 @@ describe('Authentication - Verify JWT', () => {
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
 
     const endContainerOutputCapture = await startContainerOutputCapture('gateway');
-    const result = await gatewayClient.request(query).catch(e => e.response);
+    const result = await gatewayClient.request(query, variables).catch(e => e.response);
     expect(result).toMatchSnapshot();
 
     const captureResult = await endContainerOutputCapture();
@@ -110,7 +110,7 @@ describe('Authentication - Verify JWT', () => {
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
 
     const endContainerOutputCapture = await startContainerOutputCapture('gateway');
-    const result = await gatewayClient.request(query);
+    const result = await gatewayClient.request(query, variables);
     expect(result).toMatchSnapshot();
 
     const captureResult = await endContainerOutputCapture();
@@ -123,7 +123,7 @@ describe('Authentication - Verify JWT', () => {
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
 
     const endContainerOutputCapture = await startContainerOutputCapture('gateway');
-    const result = await gatewayClient.request(query);
+    const result = await gatewayClient.request(query, variables);
     expect(result).toMatchSnapshot();
 
     const captureResult = await endContainerOutputCapture();

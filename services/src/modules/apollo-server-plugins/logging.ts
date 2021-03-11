@@ -9,25 +9,27 @@ export function createLoggingPlugin(): ApolloServerPlugin {
   return {
     requestDidStart(requestDidStartContext: GraphQLRequestContext<unknown>) {
       const {
-        request: { query, operationName },
+        request: { query, operationName, variables },
       } = requestDidStartContext;
       const startHrTime = process.hrtime.bigint();
-      logger.trace({ query, operationName }, 'Started to handle request');
+      const reqLogger = logger.child({ query, operationName });
+      reqLogger.debug('Started to handle request');
+      variables && reqLogger.trace({ variables }, 'request query variables');
       return {
         willSendResponse(willSendResponseContext: GraphQLRequestContextWillSendResponse<unknown>) {
           const {
-            request: { query, operationName },
-            response: { errors },
+            response: { errors, data },
           } = willSendResponseContext;
 
           const endHrTime = process.hrtime.bigint();
           const durationMs = Number(endHrTime - startHrTime) / 1000000;
-          const logData = { query, operationName, errors, durationMs };
+          const logData = { errors, durationMs };
           if (errors) {
-            logger.warn(logData, 'The server encountered errors while proceeding request');
+            reqLogger.warn(logData, 'The server encountered errors while proceeding request');
             return;
           }
-          logger.trace(logData, 'Finished to handle request');
+          reqLogger.debug(logData, 'Finished to handle request');
+          data && reqLogger.trace({ data }, 'response data');
         },
       };
     },
