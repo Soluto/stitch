@@ -5,7 +5,7 @@ Object {
   "defaultUpstream": Object {
     "targetOrigin": "http://localhost:8080",
   },
-  "plugin": Object {},
+  "pluginsData": Object {},
   "policies": Array [],
   "policyAttachments": Object {},
   "schemas": Array [
@@ -60,7 +60,7 @@ Object {
   "defaultUpstream": Object {
     "targetOrigin": "http://localhost:8080",
   },
-  "plugin": Object {},
+  "pluginsData": Object {},
   "policies": Array [
     Object {
       "args": Object {
@@ -127,7 +127,7 @@ Object {
   "defaultUpstream": Object {
     "targetOrigin": "http://localhost:8080",
   },
-  "plugin": Object {},
+  "pluginsData": Object {},
   "policies": Array [
     Object {
       "args": Object {
@@ -194,7 +194,7 @@ Object {
   "defaultUpstream": Object {
     "targetOrigin": "http://localhost:8080",
   },
-  "plugin": Object {},
+  "pluginsData": Object {},
   "policies": Array [
     Object {
       "args": Object {
@@ -257,7 +257,7 @@ Object {
   "defaultUpstream": Object {
     "targetOrigin": "http://localhost:8080",
   },
-  "plugin": Object {},
+  "pluginsData": Object {},
   "policies": Array [
     Object {
       "args": Object {
@@ -322,7 +322,7 @@ Object {
   "defaultUpstream": Object {
     "targetOrigin": "http://localhost:8080",
   },
-  "plugin": Object {},
+  "pluginsData": Object {},
   "policies": Array [],
   "policyAttachments": Object {},
   "schemas": Array [
@@ -374,7 +374,7 @@ exports[`Delete resource deletes an opa type policy using deleteResources 2`] = 
 
 exports[`Delete resource reset an Default Upstream 1`] = `
 Object {
-  "plugin": Object {},
+  "pluginsData": Object {},
   "policies": Array [
     Object {
       "args": Object {

@@ -11,7 +11,7 @@ Object {
     ],
     "targetOrigin": "http://localhost:8080",
   },
-  "plugin": Object {},
+  "pluginsData": Object {},
   "policies": Array [],
   "policyAttachments": Object {},
   "schemas": Array [],
@@ -22,7 +22,7 @@ Object {
 
 exports[`Create resource Upstream 1`] = `
 Object {
-  "plugin": Object {},
+  "pluginsData": Object {},
   "policies": Array [],
   "policyAttachments": Object {},
   "schemas": Array [],
@@ -48,7 +48,7 @@ Object {
 
 exports[`Create resource UpstreamClientCredentials 1`] = `
 Object {
-  "plugin": Object {},
+  "pluginsData": Object {},
   "policies": Array [],
   "policyAttachments": Object {},
   "schemas": Array [],
@@ -72,7 +72,7 @@ Object {
 
 exports[`Create resource creates a Schema 1`] = `
 Object {
-  "plugin": Object {},
+  "pluginsData": Object {},
   "policies": Array [],
   "policyAttachments": Object {},
   "schemas": Array [
@@ -91,7 +91,7 @@ Object {
 
 exports[`Create resource creates a Schema using updateResourceGroup 1`] = `
 Object {
-  "plugin": Object {},
+  "pluginsData": Object {},
   "policies": Array [],
   "policyAttachments": Object {},
   "schemas": Array [
@@ -110,7 +110,7 @@ Object {
 
 exports[`Create resource creates an opa type policy 1`] = `
 Object {
-  "plugin": Object {},
+  "pluginsData": Object {},
   "policies": Array [
     Object {
       "args": Object {
@@ -149,7 +149,7 @@ Object {
 
 exports[`Create resource creates an opa type policy using updateResourceGroup 1`] = `
 Object {
-  "plugin": Object {},
+  "pluginsData": Object {},
   "policies": Array [
     Object {
       "args": Object {
