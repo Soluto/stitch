@@ -18,32 +18,32 @@ export default async function (context: RegistryRequestContext, dryRun = false) 
     const resourceRepository = getResourceRepository();
 
     try {
-      logger.trace('Fetching latest resource group...');
+      logger.debug('Fetching latest resource group...');
       const { resourceGroup } = await resourceRepository.fetchLatest();
 
       const existingPolicies = _.cloneDeep(resourceGroup.policies);
 
-      logger.trace('Updating remote gql schemas...');
+      logger.debug('Updating remote gql schemas...');
       await updateRemoteGqlSchemas(resourceGroup, context);
 
       const registryRg = _.cloneDeep(resourceGroup);
 
-      logger.trace('Applying plugins for resource group...');
+      logger.debug('Applying plugins for resource group...');
       const gatewayRg = await applyPluginsForResourceGroup(resourceGroup);
 
-      logger.trace('Validating resource group...');
+      logger.debug('Validating resource group...');
       validateResourceGroupOrThrow(gatewayRg);
 
-      logger.trace('Creating schema config...');
+      logger.debug('Creating schema config...');
       await createSchemaConfig(gatewayRg);
 
-      logger.trace('Synchronizing policy attachments...');
+      logger.debug('Synchronizing policy attachments...');
       await policyAttachments.sync(existingPolicies, gatewayRg.policies);
 
       if (!dryRun) {
-        logger.trace('Saving policy attachments...');
+        logger.debug('Saving policy attachments...');
         await policyAttachments.writeToRepo();
-        logger.trace('Saving resource group...');
+        logger.debug('Saving resource group...');
         await Promise.all([
           resourceRepository.update(registryRg, { registry: true }),
           resourceRepository.update(gatewayRg),
@@ -54,7 +54,7 @@ export default async function (context: RegistryRequestContext, dryRun = false) 
       logger.error({ err }, message);
       throw err;
     } finally {
-      logger.trace('Removing policy attachments temporary files...');
+      logger.debug('Removing policy attachments temporary files...');
       await policyAttachments.cleanup();
     }
     logger.info(`All resources were ${dryRun ? 'validated' : 'rebuilt'}`);

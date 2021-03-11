@@ -15,7 +15,7 @@ export async function getAuthHeaders(
   );
   if (!credentials) return;
 
-  logger.trace(
+  logger.debug(
     { authority: credentials.activeDirectory.authority },
     `Upstream credentials found for authority: ${credentials.activeDirectory.authority}. Acquiring auth token...`
   );
@@ -26,7 +26,7 @@ export async function getAuthHeaders(
       credentials.activeDirectory.clientSecret,
       upstream.auth.activeDirectory.resource
     );
-    logger.trace({ authority: credentials.activeDirectory.authority }, 'Auth token has been acquired successfully.');
+    logger.debug({ authority: credentials.activeDirectory.authority }, 'Auth token has been acquired successfully.');
     return {
       Authorization: `Bearer ${token}`,
     };

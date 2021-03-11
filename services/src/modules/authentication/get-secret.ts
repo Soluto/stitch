@@ -70,7 +70,7 @@ export default async function getSecret(
         cb(err, undefined);
         return;
       }
-      logger.trace({ authority }, 'JWK found');
+      logger.debug({ authority }, 'JWK found');
       cb(null, key.getPublicKey());
     });
   } catch (err) {

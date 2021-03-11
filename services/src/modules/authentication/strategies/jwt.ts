@@ -8,9 +8,11 @@ export default async function (request: fastify.FastifyRequest): Promise<void> {
 
   // Verify issuer
   const issuer = String(decodedJWT.payload.iss);
+  const reqLogger = logger.child({ issuer });
+
   const issuerConfig = authenticationConfig?.jwt?.[issuer];
   if (!issuerConfig) {
-    logger.debug({ issuer }, 'Unknown issuer');
+    reqLogger.debug('Unknown issuer');
     throw new Error('Unauthorized');
   }
 
@@ -20,7 +22,7 @@ export default async function (request: fastify.FastifyRequest): Promise<void> {
       ? decodedJWT.payload.aud.map(a => String(a))
       : Array.of(String(decodedJWT.payload.aud));
     if (!audience.includes(issuerConfig.audience)) {
-      logger.debug({ issuer, audience: decodedJWT.payload.aud }, 'Unexpected audience');
+      reqLogger.debug({ audience: decodedJWT.payload.aud }, 'Unexpected audience');
       throw new Error('Unauthorized');
     }
   }
@@ -30,9 +32,9 @@ export default async function (request: fastify.FastifyRequest): Promise<void> {
     try {
       // Verify JWT signing, expiration and more
       await request.jwtVerify();
-      logger.trace({ issuer }, 'JWT verified');
+      reqLogger.trace('JWT verified');
     } catch (err) {
-      logger.debug({ err, issuer }, 'Failed to verify request JWT');
+      reqLogger.debug({ err }, 'Failed to verify request JWT');
       throw new Error('Unauthorized');
     }
   }

@@ -1,4 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql';
+import logger from '../../logger';
 import { RequestContext } from '../../context';
 import { PolicyDefinition, PolicyArgsObject } from '../../resource-repository';
 import { inject } from '../../arguments-injection';
@@ -98,6 +99,9 @@ export default class PolicyExecutor {
     const evaluate = typeEvaluators[ctx.policyDefinition.type];
     if (!evaluate) throw new Error(`Unsupported policy type ${ctx.policyDefinition.type}`);
 
+    const logData = { metadata: ctx.policyDefinition.metadata, args, query };
+    logger.trace(logData, 'Executing policy...');
+
     const { done, allow } = evaluate({
       ...ctx.policy,
       args,
@@ -105,6 +109,8 @@ export default class PolicyExecutor {
       policyAttachments: ctx.requestContext.resourceGroup.policyAttachments!,
     });
     if (!done) throw new Error('in-line query evaluation not yet supported');
+
+    logger.trace(logData, `Policy executed. The resolver execution is ${allow ? 'allowed' : 'denied'}`);
     return allow || false;
   }
 

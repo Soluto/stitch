@@ -8,15 +8,25 @@ Object {
 
 exports[`Authentication - Verify JWT Authority without discovery endpoint: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
-[hh:mm:ss.ms] TRACE: JWK found
+[hh:mm:ss.ms] DEBUG: JWK found
     authority: \\"http://authority-without-discrovery-endpoint\\"
 [hh:mm:ss.ms] TRACE: JWT verified
     issuer: \\"http://localhost:8070\\"
-[hh:mm:ss.ms] TRACE: Started to handle request
-    query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
-[hh:mm:ss.ms] TRACE: Finished to handle request
-    query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
+[hh:mm:ss.ms] DEBUG: Started to handle request
+    query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
+[hh:mm:ss.ms] TRACE: request query variables
+    variables: {
+      \\"foo\\": \\"FOO\\"
+    }
+    query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
+[hh:mm:ss.ms] DEBUG: Finished to handle request
     durationMs: XXX
+    query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
+[hh:mm:ss.ms] TRACE: response data
+    data: {
+      \\"jwt_foo\\": \\"FOO\\"
+    }
+    query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
 \\"***** END OUTPUT CAPTURE *****"
 `;
 
@@ -112,15 +122,25 @@ Object {
 
 exports[`Authentication - Verify JWT Second call with valid JWT - JWKs caching: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
-[hh:mm:ss.ms] TRACE: JWK found
+[hh:mm:ss.ms] DEBUG: JWK found
     authority: \\"http://oidc-server-mock:8060\\"
 [hh:mm:ss.ms] TRACE: JWT verified
     issuer: \\"http://localhost:8060\\"
-[hh:mm:ss.ms] TRACE: Started to handle request
-    query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
-[hh:mm:ss.ms] TRACE: Finished to handle request
-    query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
+[hh:mm:ss.ms] DEBUG: Started to handle request
+    query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
+[hh:mm:ss.ms] TRACE: request query variables
+    variables: {
+      \\"foo\\": \\"FOO\\"
+    }
+    query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
+[hh:mm:ss.ms] DEBUG: Finished to handle request
     durationMs: XXX
+    query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
+[hh:mm:ss.ms] TRACE: response data
+    data: {
+      \\"jwt_foo\\": \\"FOO\\"
+    }
+    query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
 \\"***** END OUTPUT CAPTURE *****"
 `;
 
@@ -136,8 +156,8 @@ Object {
 exports[`Authentication - Verify JWT Unexpected audience: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
 [hh:mm:ss.ms] DEBUG: Unexpected audience
-    issuer: \\"http://localhost:8070\\"
     audience: \\"Stitch Other\\"
+    issuer: \\"http://localhost:8070\\"
 \\"***** END OUTPUT CAPTURE *****"
 `;
 
@@ -168,14 +188,24 @@ exports[`Authentication - Verify JWT Valid JWT: gateway logs 1`] = `
 [hh:mm:ss.ms] DEBUG: New authority received. Creating new JWKs client...
     authority: \\"http://oidc-server-mock:8060\\"
     jwksUri: \\"http://oidc-server-mock:8060/.well-known/openid-configuration/jwks\\"
-[hh:mm:ss.ms] TRACE: JWK found
+[hh:mm:ss.ms] DEBUG: JWK found
     authority: \\"http://oidc-server-mock:8060\\"
 [hh:mm:ss.ms] TRACE: JWT verified
     issuer: \\"http://localhost:8060\\"
-[hh:mm:ss.ms] TRACE: Started to handle request
-    query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
-[hh:mm:ss.ms] TRACE: Finished to handle request
-    query: \\"{\\\\n  jwt_foo\\\\n}\\\\n\\"
+[hh:mm:ss.ms] DEBUG: Started to handle request
+    query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
+[hh:mm:ss.ms] TRACE: request query variables
+    variables: {
+      \\"foo\\": \\"FOO\\"
+    }
+    query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
+[hh:mm:ss.ms] DEBUG: Finished to handle request
     durationMs: XXX
+    query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
+[hh:mm:ss.ms] TRACE: response data
+    data: {
+      \\"jwt_foo\\": \\"FOO\\"
+    }
+    query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
 \\"***** END OUTPUT CAPTURE *****"
 `;

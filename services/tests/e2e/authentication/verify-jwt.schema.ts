@@ -9,13 +9,15 @@ export const schema: Schema = {
   },
   schema: print(gql`
     type Query {
-      jwt_foo: String @localResolver(value: "FOO")
+      jwt_foo(foo: String!): String! @localResolver(value: "{args.foo}")
     }
   `),
 };
 
 export const query = print(gql`
-  query {
-    jwt_foo
+  query($foo: String!) {
+    jwt_foo(foo: $foo)
   }
 `);
+
+export const variables = { foo: 'FOO' };
