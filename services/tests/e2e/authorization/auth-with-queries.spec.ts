@@ -117,4 +117,20 @@ describe('Authorization with queries', () => {
     }
     expect(response).toMatchSnapshot();
   });
+
+  test('Query field with policy with invalid query', async () => {
+    let response;
+    try {
+      response = await gatewayClient.request(
+        print(gql`
+          query {
+            invalidQuery
+          }
+        `)
+      );
+    } catch (e) {
+      response = e.response;
+    }
+    expect(response).toMatchSnapshot();
+  });
 });

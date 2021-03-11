@@ -8,7 +8,7 @@ import {
 } from '../../resource-repository/types';
 import { RequestContext } from '../../context';
 
-export type QueryResults = Record<string, unknown> | undefined;
+export type QueryResults = Record<string, unknown> | null | undefined;
 
 export type Policy = {
   namespace: string;

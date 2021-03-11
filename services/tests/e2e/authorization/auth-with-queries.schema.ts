@@ -74,6 +74,23 @@ export const policies: PolicyDefinition[] = [
       },
     },
   },
+  {
+    metadata: {
+      name: 'invalid-query',
+      namespace: 'auth-with-query',
+    },
+    type: PolicyType.opa,
+    code: `
+      default allow = true
+    `,
+    query: {
+      gql: print(gql`
+        query {
+          wrongField
+        }
+      `),
+    },
+  },
 ];
 
 export const schema: Schema = {
@@ -128,6 +145,10 @@ export const schema: Schema = {
       classifiedDepartments: [Department!]!
         @localResolver(value: [{ id: "D1000", name: "VIP" }])
         @policy(namespace: "auth-with-query", name: "always-denied")
+
+      invalidQuery: String!
+        @localResolver(value: "Invalid")
+        @policy(namespace: "auth-with-query", name: "invalid-query")
     }
   `),
 };
