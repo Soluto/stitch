@@ -17,8 +17,19 @@ const devLoggerConfig: pino.LoggerOptions = {
   },
 };
 
-export default pino({
+const logger = pino({
   ...loggerConfig,
   ...(nodeEnv !== 'production' ? devLoggerConfig : {}),
   ...loggerConfiguration,
 });
+
+const level = logger.level;
+if (level === 'trace' || level === 'debug') {
+  logger.warn(`
+    ************************************************************************
+      !!!LOGGER LEVEL IS "${level}" - SOME SENSITIVE DATA MIGHT BE PRINTED!!!
+    ************************************************************************
+  `);
+}
+
+export default logger;
