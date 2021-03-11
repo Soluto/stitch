@@ -18,6 +18,7 @@ The argument expression can be dependent on several sources:
 - Ancestor's fields exported higher in query result tree
 - GraphQL query variables
 - `isAnonymousAccess()` method that returns `true` if the HTTP request has no `Authorization` header. Otherwise returns `false`.
+- [Plugins' exported data](./plugins.md#pluginsData)
 
 ### Syntax
 
@@ -209,6 +210,20 @@ query {
 # Schema
 type Query {
   foo: String! @localResolver(value: "{headers['x-api-client']}") # foo field will be resolved to the request x-api-client header.
+}
+
+#Query
+query {
+  foo
+}
+```
+
+#### Plugins data
+
+```graphql
+# Schema
+type Query {
+  foo: String! @localResolver(value: "{plugins.foo}") # The foo field was populated by a plugin.
 }
 
 #Query

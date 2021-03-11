@@ -101,6 +101,9 @@ For example this plugin adds a base policy if one does not exist:
 }
 ```
 
+<a name="pluginsData"></a>
+Also allows to export data the resource group's `pluginsData` field, that will be available in [Argument Injection](./arguments_injection.md) clauses under the `plugins` constant.
+
 ### transformBaseSchema
 
 Allow to transform the base schema. This method can modify the scalars and directives definitions.
