@@ -28,10 +28,12 @@ export async function prepareCompiledRegoFile(resourceMetadata: ResourceMetadata
   await fs.writeFile(uncompiledPath, regoCode);
 
   const compileCommand = getOpaBuildWasmCommand(uncompiledPath, compiledPath);
+  const regoLogger = logger.child({ policy: resourceMetadata });
   try {
     await exec(compileCommand);
+    regoLogger.debug('Rego compilation succeeded');
   } catch (err) {
-    logger.warn(
+    regoLogger.warn(
       { err, cmd: err.cmd, stdout: err.stdout },
       'Rego compilation failed (normally means invalid user input)'
     );
@@ -42,7 +44,7 @@ export async function prepareCompiledRegoFile(resourceMetadata: ResourceMetadata
     try {
       await deleteLocalRegoFile(uncompiledPath);
     } catch (err) {
-      logger.warn({ err }, 'Failed cleanup of uncompiled rego file, this did not affect the request outcome');
+      regoLogger.warn({ err }, 'Failed cleanup of uncompiled rego file, this did not affect the request outcome');
     }
   }
 

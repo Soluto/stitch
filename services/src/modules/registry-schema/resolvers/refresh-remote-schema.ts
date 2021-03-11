@@ -13,7 +13,7 @@ export default async function (url: string, context: RegistryRequestContext) {
   return singleton(async () => {
     logger.info(`Proceeding remote schema refresh request...`);
     try {
-      logger.trace('Fetching latest resource group...');
+      logger.debug('Fetching latest resource group...');
       const { resourceGroup: registryRg } = await registryResourceRepository.fetchLatest();
 
       if (!registryRg.remoteSchemas) {
@@ -30,7 +30,7 @@ export default async function (url: string, context: RegistryRequestContext) {
       const { resourceGroup: gatewayRg } = await gatewayResourceRepository.fetchLatest();
       gatewayRg.remoteSchemas = registryRg.remoteSchemas;
 
-      logger.trace('Saving resource group...');
+      logger.debug('Saving resource group...');
       await Promise.all([
         registryResourceRepository.update(registryRg, { registry: true }),
         registryResourceRepository.update(gatewayRg),
