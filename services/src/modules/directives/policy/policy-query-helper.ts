@@ -2,6 +2,7 @@ import { gql } from 'apollo-server-core';
 import { graphql } from 'graphql';
 import { injectArgs } from '../../arguments-injection';
 import { RequestContext } from '../../context';
+import logger from '../../logger';
 import { PolicyQueryVariables, PolicyArgsObject, PolicyDefinition, ResourceMetadata } from '../../resource-repository';
 import { PolicyDirectiveExecutionContext, QueryResults } from './types';
 
@@ -12,8 +13,19 @@ export async function getQueryResult(
   const query = ctx.policyDefinition.query;
   if (!query) return;
 
+  const pqLogger = logger.child({ metadata: ctx.policyDefinition.metadata });
+
   const variables = prepareVariables(args, query.variables);
-  return executeQuery(ctx, variables);
+  const requestContext: RequestContext = { ...ctx.requestContext, ignorePolicies: true };
+  const gql = ctx.policyDefinition.query!.gql;
+  pqLogger.trace({ variables }, 'Executing policy query...');
+  const { data, errors } = await graphql(ctx.info.schema, gql, undefined, requestContext, variables);
+  if (errors) {
+    pqLogger.error({ errors }, 'Policy query execution failed');
+    throw new Error('Policy query execution failed');
+  }
+  pqLogger.trace({ data }, 'Policy query executed');
+  return data;
 }
 
 function prepareVariables(
@@ -29,17 +41,6 @@ function prepareVariables(
     policyArgs[varName] = varValue;
     return policyArgs;
   }, {});
-}
-
-async function executeQuery(
-  ctx: PolicyDirectiveExecutionContext,
-  variables?: PolicyQueryVariables
-): Promise<QueryResults> {
-  const requestContext: RequestContext = { ...ctx.requestContext, ignorePolicies: true };
-  const gql = ctx.policyDefinition.query!.gql;
-
-  const gqlResult = await graphql(ctx.info.schema, gql, undefined, requestContext, variables);
-  return gqlResult.data || undefined;
 }
 
 function getPolicyQueryName({ namespace, name }: ResourceMetadata) {
