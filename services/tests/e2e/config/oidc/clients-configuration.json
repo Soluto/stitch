@@ -13,7 +13,7 @@
     "ClientSecrets": ["e2e-client-secret"],
     "Description": "Stitch gateway calling API",
     "AllowedGrantTypes": ["client_credentials"],
-    "AllowedScopes": ["stitch-gateway"],
+    "AllowedScopes": ["stitch-gateway", "some-rest-service"],
     "ClientClaimsPrefix": "",
     "Claims": []
   },

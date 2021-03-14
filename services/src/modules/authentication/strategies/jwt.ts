@@ -1,4 +1,5 @@
 import * as fastify from 'fastify';
+import * as _ from 'lodash';
 import logger from '../../logger';
 import { authenticationConfig } from '../../config';
 
@@ -18,10 +19,15 @@ export default async function (request: fastify.FastifyRequest): Promise<void> {
 
   // Verify audience
   if (issuerConfig.audience) {
-    const audience = Array.isArray(decodedJWT.payload.aud)
+    const jwtAudiences = Array.isArray(decodedJWT.payload.aud)
       ? decodedJWT.payload.aud.map(a => String(a))
       : Array.of(String(decodedJWT.payload.aud));
-    if (!audience.includes(issuerConfig.audience)) {
+    const configAudiences = Array.isArray(issuerConfig.audience)
+      ? issuerConfig.audience
+      : Array.of(issuerConfig.audience);
+
+    const intersection = _.intersection(configAudiences, jwtAudiences);
+    if (!intersection || intersection.length === 0) {
       reqLogger.debug({ audience: decodedJWT.payload.aud }, 'Unexpected audience');
       throw new Error('Unauthorized');
     }

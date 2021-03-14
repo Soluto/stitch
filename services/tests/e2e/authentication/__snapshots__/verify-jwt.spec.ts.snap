@@ -114,6 +114,36 @@ exports[`Authentication - Verify JWT JWK uri is not resolved: gateway logs 1`] =
 \\"***** END OUTPUT CAPTURE *****"
 `;
 
+exports[`Authentication - Verify JWT Multiple audiences 1`] = `
+Object {
+  "jwt_foo": "FOO",
+}
+`;
+
+exports[`Authentication - Verify JWT Multiple audiences: gateway logs 1`] = `
+"**** START OUTPUT CAPTURE *****\\"
+[hh:mm:ss.ms] DEBUG: JWK found
+    authority: \\"http://authority-without-discrovery-endpoint\\"
+[hh:mm:ss.ms] TRACE: JWT verified
+    issuer: \\"http://localhost:8070\\"
+[hh:mm:ss.ms] DEBUG: Started to handle request
+    query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
+[hh:mm:ss.ms] TRACE: request query variables
+    variables: {
+      \\"foo\\": \\"FOO\\"
+    }
+    query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
+[hh:mm:ss.ms] DEBUG: Finished to handle request
+    durationMs: XXX
+    query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
+[hh:mm:ss.ms] TRACE: response data
+    data: {
+      \\"jwt_foo\\": \\"FOO\\"
+    }
+    query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
+\\"***** END OUTPUT CAPTURE *****"
+`;
+
 exports[`Authentication - Verify JWT Second call with valid JWT - JWKs caching 1`] = `
 Object {
   "jwt_foo": "FOO",
