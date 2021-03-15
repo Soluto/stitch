@@ -27,7 +27,7 @@ export default async function (request: fastify.FastifyRequest): Promise<void> {
       : Array.of(issuerConfig.audience);
 
     const intersection = _.intersection(configAudiences, jwtAudiences);
-    if (!intersection || intersection.length === 0) {
+    if (intersection.length === 0) {
       reqLogger.debug({ audience: decodedJWT.payload.aud }, 'Unexpected audience');
       throw new Error('Unauthorized');
     }
