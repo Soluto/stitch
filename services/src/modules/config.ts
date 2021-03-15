@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as envVar from 'env-var';
 import { LoggerOptions } from 'pino';
 import { AuthenticationConfig } from './authentication/types';
+import { CorsConfiguration } from './cors';
 
 const envVarExt = envVar.from(process.env, {
   asSet: (value: string) => new Set(value.split(',')),
@@ -58,3 +59,5 @@ export const knownApolloDirectives = envVarExt
   .asSet();
 
 export const loggerConfiguration = envVar.get('LOGGER_CONFIGURATION').default({}).asJsonObject() as LoggerOptions;
+
+export const corsConfiguration = envVar.get('CORS_CONFIGURATION').default({}).asJson() as CorsConfiguration;
