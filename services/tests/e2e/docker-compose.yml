@@ -27,7 +27,7 @@ services:
             },
             "http://localhost:8070": {
               "authority": "http://authority-without-discrovery-endpoint",
-              "audience": "Stitch Gateway",
+              "audience": ["Stitch Gateway", "stitch gateway"],
               "jwksConfig": {
                 "jwksUri": "http://oidc-server-mock:8070/.well-known/openid-configuration/jwks",
                 "timeout": 1000
