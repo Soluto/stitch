@@ -9,7 +9,7 @@ import { schema } from './ignore-policies.schema';
 const gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
 const registryClient = new GraphQLClient('http://localhost:8090/graphql');
 
-describe('Ignore Policies', () => {
+describe.skip('Ignore Policies', () => {
   const query = print(gql`
     query {
       ip_foo
