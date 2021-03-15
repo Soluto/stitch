@@ -2,10 +2,10 @@ FROM node:lts-buster-slim as base
 WORKDIR /build
 
 FROM base as dependencies
-RUN apt-get update && apt-get install -y \
-  curl \
+RUN apt-get -qq update && apt-get -qq install -y \
+  curl python make gcc g++ \
   && rm -rf /var/lib/apt/lists/*
-RUN curl -L -o /bin/opa https://github.com/open-policy-agent/opa/releases/download/v0.26.0/opa_linux_amd64
+RUN curl -s -L -o /bin/opa https://github.com/open-policy-agent/opa/releases/download/v0.26.0/opa_linux_amd64
 COPY package.json package-lock.json ./
 RUN npm ci --only=production
 COPY . .
