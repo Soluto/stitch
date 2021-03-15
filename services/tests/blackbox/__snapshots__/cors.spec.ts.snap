@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CORS Preflight request from valid origin 1`] = `
+Object {
+  "access-control-allow-headers": "x-api-client, authorization",
+  "access-control-allow-methods": "GET, POST",
+  "access-control-allow-origin": "http://localhost",
+}
+`;
+
+exports[`CORS reflight request from invalid origin 1`] = `
+Object {
+  "access-control-allow-headers": "x-api-client, authorization",
+  "access-control-allow-methods": "GET, POST",
+  "access-control-allow-origin": false,
+}
+`;

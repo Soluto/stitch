@@ -1,4 +1,5 @@
 import * as fastify from 'fastify';
+import * as corsPlugin from 'fastify-cors';
 import * as fastifyMetrics from 'fastify-metrics';
 import * as jwtPlugin from 'fastify-jwt';
 import * as authPlugin from 'fastify-auth';
@@ -22,6 +23,7 @@ export async function createServer() {
   await loadPlugins();
 
   const app = fastify()
+    .register(corsPlugin as any, config.corsConfiguration)
     .register(authPlugin)
     .register(jwtPlugin, {
       secret: getSecret,

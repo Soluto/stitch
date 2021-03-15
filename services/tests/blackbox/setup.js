@@ -14,6 +14,12 @@ process.env.FS_REGISTRY_RESOURCE_METADATA_PATH = './tests/blackbox/resources/res
 process.env.USE_S3_RESOURCE_REPOSITORY = 'false';
 process.env.USE_FS_RESOURCE_REPOSITORY = 'true';
 
+process.env.CORS_CONFIGURATION = JSON.stringify({
+  methods: ['GET', 'POST'],
+  origin: ['http://localhost', 'http://my-web-app.com'],
+  allowedHeaders: ['x-api-client', 'authorization'],
+});
+
 process.env.AUTHENTICATION_CONFIGURATION = JSON.stringify({
   anonymous: {
     publicPaths: ['/metrics', '/.well-known/apollo/server-health', '/graphql'],
