@@ -5,6 +5,8 @@ import {
 } from 'apollo-server-plugin-base';
 import logger from '../logger';
 
+const isIntrospectionQuery = (operationName?: string) => operationName === 'IntrospectionQuery';
+
 export function createLoggingPlugin(): ApolloServerPlugin {
   return {
     requestDidStart(requestDidStartContext: GraphQLRequestContext<unknown>) {
@@ -13,8 +15,10 @@ export function createLoggingPlugin(): ApolloServerPlugin {
       } = requestDidStartContext;
       const startHrTime = process.hrtime.bigint();
       const reqLogger = logger.child({ query, operationName });
-      reqLogger.debug('Started to handle request');
-      variables && reqLogger.trace({ variables }, 'request query variables');
+      if (!isIntrospectionQuery(operationName)) {
+        reqLogger.debug('Started to handle request');
+        variables && reqLogger.trace({ variables }, 'request query variables');
+      }
       return {
         willSendResponse(willSendResponseContext: GraphQLRequestContextWillSendResponse<unknown>) {
           const {
@@ -28,8 +32,10 @@ export function createLoggingPlugin(): ApolloServerPlugin {
             reqLogger.warn(logData, 'The server encountered errors while proceeding request');
             return;
           }
-          reqLogger.debug(logData, 'Finished to handle request');
-          data && reqLogger.trace({ data }, 'response data');
+          if (!isIntrospectionQuery(operationName)) {
+            reqLogger.debug(logData, 'Finished to handle request');
+            data && reqLogger.trace({ data }, 'response data');
+          }
         },
       };
     },
