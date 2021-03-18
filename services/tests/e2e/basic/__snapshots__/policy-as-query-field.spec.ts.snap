@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Policies as query field mandatory_arg 1`] = `
+Object {
+  "policy": Object {
+    "e2e_policies_as_query_field___mandatory_arg": Object {
+      "allow": true,
+    },
+  },
+}
+`;
+
+exports[`Policies as query field mandatory_arg_with_default 1`] = `
+Object {
+  "policy": Object {
+    "e2e_policies_as_query_field___mandatory_arg_with_default": Object {
+      "allow": true,
+    },
+  },
+}
+`;
+
+exports[`Policies as query field no_args 1`] = `
+Object {
+  "policy": Object {
+    "e2e_policies_as_query_field___no_args": Object {
+      "allow": true,
+    },
+  },
+}
+`;
+
+exports[`Policies as query field optional_arg 1`] = `
+Object {
+  "policy": Object {
+    "e2e_policies_as_query_field___optional_arg": Object {
+      "allow": true,
+    },
+  },
+}
+`;
+
+exports[`Policies as query field optional_arg_not_set 1`] = `
+Object {
+  "policy": Object {
+    "e2e_policies_as_query_field___optional_arg_not_set": Object {
+      "allow": true,
+    },
+  },
+}
+`;
+
+exports[`Policies as query field optional_arg_with_default 1`] = `
+Object {
+  "policy": Object {
+    "e2e_policies_as_query_field___optional_arg_with_default": Object {
+      "allow": true,
+    },
+  },
+}
+`;

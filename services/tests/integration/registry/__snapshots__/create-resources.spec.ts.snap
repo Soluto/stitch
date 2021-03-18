@@ -116,7 +116,7 @@ Object {
       "args": Object {
         "an": Object {
           "default": "{source.an}",
-          "optional": false,
+          "optional": true,
           "type": "String",
         },
         "another": Object {
@@ -155,7 +155,7 @@ Object {
       "args": Object {
         "an": Object {
           "default": "{source.an}",
-          "optional": false,
+          "optional": true,
           "type": "String",
         },
         "another": Object {

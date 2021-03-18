@@ -1,5 +1,5 @@
 import { gql } from 'apollo-server-core';
-import { graphql } from 'graphql';
+import { DocumentNode, graphql } from 'graphql';
 import { injectArgs } from '../../arguments-injection';
 import { RequestContext } from '../../context';
 import logger from '../../logger';
@@ -47,10 +47,10 @@ function getPolicyQueryName({ namespace, name }: ResourceMetadata) {
   return `${namespace}___${name}`.replace(/-/g, '_');
 }
 
-export function buildPolicyQueryTypeDef(policy: PolicyDefinition) {
+export function buildPolicyQueryTypeDef(policy: PolicyDefinition): [string, DocumentNode] {
   const argStr = policy.args
     ? `(${Object.entries(policy.args)
-        .map(([argName, { type }]) => `${argName}: ${type}`)
+        .map(([argName, { type, optional }]) => `${argName}: ${getPolicyQueryTypeDefArgType(type, optional)}`)
         .join(',')})`
     : '';
 
@@ -63,6 +63,13 @@ export function buildPolicyQueryTypeDef(policy: PolicyDefinition) {
     }
   `;
   return [policyQueryName, policyQueryTypeDef];
+}
+
+function getPolicyQueryTypeDefArgType(type: string, optional?: boolean) {
+  if (type.endsWith('!') && optional) {
+    return type.slice(0, -1);
+  }
+  return type;
 }
 
 declare module '../../context' {

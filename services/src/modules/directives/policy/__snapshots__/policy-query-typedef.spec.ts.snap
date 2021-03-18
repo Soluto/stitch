@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Policy query typedef Multiple argument: policy_query_typedef___multiple_argument 1`] = `
+"extend type Policy {
+  policy_query_typedef___multiple_argument(arg1: String!, arg2: Int, arg3: Boolean): PolicyResult! @policyQuery(namespace: \\"policy-query-typedef\\", name: \\"multiple_argument\\")
+}
+"
+`;
+
+exports[`Policy query typedef No args: policy_query_typedef___no_args 1`] = `
+"extend type Policy {
+  policy_query_typedef___no_args: PolicyResult! @policyQuery(namespace: \\"policy-query-typedef\\", name: \\"no_args\\")
+}
+"
+`;
+
+exports[`Policy query typedef Single mandatory arg with default: policy_query_typedef___single_mandatory_arg_with_default 1`] = `
+"extend type Policy {
+  policy_query_typedef___single_mandatory_arg_with_default(arg1: String): PolicyResult! @policyQuery(namespace: \\"policy-query-typedef\\", name: \\"single_mandatory_arg_with_default\\")
+}
+"
+`;
+
+exports[`Policy query typedef Single mandatory arg: policy_query_typedef___single_mandatory_arg 1`] = `
+"extend type Policy {
+  policy_query_typedef___single_mandatory_arg(arg1: String!): PolicyResult! @policyQuery(namespace: \\"policy-query-typedef\\", name: \\"single_mandatory_arg\\")
+}
+"
+`;
+
+exports[`Policy query typedef Single optional arg with default: policy_query_typedef___single_optional_arg_with_default 1`] = `
+"extend type Policy {
+  policy_query_typedef___single_optional_arg_with_default(arg1: String): PolicyResult! @policyQuery(namespace: \\"policy-query-typedef\\", name: \\"single_optional_arg_with_default\\")
+}
+"
+`;
+
+exports[`Policy query typedef Single optional arg: policy_query_typedef___single_optional_arg 1`] = `
+"extend type Policy {
+  policy_query_typedef___single_optional_arg(arg1: String): PolicyResult! @policyQuery(namespace: \\"policy-query-typedef\\", name: \\"single_optional_arg\\")
+}
+"
+`;
