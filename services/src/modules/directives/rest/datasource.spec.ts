@@ -247,6 +247,18 @@ const testCases: [string, TestCase][] = [
       fieldResolverParams: {},
     },
   ],
+  [
+    'GET with arg named "input"',
+    {
+      setup: () => nock(remoteHost).get('/').reply(200, remoteHostResponse),
+      restParams: {},
+      fieldResolverParams: {
+        args: {
+          input: '1',
+        },
+      },
+    },
+  ],
 ];
 
 const emptyContext = {

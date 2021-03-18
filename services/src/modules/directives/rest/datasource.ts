@@ -45,6 +45,9 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
   }
 
   private setBody(requestParams: RequestParams, params: RestParams, fieldResolverParams: FieldResolverParams) {
+    if (!requestParams.method || ['GET', 'HEAD'].includes(requestParams.method.toUpperCase())) {
+      return;
+    }
     const { body: bodyObj, bodyArg } = params;
     if (bodyObj && bodyArg) {
       throw new Error('Set either "body" or "bodyArg" argument but not both');
