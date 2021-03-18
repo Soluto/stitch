@@ -31,6 +31,7 @@ export async function prepareCompiledRegoFile(resourceMetadata: ResourceMetadata
   const regoLogger = logger.child({ policy: resourceMetadata });
   try {
     await exec(compileCommand);
+    await fs.stat(compiledPath);
     regoLogger.debug('Rego compilation succeeded');
   } catch (err) {
     regoLogger.warn(
