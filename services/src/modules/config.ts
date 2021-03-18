@@ -60,4 +60,4 @@ export const knownApolloDirectives = envVarExt
 
 export const loggerConfiguration = envVar.get('LOGGER_CONFIGURATION').default({}).asJsonObject() as LoggerOptions;
 
-export const corsConfiguration = envVar.get('CORS_CONFIGURATION').default({}).asJson() as CorsConfiguration;
+export const corsConfiguration = envVar.get('CORS_CONFIGURATION').default({}).asJsonObject() as CorsConfiguration;
