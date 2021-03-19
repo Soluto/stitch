@@ -1,0 +1,73 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Remote Schema with upstream Add schema with @gql directive 1`] = `
+Object {
+  "updateSchemas": Object {
+    "success": true,
+  },
+}
+`;
+
+exports[`Remote Schema with upstream Add schema with @gql directive: gateway resource group 1`] = `
+Array [
+  Object {
+    "schema": "type Query {
+  foo: String
+}
+",
+    "url": "http://remote-server/graphql",
+  },
+]
+`;
+
+exports[`Remote Schema with upstream Add schema with @gql directive: registry resource group 1`] = `
+Array [
+  Object {
+    "schema": "type Query {
+  foo: String
+}
+",
+    "url": "http://remote-server/graphql",
+  },
+]
+`;
+
+exports[`Remote Schema with upstream Add upstream 1`] = `
+Object {
+  "updateUpstreams": Object {
+    "success": true,
+  },
+}
+`;
+
+exports[`Remote Schema with upstream Refresh remote schema 1`] = `
+Object {
+  "refreshRemoteSchema": Object {
+    "success": true,
+  },
+}
+`;
+
+exports[`Remote Schema with upstream Refresh remote schema: gateway resource group 1`] = `
+Array [
+  Object {
+    "schema": "type Query {
+  foo: Int
+}
+",
+    "url": "http://remote-server/graphql",
+  },
+]
+`;
+
+exports[`Remote Schema with upstream Refresh remote schema: registry resource group 1`] = `
+Array [
+  Object {
+    "schema": "type Query {
+  foo: Int
+}
+",
+    "url": "http://remote-server/graphql",
+  },
+]
+`;
