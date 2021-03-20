@@ -13,7 +13,7 @@ const options = {
     DOCKER_BUILDKIT: '1',
     PATH: process.env.PATH,
   },
-  log: true,
+  log: !process.env.CI,
 };
 
 const upAdditionalOptions = {
@@ -71,7 +71,7 @@ class SerialJestRunner extends DefaultJestRunner {
         const packageJsonPath = join(pluginPath, 'package.json');
         const packageJsonStat = await lstat(packageJsonPath).catch(() => null);
         if (packageJsonStat) {
-          const result = execSync('npm install', { encoding: 'utf8', cwd: pluginPath });
+          const result = execSync('npm --silent ci', { encoding: 'utf8', cwd: pluginPath });
           console.log(result);
         }
       }

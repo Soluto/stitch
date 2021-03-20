@@ -1,6 +1,7 @@
 const fs = require('fs');
 
 process.env.NODE_ENV = 'test';
+process.env.LOG_LEVEL = process.env.CI ? 'silent' : 'trace';
 
 process.env.RESOURCE_UPDATE_INTERVAL = '400';
 process.env.FS_RESOURCE_REPOSITORY_PATH = './tests/blackbox/resources/resources-gateway.json';

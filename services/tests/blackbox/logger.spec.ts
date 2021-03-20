@@ -3,6 +3,7 @@ import * as nock from 'nock';
 import { print } from 'graphql';
 import { gql, GraphQLRequest } from 'apollo-server-core';
 import { FastifyInstance } from 'fastify';
+import logger from '../../src/modules/logger';
 import { createServer as createGateway } from '../../src/gateway';
 import { ResourceGroup, Schema } from '../../src/modules/resource-repository';
 import { startCaptureOutput } from '../helpers/get-container-logs';
@@ -10,6 +11,7 @@ import { startCaptureOutput } from '../helpers/get-container-logs';
 describe('Logger config', () => {
   const remoteServer = 'http://remote-server';
   const fooId = '1';
+  const originalLogLevel = logger.level;
 
   let app: FastifyInstance;
   let dispose: () => Promise<void>;
@@ -17,6 +19,7 @@ describe('Logger config', () => {
   let remoteServerScope: nock.Scope;
 
   beforeAll(async () => {
+    logger.level = 'trace';
     remoteServerScope = nock(remoteServer).get(`/foo/${fooId}`).replyWithError('Something went wrong');
 
     const schema: Schema = {
@@ -50,6 +53,7 @@ describe('Logger config', () => {
   });
 
   afterAll(async () => {
+    logger.level = originalLogLevel;
     await dispose();
     await fs.unlink(process.env.FS_RESOURCE_REPOSITORY_PATH!);
   });
