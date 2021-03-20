@@ -27,5 +27,5 @@ jobs:
         working-directory: services
 
       - name: npm run test
-        run: npm run test:full
+        run: npm run test:full:ci
         working-directory: services

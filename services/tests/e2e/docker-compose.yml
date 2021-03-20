@@ -15,6 +15,7 @@ services:
     env_file: .env
     environment:
       NODE_ENV: test
+      LOG_LEVEL: ${LOG_LEVEL:-trace}
       PORT: 80
       AUTHENTICATION_CONFIGURATION: |
         {
@@ -65,6 +66,7 @@ services:
     env_file: .env
     environment:
       NODE_ENV: test
+      LOG_LEVEL: ${LOG_LEVEL:-trace}
       PORT: 80
     volumes:
       - ./config/plugins:/plugins:ro

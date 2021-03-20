@@ -4,6 +4,7 @@ module.exports = {
       displayName: 'Unit Tests',
       preset: 'ts-jest',
       rootDir: '.',
+      setupFiles: ['<rootDir>/setup-unit-tests.js'],
       testEnvironment: 'node',
       testMatch: ['<rootDir>/src/**/*.spec.ts'],
       testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/', '<rootDir>/tests'],
