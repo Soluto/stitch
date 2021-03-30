@@ -13,6 +13,7 @@ import {
   anonymousAuthStrategy,
   anonymousPlugin,
   jwtDecoderPlugin,
+  apiKeyStrategy,
 } from './modules/authentication';
 import { loadPlugins } from './modules/plugins';
 import { initializeMetrics } from './modules/apollo-server-plugins/metrics';
@@ -45,7 +46,7 @@ export async function createServer() {
     .register(server.createHandler({ path: '/graphql' }));
 
   app.after(() => {
-    app.addHook('onRequest', app.auth([jwtAuthStrategy, anonymousAuthStrategy]));
+    app.addHook('onRequest', app.auth([jwtAuthStrategy, apiKeyStrategy, anonymousAuthStrategy]));
   });
 
   app.get('/health', {}, (_, reply) => {
