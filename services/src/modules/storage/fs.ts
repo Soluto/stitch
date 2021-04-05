@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { promises as fs } from 'fs';
-import pLimit from 'p-limit';
+import * as pLimit from 'p-limit';
 import { Storage, FileStats, listFilesItem } from '.';
 
 export class FileSystemStorage implements Storage {
