@@ -30,6 +30,7 @@ export async function createServer() {
 
   logger.info('Stitch registry booting up...');
   await loadPlugins();
+
   await app.start();
 
   const server = fastify();
