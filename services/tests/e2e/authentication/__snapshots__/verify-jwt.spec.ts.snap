@@ -58,16 +58,8 @@ exports[`Authentication - Verify JWT Invalid JWT: gateway logs 1`] = `
     authority: \\"http://authority-without-discrovery-endpoint\\"
     jwksUri: \\"http://oidc-server-mock:8070/.well-known/openid-configuration/jwks\\"
 [hh:mm:ss.ms] ERROR: Failed to get JWK for request token.
-    err: {
-      \\"type\\": \\"SigningKeyNotFoundError\\",
-      \\"message\\": \\"Unable to find a signing key that matches 'C1B59DF60057CFB292C4E36CCE329615'\\",
-      \\"stack\\":
-          SigningKeyNotFoundError: Unable to find a signing key that matches 'C1B59DF60057CFB292C4E36CCE329615'
-      \\"name\\": \\"SigningKeyNotFoundError\\"
-    }
     authority: \\"http://authority-without-discrovery-endpoint\\"
     jwksUri: \\"http://oidc-server-mock:8070/.well-known/openid-configuration/jwks\\"
-[hh:mm:ss.ms] DEBUG: Failed to verify request JWT
     err: {
       \\"type\\": \\"SigningKeyNotFoundError\\",
       \\"message\\": \\"Unable to find a signing key that matches 'C1B59DF60057CFB292C4E36CCE329615'\\",
@@ -75,7 +67,15 @@ exports[`Authentication - Verify JWT Invalid JWT: gateway logs 1`] = `
           SigningKeyNotFoundError: Unable to find a signing key that matches 'C1B59DF60057CFB292C4E36CCE329615'
       \\"name\\": \\"SigningKeyNotFoundError\\"
     }
+[hh:mm:ss.ms] DEBUG: Failed to verify request JWT
     issuer: \\"http://localhost:8070\\"
+    err: {
+      \\"type\\": \\"SigningKeyNotFoundError\\",
+      \\"message\\": \\"Unable to find a signing key that matches 'C1B59DF60057CFB292C4E36CCE329615'\\",
+      \\"stack\\":
+          SigningKeyNotFoundError: Unable to find a signing key that matches 'C1B59DF60057CFB292C4E36CCE329615'
+      \\"name\\": \\"SigningKeyNotFoundError\\"
+    }
 \\"***** END OUTPUT CAPTURE *****"
 `;
 
@@ -93,12 +93,6 @@ exports[`Authentication - Verify JWT JWK uri is not resolved: gateway logs 1`] =
 [hh:mm:ss.ms] DEBUG: New authority received. Creating new JWKs client...
     authority: \\"http://discovery-endpoint-does-not-exist\\"
 [hh:mm:ss.ms] ERROR: Failed to get JWK config.
-    err: {
-      \\"type\\": \\"Error\\",
-      \\"message\\": \\"Failed to retrieve jwksUri for http://discovery-endpoint-does-not-exist from undefined\\",
-      \\"stack\\":
-          Error: Failed to retrieve jwksUri for http://discovery-endpoint-does-not-exist from undefined
-    }
     issuerConfig: {
       \\"authority\\": \\"http://discovery-endpoint-does-not-exist\\",
       \\"audience\\": \\"Stitch Gateway\\",
@@ -107,14 +101,20 @@ exports[`Authentication - Verify JWT JWK uri is not resolved: gateway logs 1`] =
         \\"/graphql\\"
       ]
     }
-[hh:mm:ss.ms] DEBUG: Failed to verify request JWT
     err: {
       \\"type\\": \\"Error\\",
       \\"message\\": \\"Failed to retrieve jwksUri for http://discovery-endpoint-does-not-exist from undefined\\",
       \\"stack\\":
           Error: Failed to retrieve jwksUri for http://discovery-endpoint-does-not-exist from undefined
     }
+[hh:mm:ss.ms] DEBUG: Failed to verify request JWT
     issuer: \\"http://localhost:8071\\"
+    err: {
+      \\"type\\": \\"Error\\",
+      \\"message\\": \\"Failed to retrieve jwksUri for http://discovery-endpoint-does-not-exist from undefined\\",
+      \\"stack\\":
+          Error: Failed to retrieve jwksUri for http://discovery-endpoint-does-not-exist from undefined
+    }
 \\"***** END OUTPUT CAPTURE *****"
 `;
 
