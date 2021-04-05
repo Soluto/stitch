@@ -47,7 +47,7 @@
     "graphql-tools": "^4.0.8",
     "graphql-type-json": "^0.3.2",
     "jsonwebtoken": "^8.5.1",
-    "jwks-rsa": "^1.8.1",
+    "jwks-rsa": "^2.0.2",
     "lodash": "^4.17.20",
     "node-cache": "^5.1.1",
     "node-fetch": "^2.6.0",
