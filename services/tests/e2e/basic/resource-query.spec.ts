@@ -68,7 +68,7 @@ describe('Basic flow', () => {
       fromGatewayResources: true,
     });
     expect(gatewayResult.policy).toMatchSnapshot();
-  });
+  }, 10000);
 
   test('Get gateway resource added by plugin', async () => {
     const gatewayOnlyResourceMetadata: ResourceMetadataInput = {
