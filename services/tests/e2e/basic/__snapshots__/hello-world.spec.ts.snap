@@ -7,8 +7,8 @@ exports[`Basic flow Send wrong schema 1`] = `
       "message": "Federation validation failed",
       "errorCode": "FEDERATION_VALIDATION_FAILURE",
       "innerErrors": [
-        "Unknown type: \\"HLFoo\\".",
-        "Unknown type \\"HLFoo\\". Did you mean \\"FedFoo\\"?",
+        "Unknown type: \\"HLUnknownType\\".",
+        "Unknown type \\"HLUnknownType\\".",
         "Type Query must define one or more fields."
       ]
     }

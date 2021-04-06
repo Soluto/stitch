@@ -44,7 +44,7 @@ export const invalidSchema = {
   },
   schema: print(gql`
     type Query {
-      foo: HLFoo!
+      foo: HLUnknownType!
     }
   `),
 };
