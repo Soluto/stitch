@@ -1,6 +1,7 @@
 import * as querystring from 'querystring';
 import * as jwtUtil from 'jsonwebtoken';
 import * as NodeRSA from 'node-rsa';
+import fetch from 'node-fetch';
 
 export interface TokenOptions {
   clientId: string;
