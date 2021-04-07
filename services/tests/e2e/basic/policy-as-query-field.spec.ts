@@ -1,7 +1,12 @@
 import { print } from 'graphql';
 import { gql } from 'apollo-server-core';
 import { GraphQLClient } from 'graphql-request';
-import { PolicyArgsDefinitions, PolicyDefinition, PolicyType } from '../../../src/modules/resource-repository';
+import {
+  PolicyArgsDefinitions,
+  PolicyDefinition,
+  PolicyQuery,
+  PolicyType,
+} from '../../../src/modules/resource-repository';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { updateGatewaySchema } from '../../helpers/utility';
 import { RegistryMutationResponse, updatePoliciesMutation } from '../../helpers/registry-request-builder';
@@ -11,6 +16,7 @@ interface TestCase {
   code: string;
   args?: PolicyArgsDefinitions;
   argsLiteral?: string;
+  query?: PolicyQuery;
 }
 
 const gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
@@ -118,6 +124,28 @@ const testCases: [string, TestCase][] = [
       },
     },
   ],
+  [
+    'mandatory_arg_with_default_nested',
+    {
+      code: `
+        default allow = false
+        allow {
+          input.query.policy.e2e_policies_as_query_field___mandatory_arg_with_default.allow
+        }
+      `,
+      query: {
+        gql: print(gql`
+          query {
+            policy {
+              e2e_policies_as_query_field___mandatory_arg_with_default {
+                allow
+              }
+            }
+          }
+        `),
+      },
+    },
+  ],
 ];
 
 describe('Policies as query field', () => {
@@ -131,7 +159,7 @@ describe('Policies as query field', () => {
   });
 
   test('Setup policies', async () => {
-    const policies: PolicyDefinition[] = testCases.map(([name, { code, args }]) => ({
+    const policies: PolicyDefinition[] = testCases.map(([name, { code, args, query }]) => ({
       metadata: {
         namespace,
         name,
@@ -139,6 +167,7 @@ describe('Policies as query field', () => {
       type: PolicyType.opa,
       code,
       args,
+      query,
     }));
 
     const policiesResponse = await registryClient.request<RegistryMutationResponse>(updatePoliciesMutation, {

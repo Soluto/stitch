@@ -20,6 +20,16 @@ Object {
 }
 `;
 
+exports[`Policies as query field mandatory_arg_with_default_nested 1`] = `
+Object {
+  "policy": Object {
+    "e2e_policies_as_query_field___mandatory_arg_with_default_nested": Object {
+      "allow": true,
+    },
+  },
+}
+`;
+
 exports[`Policies as query field no_args 1`] = `
 Object {
   "policy": Object {
