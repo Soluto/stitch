@@ -10,18 +10,17 @@ import getPlugins from './apollo-server-plugins';
 
 export interface GatewayConfig extends Config {
   resourceGroups: Observable<ResourceGroup>;
-  fastifyInstance: fastify.FastifyInstance;
 }
 
 export function createStitchGateway(config: GatewayConfig) {
-  const { resourceGroups, fastifyInstance, ...apolloConfig } = config;
+  const { resourceGroups, ...apolloConfig } = config;
   const gateway = createGraphQLService({ resourceGroups });
 
   const server = new ApolloServer({
     ...apolloConfig,
     gateway,
     extensions: [() => new ExportTrackingExtension()],
-    plugins: getPlugins(fastifyInstance),
+    plugins: getPlugins(),
     subscriptions: false,
     context(request: fastify.FastifyRequest) {
       const ctx = {

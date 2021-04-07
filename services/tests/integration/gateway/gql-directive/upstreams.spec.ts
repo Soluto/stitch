@@ -102,7 +102,6 @@ describe.each(testCases)('Gql - Upstreams', (testCaseName, { upstreams, virtualH
 
     const stitch = createStitchGateway({
       resourceGroups: Rx.of(resourceGroup),
-      fastifyInstance: { metrics: undefined as any } as any,
     });
     client = createTestClient(stitch.server);
 

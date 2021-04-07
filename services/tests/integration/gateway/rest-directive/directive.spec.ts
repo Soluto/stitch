@@ -307,7 +307,6 @@ describe.each(testCases)('Rest directive', (testName, { mock, schema, query, var
 
     const { server, dispose } = createStitchGateway({
       resourceGroups: Rx.of(resourceGroup),
-      fastifyInstance: { metrics: undefined as any } as any,
     });
     client = createTestClient(server);
     disposeServer = dispose;

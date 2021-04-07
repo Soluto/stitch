@@ -5,41 +5,40 @@ import {
   GraphQLRequestListenerParsingDidEnd,
   GraphQLRequestListenerValidationDidEnd,
 } from 'apollo-server-plugin-base';
-import { FastifyInstance } from 'fastify';
-import { Histogram, Counter } from 'prom-client';
+import * as promClient from 'prom-client';
 import { knownApolloDirectives } from '../config';
 
-let requestDurationHistogram: Histogram<string> | undefined;
-let resolverDurationHistogram: Histogram<string> | undefined;
-let requestParsingErrorCounter: Counter<string> | undefined;
-let requestValidationErrorCounter: Counter<string> | undefined;
+let requestDurationHistogram: promClient.Histogram<string> | undefined;
+let resolverDurationHistogram: promClient.Histogram<string> | undefined;
+let requestParsingErrorCounter: promClient.Counter<string> | undefined;
+let requestValidationErrorCounter: promClient.Counter<string> | undefined;
 
-export function createMetricsPlugin(fastifyInstance: Pick<FastifyInstance, 'metrics'>): ApolloServerPlugin {
+export function initializeMetrics(pClient: typeof promClient) {
+  requestDurationHistogram = new pClient.Histogram({
+    name: 'graphql_request_duration_seconds',
+    help: 'request duration in seconds',
+    labelNames: ['status'],
+  });
+
+  resolverDurationHistogram = new pClient.Histogram({
+    name: 'graphql_resolver_duration_seconds',
+    help: 'resolver duration in seconds',
+    labelNames: ['parentType', 'fieldName', 'status'],
+  });
+
+  requestParsingErrorCounter = new pClient.Counter({
+    name: 'graphql_request_parsing_errors_count',
+    help: 'request query parsing errors',
+  });
+
+  requestValidationErrorCounter = new pClient.Counter({
+    name: 'graphql_request_validation_errors_count',
+    help: 'request query validation errors',
+  });
+}
+
+export function createMetricsPlugin(): ApolloServerPlugin {
   return {
-    serverWillStart() {
-      const promClient = fastifyInstance.metrics?.client;
-      requestDurationHistogram = new promClient.Histogram({
-        name: 'graphql_request_duration_seconds',
-        help: 'request duration in seconds',
-        labelNames: ['status'],
-      });
-
-      resolverDurationHistogram = new promClient.Histogram({
-        name: 'graphql_resolver_duration_seconds',
-        help: 'resolver duration in seconds',
-        labelNames: ['parentType', 'fieldName', 'status'],
-      });
-
-      requestParsingErrorCounter = new promClient.Counter({
-        name: 'graphql_request_parsing_errors_count',
-        help: 'request query parsing errors',
-      });
-
-      requestValidationErrorCounter = new promClient.Counter({
-        name: 'graphql_request_validation_errors_count',
-        help: 'request query validation errors',
-      });
-    },
     requestDidStart() {
       const endResponseTimer = requestDurationHistogram?.startTimer();
       return {
