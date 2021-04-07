@@ -4,4 +4,5 @@ module.exports = {
     ...require('./jest.config.blackbox').projects,
     ...require('./jest.config.e2e').projects,
   ],
+  testTimeout: 60000,
 };
