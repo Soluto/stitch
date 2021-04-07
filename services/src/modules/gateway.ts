@@ -1,19 +1,14 @@
 import * as fastify from 'fastify';
 import { ApolloServer, Config } from 'apollo-server-fastify';
-import { Observable } from 'rxjs';
 import { ignorePolicies } from './config';
 import { createGraphQLService } from './graphql-service';
 import { RESTDirectiveDataSource } from './directives/rest';
-import { ResourceGroup } from './resource-repository';
+import { pollForUpdates } from './resource-repository';
 import { ExportTrackingExtension } from './exports';
 import getPlugins from './apollo-server-plugins';
 
-export interface GatewayConfig extends Config {
-  resourceGroups: Observable<ResourceGroup>;
-}
-
-export function createStitchGateway(config: GatewayConfig) {
-  const { resourceGroups, ...apolloConfig } = config;
+export function createStitchGateway(apolloConfig?: Config) {
+  const resourceGroups = pollForUpdates();
   const gateway = createGraphQLService({ resourceGroups });
 
   const server = new ApolloServer({

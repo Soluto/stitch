@@ -35,12 +35,7 @@ export function createGraphQLService(config: { resourceGroups: Observable<Resour
       subscription.add(startListening());
       currentSchemaConfig = await newSchemaConfigs.pipe(take(1)).toPromise();
 
-      return {
-        schema: currentSchemaConfig.schema,
-        executor(requestContext) {
-          return currentSchemaConfig!.executor(requestContext);
-        },
-      };
+      return currentSchemaConfig;
     },
     onSchemaChange(callback: SchemaChangeCallback): Unsubscriber {
       const sub = newSchemaConfigs.pipe(map(sc => sc.schema)).subscribe(callback);

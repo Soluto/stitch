@@ -7,6 +7,9 @@ import { createStitchGateway } from '../../../../src/modules/gateway';
 import { DefaultUpstream, ResourceGroup, Schema, Upstream } from '../../../../src/modules/resource-repository';
 import { beforeEachDispose } from '../../before-each-dispose';
 
+jest.mock('../../../../src/modules/resource-repository/stream');
+import { pollForUpdates } from '../../../../src/modules/resource-repository/stream';
+
 interface TestCase {
   upstreams: Upstream[];
   defaultUpstream?: DefaultUpstream;
@@ -138,9 +141,9 @@ describe.each(testCases)('Rest - Upstreams', (testCaseName, { upstreams, default
 
     if (defaultUpstream) resourceGroup.defaultUpstream = defaultUpstream;
 
-    const stitch = createStitchGateway({
-      resourceGroups: Rx.of(resourceGroup),
-    });
+    (pollForUpdates as jest.Mock).mockImplementationOnce(jest.fn().mockReturnValueOnce(Rx.of(resourceGroup)));
+
+    const stitch = createStitchGateway();
     client = createTestClient(stitch.server);
 
     return () => {

@@ -75,6 +75,10 @@ const resourceGroup: ResourceGroup = {
   },
 };
 
+jest.mock('../../../src/modules/resource-repository/stream', () => ({
+  pollForUpdates: jest.fn(() => Rx.of(resourceGroup)),
+}));
+
 describe('Policy Caching', () => {
   let client: ApolloServerTestClient;
   let _evaluatePolicySpy: jest.SpyInstance;
@@ -82,9 +86,7 @@ describe('Policy Caching', () => {
   beforeEachDispose(() => {
     _evaluatePolicySpy = jest.spyOn(PolicyExecutor.prototype as any, '_evaluatePolicy');
 
-    const stitch = createStitchGateway({
-      resourceGroups: Rx.of(resourceGroup),
-    });
+    const stitch = createStitchGateway();
     client = createTestClient(stitch.server);
 
     return () => {

@@ -79,15 +79,17 @@ const resourceGroup: ResourceGroup = {
   policies: [],
 };
 
+jest.mock('../../../src/modules/resource-repository/stream', () => ({
+  pollForUpdates: jest.fn(() => Rx.of(resourceGroup)),
+}));
+
 describe('Schema Extensions', () => {
   let client: ApolloServerTestClient;
 
   beforeEachDispose(() => {
     mockRestBackend('http://test.api');
 
-    const stitch = createStitchGateway({
-      resourceGroups: Rx.of(resourceGroup),
-    });
+    const stitch = createStitchGateway();
     client = createTestClient(stitch.server);
 
     return () => {

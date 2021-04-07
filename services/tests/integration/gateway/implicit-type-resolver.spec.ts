@@ -7,6 +7,9 @@ import { beforeEachDispose } from '../before-each-dispose';
 import { createStitchGateway } from '../../../src/modules/gateway';
 import { ResourceGroup } from '../../../src/modules/resource-repository';
 
+jest.mock('../../../src/modules/resource-repository/stream');
+import { pollForUpdates } from '../../../src/modules/resource-repository/stream';
+
 const testCases: [string, ResourceGroup][] = [
   [
     'Interface',
@@ -129,10 +132,10 @@ describe.each(testCases)('Implicit Type Resolver Tests', (testName, resourceGrou
     }
   `;
 
+  (pollForUpdates as jest.Mock).mockImplementationOnce(jest.fn().mockReturnValueOnce(Rx.of(resourceGroup)));
+
   beforeEachDispose(() => {
-    const stitch = createStitchGateway({
-      resourceGroups: Rx.of(resourceGroup),
-    });
+    const stitch = createStitchGateway();
     client = createTestClient(stitch.server);
 
     return () => {

@@ -7,7 +7,6 @@ import * as config from './modules/config';
 import logger from './modules/logger';
 import { handleSignals, handleUncaughtErrors } from './modules/shutdown-handler';
 import { createStitchGateway } from './modules/gateway';
-import { getResourceRepository, pollForUpdates } from './modules/resource-repository';
 import {
   getSecret,
   jwtAuthStrategy,
@@ -24,7 +23,6 @@ export async function createServer() {
   await loadPlugins();
 
   const { server, dispose } = createStitchGateway({
-    resourceGroups: pollForUpdates(getResourceRepository(), config.resourceUpdateInterval),
     tracing: config.enableGraphQLTracing,
     playground: config.enableGraphQLPlayground,
     introspection: config.enableGraphQLIntrospection,

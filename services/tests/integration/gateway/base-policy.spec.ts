@@ -9,6 +9,9 @@ import { beforeEachDispose } from '../before-each-dispose';
 import { Policy } from '../../../src/modules/directives/policy/types';
 import { mockLoadedPolicy } from '../../helpers/opa-utility';
 
+jest.mock('../../../src/modules/resource-repository/stream');
+import { pollForUpdates } from '../../../src/modules/resource-repository/stream';
+
 const policies: PolicyDefinition[] = [
   {
     metadata: {
@@ -167,10 +170,10 @@ describe.each(testCases)('Base Policy Tests', (testName, resourceGroup) => {
     }
   `;
 
+  (pollForUpdates as jest.Mock).mockImplementationOnce(jest.fn().mockReturnValueOnce(Rx.of(resourceGroup)));
+
   beforeEachDispose(() => {
-    const stitch = createStitchGateway({
-      resourceGroups: Rx.of(resourceGroup),
-    });
+    const stitch = createStitchGateway();
     client = createTestClient(stitch.server);
 
     return () => {

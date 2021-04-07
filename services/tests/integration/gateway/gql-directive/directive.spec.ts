@@ -86,6 +86,10 @@ const resourceGroup = {
   remoteSchemas: [remoteSchemaResource],
 };
 
+jest.mock('../../../../src/modules/resource-repository/stream', () => ({
+  pollForUpdates: jest.fn(() => Rx.of(resourceGroup)),
+}));
+
 interface TestCase {
   statusCode?: number;
   delay?: number;
@@ -104,9 +108,7 @@ describe.each(testCases)('GQL Directive', (testCaseName, { statusCode, delay }) 
   beforeEachDispose(async () => {
     mockGqlBackend(remoteHost, remoteSchema, statusCode, delay);
 
-    const stitch = createStitchGateway({
-      resourceGroups: Rx.of(resourceGroup),
-    });
+    const stitch = createStitchGateway();
     client = createTestClient(stitch.server);
 
     return () => {

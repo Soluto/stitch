@@ -27,13 +27,15 @@ const resourceGroup: ResourceGroup & { etag: string } = {
   policies: [],
 };
 
+jest.mock('../../../src/modules/resource-repository/stream', () => ({
+  pollForUpdates: jest.fn(() => Rx.of(resourceGroup)),
+}));
+
 describe('Hello world', () => {
   let client: ApolloServerTestClient;
 
   beforeEachDispose(() => {
-    const stitch = createStitchGateway({
-      resourceGroups: Rx.of(resourceGroup),
-    });
+    const stitch = createStitchGateway();
     client = createTestClient(stitch.server);
 
     return () => {
