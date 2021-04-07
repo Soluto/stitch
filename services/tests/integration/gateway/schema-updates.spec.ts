@@ -31,19 +31,23 @@ const schema2 = {
   `),
 };
 
-const resourceGroup = {
+const resourceGroup: ResourceGroup = {
+  schemas: [],
   upstreams: [],
   upstreamClientCredentials: [],
   policies: [],
 };
 
+const resourceGroups = new Rx.BehaviorSubject<ResourceGroup>({ ...resourceGroup, schemas: [schema1] });
+jest.mock('../../../src/modules/resource-repository/stream', () => ({
+  pollForUpdates: jest.fn(() => resourceGroups),
+}));
+
 describe('Hello world', () => {
   let client: ApolloServerTestClient;
-  let resourceGroups: Rx.BehaviorSubject<ResourceGroup>;
 
   beforeEachDispose(() => {
-    resourceGroups = new Rx.BehaviorSubject({ ...resourceGroup, schemas: [schema1] } as ResourceGroup);
-    const stitch = createStitchGateway({ resourceGroups });
+    const stitch = createStitchGateway();
     client = createTestClient(stitch.server);
 
     return () => {

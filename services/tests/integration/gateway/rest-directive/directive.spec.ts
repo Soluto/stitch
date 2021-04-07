@@ -6,6 +6,9 @@ import * as nock from 'nock';
 import { createStitchGateway } from '../../../../src/modules/gateway';
 import { Schema } from '../../../../src/modules/resource-repository';
 
+jest.mock('../../../../src/modules/resource-repository/stream');
+import { pollForUpdates } from '../../../../src/modules/resource-repository/stream';
+
 interface TestCase {
   mock: () => nock.Scope;
   schema: DocumentNode;
@@ -305,9 +308,9 @@ describe.each(testCases)('Rest directive', (testName, { mock, schema, query, var
       policies: [],
     };
 
-    const { server, dispose } = createStitchGateway({
-      resourceGroups: Rx.of(resourceGroup),
-    });
+    (pollForUpdates as jest.Mock).mockImplementationOnce(jest.fn().mockReturnValueOnce(Rx.of(resourceGroup)));
+
+    const { server, dispose } = createStitchGateway();
     client = createTestClient(server);
     disposeServer = dispose;
 

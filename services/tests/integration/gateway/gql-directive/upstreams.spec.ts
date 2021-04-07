@@ -9,6 +9,9 @@ import { ResourceGroup, Schema, Upstream } from '../../../../src/modules/resourc
 import { beforeEachDispose } from '../../before-each-dispose';
 import { RemoteSchema } from '../../../../src/modules/directives/gql';
 
+jest.mock('../../../../src/modules/resource-repository/stream');
+import { pollForUpdates } from '../../../../src/modules/resource-repository/stream';
+
 interface TestCase {
   upstreams: Upstream[];
   virtualHost?: string;
@@ -100,9 +103,9 @@ describe.each(testCases)('Gql - Upstreams', (testCaseName, { upstreams, virtualH
       remoteSchemas: [remoteSchemaResource],
     };
 
-    const stitch = createStitchGateway({
-      resourceGroups: Rx.of(resourceGroup),
-    });
+    (pollForUpdates as jest.Mock).mockImplementationOnce(jest.fn().mockReturnValueOnce(Rx.of(resourceGroup)));
+
+    const stitch = createStitchGateway();
     client = createTestClient(stitch.server);
 
     return () => {
