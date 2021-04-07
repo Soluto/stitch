@@ -16,11 +16,19 @@ import {
   jwtDecoderPlugin,
 } from './modules/authentication';
 import { loadPlugins } from './modules/plugins';
+import { initializeMetrics } from './modules/apollo-server-plugins/metrics';
 
 export async function createServer() {
   logger.info('Stitch gateway booting up...');
 
   await loadPlugins();
+
+  const { server, dispose } = createStitchGateway({
+    resourceGroups: pollForUpdates(getResourceRepository(), config.resourceUpdateInterval),
+    tracing: config.enableGraphQLTracing,
+    playground: config.enableGraphQLPlayground,
+    introspection: config.enableGraphQLIntrospection,
+  });
 
   const app = fastify()
     .register(corsPlugin as any, config.corsConfiguration)
@@ -35,17 +43,9 @@ export async function createServer() {
     .register(anonymousPlugin)
     .register(fastifyMetrics, {
       endpoint: '/metrics',
-    });
+    })
+    .register(server.createHandler({ path: '/graphql' }));
 
-  const { server, dispose } = createStitchGateway({
-    resourceGroups: pollForUpdates(getResourceRepository(), config.resourceUpdateInterval),
-    tracing: config.enableGraphQLTracing,
-    playground: config.enableGraphQLPlayground,
-    introspection: config.enableGraphQLIntrospection,
-    fastifyInstance: app,
-  });
-
-  app.register(server.createHandler({ path: '/graphql' }));
   app.after(() => {
     app.addHook('onRequest', app.auth([jwtAuthStrategy, anonymousAuthStrategy]));
   });
@@ -60,6 +60,7 @@ export async function createServer() {
 
 async function runServer(app: fastify.FastifyInstance, dispose: () => Promise<void>) {
   const address = await app.listen(config.httpPort, '0.0.0.0');
+  initializeMetrics(app.metrics.client);
   logger.info({ address }, 'Stitch gateway started');
 
   handleSignals(dispose);
