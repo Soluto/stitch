@@ -125,25 +125,56 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
+    'mandatory_args_with_default_and_without',
+    {
+      code: `
+        default allow = false
+        allow {
+          input.args.arg1
+          input.args.arg2
+        }
+      `,
+      args: {
+        arg1: {
+          type: 'Boolean!',
+          default: '{true}',
+        },
+        arg2: {
+          type: 'Boolean!',
+        },
+      },
+      argsLiteral: '(arg2: true)',
+    },
+  ],
+  [
     'mandatory_arg_with_default_nested',
     {
       code: `
         default allow = false
         allow {
-          input.query.policy.e2e_policies_as_query_field___mandatory_arg_with_default.allow
+          input.query.policy.e2e_policies_as_query_field___mandatory_args_with_default_and_without.allow
         }
       `,
+      args: {
+        arg2: {
+          type: 'Boolean!',
+        },
+      },
       query: {
         gql: print(gql`
-          query {
+          query($arg2: Boolean!) {
             policy {
-              e2e_policies_as_query_field___mandatory_arg_with_default {
+              e2e_policies_as_query_field___mandatory_args_with_default_and_without(arg2: $arg2) {
                 allow
               }
             }
           }
         `),
+        variables: {
+          arg2: '{arg2}',
+        },
       },
+      argsLiteral: '(arg2: true)',
     },
   ],
 ];
