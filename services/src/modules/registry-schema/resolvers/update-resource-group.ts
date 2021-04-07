@@ -24,6 +24,9 @@ export default async function (updates: ResourceGroupInput, context: RegistryReq
       const { resourceGroup } = await resourceRepository.fetchLatest();
       const existingPolicies = _.cloneDeep(resourceGroup.policies);
 
+      logger.debug('Marking optional policy arguments...');
+      markOptionalPolicyArgs(updates.policies);
+
       logger.debug('Applying resource group updates...');
       const newRg = applyResourceGroupUpdates(resourceGroup, updates);
 
@@ -41,9 +44,6 @@ export default async function (updates: ResourceGroupInput, context: RegistryReq
 
       logger.debug('Creating schema config...');
       await createSchemaConfig(gatewayRg);
-
-      logger.debug('Marking optional policy arguments...');
-      markOptionalPolicyArgs(updates.policies);
 
       logger.debug('Synchronizing policy attachments...');
       await policyAttachments.sync(existingPolicies, gatewayRg.policies);
