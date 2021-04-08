@@ -34,14 +34,18 @@ export default async function (request: fastify.FastifyRequest): Promise<void> {
   }
 
   // Verify route
-  if (issuerConfig.authenticatedPaths.some(ap => request.raw.url === ap)) {
-    try {
-      // Verify JWT signing, expiration and more
-      await request.jwtVerify();
-      reqLogger.trace('JWT verified');
-    } catch (err) {
-      reqLogger.debug({ err }, 'Failed to verify request JWT');
-      throw new Error('Unauthorized');
-    }
+  const url = request.raw.url;
+  if (!url || !issuerConfig.authenticatedPaths.includes(url)) {
+    reqLogger.trace({ url }, 'Unexpected path');
+    throw new Error('Unauthorized');
+  }
+
+  try {
+    // Verify JWT signing, expiration and more
+    await request.jwtVerify();
+    reqLogger.trace('JWT verified');
+  } catch (err) {
+    reqLogger.debug({ err }, 'Failed to verify request JWT');
+    throw new Error('Unauthorized');
   }
 }
