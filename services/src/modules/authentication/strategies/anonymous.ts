@@ -4,10 +4,8 @@ import { authenticationConfig } from '../../config';
 export default async function (request: FastifyRequest): Promise<void> {
   const config = authenticationConfig?.anonymous;
   if (!config) throw new Error('Unauthorized');
-  if (config.rejectAuthorizationHeader) {
-    if (request.headers.authorization) {
-      throw new Error('Unauthorized');
-    }
+  if (config.rejectAuthorizationHeader && request.headers.authorization) {
+    throw new Error('Unauthorized');
   }
 
   const anonymousPaths = config.publicPaths;
