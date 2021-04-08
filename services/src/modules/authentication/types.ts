@@ -20,11 +20,13 @@ export interface ApiKeyConfig {
   description?: string;
   disabled?: boolean;
 }
+
+export interface AnonymousAuthConfig {
+  publicPaths: string[];
+  rejectAuthorizationHeader?: boolean;
+}
 export interface AuthenticationConfig {
   jwt?: Record<string, IssuerConfig>;
   apiKey?: ApiKeyAuthConfig;
-  anonymous?: {
-    publicPaths: string[];
-    rejectAuthorizationHeader?: boolean;
-  };
+  anonymous?: AnonymousAuthConfig;
 }

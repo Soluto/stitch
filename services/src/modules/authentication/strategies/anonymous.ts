@@ -1,10 +1,18 @@
-import { FastifyRequest } from 'fastify';
+import * as fastify from 'fastify';
 import { authenticationConfig } from '../../config';
 
-export default async function (request: FastifyRequest): Promise<void> {
+export interface AnonymousAuthPartialRequest {
+  headers?: fastify.DefaultHeaders;
+  raw: {
+    url?: string;
+  };
+  _isAnonymousAccess?: boolean;
+}
+
+export default async function (request: AnonymousAuthPartialRequest) {
   const config = authenticationConfig?.anonymous;
   if (!config) throw new Error('Unauthorized');
-  if (config.rejectAuthorizationHeader && request.headers.authorization) {
+  if (config.rejectAuthorizationHeader && request.headers?.authorization) {
     throw new Error('Unauthorized');
   }
 

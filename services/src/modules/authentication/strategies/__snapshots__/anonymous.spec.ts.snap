@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Anonymous auth strategy No anonymous auth config 1`] = `[Error: Unauthorized]`;
+
+exports[`Anonymous auth strategy Reject authorization header 1`] = `[Error: Unauthorized]`;
+
+exports[`Anonymous auth strategy Unexpected path 1`] = `[Error: Unauthorized]`;
