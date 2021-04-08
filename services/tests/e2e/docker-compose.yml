@@ -52,7 +52,7 @@ services:
               },
               "disabledApiKey": {
                 "name": "Disabled Key",
-                "enabled": false
+                "disabled": true
               }
             }
           },

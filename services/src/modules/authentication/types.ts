@@ -8,19 +8,21 @@ export interface IssuerConfig {
   description?: string;
 }
 
+export interface ApiKeyAuthConfig {
+  header?: string;
+  queryParam?: string;
+  keys: Record<string, ApiKeyConfig>;
+  authenticatedPaths: string[];
+}
+
 export interface ApiKeyConfig {
   name: string;
   description?: string;
-  enabled?: boolean;
+  disabled?: boolean;
 }
 export interface AuthenticationConfig {
   jwt?: Record<string, IssuerConfig>;
-  apiKey?: {
-    header?: string;
-    queryParam?: string;
-    keys: Record<string, ApiKeyConfig>;
-    authenticatedPaths: string[];
-  };
+  apiKey?: ApiKeyAuthConfig;
   anonymous?: {
     publicPaths: string[];
     rejectAuthorizationHeader?: boolean;
