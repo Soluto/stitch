@@ -25,8 +25,10 @@ export interface AnonymousAuthConfig {
   publicPaths: string[];
   rejectAuthorizationHeader?: boolean;
 }
+
+export type JWTAuthConfig = Record<string, IssuerConfig>;
 export interface AuthenticationConfig {
-  jwt?: Record<string, IssuerConfig>;
+  jwt?: JWTAuthConfig;
   apiKey?: ApiKeyAuthConfig;
   anonymous?: AnonymousAuthConfig;
 }
