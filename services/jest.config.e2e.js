@@ -5,10 +5,11 @@ module.exports = {
       preset: 'ts-jest',
       rootDir: '.',
       setupFiles: ['<rootDir>/tests/e2e/setup.js'],
-      testTimeout: 60000,
+      testEnvironment: 'node',
       testMatch: ['<rootDir>/tests/e2e/**/*.spec.ts'],
       testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/'],
       runner: '<rootDir>/tests/e2e/jest-e2e-runner.js',
     },
   ],
+  testTimeout: 60000,
 };

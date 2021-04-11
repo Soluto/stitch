@@ -8,7 +8,6 @@ module.exports = {
       testEnvironment: 'node',
       testMatch: ['<rootDir>/src/**/*.spec.ts'],
       testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/', '<rootDir>/tests'],
-      testTimeout: 60000,
     },
     {
       displayName: 'Integration Tests',
@@ -18,7 +17,7 @@ module.exports = {
       testEnvironment: 'node',
       testMatch: ['<rootDir>/tests/integration/**/*.spec.ts'],
       testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/dist/'],
-      testTimeout: 60000,
     },
   ],
+  testTimeout: 60000,
 };
