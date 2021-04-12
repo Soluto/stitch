@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ApiKey auth strategy Api key header does not exist 1`] = `[Error: Unauthorized]`;
+
+exports[`ApiKey auth strategy Api key query param does not exist 1`] = `[Error: Unauthorized]`;
+
+exports[`ApiKey auth strategy Disabled api key from header 1`] = `[Error: Unauthorized]`;
+
+exports[`ApiKey auth strategy No api key and no api key auth config 1`] = `[Error: Unauthorized]`;
+
+exports[`ApiKey auth strategy Unexpected api key from header 1`] = `[Error: Unauthorized]`;
+
+exports[`ApiKey auth strategy Valid api key from header but invalid path 1`] = `[Error: Unauthorized]`;

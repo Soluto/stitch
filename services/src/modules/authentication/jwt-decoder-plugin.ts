@@ -4,7 +4,7 @@ import { FastifyRequest, FastifyInstance } from 'fastify';
 import * as fp from 'fastify-plugin';
 import logger from '../logger';
 
-type DecodedJWT = {
+export type DecodedJWT = {
   header: Record<string, unknown>;
   payload: Record<string, unknown>;
   signature: string;

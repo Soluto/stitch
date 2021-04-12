@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`JWT auth strategy Invalid jwt token 1`] = `[Error: Invalid JWT]`;
+
+exports[`JWT auth strategy No jwt auth config 1`] = `[Error: Unauthorized]`;
+
+exports[`JWT auth strategy No jwt token 1`] = `[Error: Unauthorized]`;
+
+exports[`JWT auth strategy Unexpected audience - array 1`] = `[Error: Unauthorized]`;
+
+exports[`JWT auth strategy Unexpected audience 1`] = `[Error: Unauthorized]`;
+
+exports[`JWT auth strategy Unexpected path 1`] = `[Error: Unauthorized]`;
+
+exports[`JWT auth strategy Unknown issuer 1`] = `[Error: Unauthorized]`;
+
+exports[`JWT auth strategy Verify JWT failed 1`] = `[Error: Unauthorized]`;

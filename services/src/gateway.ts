@@ -7,13 +7,7 @@ import * as config from './modules/config';
 import logger from './modules/logger';
 import { handleSignals, handleUncaughtErrors } from './modules/shutdown-handler';
 import { createStitchGateway } from './modules/gateway';
-import {
-  getSecret,
-  jwtAuthStrategy,
-  anonymousAuthStrategy,
-  anonymousPlugin,
-  jwtDecoderPlugin,
-} from './modules/authentication';
+import { getSecret, anonymousPlugin, jwtDecoderPlugin, authStrategies } from './modules/authentication';
 import { loadPlugins } from './modules/plugins';
 import { initializeMetrics } from './modules/apollo-server-plugins/metrics';
 
@@ -45,7 +39,7 @@ export async function createServer() {
     .register(server.createHandler({ path: '/graphql' }));
 
   app.after(() => {
-    app.addHook('onRequest', app.auth([jwtAuthStrategy, anonymousAuthStrategy]));
+    app.addHook('onRequest', app.auth(authStrategies));
   });
 
   app.get('/health', {}, (_, reply) => {

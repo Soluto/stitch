@@ -43,6 +43,19 @@ services:
               "authenticatedPaths": ["/graphql"]
             }
           },
+          "apiKey": {
+            "header": "x-api-key",
+            "authenticatedPaths": ["/graphql"],
+            "keys": {
+              "validApiKey": {
+                "name": "Valid Key"
+              },
+              "disabledApiKey": {
+                "name": "Disabled Key",
+                "disabled": true
+              }
+            }
+          },
           "anonymous": {
             "rejectAuthorizationHeader": true,
             "publicPaths": ["/metrics", "/.well-known/apollo/server-health", "/graphql"]

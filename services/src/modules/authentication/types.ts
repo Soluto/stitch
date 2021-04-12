@@ -8,10 +8,27 @@ export interface IssuerConfig {
   description?: string;
 }
 
+export interface ApiKeyAuthConfig {
+  header?: string;
+  queryParam?: string;
+  keys: Record<string, ApiKeyConfig>;
+  authenticatedPaths: string[];
+}
+
+export interface ApiKeyConfig {
+  name: string;
+  description?: string;
+  disabled?: boolean;
+}
+
+export interface AnonymousAuthConfig {
+  publicPaths: string[];
+  rejectAuthorizationHeader?: boolean;
+}
+
+export type JWTAuthConfig = Record<string, IssuerConfig>;
 export interface AuthenticationConfig {
-  jwt?: Record<string, IssuerConfig>;
-  anonymous?: {
-    publicPaths: string[];
-    rejectAuthorizationHeader?: boolean;
-  };
+  jwt?: JWTAuthConfig;
+  apiKey?: ApiKeyAuthConfig;
+  anonymous?: AnonymousAuthConfig;
 }

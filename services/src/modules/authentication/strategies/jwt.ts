@@ -1,9 +1,20 @@
-import * as fastify from 'fastify';
 import * as _ from 'lodash';
 import logger from '../../logger';
 import { authenticationConfig } from '../../config';
+import { DecodedJWT } from '../jwt-decoder-plugin';
 
-export default async function (request: fastify.FastifyRequest): Promise<void> {
+export interface JWTAuthPartialRequest {
+  raw: {
+    url?: string;
+  };
+  decodeJWT: () => DecodedJWT | undefined;
+  jwtVerify: () => Promise<void>;
+}
+
+export default async function (request: JWTAuthPartialRequest): Promise<void> {
+  const config = authenticationConfig.jwt;
+  if (!config) throw new Error('Unauthorized');
+
   const decodedJWT = request.decodeJWT();
   if (!decodedJWT) throw new Error('Unauthorized');
 
@@ -11,7 +22,7 @@ export default async function (request: fastify.FastifyRequest): Promise<void> {
   const issuer = String(decodedJWT.payload.iss);
   const reqLogger = logger.child({ issuer });
 
-  const issuerConfig = authenticationConfig?.jwt?.[issuer];
+  const issuerConfig = config[issuer];
   if (!issuerConfig) {
     reqLogger.debug('Unknown issuer');
     throw new Error('Unauthorized');
@@ -34,14 +45,18 @@ export default async function (request: fastify.FastifyRequest): Promise<void> {
   }
 
   // Verify route
-  if (issuerConfig.authenticatedPaths.some(ap => request.raw.url === ap)) {
-    try {
-      // Verify JWT signing, expiration and more
-      await request.jwtVerify();
-      reqLogger.trace('JWT verified');
-    } catch (err) {
-      reqLogger.debug({ err }, 'Failed to verify request JWT');
-      throw new Error('Unauthorized');
-    }
+  const url = request.raw.url;
+  if (!url || !issuerConfig.authenticatedPaths.includes(url)) {
+    reqLogger.trace({ url }, 'Unexpected path');
+    throw new Error('Unauthorized');
+  }
+
+  try {
+    // Verify JWT signing, expiration and more
+    await request.jwtVerify();
+    reqLogger.trace('JWT verified');
+  } catch (err) {
+    reqLogger.debug({ err }, 'Failed to verify request JWT');
+    throw new Error('Unauthorized');
   }
 }
