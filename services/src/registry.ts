@@ -13,7 +13,7 @@ import { jwtDecoderPlugin } from './modules/authentication';
 export const app = new ApolloServer({
   typeDefs,
   resolvers,
-  context(request: fastify.FastifyRequest) {
+  context({ request }) {
     const ctx: RegistryRequestContext = {
       request,
       activeDirectoryAuth: new ActiveDirectoryAuth(),
@@ -30,6 +30,7 @@ export async function createServer() {
 
   logger.info('Stitch registry booting up...');
   await loadPlugins();
+  await app.start();
 
   const server = fastify();
   server

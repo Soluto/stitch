@@ -22,8 +22,8 @@ import {
 import { IResolvers, makeExecutableSchema, SchemaDirectiveVisitor } from 'graphql-tools';
 import { composeAndValidate } from '@apollo/federation';
 import { ApolloError } from 'apollo-server-core';
-import createTypeResolvers from './implicit-type-resolver';
-import { knownApolloDirectives } from './config';
+import createTypeResolvers from '../implicit-type-resolver';
+import { knownApolloDirectives } from '../config';
 interface DirectiveVisitors {
   [directiveName: string]: typeof SchemaDirectiveVisitor;
 }
@@ -73,9 +73,10 @@ export function buildSchemaFromFederatedTypeDefs({
 
   // Compose all SDLs together using federation
   const compositionResult = composeAndValidate(serviceDefinitions);
-  if (compositionResult.errors.length > 0) {
+  const compositionErrors = compositionResult.errors ?? [];
+  if (compositionErrors.length > 0) {
     throw new ApolloError('Federation validation failed', 'FEDERATION_VALIDATION_FAILURE', {
-      errors: compositionResult.errors.map(err => (err instanceof GraphQLError ? err : new GraphQLError(err!.message))),
+      errors: compositionErrors.map(err => (err instanceof GraphQLError ? err : new GraphQLError(err!.message))),
     });
   }
 
