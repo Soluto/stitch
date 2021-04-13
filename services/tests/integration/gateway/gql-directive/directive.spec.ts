@@ -1,12 +1,14 @@
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
-import * as Rx from 'rxjs';
 import * as nock from 'nock';
 import { makeExecutableSchema } from 'graphql-tools';
 import { gql } from 'apollo-server-core';
 import { graphqlSync, GraphQLSchema, print, printSchema } from 'graphql';
-import { createStitchGateway } from '../../../../src/modules/gateway';
+import createStitchGateway from '../../../../src/modules/apollo-server';
 import { beforeEachDispose } from '../../before-each-dispose';
 import { RemoteSchema } from '../../../../src/modules/directives/gql';
+
+jest.mock('../../../../src/modules/resource-repository/get-resource-repository');
+import getResourceRepository from '../../../../src/modules/resource-repository/get-resource-repository';
 
 const miriam = {
   employeeId: '1',
@@ -86,9 +88,11 @@ const resourceGroup = {
   remoteSchemas: [remoteSchemaResource],
 };
 
-jest.mock('../../../../src/modules/resource-repository/stream', () => ({
-  pollForUpdates: jest.fn(() => Rx.of(resourceGroup)),
-}));
+(getResourceRepository as jest.Mock).mockImplementation(
+  jest.fn().mockReturnValue({
+    fetchLatest: () => Promise.resolve({ resourceGroup, isNew: true }),
+  })
+);
 
 interface TestCase {
   statusCode?: number;
@@ -108,12 +112,12 @@ describe.each(testCases)('GQL Directive', (testCaseName, { statusCode, delay }) 
   beforeEachDispose(async () => {
     mockGqlBackend(remoteHost, remoteSchema, statusCode, delay);
 
-    const stitch = createStitchGateway();
-    client = createTestClient(stitch.server);
+    const { server } = await createStitchGateway();
+    client = createTestClient(server);
 
     return () => {
       nock.cleanAll();
-      return stitch.dispose();
+      return server.stop();
     };
   });
 

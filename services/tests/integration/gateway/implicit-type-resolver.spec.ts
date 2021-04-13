@@ -1,14 +1,13 @@
-import * as Rx from 'rxjs';
 import { ApolloServerTestClient, createTestClient } from 'apollo-server-testing';
 import { print } from 'graphql';
 import { gql } from 'apollo-server-core';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { beforeEachDispose } from '../before-each-dispose';
-import { createStitchGateway } from '../../../src/modules/gateway';
+import createStitchGateway from '../../../src/modules/apollo-server';
 import { ResourceGroup } from '../../../src/modules/resource-repository';
 
-jest.mock('../../../src/modules/resource-repository/stream');
-import { pollForUpdates } from '../../../src/modules/resource-repository/stream';
+jest.mock('../../../src/modules/resource-repository/get-resource-repository');
+import getResourceRepository from '../../../src/modules/resource-repository/get-resource-repository';
 
 const testCases: [string, ResourceGroup][] = [
   [
@@ -132,14 +131,18 @@ describe.each(testCases)('Implicit Type Resolver Tests', (testName, resourceGrou
     }
   `;
 
-  (pollForUpdates as jest.Mock).mockImplementationOnce(jest.fn().mockReturnValueOnce(Rx.of(resourceGroup)));
+  (getResourceRepository as jest.Mock).mockImplementationOnce(
+    jest.fn().mockReturnValueOnce({
+      fetchLatest: () => Promise.resolve({ resourceGroup, isNew: true }),
+    })
+  );
 
-  beforeEachDispose(() => {
-    const stitch = createStitchGateway();
-    client = createTestClient(stitch.server);
+  beforeEachDispose(async () => {
+    const { server } = await createStitchGateway();
+    client = createTestClient(server);
 
     return () => {
-      return stitch.dispose();
+      return server.stop();
     };
   });
 

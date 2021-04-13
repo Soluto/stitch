@@ -1,13 +1,12 @@
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
-import * as Rx from 'rxjs';
-import { gql } from 'apollo-server-core';
+import { gql, ApolloServerBase } from 'apollo-server-core';
 import { print, DocumentNode } from 'graphql';
 import * as nock from 'nock';
-import { createStitchGateway } from '../../../../src/modules/gateway';
+import createStitchGateway from '../../../../src/modules/apollo-server';
 import { Schema } from '../../../../src/modules/resource-repository';
 
-jest.mock('../../../../src/modules/resource-repository/stream');
-import { pollForUpdates } from '../../../../src/modules/resource-repository/stream';
+jest.mock('../../../../src/modules/resource-repository/get-resource-repository');
+import getResourceRepository from '../../../../src/modules/resource-repository/get-resource-repository';
 
 interface TestCase {
   mock: () => nock.Scope;
@@ -288,8 +287,8 @@ const testCases: [string, TestCase][] = [
 ];
 
 describe.each(testCases)('Rest directive', (testName, { mock, schema, query, variables, skipMockIsDoneAssert }) => {
+  let server: ApolloServerBase;
   let client: ApolloServerTestClient;
-  let disposeServer: any;
   let nockScope: nock.Scope;
   beforeAll(async () => {
     const schemaResource: Schema = {
@@ -308,18 +307,21 @@ describe.each(testCases)('Rest directive', (testName, { mock, schema, query, var
       policies: [],
     };
 
-    (pollForUpdates as jest.Mock).mockImplementationOnce(jest.fn().mockReturnValueOnce(Rx.of(resourceGroup)));
+    (getResourceRepository as jest.Mock).mockImplementationOnce(
+      jest.fn().mockReturnValueOnce({
+        fetchLatest: () => Promise.resolve({ resourceGroup, isNew: true }),
+      })
+    );
 
-    const { server, dispose } = createStitchGateway();
+    ({ server } = await createStitchGateway());
     client = createTestClient(server);
-    disposeServer = dispose;
 
     nockScope = mock();
     expect(nockScope).toBeDefined();
   });
 
   afterAll(async () => {
-    disposeServer && (await disposeServer());
+    await server.stop();
     nock.cleanAll();
   });
 
