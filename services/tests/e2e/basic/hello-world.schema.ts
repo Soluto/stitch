@@ -32,6 +32,18 @@ export const schema3 = {
   },
   schema: print(gql`
     type Query {
+      foo: String! @localResolver(value: "TAZ")
+    }
+  `),
+};
+
+export const invalidSchema = {
+  metadata: {
+    namespace: 'hello_world',
+    name: 'name',
+  },
+  schema: print(gql`
+    type Query {
       foo: HLFoo!
     }
   `),

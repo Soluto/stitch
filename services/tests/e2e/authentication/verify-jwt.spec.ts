@@ -1,6 +1,6 @@
 import { GraphQLClient } from 'graphql-request';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
-import { sleep } from '../../helpers/utility';
+import { sleep, updateGatewaySchema } from '../../helpers/utility';
 import { RegistryMutationResponse, updateSchemasMutation } from '../../helpers/registry-request-builder';
 import { getToken, getInvalidToken } from '../../helpers/get-token';
 import { startContainerOutputCapture } from '../../helpers/get-container-logs';
@@ -27,8 +27,8 @@ describe('Authentication - Verify JWT', () => {
     });
     expect(schemaResponse.result.success).toBeTruthy();
 
-    // Wait for gateway to update before next tests
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
+    const resp = await updateGatewaySchema('http://localhost:8080');
+    expect(resp.status).toEqual(200);
   });
 
   test('Valid JWT', async () => {

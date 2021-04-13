@@ -2,7 +2,7 @@ import { print } from 'graphql';
 import { gql } from 'apollo-server-core';
 import { GraphQLClient } from 'graphql-request';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
-import { sleep } from '../../helpers/utility';
+import { updateGatewaySchema } from '../../helpers/utility';
 import { RegistryMutationResponse, updateSchemasMutation } from '../../helpers/registry-request-builder';
 import { getToken } from '../../helpers/get-token';
 import { schema, schemaCrashesPlugin } from './plugins.schema';
@@ -52,8 +52,8 @@ describe('Plugins', () => {
     });
     expect(schemaResponse.result.success).toBeTruthy();
 
-    // Wait for gateway to update
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
+    const resp = await updateGatewaySchema('http://localhost:8080');
+    expect(resp.status).toEqual(200);
   });
 
   test('Check plugins', async () => {

@@ -1,5 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
-import { sleep } from '../../helpers/utility';
+import { updateGatewaySchema } from '../../helpers/utility';
 import {
   RegistryMutationResponse,
   updatePoliciesMutation,
@@ -35,8 +35,8 @@ describe('authorization', () => {
     const schemaResponse = await registryClient.request<RegistryMutationResponse>(updateSchemasMutation, { schema });
     expect(schemaResponse.result.success).toBeTruthy();
 
-    // Wait for gateway to update before next tests
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
+    const resp = await updateGatewaySchema('http://localhost:8080');
+    expect(resp.status).toEqual(200);
   });
 
   it('allows access to a field based on an argument using param injection from source', async () => {

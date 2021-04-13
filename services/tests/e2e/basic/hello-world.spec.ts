@@ -2,10 +2,10 @@ import { print } from 'graphql';
 import { gql } from 'apollo-server-core';
 import { GraphQLClient } from 'graphql-request';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
-import { sleep } from '../../helpers/utility';
+import { sleep, updateGatewaySchema } from '../../helpers/utility';
 import { RegistryMutationResponse, updateSchemasMutation } from '../../helpers/registry-request-builder';
 import { getToken } from '../../helpers/get-token';
-import { schema1, schema2, schema3 } from './hello-world.schema';
+import { invalidSchema, schema1, schema2, schema3 } from './hello-world.schema';
 
 const gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
 const registryClient = new GraphQLClient('http://localhost:8090/graphql');
@@ -24,27 +24,39 @@ describe('Basic flow', () => {
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
   });
 
-  test('Setup schema', async () => {
+  test('Update schema and query new fields', async () => {
     const response1 = await registryClient.request<RegistryMutationResponse>(updateSchemasMutation, {
       schema: schema1,
     });
     expect(response1.result.success).toBeTruthy();
 
-    // Wait for gateway to update
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
+    const resp = await updateGatewaySchema('http://localhost:8080');
+    expect(resp.status).toEqual(200);
 
     const response = await gatewayClient.request(query);
     expect(response).toMatchSnapshot();
   });
 
-  test('Gateway updates when updating schema in registry', async () => {
+  test('Update schema and query again', async () => {
     const response2 = await registryClient.request<RegistryMutationResponse>(updateSchemasMutation, {
       schema: schema2,
     });
     expect(response2.result.success).toBeTruthy();
 
-    // Wait for gateway to update
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
+    const resp = await updateGatewaySchema('http://localhost:8080');
+    expect(resp.status).toEqual(200);
+
+    const response = await gatewayClient.request(query);
+    expect(response).toMatchSnapshot();
+  });
+
+  test('Update schema, wait for interval update and query', async () => {
+    const response3 = await registryClient.request<RegistryMutationResponse>(updateSchemasMutation, {
+      schema: schema3,
+    });
+    expect(response3.result.success).toBeTruthy();
+
+    await sleep(1500);
 
     const response = await gatewayClient.request(query);
     expect(response).toMatchSnapshot();
@@ -53,7 +65,7 @@ describe('Basic flow', () => {
   test('Send wrong schema', async () => {
     try {
       await registryClient.request(updateSchemasMutation, {
-        schema: schema3,
+        schema: invalidSchema,
       });
     } catch (e) {
       expect(e.response).toMatchSnapshot();

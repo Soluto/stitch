@@ -46,7 +46,7 @@ class SerialJestRunner extends DefaultJestRunner {
 
   async teardown() {
     if (process.env.PRINT_CONTAINER_LOGS) {
-      await dockerCompose.logs(['gateway', 'registry'], options);
+      await dockerCompose.logs(['gateway'], options);
     }
     await dockerCompose.down({ ...options, ...downAdditionalOptions });
     await waitFor.stop(30000);

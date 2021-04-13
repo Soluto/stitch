@@ -5,7 +5,7 @@ import { GraphQLClient } from 'graphql-request';
 import PrometheusMetricsSerializer from '../../utils/prometheus-metrics-serializer';
 import { getToken } from '../../helpers/get-token';
 import { RegistryMutationResponse, updateSchemasMutation } from '../../helpers/registry-request-builder';
-import { sleep } from '../../helpers/utility';
+import { updateGatewaySchema } from '../../helpers/utility';
 import { schema1, schema2 } from './metrics.schema';
 
 const gatewayBaseUrl = 'http://localhost:8080';
@@ -48,8 +48,8 @@ describe('Metrics', () => {
     });
     expect(updateSchemaResponse.result.success).toBeTruthy();
 
-    // Wait for gateway to update
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
+    const resp = await updateGatewaySchema('http://localhost:8080');
+    expect(resp.status).toEqual(200);
 
     const response = await gatewayClient.request(query);
     expect(response).toBeDefined();
@@ -67,8 +67,8 @@ describe('Metrics', () => {
     });
     expect(updateSchemaResponse.result.success).toBeTruthy();
 
-    // Wait for gateway to update
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
+    const resp = await updateGatewaySchema('http://localhost:8080');
+    expect(resp.status).toEqual(200);
   });
 
   test('Check metrics again', async () => {

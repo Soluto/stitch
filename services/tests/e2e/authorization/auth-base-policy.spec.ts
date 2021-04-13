@@ -1,5 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
-import { sleep } from '../../helpers/utility';
+import { updateGatewaySchema } from '../../helpers/utility';
 import {
   RegistryMutationResponse,
   updateBasePolicyMutation,
@@ -48,8 +48,8 @@ describe('Authorization - Base policy', () => {
     });
     expect(basePolicyResponse.result.success).toBeTruthy();
 
-    // Wait for gateway to update before next tests
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
+    const resp = await updateGatewaySchema('http://localhost:8080');
+    expect(resp.status).toEqual(200);
   });
 
   afterAll(async () => {
@@ -58,8 +58,8 @@ describe('Authorization - Base policy', () => {
     });
     expect(basePolicyResponse.result.success).toBeTruthy();
 
-    // Wait for gateway to update before next tests
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
+    const resp = await updateGatewaySchema('http://localhost:8080');
+    expect(resp.status).toEqual(200);
   });
 
   beforeEach(() => {
