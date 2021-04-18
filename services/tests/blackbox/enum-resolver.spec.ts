@@ -92,7 +92,7 @@ describe('@enumResolver directive', () => {
       },
     };
 
-    const { app: gatewayApp, dispose } = await createGateway();
+    const gatewayApp = await createGateway();
 
     const response = await gatewayApp.inject({
       method: 'POST',
@@ -103,6 +103,6 @@ describe('@enumResolver directive', () => {
     expect(response.statusCode).toEqual(200);
     expect(response.json().data).toMatchSnapshot();
 
-    await dispose();
+    await gatewayApp.close();
   });
 });

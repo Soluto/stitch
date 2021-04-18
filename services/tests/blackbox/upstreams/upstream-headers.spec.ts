@@ -14,7 +14,6 @@ describe('Upstream headers', () => {
   const fooId = '1';
 
   let app: FastifyInstance;
-  let dispose: () => Promise<void>;
 
   let remoteServerScope: nock.Scope;
 
@@ -74,11 +73,11 @@ describe('Upstream headers', () => {
 
     await fs.writeFile(process.env.FS_RESOURCE_REPOSITORY_PATH!, JSON.stringify(resources));
 
-    ({ app, dispose } = await createGateway());
+    app = await createGateway();
   });
 
   afterAll(async () => {
-    await dispose();
+    await app.close();
     await fs.unlink(process.env.FS_RESOURCE_REPOSITORY_PATH!);
     nock.cleanAll();
   });

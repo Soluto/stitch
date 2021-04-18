@@ -15,7 +15,6 @@ describe('Upstream for gql introspection query', () => {
   const jwtIssuer = 'https://oidc-provider';
 
   let app: FastifyInstance;
-  let dispose: () => Promise<void>;
 
   let remoteServerScope: nock.Scope;
 
@@ -84,7 +83,7 @@ describe('Upstream for gql introspection query', () => {
   });
 
   afterAll(async () => {
-    await dispose();
+    await app.close();
     await fs.unlink(process.env.FS_RESOURCE_REPOSITORY_PATH!);
     nock.cleanAll();
   });

@@ -5,7 +5,6 @@ import { ResourceGroup } from '../../src/modules/resource-repository';
 
 describe('CORS', () => {
   let app: FastifyInstance;
-  let dispose: () => Promise<void>;
 
   beforeAll(async () => {
     const resources: ResourceGroup = {
@@ -17,11 +16,11 @@ describe('CORS', () => {
 
     await fs.writeFile(process.env.FS_RESOURCE_REPOSITORY_PATH!, JSON.stringify(resources));
 
-    ({ app, dispose } = await createGateway());
+    app = await createGateway();
   });
 
   afterAll(async () => {
-    await dispose();
+    await app.close();
     await fs.unlink(process.env.FS_RESOURCE_REPOSITORY_PATH!);
   });
 

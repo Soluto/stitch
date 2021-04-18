@@ -14,7 +14,6 @@ describe('Logger config', () => {
   const originalLogLevel = logger.level;
 
   let app: FastifyInstance;
-  let dispose: () => Promise<void>;
 
   let remoteServerScope: nock.Scope;
 
@@ -49,12 +48,12 @@ describe('Logger config', () => {
 
     await fs.writeFile(process.env.FS_RESOURCE_REPOSITORY_PATH!, JSON.stringify(resources));
 
-    ({ app, dispose } = await createGateway());
+    app = await createGateway();
   });
 
   afterAll(async () => {
     logger.level = originalLogLevel;
-    await dispose();
+    await app.close();
     await fs.unlink(process.env.FS_RESOURCE_REPOSITORY_PATH!);
   });
 
