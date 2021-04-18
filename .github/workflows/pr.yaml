@@ -26,6 +26,14 @@ jobs:
         run: npm run type-check
         working-directory: services
 
-      - name: npm run test
-        run: npm run test:full:ci
+      - name: unit & integration tests
+        run: npm run test
+        working-directory: services
+
+      - name: blackbox tests
+        run: npm run test:blackbox
+        working-directory: services
+
+      - name: e2e tests
+        run: npm run test:e2e
         working-directory: services
