@@ -1,7 +1,7 @@
 import { print } from 'graphql';
 import { gql } from 'apollo-server-core';
 import { GraphQLClient } from 'graphql-request';
-import { sleep } from '../../helpers/utility';
+import { updateGatewaySchema } from '../../helpers/utility';
 import { RegistryMutationResponse, updateSchemasMutation } from '../../helpers/registry-request-builder';
 import { getToken } from '../../helpers/get-token';
 import { schema } from './ignore-policies.schema';
@@ -27,8 +27,8 @@ describe.skip('Ignore Policies', () => {
     });
     expect(response.result.success).toBeTruthy();
 
-    // Wait for gateway to update
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
+    const resp = await updateGatewaySchema('http://localhost:8080');
+    expect(resp.status).toEqual(200);
   });
 
   test('Call gateway', async () => {

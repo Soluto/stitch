@@ -6,7 +6,7 @@ import { getToken } from '../../helpers/get-token';
 import { ResourceMetadataInput } from '../../../src/modules/registry-schema';
 import { PolicyDefinition, PolicyType } from '../../../src/modules/resource-repository';
 import { RegistryMutationResponse, updatePoliciesMutation } from '../../helpers/registry-request-builder';
-import { sleep } from '../../helpers/utility';
+import { updateGatewaySchema } from '../../helpers/utility';
 
 const gatewayClient = new GraphQLClient('http://localhost:8080/graphql');
 const registryClient = new GraphQLClient('http://localhost:8090/graphql');
@@ -57,8 +57,8 @@ describe('Basic flow', () => {
     });
     expect(updateResponse.result.success).toBeTruthy();
 
-    // Wait for gateway to update before next tests
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
+    const resp = await updateGatewaySchema('http://localhost:8080');
+    expect(resp.status).toEqual(200);
 
     const registryResult = await registryClient.request<{ policy?: PolicyDefinition }>(query, { metadata });
     expect(registryResult.policy).toMatchSnapshot();

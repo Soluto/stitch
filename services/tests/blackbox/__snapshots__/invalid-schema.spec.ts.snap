@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Invalid schema Make default query 1`] = `
+Object {
+  "default": "default",
+}
+`;
+
+exports[`Invalid schema Make default query again 1`] = `
+Object {
+  "default": "default",
+}
+`;
+
+exports[`Invalid schema Query new field 1`] = `
+Object {
+  "foo": "FOO",
+}
+`;
+
+exports[`Invalid schema Wait for refresh and make default query 1`] = `
+Object {
+  "default": "default",
+}
+`;

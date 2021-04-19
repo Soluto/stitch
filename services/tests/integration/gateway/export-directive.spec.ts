@@ -1,11 +1,13 @@
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
-import * as Rx from 'rxjs';
 import { gql } from 'apollo-server-core';
 import { print } from 'graphql';
 import * as nock from 'nock';
-import { createStitchGateway } from '../../../src/modules/gateway';
+import createStitchGateway from '../../../src/modules/apollo-server';
 import { beforeEachDispose } from '../before-each-dispose';
 import { Schema, ResourceGroup } from '../../../src/modules/resource-repository';
+
+jest.mock('../../../src/modules/resource-repository/get-resource-repository');
+import getResourceRepository from '../../../src/modules/resource-repository/get-resource-repository';
 
 const organizations = [
   {
@@ -72,22 +74,24 @@ const resourceGroup: ResourceGroup = {
   policies: [],
 };
 
-jest.mock('../../../src/modules/resource-repository/stream', () => ({
-  pollForUpdates: jest.fn(() => Rx.of(resourceGroup)),
-}));
+(getResourceRepository as jest.Mock).mockImplementationOnce(
+  jest.fn().mockReturnValueOnce({
+    fetchLatest: () => Promise.resolve({ resourceGroup, isNew: true }),
+  })
+);
 
 describe('Export Directive', () => {
   let client: ApolloServerTestClient;
 
-  beforeEachDispose(() => {
+  beforeEachDispose(async () => {
     mockRestBackend('http://test.api');
 
-    const stitch = createStitchGateway();
-    client = createTestClient(stitch.server);
+    const { server } = await createStitchGateway();
+    client = createTestClient(server);
 
     return () => {
       nock.cleanAll();
-      return stitch.dispose();
+      return server.stop();
     };
   });
 

@@ -1,10 +1,9 @@
 import { gql } from 'apollo-server-core';
 import { print } from 'graphql';
-import * as Rx from 'rxjs';
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { Schema, ResourceGroup } from '../../../src/modules/resource-repository';
 import { PolicyDefinition, PolicyType } from '../../../src/modules/resource-repository/types';
-import { createStitchGateway } from '../../../src/modules/gateway';
+import createStitchGateway from '../../../src/modules/apollo-server';
 import { PolicyExecutor } from '../../../src/modules/directives/policy';
 import { beforeEachDispose } from '../before-each-dispose';
 import { getCompiledFilename } from '../../../src/modules/opa-helper';
@@ -13,6 +12,9 @@ import { mockLoadedPolicy } from '../../helpers/opa-utility';
 jest.mock('../../../src/modules/directives/policy/opa', () => ({
   evaluate: jest.fn(() => ({ done: true, allow: true })),
 }));
+
+jest.mock('../../../src/modules/resource-repository/get-resource-repository');
+import getResourceRepository from '../../../src/modules/resource-repository/get-resource-repository';
 
 const userSchema: Schema = {
   metadata: { namespace: 'ns', name: 'user' },
@@ -75,23 +77,25 @@ const resourceGroup: ResourceGroup = {
   },
 };
 
-jest.mock('../../../src/modules/resource-repository/stream', () => ({
-  pollForUpdates: jest.fn(() => Rx.of(resourceGroup)),
-}));
+(getResourceRepository as jest.Mock).mockImplementationOnce(
+  jest.fn().mockReturnValueOnce({
+    fetchLatest: () => Promise.resolve({ resourceGroup, isNew: true }),
+  })
+);
 
 describe('Policy Caching', () => {
   let client: ApolloServerTestClient;
   let _evaluatePolicySpy: jest.SpyInstance;
 
-  beforeEachDispose(() => {
+  beforeEachDispose(async () => {
     _evaluatePolicySpy = jest.spyOn(PolicyExecutor.prototype as any, '_evaluatePolicy');
 
-    const stitch = createStitchGateway();
-    client = createTestClient(stitch.server);
+    const { server } = await createStitchGateway();
+    client = createTestClient(server);
 
     return () => {
       jest.restoreAllMocks();
-      return stitch.dispose();
+      return server.stop();
     };
   });
 

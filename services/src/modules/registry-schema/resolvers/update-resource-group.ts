@@ -1,7 +1,7 @@
 import pLimit from 'p-limit';
 import * as _ from 'lodash';
 import logger from '../../logger';
-import { createSchemaConfig } from '../../graphql-service';
+import { createGatewaySchema } from '../../apollo-server';
 import { applyResourceGroupUpdates } from '../../resource-repository';
 import { validateResourceGroupOrThrow } from '../validation';
 import { transformResourceGroup as applyPluginsForResourceGroup } from '../../plugins';
@@ -39,8 +39,8 @@ export default async function (updates: ResourceGroupInput, context: RegistryReq
       logger.debug('Validating resource group...');
       validateResourceGroupOrThrow(gatewayRg);
 
-      logger.debug('Creating schema config...');
-      await createSchemaConfig(gatewayRg);
+      logger.debug('Creating schema...');
+      await createGatewaySchema(gatewayRg);
 
       logger.debug('Marking optional policy arguments...');
       markOptionalPolicyArgs(updates.policies);

@@ -23,7 +23,7 @@ process.env.CORS_CONFIGURATION = JSON.stringify({
 
 process.env.AUTHENTICATION_CONFIGURATION = JSON.stringify({
   anonymous: {
-    publicPaths: ['/metrics', '/.well-known/apollo/server-health', '/graphql'],
+    publicPaths: ['/metrics', '/.well-known/apollo/server-health', '/graphql', '/updateSchema'],
   },
 });
 

@@ -158,7 +158,7 @@ describe('@requires directive', () => {
       `),
     };
 
-    const { app: gatewayApp, dispose } = await createGateway();
+    const gatewayApp = await createGateway();
 
     const response = await gatewayApp.inject({
       method: 'POST',
@@ -169,6 +169,6 @@ describe('@requires directive', () => {
     expect(response.statusCode).toEqual(200);
     expect(response.json().data).toMatchSnapshot();
 
-    await dispose();
+    await gatewayApp.close();
   });
 });

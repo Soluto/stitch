@@ -1,18 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Basic flow Gateway updates when updating schema in registry 1`] = `
-Object {
-  "foo": "BAZ",
-}
-`;
-
 exports[`Basic flow Send wrong schema 1`] = `
 {
   "errors": [
     {
-      "message": "Unknown type: \\"HLFoo\\".",
+      "message": "Federation validation failed",
       "exception": {
-        "code": "INTERNAL_SERVER_ERROR"
+        "code": "FEDERATION_VALIDATION_FAILURE"
       }
     }
   ],
@@ -22,8 +16,20 @@ exports[`Basic flow Send wrong schema 1`] = `
 }
 `;
 
-exports[`Basic flow Setup schema 1`] = `
+exports[`Basic flow Update schema and query again 1`] = `
+Object {
+  "foo": "BAZ",
+}
+`;
+
+exports[`Basic flow Update schema and query new fields 1`] = `
 Object {
   "foo": "BAR",
+}
+`;
+
+exports[`Basic flow Update schema, wait for interval update and query 1`] = `
+Object {
+  "foo": "TAZ",
 }
 `;

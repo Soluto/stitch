@@ -1,11 +1,13 @@
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
-import * as Rx from 'rxjs';
 import * as nock from 'nock';
 import { gql } from 'apollo-server-core';
 import { print } from 'graphql';
-import { createStitchGateway } from '../../../src/modules/gateway';
+import createStitchGateway from '../../../src/modules/apollo-server';
 import { beforeEachDispose } from '../before-each-dispose';
 import { ResourceGroup } from '../../../src/modules/resource-repository';
+
+jest.mock('../../../src/modules/resource-repository/get-resource-repository');
+import getResourceRepository from '../../../src/modules/resource-repository/get-resource-repository';
 
 const schema = {
   metadata: {
@@ -27,20 +29,22 @@ const resourceGroup: ResourceGroup & { etag: string } = {
   policies: [],
 };
 
-jest.mock('../../../src/modules/resource-repository/stream', () => ({
-  pollForUpdates: jest.fn(() => Rx.of(resourceGroup)),
-}));
+(getResourceRepository as jest.Mock).mockImplementationOnce(
+  jest.fn().mockReturnValueOnce({
+    fetchLatest: () => Promise.resolve({ resourceGroup, isNew: true }),
+  })
+);
 
 describe('Hello world', () => {
   let client: ApolloServerTestClient;
 
-  beforeEachDispose(() => {
-    const stitch = createStitchGateway();
-    client = createTestClient(stitch.server);
+  beforeEachDispose(async () => {
+    const { server } = await createStitchGateway();
+    client = createTestClient(server);
 
     return () => {
       nock.cleanAll();
-      return stitch.dispose();
+      return server.stop();
     };
   });
 

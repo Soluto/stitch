@@ -2,7 +2,7 @@ import pLimit from 'p-limit';
 import * as _ from 'lodash';
 import { GraphQLError } from 'graphql';
 import logger from '../../logger';
-import { createSchemaConfig } from '../../graphql-service';
+import { createGatewaySchema } from '../../apollo-server';
 import { applyResourceGroupDeletions } from '../../resource-repository';
 import { validateResourceGroupOrThrow } from '../validation';
 import { transformResourceGroup as applyPluginForResourceGroup } from '../../plugins';
@@ -40,7 +40,7 @@ export default async function (deletions: ResourceGroupMetadataInput, context: R
       validateResourceGroupOrThrow(gatewayRg);
 
       logger.debug('Creating schema config...');
-      await createSchemaConfig(gatewayRg);
+      await createGatewaySchema(gatewayRg);
 
       logger.debug('Synchronizing policy attachments...');
       await policyAttachments.sync(existingPolicies, gatewayRg.policies);

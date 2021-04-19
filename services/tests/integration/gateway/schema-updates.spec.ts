@@ -1,11 +1,13 @@
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
-import * as Rx from 'rxjs';
 import * as nock from 'nock';
 import { gql } from 'apollo-server-core';
 import { print } from 'graphql';
-import { createStitchGateway } from '../../../src/modules/gateway';
+import createStitchGateway, { StitchGatewayService } from '../../../src/modules/apollo-server';
 import { beforeEachDispose } from '../before-each-dispose';
 import { ResourceGroup } from '../../../src/modules/resource-repository';
+
+jest.mock('../../../src/modules/resource-repository/get-resource-repository');
+import getResourceRepository from '../../../src/modules/resource-repository/get-resource-repository';
 
 const schema1 = {
   metadata: {
@@ -38,23 +40,29 @@ const resourceGroup: ResourceGroup = {
   policies: [],
 };
 
-const resourceGroups = new Rx.BehaviorSubject<ResourceGroup>({ ...resourceGroup, schemas: [schema1] });
-jest.mock('../../../src/modules/resource-repository/stream', () => ({
-  pollForUpdates: jest.fn(() => resourceGroups),
-}));
-
 describe('Hello world', () => {
+  let stitch: StitchGatewayService;
   let client: ApolloServerTestClient;
 
-  beforeEachDispose(() => {
-    const stitch = createStitchGateway();
+  const fetchLatestMock = jest.fn();
+  (getResourceRepository as jest.Mock).mockImplementationOnce(
+    jest.fn().mockReturnValueOnce({
+      fetchLatest: fetchLatestMock,
+    })
+  );
+
+  beforeEachDispose(async () => {
+    fetchLatestMock.mockImplementation(() =>
+      Promise.resolve({ resourceGroup: { ...resourceGroup, schemas: [schema1] }, isNew: true })
+    );
+
+    stitch = await createStitchGateway();
     client = createTestClient(stitch.server);
 
     return () => {
       jest.useRealTimers();
       nock.cleanAll();
-      resourceGroups.complete();
-      return stitch.dispose();
+      return stitch.server.stop();
     };
   });
 
@@ -70,7 +78,10 @@ describe('Hello world', () => {
     expect(response1.errors).toBeUndefined();
     expect(response1.data).toEqual({ version: 'v1' });
 
-    resourceGroups.next({ ...resourceGroup, schemas: [schema2] });
+    fetchLatestMock.mockImplementation(() =>
+      Promise.resolve({ resourceGroup: { ...resourceGroup, schemas: [schema2] }, isNew: true })
+    );
+    await stitch.updateSchema();
 
     const response2 = await client.query({
       query: gql`

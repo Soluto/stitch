@@ -6,7 +6,7 @@ import {
   updatePoliciesMutation,
   updateSchemasMutation,
 } from '../../helpers/registry-request-builder';
-import { sleep } from '../../helpers/utility';
+import { updateGatewaySchema } from '../../helpers/utility';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { getToken } from '../../helpers/get-token';
 import { policies, schema } from './auth-object-directive.schema';
@@ -36,8 +36,8 @@ describe('Authorization - Policy directive on Object', () => {
     });
     expect(schemaResponse.result.success).toBeTruthy();
 
-    // Wait for gateway to update before next tests
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
+    const resp = await updateGatewaySchema('http://localhost:8080');
+    expect(resp.status).toEqual(200);
   });
 
   test('OK for query field without policy of object with allowed policy', async () => {

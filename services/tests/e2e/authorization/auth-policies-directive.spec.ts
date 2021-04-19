@@ -1,5 +1,5 @@
 import { GraphQLClient } from 'graphql-request';
-import { sleep } from '../../helpers/utility';
+import { updateGatewaySchema } from '../../helpers/utility';
 import {
   RegistryMutationResponse,
   updatePoliciesMutation,
@@ -66,8 +66,8 @@ describe('Policies directive', () => {
     });
     expect(schemaResponse.result.success).toBeTruthy();
 
-    // Wait for gateway to update before next tests
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
+    const resp = await updateGatewaySchema('http://localhost:8080');
+    expect(resp.status).toEqual(200);
   });
 
   test.each(testCases)('%s', async (_, variables) => {

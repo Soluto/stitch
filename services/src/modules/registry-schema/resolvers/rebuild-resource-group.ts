@@ -2,7 +2,7 @@ import pLimit from 'p-limit';
 import * as _ from 'lodash';
 import { RegistryRequestContext } from '..';
 import { updateRemoteGqlSchemas } from '../../directives/gql';
-import { createSchemaConfig } from '../../graphql-service';
+import { createGatewaySchema } from '../../apollo-server';
 import logger from '../../logger';
 import { transformResourceGroup as applyPluginsForResourceGroup } from '../../plugins';
 import { PolicyAttachmentsHelper } from '../helpers';
@@ -34,8 +34,8 @@ export default async function (context: RegistryRequestContext, dryRun = false) 
       logger.debug('Validating resource group...');
       validateResourceGroupOrThrow(gatewayRg);
 
-      logger.debug('Creating schema config...');
-      await createSchemaConfig(gatewayRg);
+      logger.debug('Creating schema...');
+      await createGatewaySchema(gatewayRg);
 
       logger.debug('Synchronizing policy attachments...');
       await policyAttachments.sync(existingPolicies, gatewayRg.policies);

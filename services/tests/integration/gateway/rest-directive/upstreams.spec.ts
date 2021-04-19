@@ -1,14 +1,13 @@
 import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { print } from 'graphql';
 import { gql } from 'apollo-server-core';
-import * as Rx from 'rxjs';
 import * as nock from 'nock';
-import { createStitchGateway } from '../../../../src/modules/gateway';
+import createStitchGateway from '../../../../src/modules/apollo-server';
 import { DefaultUpstream, ResourceGroup, Schema, Upstream } from '../../../../src/modules/resource-repository';
 import { beforeEachDispose } from '../../before-each-dispose';
 
-jest.mock('../../../../src/modules/resource-repository/stream');
-import { pollForUpdates } from '../../../../src/modules/resource-repository/stream';
+jest.mock('../../../../src/modules/resource-repository/get-resource-repository');
+import getResourceRepository from '../../../../src/modules/resource-repository/get-resource-repository';
 
 interface TestCase {
   upstreams: Upstream[];
@@ -141,14 +140,18 @@ describe.each(testCases)('Rest - Upstreams', (testCaseName, { upstreams, default
 
     if (defaultUpstream) resourceGroup.defaultUpstream = defaultUpstream;
 
-    (pollForUpdates as jest.Mock).mockImplementationOnce(jest.fn().mockReturnValueOnce(Rx.of(resourceGroup)));
+    (getResourceRepository as jest.Mock).mockImplementationOnce(
+      jest.fn().mockReturnValueOnce({
+        fetchLatest: () => Promise.resolve({ resourceGroup, isNew: true }),
+      })
+    );
 
-    const stitch = createStitchGateway();
-    client = createTestClient(stitch.server);
+    const { server } = await createStitchGateway();
+    client = createTestClient(server);
 
     return () => {
       nock.cleanAll();
-      return stitch.dispose();
+      return server.stop();
     };
   });
 

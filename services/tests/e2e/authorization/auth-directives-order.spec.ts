@@ -6,7 +6,7 @@ import {
   updatePoliciesMutation,
   updateSchemasMutation,
 } from '../../helpers/registry-request-builder';
-import { sleep } from '../../helpers/utility';
+import { updateGatewaySchema } from '../../helpers/utility';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { getToken } from '../../helpers/get-token';
 import { schema, policies } from './auth-directives-order.schema';
@@ -36,8 +36,8 @@ describe('Authorization - Policy directive order', () => {
     });
     expect(schemaResponse.result.success).toBeTruthy();
 
-    // Wait for gateway to update before next tests
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
+    const resp = await updateGatewaySchema('http://localhost:8080');
+    expect(resp.status).toEqual(200);
   });
 
   test('Query should return error', async () => {

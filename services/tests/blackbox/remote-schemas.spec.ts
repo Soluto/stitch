@@ -13,7 +13,6 @@ describe('Remote Schemas', () => {
   const remoteServer = 'http://remote-server';
 
   let app: FastifyInstance;
-  let dispose: () => Promise<void>;
 
   const metadata: ResourceMetadata = { namespace: 'remote-schemas', name: 'schema' };
 
@@ -108,7 +107,7 @@ describe('Remote Schemas', () => {
   });
 
   afterAll(async () => {
-    await dispose();
+    await app.close();
     await fs.unlink(process.env.FS_RESOURCE_REPOSITORY_PATH!);
     await fs.unlink(process.env.FS_REGISTRY_RESOURCE_REPOSITORY_PATH!);
 

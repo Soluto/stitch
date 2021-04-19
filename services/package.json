@@ -7,7 +7,6 @@
     "test:blackbox": "jest --ci --runInBand --config jest.config.blackbox.js",
     "test:e2e": "jest --ci --runInBand --config jest.config.e2e.js",
     "test:full": "NODE_OPTIONS=--max_old_space_size=4096 jest --ci --runInBand --config jest.config.full.js",
-    "test:full:ci": "NODE_OPTIONS=--max_old_space_size=4096 jest --ci --silent --runInBand --config jest.config.full.js",
     "build": "tsc",
     "build:dev": "tsc --watch",
     "start:gateway:watch": "ts-node-dev src/gateway.ts",
@@ -19,7 +18,7 @@
     "node": ">=12.9.0"
   },
   "dependencies": {
-    "@apollo/federation": "^0.16.10",
+    "@apollo/federation": "^0.23.0",
     "@open-policy-agent/opa-wasm": "^1.2.0",
     "@types/lodash": "^4.14.159",
     "@types/node-rsa": "^1.0.0",
@@ -29,9 +28,9 @@
     "apollo-link-http": "^1.5.17",
     "apollo-link-retry": "^2.2.16",
     "apollo-server-caching": "^0.5.2",
-    "apollo-server-core": "2.15.1",
+    "apollo-server-core": "2.22.2",
     "apollo-server-env": "^2.4.5",
-    "apollo-server-fastify": "^2.15.1",
+    "apollo-server-fastify": "^2.22.2",
     "apollo-server-plugin-base": "^0.9.1",
     "apollo-server-types": "^0.5.1",
     "aws-sdk": "^2.715.0",
@@ -58,7 +57,6 @@
     "pino": "^6.3.2",
     "pino-pretty": "^4.0.0",
     "prom-client": "^12.0.0",
-    "rxjs": "^6.5.5",
     "tslib": "^2.0.0",
     "vm2": "^3.9.2",
     "wait-on": "^5.1.0"

@@ -45,7 +45,7 @@ services:
           },
           "apiKey": {
             "header": "x-api-key",
-            "authenticatedPaths": ["/graphql"],
+            "authenticatedPaths": ["/updateSchema"],
             "keys": {
               "validApiKey": {
                 "name": "Valid Key"

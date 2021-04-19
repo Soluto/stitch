@@ -1,7 +1,7 @@
 import { print } from 'graphql';
 import { gql } from 'apollo-server-core';
 import { GraphQLClient } from 'graphql-request';
-import { sleep } from '../../helpers/utility';
+import { updateGatewaySchema } from '../../helpers/utility';
 import { RegistryMutationResponse, updateSchemasMutation } from '../../helpers/registry-request-builder';
 import { getToken } from '../../helpers/get-token';
 import { schema1, schema2 } from './federation.schema';
@@ -35,16 +35,16 @@ describe('Schema Federation', () => {
     });
     expect(response1.result.success).toBeTruthy();
 
-    // Wait for gateway to update
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
+    const resp1 = await updateGatewaySchema('http://localhost:8080');
+    expect(resp1.status).toEqual(200);
 
     const response2 = await registryClient.request<RegistryMutationResponse>(updateSchemasMutation, {
       schema: schema2,
     });
     expect(response2.result.success).toBeTruthy();
 
-    // Wait for gateway to update
-    await sleep(Number(process.env.WAIT_FOR_REFRESH_ON_GATEWAY) | 1500);
+    const resp2 = await updateGatewaySchema('http://localhost:8080');
+    expect(resp2.status).toEqual(200);
   });
 
   test('Send request', async () => {
