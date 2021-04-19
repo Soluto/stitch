@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'services/**'
+      - '.github/workflows/pr.yaml'
     branches-ignore:
       - master
 
@@ -26,6 +27,14 @@ jobs:
         run: npm run type-check
         working-directory: services
 
-      - name: npm run test
-        run: npm run test:full:ci
+      - name: npm run unit & integration test
+        run: npm run test -- --silent
+        working-directory: services
+
+      - name: npm run blackbox test
+        run: npm run test:blackbox -- --silent
+        working-directory: services
+
+      - name: npm run e2e test
+        run: npm run test:e2e -- --silent
         working-directory: services
