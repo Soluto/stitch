@@ -1,8 +1,8 @@
-import { ClientOptions } from 'jwks-rsa';
+import { Options as JwksClientOptions } from 'jwks-rsa';
 
 export interface IssuerConfig {
   authority: string;
-  jwksConfig?: Partial<ClientOptions>;
+  jwksConfig?: Partial<JwksClientOptions>;
   audience?: string | string[];
   authenticatedPaths: string[];
   description?: string;

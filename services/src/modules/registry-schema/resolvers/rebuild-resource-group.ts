@@ -1,4 +1,4 @@
-import pLimit from 'p-limit';
+import * as pLimit from 'p-limit';
 import * as _ from 'lodash';
 import { RegistryRequestContext } from '..';
 import { updateRemoteGqlSchemas } from '../../directives/gql';

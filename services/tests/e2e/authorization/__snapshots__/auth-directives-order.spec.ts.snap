@@ -5,9 +5,7 @@ exports[`Authorization - Policy directive order Query should return error 1`] = 
   "errors": [
     {
       "message": "Unauthorized by policy alwaysDeny in namespace auth_directives_order",
-      "exception": {
-        "code": "INTERNAL_SERVER_ERROR"
-      }
+      "errorCode": "INTERNAL_SERVER_ERROR"
     }
   ],
   "data": {}

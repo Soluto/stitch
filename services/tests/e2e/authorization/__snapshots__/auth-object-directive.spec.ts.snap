@@ -5,9 +5,7 @@ exports[`Authorization - Policy directive on Object Error for query field with d
   "errors": [
     {
       "message": "Unauthorized by policy alwaysDeny in namespace auth_object_directive",
-      "exception": {
-        "code": "INTERNAL_SERVER_ERROR"
-      }
+      "errorCode": "INTERNAL_SERVER_ERROR"
     }
   ],
   "data": {}
@@ -19,9 +17,7 @@ exports[`Authorization - Policy directive on Object Error for query field withou
   "errors": [
     {
       "message": "Unauthorized by policy alwaysDeny in namespace auth_object_directive",
-      "exception": {
-        "code": "INTERNAL_SERVER_ERROR"
-      }
+      "errorCode": "INTERNAL_SERVER_ERROR"
     }
   ],
   "data": {}

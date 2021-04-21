@@ -1,4 +1,4 @@
-import pLimit from 'p-limit';
+import * as pLimit from 'p-limit';
 import * as _ from 'lodash';
 import { GraphQLError } from 'graphql';
 import logger from '../../logger';

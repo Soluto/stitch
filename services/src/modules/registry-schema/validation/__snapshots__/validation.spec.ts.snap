@@ -6,9 +6,7 @@ exports[`validate host duplications throws on duplicate upstream host 1`] = `
     {
       "name": "Error",
       "message": "Duplicate host found on upstream",
-      "exception": {
-        "code": "DUPLICATE_UPSTREAM_FOUND"
-      }
+      "errorCode": "DUPLICATE_UPSTREAM_FOUND"
     }
   ],
   "data": {}
@@ -21,9 +19,7 @@ exports[`validate host duplications throws on duplicate upstream host and source
     {
       "name": "Error",
       "message": "Duplicate host found on upstream",
-      "exception": {
-        "code": "DUPLICATE_UPSTREAM_FOUND"
-      }
+      "errorCode": "DUPLICATE_UPSTREAM_FOUND"
     }
   ],
   "data": {}
@@ -36,9 +32,7 @@ exports[`validate host duplications throws on upstream w/ host and sourceHosts 1
     {
       "name": "Error",
       "message": "Upstream should have either sourceHosts or host property",
-      "exception": {
-        "code": "INVALID_UPSTREAM_CONFIGURATION"
-      }
+      "errorCode": "INVALID_UPSTREAM_CONFIGURATION"
     }
   ],
   "data": {}
@@ -51,9 +45,7 @@ exports[`validate host duplications throws on upstream w/o host and sourceHosts 
     {
       "name": "Error",
       "message": "Upstream should have either sourceHosts or host property",
-      "exception": {
-        "code": "INVALID_UPSTREAM_CONFIGURATION"
-      }
+      "errorCode": "INVALID_UPSTREAM_CONFIGURATION"
     }
   ],
   "data": {}
@@ -66,9 +58,7 @@ exports[`validateMetadataCharacters - Validation that namespaces and names conta
     {
       "name": "Error",
       "message": "Invalid characters found in namespace name special_not_allowed_@@ of resource type schemas, allowed characters are /^[A-Z_a-z-][\\\\w-]*$/",
-      "exception": {
-        "code": "INVALID_CHARACTERS_IN_NAME"
-      }
+      "errorCode": "INVALID_CHARACTERS_IN_NAME"
     }
   ],
   "data": {}
@@ -81,9 +71,7 @@ exports[`validateMetadataCharacters - Validation that namespaces and names conta
     {
       "name": "Error",
       "message": "Invalid characters found in resource name special_not_allowed_$$ of resource type policies, allowed characters are /^[A-Z_a-z-][\\\\w-]*$/",
-      "exception": {
-        "code": "INVALID_CHARACTERS_IN_NAME"
-      }
+      "errorCode": "INVALID_CHARACTERS_IN_NAME"
     }
   ],
   "data": {}
@@ -96,9 +84,7 @@ exports[`validateMetadataNameConflicts throws when two namespace names are simil
     {
       "name": "Error",
       "message": "Namespace name conflict found between some-ns and some_ns, they have to either match exactly or have a difference in non-special characters",
-      "exception": {
-        "code": "NAME_CONFLICT"
-      }
+      "errorCode": "NAME_CONFLICT"
     }
   ],
   "data": {}
@@ -111,9 +97,7 @@ exports[`validateMetadataNameConflicts throws when two resource names from the s
     {
       "name": "Error",
       "message": "Resource name conflict found between policy-1 and policy_1 of resource type policies in namespace some-ns, they have to either match exactly or have a difference in non-special characters",
-      "exception": {
-        "code": "NAME_CONFLICT"
-      }
+      "errorCode": "NAME_CONFLICT"
     }
   ],
   "data": {}

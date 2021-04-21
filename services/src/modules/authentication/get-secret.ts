@@ -1,13 +1,9 @@
 import * as fastify from 'fastify';
 import fetch from 'node-fetch';
 
-// There is problem with typings in the module: https://github.com/auth0/node-jwks-rsa/issues/78
-import * as jwks from 'jwks-rsa';
-import { ClientOptions, JwksClient } from 'jwks-rsa';
+import { Options as JwksClientOptions, JwksClient } from 'jwks-rsa';
 import logger from '../logger';
 import { authenticationConfig } from '../config';
-
-const createClient = (jwks as unknown) as (options: ClientOptions) => JwksClient;
 
 const jwkClients: Record<string, JwksClient> = {};
 
@@ -22,15 +18,15 @@ async function getJwksUri(authority: string) {
   }
 }
 
-const defaultConfig: Partial<ClientOptions> = {
+const defaultConfig: Partial<JwksClientOptions> = {
   cacheMaxAge: 24 * 60 * 60 * 1000,
 };
 
-async function getJwkClient(authority: string, jwksConfig?: Partial<ClientOptions>) {
+async function getJwkClient(authority: string, jwksConfig?: Partial<JwksClientOptions>) {
   if (!jwkClients[authority]) {
     const jwksUri = jwksConfig?.jwksUri ?? (await getJwksUri(authority));
     logger.debug({ authority, jwksUri }, 'New authority received. Creating new JWKs client...');
-    const clientOptions: Partial<ClientOptions> = {
+    const clientOptions: Partial<JwksClientOptions> = {
       jwksUri,
       ...defaultConfig,
       ...jwksConfig,
@@ -38,7 +34,7 @@ async function getJwkClient(authority: string, jwksConfig?: Partial<ClientOption
     if (!clientOptions.jwksUri) {
       throw new Error(`Failed to retrieve jwksUri for ${authority} from ${jwksUri}`);
     }
-    jwkClients[authority] = createClient(clientOptions as ClientOptions);
+    jwkClients[authority] = new JwksClient(clientOptions as JwksClientOptions);
   }
   return jwkClients[authority]!;
 }
