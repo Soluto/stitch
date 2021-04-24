@@ -22,6 +22,7 @@ The registry is our attempt at solving the issue of collaborating on a single gr
 - [Authorization](./docs/authorization.md)
 - [Plugins](./docs/plugins.md)
 - [Logging](./docs/logging.md)
+- [Directives](./docs/directives.md)
 
 ## Development
 

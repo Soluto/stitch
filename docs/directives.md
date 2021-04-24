@@ -1,3 +1,5 @@
 # Directives
 
-- [@localResolver](./directives/local-resolver.md)
+* [@localResolver](./directives/local-resolver.md)
+
+* [@errorHandler](./directives/error-handler.md)
