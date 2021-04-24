@@ -12,7 +12,10 @@ exports[`Policies directive Both policies rejected 1`] = `
   "errors": [
     {
       "message": "Error: Unauthorized by policy isAlpha in namespace auth_policies\\nError: Unauthorized by policy isBeta in namespace auth_policies",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "pd_foo"
+      ]
     }
   ],
   "data": {}
@@ -24,7 +27,10 @@ exports[`Policies directive First policy rejected 1`] = `
   "errors": [
     {
       "message": "Error: Unauthorized by policy isAlpha in namespace auth_policies",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "pd_bar"
+      ]
     }
   ],
   "data": {}
@@ -36,7 +42,10 @@ exports[`Policies directive Second policy rejected 1`] = `
   "errors": [
     {
       "message": "Error: Unauthorized by policy isBeta in namespace auth_policies",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "pd_bar"
+      ]
     }
   ],
   "data": {}

@@ -6,7 +6,11 @@ exports[`Implicit Type Resolver Tests Error when __typename is missing 1`] = `
     {
       "name": "GraphQLError",
       "message": "Expecting a \\"__typename\\" property in source when resolving an interface or union: Foo.",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo",
+        0
+      ]
     }
   ],
   "data": {}

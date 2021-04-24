@@ -33,7 +33,11 @@ exports[`Authorization with queries Query denied employee 1 1`] = `
   "errors": [
     {
       "message": "Unauthorized by policy notClassified in namespace auth-with-query",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "deniedEmployee1",
+        "address"
+      ]
     }
   ],
   "data": {
@@ -51,7 +55,11 @@ exports[`Authorization with queries Query denied employee 2 1`] = `
   "errors": [
     {
       "message": "Unauthorized by policy notClassified in namespace auth-with-query",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "deniedEmployee2",
+        "address"
+      ]
     }
   ],
   "data": {
@@ -69,7 +77,10 @@ exports[`Authorization with queries Query field with policy with invalid query 1
   "errors": [
     {
       "message": "Policy query execution failed",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "invalidQuery"
+      ]
     }
   ],
   "data": {}
@@ -81,7 +92,10 @@ exports[`Authorization with queries Query protected field 1`] = `
   "errors": [
     {
       "message": "Unauthorized by policy always-denied in namespace auth-with-query",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "classifiedDepartments"
+      ]
     }
   ],
   "data": {}

@@ -23,7 +23,11 @@ exports[`Policy Directive Tests LowerCase on object, policy on field, stub on pa
     {
       "name": "GraphQLError",
       "message": "Error",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo",
+        "bar"
+      ]
     }
   ],
   "data": {}
@@ -53,7 +57,11 @@ exports[`Policy Directive Tests LowerCase, policy on object, stub on parent quer
     {
       "name": "GraphQLError",
       "message": "Error",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo",
+        "bar"
+      ]
     }
   ],
   "data": {}
@@ -83,7 +91,11 @@ exports[`Policy Directive Tests Mock, policy on object, stub on parent query (DE
     {
       "name": "GraphQLError",
       "message": "Error",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo",
+        "bar"
+      ]
     }
   ],
   "data": {}
@@ -113,7 +125,11 @@ exports[`Policy Directive Tests Policy on field, resolver on object (DENY) 1`] =
     {
       "name": "GraphQLError",
       "message": "Error",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo",
+        "bar"
+      ]
     }
   ],
   "data": {}
@@ -143,7 +159,11 @@ exports[`Policy Directive Tests Policy on field, stub on parent query (DENY) 1`]
     {
       "name": "GraphQLError",
       "message": "Error",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo",
+        "bar"
+      ]
     }
   ],
   "data": {}
@@ -173,7 +193,11 @@ exports[`Policy Directive Tests Policy on object, stub on field (DENY) 1`] = `
     {
       "name": "GraphQLError",
       "message": "Error",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo",
+        "bar"
+      ]
     }
   ],
   "data": {}
@@ -220,7 +244,11 @@ exports[`Policy Directive Tests Policy, lowerCase on object, stub on parent quer
     {
       "name": "GraphQLError",
       "message": "Error",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo",
+        "bar"
+      ]
     }
   ],
   "data": {}
@@ -267,7 +295,11 @@ exports[`Policy Directive Tests Policy, stub on parent query (DENY) 1`] = `
     {
       "name": "GraphQLError",
       "message": "Error",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo",
+        "bar"
+      ]
     }
   ],
   "data": {}
@@ -297,7 +329,11 @@ exports[`Policy Directive Tests Stub, lowerCase, policy on field (DENY) 1`] = `
     {
       "name": "GraphQLError",
       "message": "Error",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo",
+        "bar"
+      ]
     }
   ],
   "data": {}
@@ -327,7 +363,11 @@ exports[`Policy Directive Tests Stub, policy on field (DENY) 1`] = `
     {
       "name": "GraphQLError",
       "message": "Error",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo",
+        "bar"
+      ]
     }
   ],
   "data": {}
@@ -357,7 +397,11 @@ exports[`Policy Directive Tests Stub, policy, lowerCase on field (DENY) 1`] = `
     {
       "name": "GraphQLError",
       "message": "Error",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo",
+        "bar"
+      ]
     }
   ],
   "data": {}

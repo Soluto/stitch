@@ -5,6 +5,7 @@ interface SerializedError {
   message: string;
   errorCode?: string;
   innerErrors?: string[];
+  path?: ReadonlyArray<string | number> | undefined;
 }
 
 export default {
@@ -17,6 +18,7 @@ export default {
         name: e.name,
         message: e.message,
         errorCode: e.extensions?.code,
+        path: e.path,
       };
       if (e.extensions?.errors) {
         error.innerErrors = e.extensions?.errors?.map((err: Error) => err.message);
