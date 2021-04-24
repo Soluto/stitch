@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Authorization - Replace policy error by "not found" one Query should return error 1`] = `
+{
+  "errors": [
+    {
+      "message": "404: Not found",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "are_bar"
+      ]
+    },
+    {
+      "message": "404: Not found",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "are_foo"
+      ]
+    }
+  ],
+  "data": {}
+}
+`;
