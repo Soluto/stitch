@@ -4,7 +4,7 @@ import { ApolloServerBase, gql } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-fastify';
 import { when } from 'jest-when';
 import { concatAST, DocumentNode } from 'graphql';
-import { PolicyExecutor } from '../../../src/modules/directives/policy';
+import { PolicyExecutor, UnauthorizedByPolicyError } from '../../../src/modules/directives/policy';
 import { sdl as lowerCaseSdl, LowerCaseDirective } from '../utils/lower-case-directive';
 import { sdl as mockSdl, MockDirective } from '../utils/mock-directive';
 import getBaseSchema from '../../../src/modules/base-schema';
@@ -18,7 +18,7 @@ when(mockValidatePolicy)
   .mockResolvedValue(undefined);
 when(mockValidatePolicy)
   .calledWith({ namespace: 'ns', name: 'alwaysDeny' })
-  .mockRejectedValue(new Error('Unauthorized by policy alwaysDeny in namespace ns'));
+  .mockRejectedValue(new UnauthorizedByPolicyError({ namespace: 'ns', name: 'alwaysDeny' }));
 jest.mock('../../../src/modules/directives/policy/policy-executor', () => ({
   default: jest.fn().mockImplementation(() => ({ validatePolicy: mockValidatePolicy })),
 }));

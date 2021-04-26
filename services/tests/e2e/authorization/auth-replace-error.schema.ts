@@ -27,7 +27,7 @@ export const schema: Schema = {
         @policy(namespace: "auth_replace_error", name: "alwaysDeny")
         @errorHandler(
           catchError: {
-            condition: "{ error.message === 'Unauthorized by policy alwaysDeny in namespace auth_replace_error' }"
+            condition: "{ error.name === 'UnauthorizedByPolicyError' }"
             returnValue: "__inner__throw_not_found___"
           }
           throwError: { condition: "{ result === '__inner__throw_not_found___' }", errorToThrow: "404: Not found" }
@@ -37,7 +37,7 @@ export const schema: Schema = {
         @policy(namespace: "auth_replace_error", name: "alwaysDeny")
         @errorHandler(
           catchError: {
-            condition: "{ error.message === 'Unauthorized by policy alwaysDeny in namespace auth_replace_error' }"
+            condition: "{ error.name === 'UnauthorizedByPolicyError' }"
             returnValue: "__inner__throw_not_found___"
           }
           throwError: { condition: "{ result === '__inner__throw_not_found___' }", errorToThrow: "404: Not found" }

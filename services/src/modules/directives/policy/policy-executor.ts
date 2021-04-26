@@ -15,6 +15,7 @@ import {
 import { evaluate as evaluateOpa } from './opa';
 import { getQueryResult } from './policy-query-helper';
 import CachedOperation from './cached-operation';
+import UnauthorizedByPolicyError from './unauthorized-by-policy-error';
 
 const typeEvaluators: Record<string, (ctx: PolicyEvaluationContext) => PolicyEvaluationResult> = {
   opa: evaluateOpa,
@@ -55,7 +56,7 @@ export default class PolicyExecutor {
   ): Promise<void> {
     const allow = await this.evaluatePolicy(policy, parent, gqlArgs, requestContext, info);
     if (!allow) {
-      throw new Error(`Unauthorized by policy ${policy.name} in namespace ${policy.namespace}`);
+      throw new UnauthorizedByPolicyError(policy);
     }
   }
 
@@ -68,7 +69,7 @@ export default class PolicyExecutor {
   ): void {
     const allow = this.evaluatePolicySync(policy, parent, gqlArgs, requestContext, info);
     if (!allow) {
-      throw new Error(`Unauthorized by policy ${policy.name} in namespace ${policy.namespace}`);
+      throw new UnauthorizedByPolicyError(policy);
     }
   }
 

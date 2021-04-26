@@ -22,7 +22,7 @@ exports[`Base Policy Tests Allow on base policy, deny on field definition 1`] = 
     {
       "name": "GraphQLError",
       "message": "Unauthorized by policy field_policy in namespace ns",
-      "errorCode": "INTERNAL_SERVER_ERROR",
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "foo"
       ]
@@ -41,7 +41,7 @@ exports[`Base Policy Tests Deny on base policy, allow on field definition 1`] = 
     {
       "name": "GraphQLError",
       "message": "Unauthorized by policy base_policy in namespace internal",
-      "errorCode": "INTERNAL_SERVER_ERROR",
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "foo"
       ]
@@ -49,7 +49,7 @@ exports[`Base Policy Tests Deny on base policy, allow on field definition 1`] = 
     {
       "name": "GraphQLError",
       "message": "Unauthorized by policy base_policy in namespace internal",
-      "errorCode": "INTERNAL_SERVER_ERROR",
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "bar"
       ]
@@ -68,7 +68,7 @@ exports[`Base Policy Tests Deny on base policy, allow on field definition with o
     {
       "name": "GraphQLError",
       "message": "Unauthorized by policy base_policy in namespace internal",
-      "errorCode": "INTERNAL_SERVER_ERROR",
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "bar"
       ]
