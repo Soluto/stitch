@@ -26,7 +26,7 @@ async function getMetrics(endpoint: string) {
 
 describe('Metrics', () => {
   const query = print(gql`
-    query {
+    query GetFoo {
       m_foo {
         bar
         baz
@@ -73,18 +73,16 @@ describe('Metrics', () => {
 
   test('Check metrics again', async () => {
     const metrics = await getMetrics(gatewayMetricsEndpoint);
-    expect(
-      metrics.some(
-        m => m === 'graphql_resolver_duration_seconds_count{parentType="MetricsFoo",fieldName="baz",status="success"} 1'
-      )
-    ).toBeTruthy();
+    expect(metrics).toContainEqual(
+      'graphql_resolver_duration_seconds_count{parentType="MetricsFoo",fieldName="baz",status="success"} 1'
+    );
   });
 
   test('Parsing errors metric', async () => {
     await expect(gatewayClient.request('wrong query')).rejects.toMatchSnapshot();
 
     const metrics = await getMetrics(gatewayMetricsEndpoint);
-    expect(metrics.some(m => m === 'graphql_request_parsing_errors_count 1')).toBeTruthy();
+    expect(metrics).toContainEqual('graphql_request_parsing_errors_count 1');
   });
 
   test('Validation errors metric', async () => {
@@ -96,7 +94,27 @@ describe('Metrics', () => {
     await expect(gatewayClient.request(query)).rejects.toMatchSnapshot();
 
     const metrics = await getMetrics(gatewayMetricsEndpoint);
-    expect(metrics.some(m => m === 'graphql_request_validation_errors_count 1')).toBeTruthy();
+    expect(metrics).toContainEqual('graphql_request_validation_errors_count 1');
+  });
+
+  test('Check resolver histogram metrics buckets', async () => {
+    const metrics = await getMetrics(gatewayMetricsEndpoint);
+    const bucketMetrics = metrics.filter(
+      m => m.startsWith('graphql_resolver_duration_seconds_bucket') && m.includes('MetricsFoo')
+    );
+    const bucketRegex = /le="(.+)",parentType=/;
+    const buckets = bucketMetrics.map(m => m.match(bucketRegex)?.[1]);
+    expect(buckets).toMatchSnapshot();
+  });
+
+  test('Check request histogram metrics buckets', async () => {
+    const metrics = await getMetrics(gatewayMetricsEndpoint);
+    const bucketMetrics = metrics.filter(
+      m => m.startsWith('graphql_request_duration_seconds_bucket') && m.includes('GetFoo')
+    );
+    const bucketRegex = /le="(.+)",operationName=/;
+    const buckets = bucketMetrics.map(m => m.match(bucketRegex)?.[1]);
+    expect(buckets).toMatchSnapshot();
   });
 
   test('Registry metrics', async () => {
