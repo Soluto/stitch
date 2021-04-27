@@ -9,6 +9,28 @@ graphql_resolver_duration_seconds_sum{parentType: MetricsFoo,fieldName: baz,stat
 graphql_resolver_duration_seconds_count{parentType: MetricsFoo,fieldName: baz,status: success} Y
 `;
 
+exports[`Metrics Check request histogram metrics buckets 1`] = `
+Array [
+  "0.02",
+  "0.1",
+  "0.5",
+  "2",
+  "10",
+  "+Inf",
+]
+`;
+
+exports[`Metrics Check resolver histogram metrics buckets 1`] = `
+Array [
+  "0.02",
+  "0.1",
+  "0.5",
+  "2",
+  "10",
+  "+Inf",
+]
+`;
+
 exports[`Metrics Parsing errors metric 1`] = `[Error: Syntax Error: Unexpected Name "wrong".: {"response":{"errors":[{"message":"Syntax Error: Unexpected Name \\"wrong\\".","locations":[{"line":1,"column":1}],"extensions":{"code":"GRAPHQL_PARSE_FAILED"}}],"status":400},"request":{"query":"wrong query"}}]`;
 
 exports[`Metrics Validation errors metric 1`] = `[Error: Cannot query field "wrong" on type "Query".: {"response":{"errors":[{"message":"Cannot query field \\"wrong\\" on type \\"Query\\".","locations":[{"line":2,"column":3}],"extensions":{"code":"GRAPHQL_VALIDATION_FAILED"}}],"status":400},"request":{"query":"{\\n  wrong\\n}\\n"}}]`;

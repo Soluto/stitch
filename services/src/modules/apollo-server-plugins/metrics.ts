@@ -17,13 +17,15 @@ export function initializeMetrics(pClient: typeof promClient) {
   requestDurationHistogram = new pClient.Histogram({
     name: 'graphql_request_duration_seconds',
     help: 'request duration in seconds',
-    labelNames: ['status'],
+    labelNames: ['status', 'operationName'],
+    buckets: [0.02, 0.1, 0.5, 2, 10],
   });
 
   resolverDurationHistogram = new pClient.Histogram({
     name: 'graphql_resolver_duration_seconds',
     help: 'resolver duration in seconds',
     labelNames: ['parentType', 'fieldName', 'status'],
+    buckets: [0.02, 0.1, 0.5, 2, 10],
   });
 
   requestParsingErrorCounter = new pClient.Counter({
@@ -58,9 +60,10 @@ export function createMetricsPlugin(): ApolloServerPlugin {
         },
         willSendResponse(willSendResponseContext: GraphQLRequestContextWillSendResponse<unknown>) {
           const {
+            operationName,
             response: { errors },
           } = willSendResponseContext;
-          endResponseTimer?.({ status: errors ? 'error' : 'success' });
+          endResponseTimer?.({ operationName: operationName ?? 'N/A', status: errors ? 'error' : 'success' });
         },
         executionDidStart: () => ({
           willResolveField(
