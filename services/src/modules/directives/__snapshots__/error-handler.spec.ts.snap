@@ -6,6 +6,9 @@ Object {
     "bar": Object {
       "baz": "Baz",
     },
+    "bar2": Object {
+      "baz": null,
+    },
     "foo": "Foo",
   },
   "errors": undefined,
@@ -35,22 +38,30 @@ exports[`@errorHandler directive 2) Original resolver DOES throw, no catchError,
   ],
   "data": {
     "foo": null,
-    "bar": {
-      "baz": null
-    }
+    "bar": null,
+    "bar2": null
   }
 }
 `;
 
 exports[`@errorHandler directive 3) Original resolver DOES throw, catchError condition and returnValue are undefined, no throwError 1`] = `
-Object {
-  "data": Object {
-    "bar": Object {
-      "baz": null,
-    },
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Cannot return null for non-nullable field Bar.baz.",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "bar",
+        "baz"
+      ]
+    }
+  ],
+  "data": {
     "foo": null,
-  },
-  "errors": undefined,
+    "bar": null,
+    "bar2": null
+  }
 }
 `;
 
@@ -60,6 +71,7 @@ Object {
     "bar": Object {
       "baz": "Baz (Caught)",
     },
+    "bar2": null,
     "foo": "Foo (Caught)",
   },
   "errors": undefined,
@@ -72,6 +84,7 @@ Object {
     "bar": Object {
       "baz": "Baz (Caught)",
     },
+    "bar2": null,
     "foo": "Foo (Caught)",
   },
   "errors": undefined,
@@ -101,9 +114,8 @@ exports[`@errorHandler directive 6) Original resolver DOES throw, catchError con
   ],
   "data": {
     "foo": null,
-    "bar": {
-      "baz": null
-    }
+    "bar": null,
+    "bar2": null
   }
 }
 `;
@@ -131,9 +143,8 @@ exports[`@errorHandler directive 7) Original resolver DOES throw, catchError con
   ],
   "data": {
     "foo": null,
-    "bar": {
-      "baz": null
-    }
+    "bar": null,
+    "bar2": null
   }
 }
 `;
@@ -144,6 +155,7 @@ Object {
     "bar": Object {
       "baz": "Baz (Caught)",
     },
+    "bar2": null,
     "foo": "Foo (Caught)",
   },
   "errors": undefined,
@@ -166,6 +178,15 @@ exports[`@errorHandler directive 9) Original resolver DOES NOT throw, no catchEr
       "message": "",
       "errorCode": "INTERNAL_SERVER_ERROR",
       "path": [
+        "bar2",
+        "baz"
+      ]
+    },
+    {
+      "name": "GraphQLError",
+      "message": "",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
         "bar",
         "baz"
       ]
@@ -173,7 +194,8 @@ exports[`@errorHandler directive 9) Original resolver DOES NOT throw, no catchEr
   ],
   "data": {
     "foo": null,
-    "bar": {
+    "bar": null,
+    "bar2": {
       "baz": null
     }
   }
@@ -196,6 +218,15 @@ exports[`@errorHandler directive 10) Original resolver DOES NOT throw, no catchE
       "message": "Throw me",
       "errorCode": "INTERNAL_SERVER_ERROR",
       "path": [
+        "bar2",
+        "baz"
+      ]
+    },
+    {
+      "name": "GraphQLError",
+      "message": "Throw me",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
         "bar",
         "baz"
       ]
@@ -203,7 +234,8 @@ exports[`@errorHandler directive 10) Original resolver DOES NOT throw, no catchE
   ],
   "data": {
     "foo": null,
-    "bar": {
+    "bar": null,
+    "bar2": {
       "baz": null
     }
   }
@@ -226,6 +258,15 @@ exports[`@errorHandler directive 11) Original resolver DOES NOT throw, no catchE
       "message": "Throw me",
       "errorCode": "INTERNAL_SERVER_ERROR",
       "path": [
+        "bar2",
+        "baz"
+      ]
+    },
+    {
+      "name": "GraphQLError",
+      "message": "Throw me",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
         "bar",
         "baz"
       ]
@@ -233,7 +274,8 @@ exports[`@errorHandler directive 11) Original resolver DOES NOT throw, no catchE
   ],
   "data": {
     "foo": null,
-    "bar": {
+    "bar": null,
+    "bar2": {
       "baz": null
     }
   }
@@ -256,6 +298,15 @@ exports[`@errorHandler directive 12) Original resolver DOES NOT throw, no catchE
       "message": "Throw me",
       "errorCode": "INTERNAL_SERVER_ERROR",
       "path": [
+        "bar2",
+        "baz"
+      ]
+    },
+    {
+      "name": "GraphQLError",
+      "message": "Throw me",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
         "bar",
         "baz"
       ]
@@ -263,7 +314,8 @@ exports[`@errorHandler directive 12) Original resolver DOES NOT throw, no catchE
   ],
   "data": {
     "foo": null,
-    "bar": {
+    "bar": null,
+    "bar2": {
       "baz": null
     }
   }
@@ -286,6 +338,15 @@ exports[`@errorHandler directive 13) Original resolver DOES NOT throw, no catchE
       "message": "{ Throw me }",
       "errorCode": "INTERNAL_SERVER_ERROR",
       "path": [
+        "bar2",
+        "baz"
+      ]
+    },
+    {
+      "name": "GraphQLError",
+      "message": "{ Throw me }",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
         "bar",
         "baz"
       ]
@@ -293,7 +354,8 @@ exports[`@errorHandler directive 13) Original resolver DOES NOT throw, no catchE
   ],
   "data": {
     "foo": null,
-    "bar": {
+    "bar": null,
+    "bar2": {
       "baz": null
     }
   }
@@ -306,6 +368,9 @@ Object {
     "bar": Object {
       "baz": "Baz",
     },
+    "bar2": Object {
+      "baz": null,
+    },
     "foo": "Foo",
   },
   "errors": undefined,
@@ -317,6 +382,9 @@ Object {
   "data": Object {
     "bar": Object {
       "baz": "Baz",
+    },
+    "bar2": Object {
+      "baz": null,
     },
     "foo": "Foo",
   },
@@ -347,7 +415,8 @@ exports[`@errorHandler directive 16) Original resolver DOES NOT throw, no catchE
   ],
   "data": {
     "foo": null,
-    "bar": {
+    "bar": null,
+    "bar2": {
       "baz": null
     }
   }
@@ -377,9 +446,8 @@ exports[`@errorHandler directive 17) Original resolver DOES throw, catchError co
   ],
   "data": {
     "foo": null,
-    "bar": {
-      "baz": null
-    }
+    "bar": null,
+    "bar2": null
   }
 }
 `;
@@ -407,9 +475,8 @@ exports[`@errorHandler directive 18) Original resolver DOES throw, catchError co
   ],
   "data": {
     "foo": null,
-    "bar": {
-      "baz": null
-    }
+    "bar": null,
+    "bar2": null
   }
 }
 `;
