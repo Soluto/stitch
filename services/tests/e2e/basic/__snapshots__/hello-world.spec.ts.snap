@@ -6,6 +6,9 @@ exports[`Basic flow Send wrong schema 1`] = `
     {
       "message": "Federation validation failed",
       "errorCode": "FEDERATION_VALIDATION_FAILURE",
+      "path": [
+        "result"
+      ],
       "innerErrors": [
         "Unknown type: \\"HLUnknownType\\".",
         "Unknown type \\"HLUnknownType\\".",

@@ -5,15 +5,24 @@ exports[`Authorization - Base policy Anonymous access 1`] = `
   "errors": [
     {
       "message": "Unauthorized by policy base_policy in namespace internal",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_foo"
+      ]
     },
     {
       "message": "Unauthorized by policy base_policy in namespace internal",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_bar"
+      ]
     },
     {
       "message": "Unauthorized by policy override_base_policy in namespace auth_bp",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_baz"
+      ]
     }
   ],
   "data": {
@@ -39,7 +48,10 @@ exports[`Authorization - Base policy JWT pass base and regular policy 1`] = `
   "errors": [
     {
       "message": "Unauthorized by policy override_base_policy in namespace auth_bp",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_baz"
+      ]
     }
   ],
   "data": {
@@ -56,15 +68,24 @@ exports[`Authorization - Base policy JWT pass none of policies 1`] = `
   "errors": [
     {
       "message": "Unauthorized by policy base_policy in namespace internal",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_foo"
+      ]
     },
     {
       "message": "Unauthorized by policy base_policy in namespace internal",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_bar"
+      ]
     },
     {
       "message": "Unauthorized by policy override_base_policy in namespace auth_bp",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_baz"
+      ]
     }
   ],
   "data": {
@@ -81,11 +102,17 @@ exports[`Authorization - Base policy JWT pass only base policy 1`] = `
   "errors": [
     {
       "message": "Unauthorized by policy regular_policy in namespace auth_bp",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_bar"
+      ]
     },
     {
       "message": "Unauthorized by policy override_base_policy in namespace auth_bp",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_baz"
+      ]
     }
   ],
   "data": {
@@ -102,11 +129,17 @@ exports[`Authorization - Base policy JWT pass only override policy 1`] = `
   "errors": [
     {
       "message": "Unauthorized by policy base_policy in namespace internal",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_foo"
+      ]
     },
     {
       "message": "Unauthorized by policy base_policy in namespace internal",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_bar"
+      ]
     }
   ],
   "data": {
@@ -123,15 +156,24 @@ exports[`Authorization - Base policy JWT pass only regular policy 1`] = `
   "errors": [
     {
       "message": "Unauthorized by policy base_policy in namespace internal",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_foo"
+      ]
     },
     {
       "message": "Unauthorized by policy base_policy in namespace internal",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_bar"
+      ]
     },
     {
       "message": "Unauthorized by policy override_base_policy in namespace auth_bp",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_baz"
+      ]
     }
   ],
   "data": {
@@ -148,11 +190,17 @@ exports[`Authorization - Base policy JWT pass regular and override policy 1`] = 
   "errors": [
     {
       "message": "Unauthorized by policy base_policy in namespace internal",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_foo"
+      ]
     },
     {
       "message": "Unauthorized by policy base_policy in namespace internal",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_bar"
+      ]
     }
   ],
   "data": {

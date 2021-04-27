@@ -286,6 +286,28 @@ const testCases: [string, TestCase][] = [
       },
     },
   ],
+  [
+    'Object',
+    {
+      typeDefs: gql`
+        type Query {
+          foo: Foo! @localResolver(value: {})
+        }
+
+        type Foo @localResolver(value: { bar: "BAR" }) {
+          bar: String!
+        }
+      `,
+      query: gql`
+        query {
+          foo {
+            bar
+          }
+        }
+      `,
+      expected: { foo: { bar: 'BAR' } },
+    },
+  ],
 ];
 
 const baseTypeDefs = gql`

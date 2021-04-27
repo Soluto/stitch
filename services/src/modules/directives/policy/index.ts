@@ -6,10 +6,12 @@ import { sdl as policyQuerySdl, PolicyQueryDirective } from './policy-query';
 import PolicyExecutor from './policy-executor';
 import { buildPolicyQueryTypeDef } from './policy-query-helper';
 import { Policy, LoadedPolicy } from './types';
+import UnauthorizedByPolicyError from './unauthorized-by-policy-error';
 
 export {
   buildPolicyQueryTypeDef,
   PolicyExecutor,
+  UnauthorizedByPolicyError,
   policySdl,
   policiesSdl,
   policyQuerySdl,

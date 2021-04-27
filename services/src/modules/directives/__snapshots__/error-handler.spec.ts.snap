@@ -1,0 +1,415 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`@errorHandler directive 1) Original resolver DOES NOT throw, no catchError, no throwError 1`] = `
+Object {
+  "data": Object {
+    "bar": Object {
+      "baz": "Baz",
+    },
+    "foo": "Foo",
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`@errorHandler directive 2) Original resolver DOES throw, no catchError, no throwError 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Foo field resolver throws",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo"
+      ]
+    },
+    {
+      "name": "GraphQLError",
+      "message": "Bar object resolver throws",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "bar",
+        "baz"
+      ]
+    }
+  ],
+  "data": {
+    "foo": null,
+    "bar": {
+      "baz": null
+    }
+  }
+}
+`;
+
+exports[`@errorHandler directive 3) Original resolver DOES throw, catchError condition and returnValue are undefined, no throwError 1`] = `
+Object {
+  "data": Object {
+    "bar": Object {
+      "baz": null,
+    },
+    "foo": null,
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`@errorHandler directive 4) Original resolver DOES throw, catchError condition is undefined, no throwError 1`] = `
+Object {
+  "data": Object {
+    "bar": Object {
+      "baz": "Baz (Caught)",
+    },
+    "foo": "Foo (Caught)",
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`@errorHandler directive 5) Original resolver DOES throw, catchError condition is undefined, returnValue is argument injection, no throwError 1`] = `
+Object {
+  "data": Object {
+    "bar": Object {
+      "baz": "Baz (Caught)",
+    },
+    "foo": "Foo (Caught)",
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`@errorHandler directive 6) Original resolver DOES throw, catchError condition is false, no throwError 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Foo field resolver throws",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo"
+      ]
+    },
+    {
+      "name": "GraphQLError",
+      "message": "Bar object resolver throws",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "bar",
+        "baz"
+      ]
+    }
+  ],
+  "data": {
+    "foo": null,
+    "bar": {
+      "baz": null
+    }
+  }
+}
+`;
+
+exports[`@errorHandler directive 7) Original resolver DOES throw, catchError condition is invalid, no throwError 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Foo field resolver throws",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo"
+      ]
+    },
+    {
+      "name": "GraphQLError",
+      "message": "Bar object resolver throws",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "bar",
+        "baz"
+      ]
+    }
+  ],
+  "data": {
+    "foo": null,
+    "bar": {
+      "baz": null
+    }
+  }
+}
+`;
+
+exports[`@errorHandler directive 8) Original resolver DOES throw, catchError condition is true, no throwError 1`] = `
+Object {
+  "data": Object {
+    "bar": Object {
+      "baz": "Baz (Caught)",
+    },
+    "foo": "Foo (Caught)",
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`@errorHandler directive 9) Original resolver DOES NOT throw, no catchError, throwError condition and error are undefined 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo"
+      ]
+    },
+    {
+      "name": "GraphQLError",
+      "message": "",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "bar",
+        "baz"
+      ]
+    }
+  ],
+  "data": {
+    "foo": null,
+    "bar": {
+      "baz": null
+    }
+  }
+}
+`;
+
+exports[`@errorHandler directive 10) Original resolver DOES NOT throw, no catchError, throwError condition is undefined 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Throw me",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo"
+      ]
+    },
+    {
+      "name": "GraphQLError",
+      "message": "Throw me",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "bar",
+        "baz"
+      ]
+    }
+  ],
+  "data": {
+    "foo": null,
+    "bar": {
+      "baz": null
+    }
+  }
+}
+`;
+
+exports[`@errorHandler directive 11) Original resolver DOES NOT throw, no catchError, throwError condition is undefined, errorToThrow evaluation is string 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Throw me",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo"
+      ]
+    },
+    {
+      "name": "GraphQLError",
+      "message": "Throw me",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "bar",
+        "baz"
+      ]
+    }
+  ],
+  "data": {
+    "foo": null,
+    "bar": {
+      "baz": null
+    }
+  }
+}
+`;
+
+exports[`@errorHandler directive 12) Original resolver DOES NOT throw, no catchError, throwError condition is undefined, errorToThrow is string 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Throw me",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo"
+      ]
+    },
+    {
+      "name": "GraphQLError",
+      "message": "Throw me",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "bar",
+        "baz"
+      ]
+    }
+  ],
+  "data": {
+    "foo": null,
+    "bar": {
+      "baz": null
+    }
+  }
+}
+`;
+
+exports[`@errorHandler directive 13) Original resolver DOES NOT throw, no catchError, throwError condition is undefined, errorToThrow is invalid 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "{ Throw me }",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo"
+      ]
+    },
+    {
+      "name": "GraphQLError",
+      "message": "{ Throw me }",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "bar",
+        "baz"
+      ]
+    }
+  ],
+  "data": {
+    "foo": null,
+    "bar": {
+      "baz": null
+    }
+  }
+}
+`;
+
+exports[`@errorHandler directive 14) Original resolver DOES NOT throw, no catchError, throwError condition is false 1`] = `
+Object {
+  "data": Object {
+    "bar": Object {
+      "baz": "Baz",
+    },
+    "foo": "Foo",
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`@errorHandler directive 15) Original resolver DOES NOT throw, no catchError, throwError condition is invalid 1`] = `
+Object {
+  "data": Object {
+    "bar": Object {
+      "baz": "Baz",
+    },
+    "foo": "Foo",
+  },
+  "errors": undefined,
+}
+`;
+
+exports[`@errorHandler directive 16) Original resolver DOES NOT throw, no catchError, throwError condition is true 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Something is wrong",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo"
+      ]
+    },
+    {
+      "name": "GraphQLError",
+      "message": "Something is wrong",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "bar",
+        "baz"
+      ]
+    }
+  ],
+  "data": {
+    "foo": null,
+    "bar": {
+      "baz": null
+    }
+  }
+}
+`;
+
+exports[`@errorHandler directive 17) Original resolver DOES throw, catchError condition is false, throwError defined 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Foo field resolver throws",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo"
+      ]
+    },
+    {
+      "name": "GraphQLError",
+      "message": "Bar object resolver throws",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "bar",
+        "baz"
+      ]
+    }
+  ],
+  "data": {
+    "foo": null,
+    "bar": {
+      "baz": null
+    }
+  }
+}
+`;
+
+exports[`@errorHandler directive 18) Original resolver DOES throw, catchError condition is true, throwError defined 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Something is wrong",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo"
+      ]
+    },
+    {
+      "name": "GraphQLError",
+      "message": "Something is wrong",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "bar",
+        "baz"
+      ]
+    }
+  ],
+  "data": {
+    "foo": null,
+    "bar": {
+      "baz": null
+    }
+  }
+}
+`;

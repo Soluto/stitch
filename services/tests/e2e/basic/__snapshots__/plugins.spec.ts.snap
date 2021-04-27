@@ -148,7 +148,10 @@ exports[`Plugins Plugin crashes 1`] = `
   "errors": [
     {
       "message": "Plugin \\"crashing.js\\" failed to execute \\"transformResourceGroup\\" with error: Error: Something bad happened",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "result"
+      ]
     }
   ],
   "data": {

@@ -39,8 +39,12 @@ exports[`Policies Directive Tests Allow and deny policies with AND (DENY) 1`] = 
   "errors": [
     {
       "name": "GraphQLError",
-      "message": "Error: Unauthorized by policy alwaysDeny in namespace ns",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "message": "UnauthorizedByPolicyError: Unauthorized by policy alwaysDeny in namespace ns",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo",
+        "bar"
+      ]
     }
   ],
   "data": {}
@@ -103,8 +107,12 @@ exports[`Policies Directive Tests Single policy (DENY) 1`] = `
   "errors": [
     {
       "name": "GraphQLError",
-      "message": "Error: Unauthorized by policy alwaysDeny in namespace ns",
-      "errorCode": "INTERNAL_SERVER_ERROR"
+      "message": "UnauthorizedByPolicyError: Unauthorized by policy alwaysDeny in namespace ns",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo",
+        "bar"
+      ]
     }
   ],
   "data": {}
