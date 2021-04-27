@@ -26,9 +26,9 @@ export class ErrorHandlerDirective extends SchemaDirectiveVisitor {
       try {
         result = await originalResolve.call(object, source, fields, context, info);
       } catch (error) {
-        result = handleCatchError(catchError, error, injectionArgs, result);
+        result = handleCatchErrorArgument(catchError, error, injectionArgs);
       }
-      throwError && handleThrowError(throwError, result, injectionArgs);
+      throwError && handleThrowErrorArgument(throwError, result, injectionArgs);
       return result;
     };
   }
@@ -43,10 +43,10 @@ export class ErrorHandlerDirective extends SchemaDirectiveVisitor {
       try {
         result = await originalResolve.call(field, source, args, context, info);
       } catch (error) {
-        result = handleCatchError(catchError, error, injectionArgs, result);
+        result = handleCatchErrorArgument(catchError, error, injectionArgs);
       }
 
-      throwError && handleThrowError(throwError, result, injectionArgs);
+      throwError && handleThrowErrorArgument(throwError, result, injectionArgs);
       return result;
     };
   }
@@ -77,11 +77,10 @@ type ErrorHandlerDirectiveArgs = {
   };
 };
 
-function handleCatchError(
+function handleCatchErrorArgument(
   catchError: { condition?: string | undefined; returnValue?: string | Record<string, unknown> } | undefined,
   error: Error,
-  injectionArgs: GraphQLFieldResolverParams<unknown, RequestContext>,
-  result: unknown
+  injectionArgs: GraphQLFieldResolverParams<unknown, RequestContext>
 ) {
   if (!catchError) throw error;
 
@@ -94,6 +93,8 @@ function handleCatchError(
   if (!shouldCatch) {
     throw error;
   }
+
+  let result: unknown;
   if (!catchError.returnValue) {
     result = null;
   } else if (typeof catchError.returnValue === 'string') {
@@ -104,7 +105,7 @@ function handleCatchError(
   return result;
 }
 
-function handleThrowError(
+function handleThrowErrorArgument(
   throwError: { condition?: string; errorToThrow: string },
   result: unknown,
   injectionArgs: GraphQLFieldResolverParams<unknown, RequestContext>
