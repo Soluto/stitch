@@ -145,6 +145,41 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
+    'MergeDeep - original resolver return non-object',
+    {
+      typeDefs: gql`
+        type SomeType2 {
+          field1: String!
+          field2: String
+        }
+
+        type NestedType {
+          nestedField: SomeType2!
+        }
+
+        type Query {
+          foo: NestedType! @localResolver(value: { nestedField: { field1: "mergedDeep" } }, mergeStrategy: MergeDeep)
+        }
+      `,
+      query: gql`
+        query {
+          foo {
+            nestedField {
+              field1
+              field2
+            }
+          }
+        }
+      `,
+      expected: { foo: { nestedField: { field1: 'mergedDeep', field2: null } } },
+      resolvers: {
+        Query: {
+          foo: () => 'Hey',
+        },
+      },
+    },
+  ],
+  [
     'Replace',
     {
       typeDefs: gql`
