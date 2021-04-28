@@ -94,7 +94,7 @@ function calculateReturnValue(
   if (mergeStrategy === MergeStrategy.Replace) return stubValue;
 
   if (!isObject(stubValue)) throw new Error(invalidValueArgumentTypeErrorMessage);
-  if (!isObject(originalValue)) throw new Error(`Resolver result isn't an object`);
+  if (!isObject(originalValue)) return stubValue;
 
   return mergeStrategy === MergeStrategy.MergeDeep
     ? lodash.merge(originalValue, stubValue)
