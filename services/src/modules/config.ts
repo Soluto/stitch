@@ -25,7 +25,7 @@ export const resourceUpdateInterval = envVarExt.get('RESOURCE_UPDATE_INTERVAL').
 
 // GraphQL configuration
 export const enableGraphQLTracing = envVarExt.get('GRAPHQL_TRACING').default('true').asBool();
-export const enableGraphQLPlayground = envVarExt.get('GRAPHQL_PLAYGROUND').default('true').asBoolStrict();
+export const enableGraphQLPlayground = envVarExt.get('GRAPHQL_PLAYGROUND').default('true').asJsonObject();
 export const enableGraphQLIntrospection = envVarExt.get('GRAPHQL_INTROSPECTION').default('true').asBoolStrict();
 
 // Policies
