@@ -32,7 +32,7 @@ exports[`Authorization with queries Query denied employee 1 1`] = `
 {
   "errors": [
     {
-      "message": "Unauthorized by policy notClassified in namespace auth-with-query",
+      "message": "Unauthorized by policy \\"notClassified\\" in namespace \\"auth-with-query\\"",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "deniedEmployee1",
@@ -54,7 +54,7 @@ exports[`Authorization with queries Query denied employee 2 1`] = `
 {
   "errors": [
     {
-      "message": "Unauthorized by policy notClassified in namespace auth-with-query",
+      "message": "Unauthorized by policy \\"notClassified\\" in namespace \\"auth-with-query\\"",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "deniedEmployee2",
@@ -91,7 +91,7 @@ exports[`Authorization with queries Query protected field 1`] = `
 {
   "errors": [
     {
-      "message": "Unauthorized by policy always-denied in namespace auth-with-query",
+      "message": "Unauthorized by policy \\"always-denied\\" in namespace \\"auth-with-query\\"",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "classifiedDepartments"
