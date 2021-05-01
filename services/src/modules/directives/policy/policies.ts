@@ -16,6 +16,7 @@ import { gql } from 'apollo-server-core';
 import { GraphQLJSONObject } from 'graphql-type-json';
 import { RequestContext } from '../../context';
 import { GraphQLArguments, Policy } from './types';
+import { UnauthorizedByPolicyError } from '.';
 
 const validatePolicies = async (
   policies: Policy[],
@@ -36,7 +37,11 @@ const validatePolicies = async (
   if (relation === 'OR' && someApproved) return;
 
   const rejectedPolicies = results.filter(r => r.status === 'rejected').map(r => (r as PromiseRejectedResult).reason);
-  throw new GraphQLError(rejectedPolicies.map(p => p as Error).join('\n'));
+  const failedPolicies = rejectedPolicies.filter(pe => pe.name !== 'UnauthorizedByPolicyError');
+  if (failedPolicies.length > 0) {
+    throw new GraphQLError(failedPolicies.join(', '));
+  }
+  throw new UnauthorizedByPolicyError(rejectedPolicies as UnauthorizedByPolicyError[]);
 };
 
 export class PoliciesDirective extends SchemaDirectiveVisitor {
