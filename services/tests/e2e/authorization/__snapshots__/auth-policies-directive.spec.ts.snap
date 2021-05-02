@@ -3,6 +3,9 @@
 exports[`Policies directive Both policies approved 1`] = `
 Object {
   "pd_bar": "FOO",
+  "pd_baz": Object {
+    "bazbaz": "BAZBAZ",
+  },
   "pd_foo": "FOO",
 }
 `;
@@ -16,9 +19,30 @@ exports[`Policies directive Both policies rejected 1`] = `
       "path": [
         "pd_foo"
       ]
+    },
+    {
+      "message": "Unauthorized by policies: isAlpha (auth_policies), isBeta (auth_policies)",
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "pd_bar"
+      ]
+    },
+    {
+      "message": "Unauthorized by policies: isAlpha (auth_policies), isBeta (auth_policies)",
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "pd_baz",
+        "bazbaz"
+      ]
     }
   ],
-  "data": {}
+  "data": {
+    "pd_foo": null,
+    "pd_bar": null,
+    "pd_baz": {
+      "bazbaz": null
+    }
+  }
 }
 `;
 
@@ -33,7 +57,13 @@ exports[`Policies directive First policy rejected 1`] = `
       ]
     }
   ],
-  "data": {}
+  "data": {
+    "pd_foo": "FOO",
+    "pd_bar": null,
+    "pd_baz": {
+      "bazbaz": "BAZBAZ"
+    }
+  }
 }
 `;
 
@@ -48,6 +78,12 @@ exports[`Policies directive Second policy rejected 1`] = `
       ]
     }
   ],
-  "data": {}
+  "data": {
+    "pd_foo": "FOO",
+    "pd_bar": null,
+    "pd_baz": {
+      "bazbaz": "BAZBAZ"
+    }
+  }
 }
 `;
