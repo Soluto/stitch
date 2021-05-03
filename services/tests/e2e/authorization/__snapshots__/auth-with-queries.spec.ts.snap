@@ -76,8 +76,8 @@ exports[`Authorization with queries Query field with policy with invalid query 1
 {
   "errors": [
     {
-      "message": "Policy query execution failed",
-      "errorCode": "INTERNAL_SERVER_ERROR",
+      "message": "Policy \\"invalid-query\\" in namespace \\"auth-with-query\\" execution failed: Policy query execution failed",
+      "errorCode": "POLICY_EXECUTION_FAILED",
       "path": [
         "invalidQuery"
       ]

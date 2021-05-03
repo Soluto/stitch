@@ -16,6 +16,7 @@ import { evaluate as evaluateOpa } from './opa';
 import { getQueryResult } from './policy-query-helper';
 import CachedOperation from './cached-operation';
 import UnauthorizedByPolicyError from './unauthorized-by-policy-error';
+import PolicyExecutionFailedError from './policy-execution-failed-error';
 
 const typeEvaluators: Record<string, (ctx: PolicyEvaluationContext) => PolicyEvaluationResult> = {
   opa: evaluateOpa,
@@ -98,9 +99,19 @@ export default class PolicyExecutor {
     query?: QueryResults
   ): boolean {
     const evaluate = typeEvaluators[ctx.policyDefinition.type];
-    if (!evaluate) throw new Error(`Unsupported policy type ${ctx.policyDefinition.type}`);
+    if (!evaluate)
+      throw new PolicyExecutionFailedError(
+        ctx.policyDefinition.metadata,
+        `Unsupported policy type ${ctx.policyDefinition.type}`
+      );
 
-    const logData = { metadata: ctx.policyDefinition.metadata, args, query };
+    const logData = {
+      type: ctx.info.parentType.name,
+      field: ctx.info.fieldName,
+      metadata: ctx.policyDefinition.metadata,
+      args,
+      query,
+    };
     logger.trace(logData, 'Executing policy...');
 
     const { done, allow } = evaluate({
@@ -109,7 +120,8 @@ export default class PolicyExecutor {
       query,
       policyAttachments: ctx.requestContext.resourceGroup.policyAttachments!,
     });
-    if (!done) throw new Error('in-line query evaluation not yet supported');
+    if (!done)
+      throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, 'in-line query evaluation not yet supported');
 
     logger.trace(logData, `Policy executed. The resolver execution is ${allow ? 'allowed' : 'denied'}`);
     return allow || false;
@@ -128,9 +140,7 @@ export default class PolicyExecutor {
 
         if (policyArgValue === undefined) {
           if (!optional) {
-            throw new Error(
-              `Missing arg ${policyArgName} for policy ${ctx.policy.name} in namespace ${ctx.policy.namespace}`
-            );
+            throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, `Missing arg ${policyArgName}`);
           }
 
           policyArgValue = null;
@@ -154,6 +164,6 @@ export function getPolicyDefinition(policyDefinitions: PolicyDefinition[], names
     return metadata.namespace === namespace && metadata.name === name;
   });
 
-  if (!policyDefinition) throw new Error(`The policy ${name} in namespace ${namespace} was not found`);
+  if (!policyDefinition) throw new PolicyExecutionFailedError({ namespace, name }, `The policy was not found`);
   return policyDefinition;
 }

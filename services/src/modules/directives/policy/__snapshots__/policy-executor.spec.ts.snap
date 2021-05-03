@@ -1,5 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Policy Executor One required arg. Has no value 1`] = `[Error: Missing arg arg1 for policy policy in namespace policy-executor-test]`;
+exports[`Policy Executor One required arg. Has no value 1`] = `[PolicyExecutionFailedError: Policy "policy" in namespace "policy-executor-test" execution failed: Missing arg arg1]`;
 
-exports[`Policy Executor One required arg. Has undefined value 1`] = `[Error: Missing arg arg1 for policy policy in namespace policy-executor-test]`;
+exports[`Policy Executor One required arg. Has undefined value 1`] = `[PolicyExecutionFailedError: Policy "policy" in namespace "policy-executor-test" execution failed: Missing arg arg1]`;

@@ -4,6 +4,7 @@ import { injectArgs } from '../../arguments-injection';
 import { RequestContext } from '../../context';
 import logger from '../../logger';
 import { PolicyQueryVariables, PolicyArgsObject, PolicyDefinition, ResourceMetadata } from '../../resource-repository';
+import PolicyExecutionFailedError from './policy-execution-failed-error';
 import { PolicyDirectiveExecutionContext, QueryResults } from './types';
 
 export async function getQueryResult(
@@ -22,7 +23,7 @@ export async function getQueryResult(
   const { data, errors } = await graphql(ctx.info.schema, gql, undefined, requestContext, variables);
   if (errors) {
     pqLogger.error({ errors }, 'Policy query execution failed');
-    throw new Error('Policy query execution failed');
+    throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, 'Policy query execution failed');
   }
   pqLogger.trace({ data }, 'Policy query executed');
   return data;

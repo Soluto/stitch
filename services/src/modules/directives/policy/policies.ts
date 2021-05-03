@@ -15,6 +15,7 @@ import { SchemaDirectiveVisitor } from 'graphql-tools';
 import { gql } from 'apollo-server-core';
 import { GraphQLJSONObject } from 'graphql-type-json';
 import { RequestContext } from '../../context';
+import logger from '../../logger';
 import { GraphQLArguments, Policy } from './types';
 import { UnauthorizedByPolicyError } from '.';
 
@@ -26,6 +27,12 @@ const validatePolicies = async (
   context: RequestContext,
   info: GraphQLResolveInfo
 ) => {
+  const policiesLogger = logger.child({
+    type: info.parentType.name,
+    field: info.fieldName,
+    policies: policies.map(({ namespace, name }) => ({ namespace, name })),
+  });
+  policiesLogger.trace('Validating policies...');
   const results = await Promise.allSettled(
     policies.map((p: Policy) => context.policyExecutor.validatePolicy(p, source, args, context, info))
   );
@@ -33,14 +40,18 @@ const validatePolicies = async (
   const allApproved = results.every(r => r.status === 'fulfilled');
   const someApproved = results.some(r => r.status === 'fulfilled');
 
-  if (relation === 'AND' && allApproved) return;
-  if (relation === 'OR' && someApproved) return;
+  if ((relation === 'AND' && allApproved) || (relation === 'OR' && someApproved)) {
+    policiesLogger.trace('Authorized');
+    return;
+  }
 
   const rejectedPolicies = results.filter(r => r.status === 'rejected').map(r => (r as PromiseRejectedResult).reason);
   const failedPolicies = rejectedPolicies.filter(pe => pe.name !== 'UnauthorizedByPolicyError');
   if (failedPolicies.length > 0) {
+    policiesLogger.trace({ failedPolicies }, 'Policies validation failed');
     throw new GraphQLError(failedPolicies.join(', '));
   }
+  policiesLogger.trace({ rejectedPolicies }, 'Unauthorized');
   throw new UnauthorizedByPolicyError(rejectedPolicies as UnauthorizedByPolicyError[]);
 };
 
