@@ -1,31 +1,34 @@
 import { gql } from 'apollo-server-core';
 import { DocumentNode, graphql } from 'graphql';
+import { Logger } from 'pino';
 import { injectArgs } from '../../arguments-injection';
 import { RequestContext } from '../../context';
-import logger from '../../logger';
 import { PolicyQueryVariables, PolicyArgsObject, PolicyDefinition, ResourceMetadata } from '../../resource-repository';
 import PolicyExecutionFailedError from './policy-execution-failed-error';
 import { PolicyDirectiveExecutionContext, QueryResults } from './types';
 
 export async function getQueryResult(
   ctx: PolicyDirectiveExecutionContext,
-  args: PolicyArgsObject = {}
+  args: PolicyArgsObject = {},
+  logger: Logger
 ): Promise<QueryResults> {
   const query = ctx.policyDefinition.query;
   if (!query) return;
-
-  const pqLogger = logger.child({ metadata: ctx.policyDefinition.metadata });
-
+  logger.trace('Preparing policy query variables...');
   const variables = prepareVariables(args, query.variables);
   const requestContext: RequestContext = { ...ctx.requestContext, ignorePolicies: true };
-  const gql = ctx.policyDefinition.query!.gql;
-  pqLogger.trace({ variables }, 'Executing policy query...');
-  const { data, errors } = await graphql(ctx.info.schema, gql, undefined, requestContext, variables);
+  const gql = query.gql;
+  logger.trace({ variables }, 'Executing policy query...');
+
+  const { data, errors } = await graphql(ctx.info.schema, gql, undefined, requestContext, variables).catch(error => {
+    logger.error({ error }, 'Policy query execution failed');
+    throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, error);
+  });
   if (errors) {
-    pqLogger.error({ errors }, 'Policy query execution failed');
+    logger.error({ errors }, 'Policy query execution failed');
     throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, 'Policy query execution failed');
   }
-  pqLogger.trace({ data }, 'Policy query executed');
+  logger.trace({ data }, 'Policy query executed');
   return data;
 }
 

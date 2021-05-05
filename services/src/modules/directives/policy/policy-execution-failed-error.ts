@@ -5,7 +5,8 @@ export default class PolicyExecutionFailedError extends ApolloError {
   constructor(policy: ResourceMetadata, reason: string) {
     super(
       `Policy "${policy.name}" in namespace "${policy.namespace}" execution failed: ${reason}`,
-      'POLICY_EXECUTION_FAILED'
+      'POLICY_EXECUTION_FAILED',
+      { policy, reason }
     );
     Object.defineProperty(this, 'policy', { value: policy });
     Object.defineProperty(this, 'reason', { value: reason });

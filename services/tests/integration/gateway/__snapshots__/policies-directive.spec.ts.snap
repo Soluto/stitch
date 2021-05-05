@@ -47,7 +47,11 @@ exports[`Policies Directive Tests Allow and deny policies with AND (DENY) 1`] = 
       ]
     }
   ],
-  "data": {}
+  "data": {
+    "foo": {
+      "bar": null
+    }
+  }
 }
 `;
 
@@ -65,6 +69,27 @@ Object {
       Symbol(map): Object {},
     },
   },
+}
+`;
+
+exports[`Policies Directive Tests Policy fails 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "PolicyExecutionFailedError: Policy \\"alwaysFail\\" in namespace \\"ns\\" execution failed: Not good",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo",
+        "bar"
+      ]
+    }
+  ],
+  "data": {
+    "foo": {
+      "bar": null
+    }
+  }
 }
 `;
 
@@ -115,6 +140,10 @@ exports[`Policies Directive Tests Single policy (DENY) 1`] = `
       ]
     }
   ],
-  "data": {}
+  "data": {
+    "foo": {
+      "bar": null
+    }
+  }
 }
 `;

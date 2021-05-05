@@ -28,6 +28,7 @@ const validatePolicies = async (
   info: GraphQLResolveInfo
 ) => {
   const policiesLogger = logger.child({
+    name: 'policies',
     type: info.parentType.name,
     field: info.fieldName,
     policies: policies.map(({ namespace, name }) => ({ namespace, name })),
