@@ -13,11 +13,13 @@ declare module '../context' {
   }
 }
 
-function injectTemplate<T = unknown>(
-  template: string,
-  params: GraphQLFieldResolverParams<unknown, Pick<RequestContext, 'exports' | 'request' | 'resourceGroup'> | undefined>
-): T {
-  const { source, args, context, info } = params;
+type InjectionParams = GraphQLFieldResolverParams<
+  unknown,
+  Pick<RequestContext, 'exports' | 'request' | 'resourceGroup'> | undefined
+> & { [key: string]: unknown };
+
+function injectTemplate<T = unknown>(template: string, params: InjectionParams): T {
+  const { source, args, context, info, ...additionalProps } = params;
   const data = {
     source,
     args,
@@ -28,15 +30,13 @@ function injectTemplate<T = unknown>(
     vars: info?.variableValues,
     info,
     plugins: context?.resourceGroup?.pluginsData,
+    ...additionalProps,
   };
 
   return evaluate<T>(template, data);
 }
 
-export function inject(
-  input: unknown,
-  params: GraphQLFieldResolverParams<unknown, Pick<RequestContext, 'exports' | 'request' | 'resourceGroup'> | undefined>
-): unknown {
+export function inject(input: unknown, params: InjectionParams): unknown {
   if (typeof input === 'string') return injectTemplate(input, params);
 
   if (isObject(input)) {
