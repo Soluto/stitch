@@ -174,7 +174,7 @@ describe('Policy Executor', () => {
     } as unknown) as GraphQLResolveInfo;
 
     try {
-      const result = await executor.evaluatePolicy(policy, typedUndefined(), typedUndefined(), context, info, logger);
+      const result = await executor.evaluatePolicy(policy, logger, typedUndefined(), typedUndefined(), context, info);
       expect(result).toBeTruthy();
       expect(shouldThrow).not.toBeTruthy();
     } catch (err) {

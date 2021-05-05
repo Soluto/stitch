@@ -8,7 +8,7 @@ import { PolicyResult, Policy } from './types';
 export class PolicyQueryDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
     field.resolve = async (
-      parent: unknown,
+      source: unknown,
       args: Record<string, unknown>,
       context: RequestContext,
       info: GraphQLResolveInfo
@@ -30,7 +30,7 @@ export class PolicyQueryDirective extends SchemaDirectiveVisitor {
       };
       const policyLogger = logger.child(logData);
       policyLogger.trace('Evaluating policy...');
-      const allow = await context.policyExecutor.evaluatePolicy(policy, parent, args, context, info, policyLogger);
+      const allow = await context.policyExecutor.evaluatePolicy(policy, policyLogger, source, args, context, info);
       policyLogger.trace({ allow }, 'The policy has been evaluated');
       return { allow };
     };

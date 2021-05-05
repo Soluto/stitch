@@ -11,9 +11,12 @@ import getBaseSchema from '../../../src/modules/base-schema';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 
 const mockValidatePolicy = jest.fn();
-// eslint-disable-next-line unicorn/no-useless-undefined
-when(mockValidatePolicy).calledWith({ namespace: 'ns', name: 'alwaysAllow' }).mockResolvedValue(undefined);
-when(mockValidatePolicy).calledWith({ namespace: 'ns', name: 'alwaysDeny' }).mockRejectedValue(new Error('Error'));
+when(mockValidatePolicy)
+  .calledWith({ namespace: 'ns', name: 'alwaysAllow', postResolve: false })
+  // eslint-disable-next-line unicorn/no-useless-undefined
+  .mockResolvedValue(undefined)
+  .calledWith({ namespace: 'ns', name: 'alwaysDeny', postResolve: false })
+  .mockRejectedValue(new Error('Error'));
 jest.mock('../../../src/modules/directives/policy/policy-executor', () => ({
   default: jest.fn().mockImplementation(() => ({ validatePolicy: mockValidatePolicy })),
 }));
@@ -61,7 +64,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'Policy on field, stub on parent query (ALLOW)',
+    'Policy on field, localResolver on parent query (ALLOW)',
     {
       typeDefs: gql`
         type Foo {
@@ -74,7 +77,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'Policy on field, stub on parent query (DENY)',
+    'Policy on field, localResolver on parent query (DENY)',
     {
       typeDefs: gql`
         type Foo {
@@ -114,7 +117,7 @@ const testCases: [string, TestCase][] = [
   ],
   [
     // This is incorrect order of directives so the policy doesn't work
-    'Policy, stub on field (ALLOW)',
+    'Policy, localResolver on field (ALLOW)',
     {
       typeDefs: gql`
         type Foo {
@@ -128,7 +131,7 @@ const testCases: [string, TestCase][] = [
   ],
   [
     // This is incorrect order of directives so the policy doesn't work
-    'Policy, stub on field (DENY)',
+    'Policy, localResolver on field (DENY)',
     {
       typeDefs: gql`
         type Foo {
@@ -141,7 +144,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'Policy on object, stub on field (ALLOW)',
+    'Policy on object, localResolver on field (ALLOW)',
     {
       typeDefs: gql`
         type Foo @policy(namespace: "ns", name: "alwaysAllow") {
@@ -154,7 +157,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'Policy on object, stub on field (DENY)',
+    'Policy on object, localResolver on field (DENY)',
     {
       typeDefs: gql`
         type Foo @policy(namespace: "ns", name: "alwaysDeny") {
@@ -167,7 +170,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'Policy on object, stub on parent query (ALLOW)',
+    'Policy on object, localResolver on parent query (ALLOW)',
     {
       typeDefs: gql`
         type Foo @policy(namespace: "ns", name: "alwaysAllow") {
@@ -180,7 +183,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'Policy, stub on parent query (DENY)',
+    'Policy, localResolver on parent query (DENY)',
     {
       typeDefs: gql`
         type Foo @policy(namespace: "ns", name: "alwaysDeny") {
@@ -247,7 +250,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'LowerCase on object, policy on field, stub on parent query (ALLOW)',
+    'LowerCase on object, policy on field, localResolver on parent query (ALLOW)',
     {
       typeDefs: gql`
         type Foo @lowerCase {
@@ -260,7 +263,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'LowerCase on object, policy on field, stub on parent query (DENY)',
+    'LowerCase on object, policy on field, localResolver on parent query (DENY)',
     {
       typeDefs: gql`
         type Foo @lowerCase {
@@ -273,7 +276,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'LowerCase, policy on object, stub on parent query (ALLOW)',
+    'LowerCase, policy on object, localResolver on parent query (ALLOW)',
     {
       typeDefs: gql`
         type Foo @lowerCase @policy(namespace: "ns", name: "alwaysAllow") {
@@ -286,7 +289,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'LowerCase, policy on object, stub on parent query (DENY)',
+    'LowerCase, policy on object, localResolver on parent query (DENY)',
     {
       typeDefs: gql`
         type Foo @lowerCase @policy(namespace: "ns", name: "alwaysDeny") {
@@ -300,7 +303,7 @@ const testCases: [string, TestCase][] = [
   ],
   [
     // This is incorrect order of directives so the policy doesn't work
-    'Policy, lowerCase on object, stub on parent query (ALLOW)',
+    'Policy, lowerCase on object, localResolver on parent query (ALLOW)',
     {
       typeDefs: gql`
         type Foo @policy(namespace: "ns", name: "alwaysAllow") @lowerCase {
@@ -314,7 +317,7 @@ const testCases: [string, TestCase][] = [
   ],
   [
     // This is incorrect order of directives so the policy doesn't work
-    'Policy, lowerCase on object, stub on parent query (DENY)',
+    'Policy, lowerCase on object, localResolver on parent query (DENY)',
     {
       typeDefs: gql`
         type Foo @policy(namespace: "ns", name: "alwaysDeny") @lowerCase {
@@ -327,7 +330,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'Mock, policy on object, stub on parent query (ALLOW)',
+    'Mock, policy on object, localResolver on parent query (ALLOW)',
     {
       typeDefs: gql`
         type Foo @mock @policy(namespace: "ns", name: "alwaysAllow") {
@@ -340,7 +343,7 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
-    'Mock, policy on object, stub on parent query (DENY)',
+    'Mock, policy on object, localResolver on parent query (DENY)',
     {
       typeDefs: gql`
         type Foo @mock @policy(namespace: "ns", name: "alwaysDeny") {
@@ -380,9 +383,14 @@ describe.each(testCases)('Policy Directive Tests', (testName, { typeDefs, resolv
         policyExecutor: new PolicyExecutor(),
       },
     });
+    await server.start();
     client = createTestClient(server);
 
     expect.addSnapshotSerializer(GraphQLErrorSerializer);
+  });
+
+  afterAll(async () => {
+    await server.stop();
   });
 
   test(testName, async () => {

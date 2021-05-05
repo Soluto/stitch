@@ -29,11 +29,12 @@ export default class PolicyExecutor {
 
   async evaluatePolicy(
     policy: Policy,
+    policyLogger: Logger,
     source: unknown,
     gqlArgs: GraphQLArguments,
     requestContext: RequestContext,
     info: GraphQLResolveInfo,
-    policyLogger: Logger
+    result?: unknown
   ): Promise<boolean> {
     const policyDefinition = getPolicyDefinition(
       requestContext.resourceGroup.policies,
@@ -41,16 +42,20 @@ export default class PolicyExecutor {
       policy.name,
       policyLogger
     );
-    return this.getPolicyResult({ policy, source, gqlArgs, requestContext, info, policyDefinition }, policyLogger);
+    return this.getPolicyResult(
+      { policy, policyDefinition, source, gqlArgs, requestContext, info, result },
+      policyLogger
+    );
   }
 
   evaluatePolicySync(
     policy: Policy,
+    policyLogger: Logger,
     source: unknown,
     gqlArgs: GraphQLArguments,
     requestContext: RequestContext,
     info: GraphQLResolveInfo,
-    policyLogger: Logger
+    result?: unknown
   ): boolean {
     const policyDefinition = getPolicyDefinition(
       requestContext.resourceGroup.policies,
@@ -58,15 +63,19 @@ export default class PolicyExecutor {
       policy.name,
       policyLogger
     );
-    return this.getPolicyResultSync({ policy, source, gqlArgs, requestContext, info, policyDefinition }, policyLogger);
+    return this.getPolicyResultSync(
+      { policy, policyDefinition, source, gqlArgs, requestContext, info, result },
+      policyLogger
+    );
   }
 
   async validatePolicy(
     policy: Policy,
-    parent: unknown,
+    source: unknown,
     gqlArgs: GraphQLArguments,
     requestContext: RequestContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
+    result?: unknown
   ): Promise<void> {
     const logData = {
       name: 'policy-executor',
@@ -79,7 +88,7 @@ export default class PolicyExecutor {
     };
     const policyLogger = logger.child(logData);
     policyLogger.trace('Validating policy...');
-    const allow = await this.evaluatePolicy(policy, parent, gqlArgs, requestContext, info, policyLogger);
+    const allow = await this.evaluatePolicy(policy, policyLogger, source, gqlArgs, requestContext, info, result);
     policyLogger.trace(`Policy validated. The resolver execution is ${allow ? 'allowed' : 'denied'}`);
     if (!allow) {
       throw new UnauthorizedByPolicyError(policy);
@@ -88,7 +97,7 @@ export default class PolicyExecutor {
 
   validatePolicySync(
     policy: Policy,
-    parent: unknown,
+    source: unknown,
     gqlArgs: GraphQLArguments,
     requestContext: RequestContext,
     info: GraphQLResolveInfo
@@ -104,7 +113,7 @@ export default class PolicyExecutor {
     };
     const policyLogger = logger.child(logData);
     policyLogger.trace('Validating policy...');
-    const allow = this.evaluatePolicySync(policy, parent, gqlArgs, requestContext, info, policyLogger);
+    const allow = this.evaluatePolicySync(policy, policyLogger, source, gqlArgs, requestContext, info);
     policyLogger.trace(`Policy validated. The resolver execution is ${allow ? 'allowed' : 'denied'}`);
     if (!allow) {
       throw new UnauthorizedByPolicyError(policy);
@@ -187,8 +196,8 @@ export default class PolicyExecutor {
         }
 
         if (typeof policyArgValue === 'string') {
-          const { source, gqlArgs: args, requestContext: context, info } = ctx;
-          policyArgValue = inject(policyArgValue, { source, args, context, info });
+          const { source, gqlArgs: args, requestContext: context, info, result } = ctx;
+          policyArgValue = inject(policyArgValue, { source, args, context, info, result });
         }
 
         policyArgs[policyArgName] = policyArgValue;

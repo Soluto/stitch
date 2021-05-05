@@ -25,7 +25,8 @@ const validatePolicies = async (
   source: unknown,
   args: GraphQLArguments,
   context: RequestContext,
-  info: GraphQLResolveInfo
+  info: GraphQLResolveInfo,
+  result?: unknown
 ) => {
   const policiesLogger = logger.child({
     name: 'policies',
@@ -35,7 +36,7 @@ const validatePolicies = async (
   });
   policiesLogger.trace('Validating policies...');
   const results = await Promise.allSettled(
-    policies.map((p: Policy) => context.policyExecutor.validatePolicy(p, source, args, context, info))
+    policies.map((p: Policy) => context.policyExecutor.validatePolicy(p, source, args, context, info, result))
   );
 
   const allApproved = results.every(r => r.status === 'fulfilled');
@@ -58,7 +59,7 @@ const validatePolicies = async (
 
 export class PoliciesDirective extends SchemaDirectiveVisitor {
   visitObject(object: GraphQLObjectType<unknown, RequestContext>) {
-    const { policies, relation } = this.args;
+    const { policies, relation, postResolve } = this.args;
 
     const originalResolveObject = object.resolveObject;
 
@@ -68,16 +69,22 @@ export class PoliciesDirective extends SchemaDirectiveVisitor {
       context: RequestContext,
       info: GraphQLResolveInfo
     ) => {
-      if (!context.ignorePolicies) {
+      if (!context.ignorePolicies && !postResolve) {
         await validatePolicies(policies, relation, source, {}, context, info);
       }
 
-      return originalResolveObject ? await originalResolveObject(source, fields, context, info) : source;
+      const result = originalResolveObject ? await originalResolveObject(source, fields, context, info) : source;
+
+      if (!context.ignorePolicies && postResolve) {
+        await validatePolicies(policies, relation, source, {}, context, info, result);
+      }
+
+      return result;
     };
   }
 
   visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
-    const { policies, relation } = this.args;
+    const { policies, relation, postResolve } = this.args;
     const originalResolve = field.resolve || defaultFieldResolver;
 
     field.resolve = async (
@@ -86,11 +93,17 @@ export class PoliciesDirective extends SchemaDirectiveVisitor {
       context: RequestContext,
       info: GraphQLResolveInfo
     ) => {
-      if (!context.ignorePolicies) {
+      if (!context.ignorePolicies && !postResolve) {
         await validatePolicies(policies, relation, source, args, context, info);
       }
 
-      return originalResolve.call(field, source, args, context, info);
+      const result = originalResolve.call(field, source, args, context, info);
+
+      if (!context.ignorePolicies && postResolve) {
+        await validatePolicies(policies, relation, source, args, context, info, result);
+      }
+
+      return result;
     };
   }
 }
@@ -128,5 +141,9 @@ export const sdl = gql`
     OR
   }
 
-  directive @policies(policies: [PolicyDetails!]!, relation: Relation = OR) on OBJECT | FIELD_DEFINITION
+  directive @policies(
+    policies: [PolicyDetails!]!
+    relation: Relation = OR
+    postResolve: Boolean = false
+  ) on OBJECT | FIELD_DEFINITION
 `;

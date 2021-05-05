@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Policy Directive Tests LowerCase on object, policy on field, stub on parent query (ALLOW) 1`] = `
+exports[`Policy Directive Tests LowerCase on object, policy on field, localResolver on parent query (ALLOW) 1`] = `
 Object {
   "data": Object {
     "foo": Object {
@@ -17,7 +17,7 @@ Object {
 }
 `;
 
-exports[`Policy Directive Tests LowerCase on object, policy on field, stub on parent query (DENY) 1`] = `
+exports[`Policy Directive Tests LowerCase on object, policy on field, localResolver on parent query (DENY) 1`] = `
 {
   "errors": [
     {
@@ -34,7 +34,7 @@ exports[`Policy Directive Tests LowerCase on object, policy on field, stub on pa
 }
 `;
 
-exports[`Policy Directive Tests LowerCase, policy on object, stub on parent query (ALLOW) 1`] = `
+exports[`Policy Directive Tests LowerCase, policy on object, localResolver on parent query (ALLOW) 1`] = `
 Object {
   "data": Object {
     "foo": Object {
@@ -51,7 +51,7 @@ Object {
 }
 `;
 
-exports[`Policy Directive Tests LowerCase, policy on object, stub on parent query (DENY) 1`] = `
+exports[`Policy Directive Tests LowerCase, policy on object, localResolver on parent query (DENY) 1`] = `
 {
   "errors": [
     {
@@ -68,7 +68,7 @@ exports[`Policy Directive Tests LowerCase, policy on object, stub on parent quer
 }
 `;
 
-exports[`Policy Directive Tests Mock, policy on object, stub on parent query (ALLOW) 1`] = `
+exports[`Policy Directive Tests Mock, policy on object, localResolver on parent query (ALLOW) 1`] = `
 Object {
   "data": Object {
     "foo": Object {
@@ -85,7 +85,41 @@ Object {
 }
 `;
 
-exports[`Policy Directive Tests Mock, policy on object, stub on parent query (DENY) 1`] = `
+exports[`Policy Directive Tests Mock, policy on object, localResolver on parent query (DENY) 1`] = `
+{
+  "errors": [
+    {
+      "name": "GraphQLError",
+      "message": "Error",
+      "errorCode": "INTERNAL_SERVER_ERROR",
+      "path": [
+        "foo",
+        "bar"
+      ]
+    }
+  ],
+  "data": {}
+}
+`;
+
+exports[`Policy Directive Tests Policy on field, localResolver on parent query (ALLOW) 1`] = `
+Object {
+  "data": Object {
+    "foo": Object {
+      "bar": "BAR",
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Policy Directive Tests Policy on field, localResolver on parent query (DENY) 1`] = `
 {
   "errors": [
     {
@@ -136,7 +170,7 @@ exports[`Policy Directive Tests Policy on field, resolver on object (DENY) 1`] =
 }
 `;
 
-exports[`Policy Directive Tests Policy on field, stub on parent query (ALLOW) 1`] = `
+exports[`Policy Directive Tests Policy on object, localResolver on field (ALLOW) 1`] = `
 Object {
   "data": Object {
     "foo": Object {
@@ -153,7 +187,7 @@ Object {
 }
 `;
 
-exports[`Policy Directive Tests Policy on field, stub on parent query (DENY) 1`] = `
+exports[`Policy Directive Tests Policy on object, localResolver on field (DENY) 1`] = `
 {
   "errors": [
     {
@@ -170,7 +204,7 @@ exports[`Policy Directive Tests Policy on field, stub on parent query (DENY) 1`]
 }
 `;
 
-exports[`Policy Directive Tests Policy on object, stub on field (ALLOW) 1`] = `
+exports[`Policy Directive Tests Policy on object, localResolver on parent query (ALLOW) 1`] = `
 Object {
   "data": Object {
     "foo": Object {
@@ -187,7 +221,41 @@ Object {
 }
 `;
 
-exports[`Policy Directive Tests Policy on object, stub on field (DENY) 1`] = `
+exports[`Policy Directive Tests Policy, localResolver on field (ALLOW) 1`] = `
+Object {
+  "data": Object {
+    "foo": Object {
+      "bar": "BAR",
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Policy Directive Tests Policy, localResolver on field (DENY) 1`] = `
+Object {
+  "data": Object {
+    "foo": Object {
+      "bar": "BAR",
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Policy Directive Tests Policy, localResolver on parent query (DENY) 1`] = `
 {
   "errors": [
     {
@@ -204,24 +272,7 @@ exports[`Policy Directive Tests Policy on object, stub on field (DENY) 1`] = `
 }
 `;
 
-exports[`Policy Directive Tests Policy on object, stub on parent query (ALLOW) 1`] = `
-Object {
-  "data": Object {
-    "foo": Object {
-      "bar": "BAR",
-    },
-  },
-  "errors": undefined,
-  "extensions": undefined,
-  "http": Object {
-    "headers": Headers {
-      Symbol(map): Object {},
-    },
-  },
-}
-`;
-
-exports[`Policy Directive Tests Policy, lowerCase on object, stub on parent query (ALLOW) 1`] = `
+exports[`Policy Directive Tests Policy, lowerCase on object, localResolver on parent query (ALLOW) 1`] = `
 Object {
   "data": Object {
     "foo": Object {
@@ -238,58 +289,7 @@ Object {
 }
 `;
 
-exports[`Policy Directive Tests Policy, lowerCase on object, stub on parent query (DENY) 1`] = `
-{
-  "errors": [
-    {
-      "name": "GraphQLError",
-      "message": "Error",
-      "errorCode": "INTERNAL_SERVER_ERROR",
-      "path": [
-        "foo",
-        "bar"
-      ]
-    }
-  ],
-  "data": {}
-}
-`;
-
-exports[`Policy Directive Tests Policy, stub on field (ALLOW) 1`] = `
-Object {
-  "data": Object {
-    "foo": Object {
-      "bar": "BAR",
-    },
-  },
-  "errors": undefined,
-  "extensions": undefined,
-  "http": Object {
-    "headers": Headers {
-      Symbol(map): Object {},
-    },
-  },
-}
-`;
-
-exports[`Policy Directive Tests Policy, stub on field (DENY) 1`] = `
-Object {
-  "data": Object {
-    "foo": Object {
-      "bar": "BAR",
-    },
-  },
-  "errors": undefined,
-  "extensions": undefined,
-  "http": Object {
-    "headers": Headers {
-      Symbol(map): Object {},
-    },
-  },
-}
-`;
-
-exports[`Policy Directive Tests Policy, stub on parent query (DENY) 1`] = `
+exports[`Policy Directive Tests Policy, lowerCase on object, localResolver on parent query (DENY) 1`] = `
 {
   "errors": [
     {

@@ -15,11 +15,17 @@ export class PolicyDirective extends SchemaDirectiveVisitor {
       context: RequestContext,
       info: GraphQLResolveInfo
     ) => {
-      if (!context.ignorePolicies) {
+      if (!context.ignorePolicies && !policy.postResolve) {
         await context.policyExecutor.validatePolicy(policy, source, {}, context, info);
       }
 
-      return originalResolveObject ? await originalResolveObject(source, fields, context, info) : source;
+      const result = originalResolveObject ? await originalResolveObject(source, fields, context, info) : source;
+
+      if (!context.ignorePolicies && policy.postResolve) {
+        await context.policyExecutor.validatePolicy(policy, source, {}, context, info, result);
+      }
+
+      return result;
     };
   }
 
@@ -33,15 +39,25 @@ export class PolicyDirective extends SchemaDirectiveVisitor {
       context: RequestContext,
       info: GraphQLResolveInfo
     ) => {
-      if (!context.ignorePolicies) {
+      if (!context.ignorePolicies && !policy.postResolve) {
         await context.policyExecutor.validatePolicy(policy, source, args, context, info);
       }
 
-      return originalResolve.call(field, source, args, context, info);
+      const result = await originalResolve.call(field, source, args, context, info);
+      if (!context.ignorePolicies && policy.postResolve) {
+        await context.policyExecutor.validatePolicy(policy, source, args, context, info, result);
+      }
+
+      return result;
     };
   }
 }
 
 export const sdl = gql`
-  directive @policy(namespace: String!, name: String!, args: JSONObject) on OBJECT | FIELD_DEFINITION
+  directive @policy(
+    namespace: String!
+    name: String!
+    args: JSONObject
+    postResolve: Boolean = false
+  ) on OBJECT | FIELD_DEFINITION
 `;
