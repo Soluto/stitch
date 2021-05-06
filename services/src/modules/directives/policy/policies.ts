@@ -97,7 +97,7 @@ export class PoliciesDirective extends SchemaDirectiveVisitor {
         await validatePolicies(policies, relation, source, args, context, info);
       }
 
-      const result = originalResolve.call(field, source, args, context, info);
+      const result = await originalResolve.call(field, source, args, context, info);
 
       if (!context.ignorePolicies && postResolve) {
         await validatePolicies(policies, relation, source, args, context, info, result);

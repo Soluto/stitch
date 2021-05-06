@@ -1,6 +1,5 @@
 import { gql } from 'apollo-server-core';
 import { DocumentNode, graphql } from 'graphql';
-import { Logger } from 'pino';
 import { injectArgs } from '../../arguments-injection';
 import { RequestContext } from '../../context';
 import { PolicyQueryVariables, PolicyArgsObject, PolicyDefinition, ResourceMetadata } from '../../resource-repository';
@@ -9,26 +8,25 @@ import { PolicyDirectiveExecutionContext, QueryResults } from './types';
 
 export async function getQueryResult(
   ctx: PolicyDirectiveExecutionContext,
-  args: PolicyArgsObject = {},
-  logger: Logger
+  args: PolicyArgsObject = {}
 ): Promise<QueryResults> {
   const query = ctx.policyDefinition.query;
   if (!query) return;
-  logger.trace('Preparing policy query variables...');
+  ctx.logger.trace('Preparing policy query variables...');
   const variables = prepareVariables(args, query.variables);
   const requestContext: RequestContext = { ...ctx.requestContext, ignorePolicies: true };
   const gql = query.gql;
-  logger.trace({ variables }, 'Executing policy query...');
+  ctx.logger.trace({ variables }, 'Executing policy query...');
 
   const { data, errors } = await graphql(ctx.info.schema, gql, undefined, requestContext, variables).catch(error => {
-    logger.error({ error }, 'Policy query execution failed');
+    ctx.logger.error({ error }, 'Policy query execution failed');
     throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, error);
   });
   if (errors) {
-    logger.error({ errors }, 'Policy query execution failed');
+    ctx.logger.error({ errors }, 'Policy query execution failed');
     throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, 'Policy query execution failed');
   }
-  logger.trace({ data }, 'Policy query executed');
+  ctx.logger.trace({ data }, 'Policy query executed');
   return data;
 }
 

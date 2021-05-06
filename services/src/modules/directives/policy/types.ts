@@ -1,5 +1,6 @@
 import { GraphQLResolveInfo } from 'graphql';
 import { loadPolicy } from '@open-policy-agent/opa-wasm';
+import { Logger } from 'pino';
 import {
   PolicyDefinition,
   ResourceMetadata,
@@ -51,6 +52,7 @@ export type PolicyDirectiveExecutionContext = {
   requestContext: RequestContext;
   info: GraphQLResolveInfo;
   result?: unknown;
+  logger: Logger;
 };
 
 export type PolicyCacheKey = {

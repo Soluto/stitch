@@ -42,10 +42,16 @@ export default class PolicyExecutor {
       policy.name,
       policyLogger
     );
-    return this.getPolicyResult(
-      { policy, policyDefinition, source, gqlArgs, requestContext, info, result },
-      policyLogger
-    );
+    return this.getPolicyResult({
+      policy,
+      policyDefinition,
+      source,
+      gqlArgs,
+      requestContext,
+      info,
+      result,
+      logger: policyLogger,
+    });
   }
 
   evaluatePolicySync(
@@ -63,10 +69,16 @@ export default class PolicyExecutor {
       policy.name,
       policyLogger
     );
-    return this.getPolicyResultSync(
-      { policy, policyDefinition, source, gqlArgs, requestContext, info, result },
-      policyLogger
-    );
+    return this.getPolicyResultSync({
+      policy,
+      policyDefinition,
+      source,
+      gqlArgs,
+      requestContext,
+      info,
+      result,
+      logger: policyLogger,
+    });
   }
 
   async validatePolicy(
@@ -120,28 +132,27 @@ export default class PolicyExecutor {
     }
   }
 
-  private async getPolicyResult(ctx: PolicyDirectiveExecutionContext, policyLogger: Logger): Promise<boolean> {
-    const args = this.preparePolicyArgs(ctx, policyLogger);
+  private async getPolicyResult(ctx: PolicyDirectiveExecutionContext): Promise<boolean> {
+    const args = this.preparePolicyArgs(ctx);
     const cacheKey = { args, metadata: ctx.policyDefinition.metadata };
     const executionFunction = async () => {
-      const query = await getQueryResult(ctx, args, policyLogger);
-      return this._evaluatePolicy(ctx, policyLogger, args, query);
+      const query = await getQueryResult(ctx, args);
+      return this._evaluatePolicy(ctx, args, query);
     };
 
-    return this.asyncCache.getOperationResult(cacheKey, executionFunction, policyLogger);
+    return this.asyncCache.getOperationResult(cacheKey, executionFunction, ctx.logger);
   }
 
-  private getPolicyResultSync(ctx: PolicyDirectiveExecutionContext, policyLogger: Logger): boolean {
-    const args = this.preparePolicyArgs(ctx, policyLogger);
+  private getPolicyResultSync(ctx: PolicyDirectiveExecutionContext): boolean {
+    const args = this.preparePolicyArgs(ctx);
     const cacheKey = { args, metadata: ctx.policyDefinition.metadata };
-    const executionFunction = () => this._evaluatePolicy(ctx, policyLogger, args);
+    const executionFunction = () => this._evaluatePolicy(ctx, args);
 
-    return this.syncCache.getOperationResult(cacheKey, executionFunction, policyLogger);
+    return this.syncCache.getOperationResult(cacheKey, executionFunction, ctx.logger);
   }
 
   private _evaluatePolicy(
     ctx: PolicyDirectiveExecutionContext,
-    policyLogger: Logger,
     args: PolicyArgsObject = {},
     query?: QueryResults
   ): boolean {
@@ -156,7 +167,7 @@ export default class PolicyExecutor {
       args,
       query,
     };
-    policyLogger.trace(logData, 'Executing OPA policy...');
+    ctx.logger.trace(logData, 'Executing OPA policy...');
 
     const { done, allow } = evaluate({
       ...ctx.policy,
@@ -165,22 +176,22 @@ export default class PolicyExecutor {
       policyAttachments: ctx.requestContext.resourceGroup.policyAttachments!,
     });
     if (!done) {
-      policyLogger.error('in-line query evaluation not yet supported');
+      ctx.logger.error('in-line query evaluation not yet supported');
       throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, 'in-line query evaluation not yet supported');
     }
 
-    policyLogger.trace(logData, 'OPA policy executed');
+    ctx.logger.trace(logData, 'OPA policy executed');
     return allow || false;
   }
 
-  private preparePolicyArgs(ctx: PolicyDirectiveExecutionContext, policyLogger: Logger): PolicyArgsObject | undefined {
-    policyLogger.trace('Preparing policy arguments...');
+  private preparePolicyArgs(ctx: PolicyDirectiveExecutionContext): PolicyArgsObject | undefined {
+    ctx.logger.trace('Preparing policy arguments...');
     const supportedPolicyArgs = ctx.policyDefinition.args;
     if (!supportedPolicyArgs) return;
 
     const policyArgs = Object.entries(supportedPolicyArgs).reduce<PolicyArgsObject>(
       (policyArgs, [policyArgName, { default: defaultArg, type, optional = false }]) => {
-        policyLogger.trace(`Evaluating policy argument "${policyArgName}"...`);
+        ctx.logger.trace(`Evaluating policy argument "${policyArgName}"...`);
         const isPolicyArgProvided =
           ctx.policy.args && Object.prototype.hasOwnProperty.call(ctx.policy.args, policyArgName);
 
@@ -188,7 +199,7 @@ export default class PolicyExecutor {
 
         if (policyArgValue === undefined) {
           if (!optional) {
-            policyLogger.error({ policyArgName }, `Missing argument "${policyArgName}"`);
+            ctx.logger.error({ policyArgName }, `Missing argument "${policyArgName}"`);
             throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, `Missing argument "${policyArgName}"`);
           }
 
@@ -201,7 +212,7 @@ export default class PolicyExecutor {
         }
 
         policyArgs[policyArgName] = policyArgValue;
-        policyLogger.trace(
+        ctx.logger.trace(
           { [policyArgName]: policyArgValue },
           `Policy argument "${policyArgName}" evaluated to "${policyArgValue}"`
         );
@@ -209,7 +220,7 @@ export default class PolicyExecutor {
         const typeAST = parseType(type);
         if (typeAST.kind === 'NonNullType' && (typeof policyArgValue === 'undefined' || policyArgValue === null)) {
           const errorMessage = `Non-nullable argument "${policyArgName}" got value "${policyArgValue}"`;
-          policyLogger.error({ policyArgName }, errorMessage);
+          ctx.logger.error({ policyArgName }, errorMessage);
           throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, errorMessage);
         }
 
@@ -217,7 +228,7 @@ export default class PolicyExecutor {
       },
       {}
     );
-    policyLogger.trace({ policyArgs }, 'Policy arguments calculated');
+    ctx.logger.trace({ policyArgs }, 'Policy arguments calculated');
     return policyArgs;
   }
 }
