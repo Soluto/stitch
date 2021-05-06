@@ -53,7 +53,7 @@ const testCases: [string, TestCase][] = [
     {
       policyArgs: { arg1: null },
       policyArgsDefinitions: { arg1: { type: 'String!' } },
-      expectedArgs: { arg1: null },
+      shouldThrow: true,
     },
   ],
   [

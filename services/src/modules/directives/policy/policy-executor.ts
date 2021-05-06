@@ -1,4 +1,4 @@
-import { GraphQLResolveInfo } from 'graphql';
+import { GraphQLResolveInfo, parseType } from 'graphql';
 import { Logger } from 'pino';
 import logger from '../../logger';
 import { RequestContext } from '../../context';
@@ -179,7 +179,7 @@ export default class PolicyExecutor {
     if (!supportedPolicyArgs) return;
 
     const policyArgs = Object.entries(supportedPolicyArgs).reduce<PolicyArgsObject>(
-      (policyArgs, [policyArgName, { default: defaultArg, optional = false }]) => {
+      (policyArgs, [policyArgName, { default: defaultArg, type, optional = false }]) => {
         policyLogger.trace(`Evaluating policy argument "${policyArgName}"...`);
         const isPolicyArgProvided =
           ctx.policy.args && Object.prototype.hasOwnProperty.call(ctx.policy.args, policyArgName);
@@ -205,6 +205,14 @@ export default class PolicyExecutor {
           { [policyArgName]: policyArgValue },
           `Policy argument "${policyArgName}" evaluated to "${policyArgValue}"`
         );
+
+        const typeAST = parseType(type);
+        if (typeAST.kind === 'NonNullType' && (typeof policyArgValue === 'undefined' || policyArgValue === null)) {
+          const errorMessage = `Non-nullable argument "${policyArgName}" got value "${policyArgValue}"`;
+          policyLogger.error({ policyArgName }, errorMessage);
+          throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, errorMessage);
+        }
+
         return policyArgs;
       },
       {}
