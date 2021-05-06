@@ -24,6 +24,7 @@ import { composeAndValidate } from '@apollo/federation';
 import { ApolloError } from 'apollo-server-core';
 import createTypeResolvers from '../implicit-type-resolver';
 import { knownApolloDirectives } from '../config';
+import logger from '../logger';
 interface DirectiveVisitors {
   [directiveName: string]: typeof SchemaDirectiveVisitor;
 }
@@ -75,7 +76,8 @@ export function buildSchemaFromFederatedTypeDefs({
   const compositionResult = composeAndValidate(serviceDefinitions);
   const compositionErrors = compositionResult.errors ?? [];
   if (compositionErrors.length > 0) {
-    throw new ApolloError('Federation validation failed', 'FEDERATION_VALIDATION_FAILURE', {
+    logger.error({ compositionErrors }, 'Schema federation validation failed');
+    throw new ApolloError('Schema federation validation failed', 'FEDERATION_VALIDATION_FAILURE', {
       errors: compositionErrors.map(err => (err instanceof GraphQLError ? err : new GraphQLError(err!.message))),
     });
   }
