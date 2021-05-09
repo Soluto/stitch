@@ -89,6 +89,8 @@ export default class PolicyExecutor {
     info: GraphQLResolveInfo,
     result?: unknown
   ): Promise<void> {
+    if (requestContext.ignorePolicies) return;
+
     const logData = {
       name: 'policy-executor',
       policy: {
@@ -114,6 +116,8 @@ export default class PolicyExecutor {
     requestContext: RequestContext,
     info: GraphQLResolveInfo
   ): void {
+    if (requestContext.ignorePolicies) return;
+
     const logData = {
       name: 'policy-executor',
       policy: {

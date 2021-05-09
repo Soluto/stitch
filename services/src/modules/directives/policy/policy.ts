@@ -15,13 +15,13 @@ export class PolicyDirective extends SchemaDirectiveVisitor {
       context: RequestContext,
       info: GraphQLResolveInfo
     ) => {
-      if (!context.ignorePolicies && !policy.postResolve) {
+      if (!policy.postResolve) {
         await context.policyExecutor.validatePolicy(policy, source, {}, context, info);
       }
 
       const result = originalResolveObject ? await originalResolveObject(source, fields, context, info) : source;
 
-      if (!context.ignorePolicies && policy.postResolve) {
+      if (policy.postResolve) {
         await context.policyExecutor.validatePolicy(policy, source, {}, context, info, result);
       }
 
@@ -39,12 +39,12 @@ export class PolicyDirective extends SchemaDirectiveVisitor {
       context: RequestContext,
       info: GraphQLResolveInfo
     ) => {
-      if (!context.ignorePolicies && !policy.postResolve) {
+      if (!policy.postResolve) {
         await context.policyExecutor.validatePolicy(policy, source, args, context, info);
       }
 
       const result = await originalResolve.call(field, source, args, context, info);
-      if (!context.ignorePolicies && policy.postResolve) {
+      if (policy.postResolve) {
         await context.policyExecutor.validatePolicy(policy, source, args, context, info, result);
       }
 

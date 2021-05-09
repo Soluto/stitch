@@ -28,6 +28,8 @@ const validatePolicies = async (
   info: GraphQLResolveInfo,
   result?: unknown
 ) => {
+  if (context.ignorePolicies) return;
+
   const policiesLogger = logger.child({
     name: 'policies',
     type: info.parentType.name,
@@ -69,13 +71,13 @@ export class PoliciesDirective extends SchemaDirectiveVisitor {
       context: RequestContext,
       info: GraphQLResolveInfo
     ) => {
-      if (!context.ignorePolicies && !postResolve) {
+      if (!postResolve) {
         await validatePolicies(policies, relation, source, {}, context, info);
       }
 
       const result = originalResolveObject ? await originalResolveObject(source, fields, context, info) : source;
 
-      if (!context.ignorePolicies && postResolve) {
+      if (postResolve) {
         await validatePolicies(policies, relation, source, {}, context, info, result);
       }
 
@@ -93,13 +95,13 @@ export class PoliciesDirective extends SchemaDirectiveVisitor {
       context: RequestContext,
       info: GraphQLResolveInfo
     ) => {
-      if (!context.ignorePolicies && !postResolve) {
+      if (!postResolve) {
         await validatePolicies(policies, relation, source, args, context, info);
       }
 
       const result = await originalResolve.call(field, source, args, context, info);
 
-      if (!context.ignorePolicies && postResolve) {
+      if (postResolve) {
         await validatePolicies(policies, relation, source, args, context, info, result);
       }
 

@@ -29,7 +29,7 @@ export function createBasicPolicyPlugin(): ApolloServerPlugin {
             return policyDefinition.shouldOverrideBasePolicy ?? false;
           });
 
-          if (!shouldOverrideBasePolicy && !context.ignorePolicies) {
+          if (!shouldOverrideBasePolicy) {
             context.policyExecutor.validatePolicySync(basePolicy, source, args, context, info);
           }
         },
