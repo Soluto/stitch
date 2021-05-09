@@ -232,6 +232,10 @@ query {
 }
 ```
 
+### Additional properties
+
+In some cases there are additional properties available for injection. For example, in `@policy` and `@policies` directives when `postValidation` argument is `true`, `result` property has value of the field/object resolver. In `@errorHandler` directive `error` property is available for injection in `catchError` argument and `result` in `throwError` argument.
+
 #### Returning a JSON Object with injection
 
 ```graphql

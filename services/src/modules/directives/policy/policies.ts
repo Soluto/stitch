@@ -15,7 +15,9 @@ import { SchemaDirectiveVisitor } from 'graphql-tools';
 import { gql } from 'apollo-server-core';
 import { GraphQLJSONObject } from 'graphql-type-json';
 import { RequestContext } from '../../context';
+import logger from '../../logger';
 import { GraphQLArguments, Policy } from './types';
+import { UnauthorizedByPolicyError } from '.';
 
 const validatePolicies = async (
   policies: Policy[],
@@ -23,25 +25,43 @@ const validatePolicies = async (
   source: unknown,
   args: GraphQLArguments,
   context: RequestContext,
-  info: GraphQLResolveInfo
+  info: GraphQLResolveInfo,
+  result?: unknown
 ) => {
+  if (context.ignorePolicies) return;
+
+  const policiesLogger = logger.child({
+    name: 'policies',
+    type: info.parentType.name,
+    field: info.fieldName,
+    policies: policies.map(({ namespace, name }) => ({ namespace, name })),
+  });
+  policiesLogger.trace('Validating policies...');
   const results = await Promise.allSettled(
-    policies.map((p: Policy) => context.policyExecutor.validatePolicy(p, source, args, context, info))
+    policies.map((p: Policy) => context.policyExecutor.validatePolicy(p, source, args, context, info, result))
   );
 
   const allApproved = results.every(r => r.status === 'fulfilled');
   const someApproved = results.some(r => r.status === 'fulfilled');
 
-  if (relation === 'AND' && allApproved) return;
-  if (relation === 'OR' && someApproved) return;
+  if ((relation === 'AND' && allApproved) || (relation === 'OR' && someApproved)) {
+    policiesLogger.trace('Authorized');
+    return;
+  }
 
   const rejectedPolicies = results.filter(r => r.status === 'rejected').map(r => (r as PromiseRejectedResult).reason);
-  throw new GraphQLError(rejectedPolicies.map(p => p as Error).join('\n'));
+  const failedPolicies = rejectedPolicies.filter(pe => pe.name !== 'UnauthorizedByPolicyError');
+  if (failedPolicies.length > 0) {
+    policiesLogger.trace({ failedPolicies }, 'Policies validation failed');
+    throw new GraphQLError(failedPolicies.join(', '));
+  }
+  policiesLogger.trace({ rejectedPolicies }, 'Unauthorized');
+  throw new UnauthorizedByPolicyError(rejectedPolicies as UnauthorizedByPolicyError[]);
 };
 
 export class PoliciesDirective extends SchemaDirectiveVisitor {
   visitObject(object: GraphQLObjectType<unknown, RequestContext>) {
-    const { policies, relation } = this.args;
+    const { policies, relation, postResolve } = this.args;
 
     const originalResolveObject = object.resolveObject;
 
@@ -51,16 +71,22 @@ export class PoliciesDirective extends SchemaDirectiveVisitor {
       context: RequestContext,
       info: GraphQLResolveInfo
     ) => {
-      if (!context.ignorePolicies) {
+      if (!postResolve) {
         await validatePolicies(policies, relation, source, {}, context, info);
       }
 
-      return originalResolveObject ? await originalResolveObject(source, fields, context, info) : source;
+      const result = originalResolveObject ? await originalResolveObject(source, fields, context, info) : source;
+
+      if (postResolve) {
+        await validatePolicies(policies, relation, source, {}, context, info, result);
+      }
+
+      return result;
     };
   }
 
   visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
-    const { policies, relation } = this.args;
+    const { policies, relation, postResolve } = this.args;
     const originalResolve = field.resolve || defaultFieldResolver;
 
     field.resolve = async (
@@ -69,11 +95,17 @@ export class PoliciesDirective extends SchemaDirectiveVisitor {
       context: RequestContext,
       info: GraphQLResolveInfo
     ) => {
-      if (!context.ignorePolicies) {
+      if (!postResolve) {
         await validatePolicies(policies, relation, source, args, context, info);
       }
 
-      return originalResolve.call(field, source, args, context, info);
+      const result = await originalResolve.call(field, source, args, context, info);
+
+      if (postResolve) {
+        await validatePolicies(policies, relation, source, args, context, info, result);
+      }
+
+      return result;
     };
   }
 }
@@ -111,5 +143,9 @@ export const sdl = gql`
     OR
   }
 
-  directive @policies(policies: [PolicyDetails!]!, relation: Relation = OR) on OBJECT | FIELD_DEFINITION
+  directive @policies(
+    policies: [PolicyDetails!]!
+    relation: Relation = OR
+    postResolve: Boolean = false
+  ) on OBJECT | FIELD_DEFINITION
 `;

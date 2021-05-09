@@ -1,4 +1,6 @@
+import { GraphQLResolveInfo } from 'graphql';
 import { when } from 'jest-when';
+import logger from '../../logger';
 import {
   PolicyArgsDefinitions,
   PolicyArgsObject,
@@ -51,7 +53,7 @@ const testCases: [string, TestCase][] = [
     {
       policyArgs: { arg1: null },
       policyArgsDefinitions: { arg1: { type: 'String!' } },
-      expectedArgs: { arg1: null },
+      shouldThrow: true,
     },
   ],
   [
@@ -164,14 +166,15 @@ describe('Policy Executor', () => {
       },
     } as any;
 
+    const info = ({
+      parentType: {
+        name: 'Foo',
+      },
+      fieldName: 'bar',
+    } as unknown) as GraphQLResolveInfo;
+
     try {
-      const result = await executor.evaluatePolicy(
-        policy,
-        typedUndefined(),
-        typedUndefined(),
-        context,
-        typedUndefined()
-      );
+      const result = await executor.evaluatePolicy(policy, logger, typedUndefined(), typedUndefined(), context, info);
       expect(result).toBeTruthy();
       expect(shouldThrow).not.toBeTruthy();
     } catch (err) {

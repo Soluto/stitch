@@ -4,7 +4,7 @@ exports[`Authorization - Policy directive order Query should return error 1`] = 
 {
   "errors": [
     {
-      "message": "Unauthorized by policy alwaysDeny in namespace auth_directives_order",
+      "message": "Unauthorized by policy \\"alwaysDeny\\" in namespace \\"auth_directives_order\\"",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "ado_foo"

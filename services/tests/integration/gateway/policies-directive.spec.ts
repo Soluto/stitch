@@ -9,16 +9,24 @@ import { sdl as lowerCaseSdl, LowerCaseDirective } from '../utils/lower-case-dir
 import { sdl as mockSdl, MockDirective } from '../utils/mock-directive';
 import getBaseSchema from '../../../src/modules/base-schema';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
+import PolicyExecutionFailedError from '../../../src/modules/directives/policy/policy-execution-failed-error';
+import { ResourceMetadata } from '../../../src/modules/resource-repository';
+
+const unauthorizedPolicy: ResourceMetadata = { namespace: 'ns', name: 'alwaysDeny' };
+const failedPolicy: ResourceMetadata = { namespace: 'ns', name: 'alwaysFail' };
 
 const mockValidatePolicy = jest.fn();
-when(mockValidatePolicy).calledWith({ namespace: 'ns', name: 'alwaysAllow' }).mockResolvedValue(undefined);
-when(mockValidatePolicy).calledWith({ namespace: 'ns', name: 'alwaysAllow2' }).mockResolvedValue(undefined);
 when(mockValidatePolicy)
+  .calledWith({ namespace: 'ns', name: 'alwaysAllow' })
+  .mockResolvedValue(undefined)
+  .calledWith({ namespace: 'ns', name: 'alwaysAllow2' })
+  .mockResolvedValue(undefined)
   .calledWith({ namespace: 'ns', name: 'allowWithArgs', args: { a: 'b' } })
-  .mockResolvedValue(undefined);
-when(mockValidatePolicy)
-  .calledWith({ namespace: 'ns', name: 'alwaysDeny' })
-  .mockRejectedValue(new UnauthorizedByPolicyError({ namespace: 'ns', name: 'alwaysDeny' }));
+  .mockResolvedValue(undefined)
+  .calledWith(unauthorizedPolicy)
+  .mockRejectedValue(new UnauthorizedByPolicyError(unauthorizedPolicy))
+  .calledWith(failedPolicy)
+  .mockRejectedValue(new PolicyExecutionFailedError(failedPolicy, 'Not good'));
 jest.mock('../../../src/modules/directives/policy/policy-executor', () => ({
   default: jest.fn().mockImplementation(() => ({ validatePolicy: mockValidatePolicy })),
 }));
@@ -33,7 +41,7 @@ const testCases: [string, TestCase][] = [
     {
       typeDefs: gql`
         type Foo {
-          bar: String! @policies(policies: [{ namespace: "ns", name: "alwaysAllow" }])
+          bar: String @policies(policies: [{ namespace: "ns", name: "alwaysAllow" }])
         }
         type Query {
           foo: Foo!
@@ -46,7 +54,7 @@ const testCases: [string, TestCase][] = [
     {
       typeDefs: gql`
         type Foo {
-          bar: String! @policies(policies: [{ namespace: "ns", name: "alwaysDeny" }])
+          bar: String @policies(policies: [{ namespace: "ns", name: "alwaysDeny" }])
         }
         type Query {
           foo: Foo!
@@ -59,7 +67,7 @@ const testCases: [string, TestCase][] = [
     {
       typeDefs: gql`
         type Foo {
-          bar: String!
+          bar: String
             @policies(
               policies: [{ namespace: "ns", name: "alwaysAllow" }, { namespace: "ns", name: "alwaysAllow2" }]
               relation: AND
@@ -76,7 +84,7 @@ const testCases: [string, TestCase][] = [
     {
       typeDefs: gql`
         type Foo {
-          bar: String!
+          bar: String
             @policies(
               policies: [{ namespace: "ns", name: "alwaysAllow" }, { namespace: "ns", name: "alwaysAllow2" }]
               relation: OR
@@ -93,7 +101,7 @@ const testCases: [string, TestCase][] = [
     {
       typeDefs: gql`
         type Foo {
-          bar: String!
+          bar: String
             @policies(
               policies: [{ namespace: "ns", name: "alwaysAllow" }, { namespace: "ns", name: "alwaysDeny" }]
               relation: AND
@@ -110,7 +118,7 @@ const testCases: [string, TestCase][] = [
     {
       typeDefs: gql`
         type Foo {
-          bar: String!
+          bar: String
             @policies(
               policies: [{ namespace: "ns", name: "alwaysAllow" }, { namespace: "ns", name: "alwaysDeny" }]
               relation: OR
@@ -127,7 +135,20 @@ const testCases: [string, TestCase][] = [
     {
       typeDefs: gql`
         type Foo {
-          bar: String! @policies(policies: [{ namespace: "ns", name: "allowWithArgs", args: { a: "b" } }], relation: OR)
+          bar: String @policies(policies: [{ namespace: "ns", name: "allowWithArgs", args: { a: "b" } }], relation: OR)
+        }
+        type Query {
+          foo: Foo!
+        }
+      `,
+    },
+  ],
+  [
+    'Policy fails',
+    {
+      typeDefs: gql`
+        type Foo {
+          bar: String @policies(policies: [{ namespace: "ns", name: "alwaysFail" }])
         }
         type Query {
           foo: Foo!

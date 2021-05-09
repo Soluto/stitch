@@ -11,7 +11,6 @@ interface TestCase {
   directiveArgsFieldDefinition: string;
   directiveArgsObjectDefinition: string;
   query?: DocumentNode;
-  rootValue?: unknown;
   variables?: Record<string, unknown>;
   resolvers?: IResolvers;
   only?: boolean;
@@ -21,6 +20,7 @@ const defaultResolvers: IResolvers = {
   Query: {
     foo: () => 'Foo',
     bar: () => ({ baz: 'Baz' }),
+    bar2: () => ({}),
   },
 };
 
@@ -36,14 +36,24 @@ const defaultThrowingResolvers: IResolvers = {
       throw new ApolloError('Bar object resolver throws');
     },
   },
+  Bar2: {
+    __resolveObject: () => {
+      throw new ApolloError('Bar2 object resolver throws');
+    },
+  },
 };
 const createTypeDefs = (directiveArgsFieldDefinition: string, directiveArgsObjectDefinition: string) => gql`
   type Query {
     foo: String @errorHandler${directiveArgsFieldDefinition}
     bar: Bar
+    bar2: Bar2
   }
 
   type Bar @errorHandler${directiveArgsObjectDefinition} {
+    baz: String!
+  }
+
+  type Bar2 @errorHandler${directiveArgsObjectDefinition} {
     baz: String
   }
 `;
@@ -211,6 +221,9 @@ const defaultQuery = gql`
     bar {
       baz
     }
+    bar2 {
+      baz
+    }
   }
 `;
 
@@ -237,7 +250,6 @@ describe.each(testCases)(
       directiveArgsObjectDefinition,
       query = defaultQuery,
       variables,
-      rootValue,
       resolvers = defaultThrowingResolvers,
       only = false,
     }
@@ -252,7 +264,6 @@ describe.each(testCases)(
         typeDefs: concatAST([typeDefs, baseTypeDefs, errorHandlerSdl]),
         schemaDirectives,
         resolvers: { ...baseResolvers, ...resolvers },
-        rootValue,
       });
       client = createTestClient(server);
     });

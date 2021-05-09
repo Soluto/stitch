@@ -1,4 +1,5 @@
 import { isDeepStrictEqual } from 'util';
+import { Logger } from 'pino';
 
 export default class CachedOperation<KeyType, ResultType> {
   protected operationCache: { key: KeyType; result: ResultType }[] = [];
@@ -8,10 +9,15 @@ export default class CachedOperation<KeyType, ResultType> {
   // As a result, if two requests happen "simultaneously", the first one will add the promise
   // to the cache and the second one will retrieve the promise from the cache.
   // The operation will be executed only once.
-  public getOperationResult(cacheKey: KeyType, executionFunction: () => ResultType) {
+  public getOperationResult(cacheKey: KeyType, executionFunction: () => ResultType, logger: Logger) {
+    logger.trace('Looking for policy result in cache...');
     const cachedResult = this.getFromCache(cacheKey);
-    if (cachedResult) return cachedResult;
+    if (cachedResult) {
+      logger.trace('Policy result found in cache');
+      return cachedResult;
+    }
 
+    logger.trace('Policy result not found in cache. Executing policy...');
     const result = executionFunction();
     this.addToCache(cacheKey, result);
     return result;

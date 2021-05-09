@@ -2,7 +2,7 @@ import { gql } from 'apollo-server-core';
 import { GraphQLFieldResolverParams } from 'apollo-server-types';
 import { defaultFieldResolver, FieldNode, GraphQLField, GraphQLObjectType, GraphQLResolveInfo } from 'graphql';
 import { SchemaDirectiveVisitor } from 'graphql-tools';
-import { injectArgs } from '../arguments-injection';
+import { inject } from '../arguments-injection';
 import { RequestContext } from '../context';
 
 const defaultObjectResolver = (
@@ -86,7 +86,7 @@ function handleCatchErrorArgument(
 
   let shouldCatch = true;
   if (catchError.condition) {
-    const catchErrorConditionResult = injectArgs(catchError.condition, { error, ...injectionArgs });
+    const catchErrorConditionResult = inject(catchError.condition, { error, ...injectionArgs });
     // If injection throws it returns the template. In this case fail the condition
     shouldCatch = !!catchErrorConditionResult && catchErrorConditionResult != catchError.condition;
   }
@@ -98,7 +98,7 @@ function handleCatchErrorArgument(
   if (!catchError.returnValue) {
     result = null;
   } else if (typeof catchError.returnValue === 'string') {
-    result = injectArgs(catchError.returnValue, { error, ...injectionArgs });
+    result = inject(catchError.returnValue, { error, ...injectionArgs });
   } else {
     result = catchError.returnValue;
   }
@@ -112,13 +112,13 @@ function handleThrowErrorArgument(
 ) {
   let shouldThrow = true;
   if (throwError.condition) {
-    const throwErrorConditionResult = injectArgs(throwError.condition, { result, ...injectionArgs });
+    const throwErrorConditionResult = inject(throwError.condition, { result, ...injectionArgs });
     // If injection throws it returns the template. In this case fail the condition
     shouldThrow = !!throwErrorConditionResult && throwErrorConditionResult != throwError.condition;
   }
   if (!shouldThrow) return;
 
-  let err = throwError.errorToThrow ? injectArgs(throwError.errorToThrow, { result, ...injectionArgs }) : '';
+  let err = throwError.errorToThrow ? inject(throwError.errorToThrow, { result, ...injectionArgs }) : '';
   if (typeof err === 'string') {
     err = new Error(err);
   }

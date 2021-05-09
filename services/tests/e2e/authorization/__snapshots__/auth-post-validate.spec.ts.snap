@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Authorization - Policy directive with postResolve Query should return error 1`] = `
+{
+  "errors": [
+    {
+      "message": "Unauthorized by policy \\"test\\" in namespace \\"auth_post_resolve\\"",
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "apv_foo"
+      ]
+    }
+  ],
+  "data": {}
+}
+`;
+
+exports[`Authorization - Policy directive with postResolve Query should return result 1`] = `
+Object {
+  "apv_foo": "bar",
+}
+`;

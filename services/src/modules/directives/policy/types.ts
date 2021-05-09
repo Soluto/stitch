@@ -1,5 +1,6 @@
 import { GraphQLResolveInfo } from 'graphql';
 import { loadPolicy } from '@open-policy-agent/opa-wasm';
+import { Logger } from 'pino';
 import {
   PolicyDefinition,
   ResourceMetadata,
@@ -14,6 +15,7 @@ export type Policy = {
   namespace: string;
   name: string;
   args?: PolicyArgsObject;
+  postResolve?: boolean;
 };
 
 // args here contain the final values after param injection
@@ -44,11 +46,13 @@ export type GraphQLArguments = {
 
 export type PolicyDirectiveExecutionContext = {
   policy: Policy;
+  policyDefinition: PolicyDefinition;
   source: unknown;
   gqlArgs: GraphQLArguments;
   requestContext: RequestContext;
   info: GraphQLResolveInfo;
-  policyDefinition: PolicyDefinition;
+  result?: unknown;
+  logger: Logger;
 };
 
 export type PolicyCacheKey = {

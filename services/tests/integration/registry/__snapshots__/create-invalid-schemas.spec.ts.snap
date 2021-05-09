@@ -2,7 +2,7 @@
 
 exports[`Creation of invalid schemas Bad federation composition in schema gets rejected 1`] = `
 Array [
-  [GraphQLError: Federation validation failed],
+  [GraphQLError: Schema federation validation failed],
 ]
 `;
 

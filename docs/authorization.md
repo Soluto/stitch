@@ -158,6 +158,41 @@ In the example above, the `roles` argument value is received by using the Argume
 
 > Note: See [Arguments Injection](./arguments_injection.md) for more information about configuration of policy arguments.
 
+## Post Resolve
+
+`@policy` directive has optional `postResolve` argument. If the value of the argument is `true` the policy validation will be executed **after** the execution of field resolver. This argument should be used in case the policy logic depends on the result of field resolver execution.
+
+For example if we don't want to allow to query photos marked as private and the policy and the schema should be like this:
+
+```graphql
+type Photo {
+  id: ID!
+  owner: String!
+  private: Boolean!
+}
+
+type Query {
+  photo(id: ID!) @rest(url: ...) @policy(namespace: "ns", name: "public-only", postResolve: true, args: { private: "{ result.private }" })
+}
+```
+
+The `@rest` directive will be executed before the `@policy` one. And its result will be available in the policy argument injection as `result`.
+
+```yaml
+metadata:
+  namespace: ns
+  name: public-only
+type: opa
+code: |
+  default allow = false
+  allow {
+    input.args.private == false
+  }
+args:
+  private:
+    type: Boolean!
+```
+
 ## Directives order
 
 **_Important!_** The [order of directives](https://github.com/graphql/graphql-spec/blob/master/spec/Section%202%20--%20Language.md#directives) does matter! The directives are applied in order they appear in schema. Object type directives are applied before field definition directives.
