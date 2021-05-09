@@ -158,7 +158,7 @@ In the example above, the `roles` argument value is received by using the Argume
 
 > Note: See [Arguments Injection](./arguments_injection.md) for more information about configuration of policy arguments.
 
-## Post validate
+## Post Resolve
 
 `@policy` directive has optional `postResolve` argument. If the value of the argument is `true` the policy validation will be executed **after** the execution of field resolver. This argument should be used in case the policy logic depends on the result of field resolver execution.
 
