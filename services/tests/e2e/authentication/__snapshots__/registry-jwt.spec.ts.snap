@@ -1,0 +1,172 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Authentication - Verify JWT Invalid Authentication Scheme 1`] = `
+Object {
+  "error": "Unauthorized",
+  "message": "Unauthorized",
+  "status": 401,
+  "statusCode": 401,
+}
+`;
+
+exports[`Authentication - Verify JWT Invalid JWT 1`] = `
+Object {
+  "error": "Unauthorized",
+  "message": "Unauthorized",
+  "status": 401,
+  "statusCode": 401,
+}
+`;
+
+exports[`Authentication - Verify JWT JWK uri is not resolved 1`] = `
+Object {
+  "error": "Unauthorized",
+  "message": "Unauthorized",
+  "status": 401,
+  "statusCode": 401,
+}
+`;
+
+exports[`Authentication - Verify JWT Multiple audiences 1`] = `
+Object {
+  "plugins": Array [
+    Object {
+      "name": "argument-injection-globals.js",
+      "version": "N/A",
+    },
+    Object {
+      "name": "async-function.js",
+      "version": "N/A",
+    },
+    Object {
+      "name": "crashing.js",
+      "version": "N/A",
+    },
+    Object {
+      "name": "folder-with-index-file",
+      "version": "N/A",
+    },
+    Object {
+      "name": "folder-with-node-module",
+      "version": "N/A",
+    },
+    Object {
+      "name": "folder-with-npm-module",
+      "version": "N/A",
+    },
+    Object {
+      "name": "folder-with-package-json-file",
+      "version": "N/A",
+    },
+    Object {
+      "name": "function.js",
+      "version": "N/A",
+    },
+    Object {
+      "name": "promise.js",
+      "version": "N/A",
+    },
+    Object {
+      "name": "single-file.js",
+      "version": "N/A",
+    },
+    Object {
+      "name": "transform-apollo-server-plugins",
+      "version": "1.0.0",
+    },
+    Object {
+      "name": "transform-base-schema",
+      "version": "1.0.0",
+    },
+    Object {
+      "name": "transform-resource-group.js",
+      "version": "N/A",
+    },
+    Object {
+      "name": "with-config.js",
+      "version": "N/A",
+    },
+  ],
+}
+`;
+
+exports[`Authentication - Verify JWT Unexpected audience 1`] = `
+Object {
+  "error": "Unauthorized",
+  "message": "Unauthorized",
+  "status": 401,
+  "statusCode": 401,
+}
+`;
+
+exports[`Authentication - Verify JWT Unknown issuer 1`] = `
+Object {
+  "error": "Unauthorized",
+  "message": "Unauthorized",
+  "status": 401,
+  "statusCode": 401,
+}
+`;
+
+exports[`Authentication - Verify JWT Valid JWT 1`] = `
+Object {
+  "plugins": Array [
+    Object {
+      "name": "argument-injection-globals.js",
+      "version": "N/A",
+    },
+    Object {
+      "name": "async-function.js",
+      "version": "N/A",
+    },
+    Object {
+      "name": "crashing.js",
+      "version": "N/A",
+    },
+    Object {
+      "name": "folder-with-index-file",
+      "version": "N/A",
+    },
+    Object {
+      "name": "folder-with-node-module",
+      "version": "N/A",
+    },
+    Object {
+      "name": "folder-with-npm-module",
+      "version": "N/A",
+    },
+    Object {
+      "name": "folder-with-package-json-file",
+      "version": "N/A",
+    },
+    Object {
+      "name": "function.js",
+      "version": "N/A",
+    },
+    Object {
+      "name": "promise.js",
+      "version": "N/A",
+    },
+    Object {
+      "name": "single-file.js",
+      "version": "N/A",
+    },
+    Object {
+      "name": "transform-apollo-server-plugins",
+      "version": "1.0.0",
+    },
+    Object {
+      "name": "transform-base-schema",
+      "version": "1.0.0",
+    },
+    Object {
+      "name": "transform-resource-group.js",
+      "version": "N/A",
+    },
+    Object {
+      "name": "with-config.js",
+      "version": "N/A",
+    },
+  ],
+}
+`;

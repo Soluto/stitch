@@ -81,6 +81,21 @@ services:
       NODE_ENV: test
       LOG_LEVEL: ${LOG_LEVEL:-trace}
       PORT: 80
+      AUTHENTICATION_CONFIGURATION: |
+        {
+          "jwt": {
+            "http://localhost:8060": {
+              "authority": "http://oidc-server-mock:8060",
+              "audience": "Stitch Registry",
+              "description": "OpenId provider with discovery endpoint",
+              "authenticatedPaths": ["/graphql"]
+            }
+          },
+          "anonymous": {
+            "rejectAuthorizationHeader": true,
+            "publicPaths": ["/metrics", "/.well-known/apollo/server-health"]
+          }
+        }
     volumes:
       - ./config/plugins:/plugins:ro
 
