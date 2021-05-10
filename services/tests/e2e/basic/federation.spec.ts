@@ -27,6 +27,9 @@ describe('Schema Federation', () => {
   beforeAll(async () => {
     const accessToken = await getToken();
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
+
+    const registryAccessToken = await getToken({ scope: 'stitch-registry' });
+    registryClient.setHeader('Authorization', `Bearer ${registryAccessToken}`);
   });
 
   test('Setup schema', async () => {

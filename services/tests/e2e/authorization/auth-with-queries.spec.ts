@@ -22,6 +22,9 @@ describe('Authorization with queries', () => {
     const accessToken = await getToken();
     gatewayClient.setHeader('Authorization', `Bearer ${accessToken}`);
     expect.addSnapshotSerializer(GraphQLErrorSerializer);
+
+    const registryAccessToken = await getToken({ scope: 'stitch-registry' });
+    registryClient.setHeader('Authorization', `Bearer ${registryAccessToken}`);
   });
 
   test('Setup policies', async () => {

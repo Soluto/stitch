@@ -22,6 +22,9 @@ describe('Authentication - Verify JWT', () => {
   });
 
   test('Setup policies', async () => {
+    const registryAccessToken = await getToken({ scope: 'stitch-registry' });
+    registryClient.setHeader('Authorization', `Bearer ${registryAccessToken}`);
+
     const schemaResponse = await registryClient.request<RegistryMutationResponse>(updateSchemasMutation, {
       schema,
     });
