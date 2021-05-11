@@ -18,6 +18,9 @@ describe('authorization', () => {
   beforeAll(async () => {
     expect.addSnapshotSerializer(GraphQLErrorSerializer);
 
+    const registryAccessToken = await getToken({ scope: 'stitch-registry' });
+    registryClient.setHeader('Authorization', `Bearer ${registryAccessToken}`);
+
     defaultAccessToken = await getToken();
   });
 

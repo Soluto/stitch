@@ -33,6 +33,9 @@ describe('Authorization - Base policy', () => {
   beforeAll(async () => {
     expect.addSnapshotSerializer(GraphQLErrorSerializer);
 
+    const registryAccessToken = await getToken({ scope: 'stitch-registry' });
+    registryClient.setHeader('Authorization', `Bearer ${registryAccessToken}`);
+
     const policiesResponse = await registryClient.request<RegistryMutationResponse>(updatePoliciesMutation, {
       policies,
     });

@@ -4,6 +4,10 @@
     "Scopes": ["stitch-gateway"]
   },
   {
+    "Name": "Stitch Registry",
+    "Scopes": ["stitch-registry"]
+  },
+  {
     "Name": "Some REST service",
     "Scopes": ["some-rest-service"]
   }

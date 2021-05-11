@@ -53,6 +53,9 @@ describe('Policies directive', () => {
 
     defaultAccessToken = await getToken();
     gatewayClient.setHeader('Authorization', `Bearer ${defaultAccessToken}`);
+
+    const registryAccessToken = await getToken({ scope: 'stitch-registry' });
+    registryClient.setHeader('Authorization', `Bearer ${registryAccessToken}`);
   });
 
   test('Setup policies', async () => {

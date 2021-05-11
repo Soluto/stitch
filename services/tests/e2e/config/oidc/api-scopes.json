@@ -3,6 +3,9 @@
     "Name": "stitch-gateway"
   },
   {
+    "Name": "stitch-registry"
+  },
+  {
     "Name": "some-rest-service"
   }
 ]
