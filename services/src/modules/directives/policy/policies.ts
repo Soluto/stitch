@@ -56,7 +56,11 @@ const validatePolicies = async (
     throw new GraphQLError(failedPolicies.join(', '));
   }
   policiesLogger.trace({ rejectedPolicies }, 'Unauthorized');
-  throw new UnauthorizedByPolicyError(rejectedPolicies as UnauthorizedByPolicyError[]);
+  throw new UnauthorizedByPolicyError(
+    rejectedPolicies as UnauthorizedByPolicyError[],
+    info.parentType.name,
+    info.fieldName
+  );
 };
 
 export class PoliciesDirective extends SchemaDirectiveVisitor {
@@ -71,13 +75,21 @@ export class PoliciesDirective extends SchemaDirectiveVisitor {
       context: RequestContext,
       info: GraphQLResolveInfo
     ) => {
+      const pLogger = logger.child({
+        name: 'policies-directive',
+        policies,
+        type: info.parentType.name,
+        field: info.fieldName,
+      });
       if (!postResolve) {
+        pLogger.trace('Pre resolve validation');
         await validatePolicies(policies, relation, source, {}, context, info);
       }
 
       const result = originalResolveObject ? await originalResolveObject(source, fields, context, info) : source;
 
       if (postResolve) {
+        pLogger.trace({ result }, 'Post resolve validation');
         await validatePolicies(policies, relation, source, {}, context, info, result);
       }
 
@@ -95,13 +107,21 @@ export class PoliciesDirective extends SchemaDirectiveVisitor {
       context: RequestContext,
       info: GraphQLResolveInfo
     ) => {
+      const pLogger = logger.child({
+        name: 'policies-directive',
+        policies,
+        type: info.parentType.name,
+        field: info.fieldName,
+      });
       if (!postResolve) {
+        pLogger.trace('Pre resolve validation');
         await validatePolicies(policies, relation, source, args, context, info);
       }
 
       const result = await originalResolve.call(field, source, args, context, info);
 
       if (postResolve) {
+        pLogger.trace({ result }, 'Post resolve validation');
         await validatePolicies(policies, relation, source, args, context, info, result);
       }
 

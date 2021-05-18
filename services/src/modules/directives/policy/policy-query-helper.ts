@@ -20,11 +20,21 @@ export async function getQueryResult(
 
   const { data, errors } = await graphql(ctx.info.schema, gql, undefined, requestContext, variables).catch(error => {
     ctx.logger.error({ error }, 'Policy query execution failed');
-    throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, error);
+    throw new PolicyExecutionFailedError(
+      ctx.policyDefinition.metadata,
+      error,
+      ctx.info.parentType.name,
+      ctx.info.fieldName
+    );
   });
   if (errors) {
     ctx.logger.error({ errors }, 'Policy query execution failed');
-    throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, 'Policy query execution failed');
+    throw new PolicyExecutionFailedError(
+      ctx.policyDefinition.metadata,
+      'Policy query execution failed',
+      ctx.info.parentType.name,
+      ctx.info.fieldName
+    );
   }
   ctx.logger.trace({ data }, 'Policy query executed');
   return data;

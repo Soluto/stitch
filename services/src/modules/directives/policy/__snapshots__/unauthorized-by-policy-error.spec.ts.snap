@@ -1,5 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Unauthorized by policy For @policies directive 1`] = `[UnauthorizedByPolicyError: Unauthorized by policies: policy-1 (ns-1), policy-2 (ns-2)]`;
+exports[`Unauthorized by policy For @policies directive 1`] = `[UnauthorizedByPolicyError: Access to Foo.bar is unauthorized by policies: policy-1 (ns-1), policy-2 (ns-2)]`;
 
-exports[`Unauthorized by policy For @policy directive 1`] = `[UnauthorizedByPolicyError: Unauthorized by policy "policy" in namespace "ns"]`;
+exports[`Unauthorized by policy For @policy directive 1`] = `[UnauthorizedByPolicyError: Access to Foo.bar is unauthorized by policy "policy" in namespace "ns"]`;

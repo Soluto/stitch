@@ -2,6 +2,7 @@ import { GraphQLResolveInfo, GraphQLField, defaultFieldResolver, GraphQLObjectTy
 import { SchemaDirectiveVisitor } from 'graphql-tools';
 import { gql } from 'apollo-server-core';
 import { RequestContext } from '../../context';
+import logger from '../../logger';
 import { GraphQLArguments, Policy } from './types';
 
 export class PolicyDirective extends SchemaDirectiveVisitor {
@@ -15,13 +16,26 @@ export class PolicyDirective extends SchemaDirectiveVisitor {
       context: RequestContext,
       info: GraphQLResolveInfo
     ) => {
-      if (!policy.postResolve) {
+      const { namespace, name, postResolve } = policy;
+      const pLogger = logger.child({
+        name: 'policy-directive',
+        policy: { namespace, name },
+        type: info.parentType.name,
+        field: info.fieldName,
+      });
+      if (!postResolve) {
+        pLogger.trace('Pre resolve validation');
         await context.policyExecutor.validatePolicy(policy, source, {}, context, info);
       }
 
       const result = originalResolveObject ? await originalResolveObject(source, fields, context, info) : source;
+      logger.trace(
+        { policy: { namespace, name }, type: info.parentType.name, field: info.fieldName, result },
+        'Field resolver executed'
+      );
 
-      if (policy.postResolve) {
+      if (postResolve) {
+        pLogger.trace({ result }, 'Post resolve validation');
         await context.policyExecutor.validatePolicy(policy, source, {}, context, info, result);
       }
 
@@ -39,12 +53,22 @@ export class PolicyDirective extends SchemaDirectiveVisitor {
       context: RequestContext,
       info: GraphQLResolveInfo
     ) => {
-      if (!policy.postResolve) {
+      const { namespace, name, postResolve } = policy;
+      const pLogger = logger.child({
+        name: 'policy-directive',
+        policy: { namespace, name },
+        type: info.parentType.name,
+        field: info.fieldName,
+      });
+      if (!postResolve) {
+        pLogger.trace('Pre resolve validation');
         await context.policyExecutor.validatePolicy(policy, source, args, context, info);
       }
 
       const result = await originalResolve.call(field, source, args, context, info);
-      if (policy.postResolve) {
+
+      if (postResolve) {
+        pLogger.trace({ result }, 'Post resolve validation');
         await context.policyExecutor.validatePolicy(policy, source, args, context, info, result);
       }
 

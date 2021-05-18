@@ -14,21 +14,21 @@ exports[`Policies directive Both policies rejected 1`] = `
 {
   "errors": [
     {
-      "message": "Unauthorized by policies: isAlpha (auth_policies), isBeta (auth_policies)",
+      "message": "Access to Query.pd_foo is unauthorized by policies: isAlpha (auth_policies), isBeta (auth_policies)",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "pd_foo"
       ]
     },
     {
-      "message": "Unauthorized by policies: isAlpha (auth_policies), isBeta (auth_policies)",
+      "message": "Access to Query.pd_bar is unauthorized by policies: isAlpha (auth_policies), isBeta (auth_policies)",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "pd_bar"
       ]
     },
     {
-      "message": "Unauthorized by policies: isAlpha (auth_policies), isBeta (auth_policies)",
+      "message": "Access to PDBaz.bazbaz is unauthorized by policies: isAlpha (auth_policies), isBeta (auth_policies)",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "pd_baz",
@@ -50,7 +50,7 @@ exports[`Policies directive First policy rejected 1`] = `
 {
   "errors": [
     {
-      "message": "Unauthorized by policies: isAlpha (auth_policies)",
+      "message": "Access to Query.pd_bar is unauthorized by policies: isAlpha (auth_policies)",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "pd_bar"
@@ -71,7 +71,7 @@ exports[`Policies directive Second policy rejected 1`] = `
 {
   "errors": [
     {
-      "message": "Unauthorized by policies: isBeta (auth_policies)",
+      "message": "Access to Query.pd_bar is unauthorized by policies: isBeta (auth_policies)",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "pd_bar"

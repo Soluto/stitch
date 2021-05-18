@@ -4,6 +4,7 @@ import { GraphQLFieldResolverParams } from 'apollo-server-types';
 import { RequestContext } from '../context';
 import { Policy } from '../directives/policy/types';
 import { getPolicyDefinition } from '../directives/policy/policy-executor';
+import PolicyExecutionFailedError from '../directives/policy/policy-execution-failed-error';
 
 export function createBasicPolicyPlugin(): ApolloServerPlugin {
   return {
@@ -26,6 +27,14 @@ export function createBasicPolicyPlugin(): ApolloServerPlugin {
               {}
             ) as Policy;
             const policyDefinition = getPolicyDefinition(policies, args.namespace, args.name);
+            if (!policyDefinition) {
+              throw new PolicyExecutionFailedError(
+                { namespace: args.namespace, name: args.name },
+                `The base policy definition was not found`,
+                info.parentType.name,
+                info.fieldName
+              );
+            }
             return policyDefinition.shouldOverrideBasePolicy ?? false;
           });
 

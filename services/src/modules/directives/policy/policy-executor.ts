@@ -36,12 +36,17 @@ export default class PolicyExecutor {
     info: GraphQLResolveInfo,
     result?: unknown
   ): Promise<boolean> {
-    const policyDefinition = getPolicyDefinition(
-      requestContext.resourceGroup.policies,
-      policy.namespace,
-      policy.name,
-      policyLogger
-    );
+    const policyDefinition = getPolicyDefinition(requestContext.resourceGroup.policies, policy.namespace, policy.name);
+    if (!policyDefinition) {
+      policyLogger.error('The policy was not found');
+      throw new PolicyExecutionFailedError(
+        { namespace: policy.namespace, name: policy.name },
+        `The policy was not found`,
+        info.parentType.name,
+        info.fieldName
+      );
+    }
+
     return this.getPolicyResult({
       policy,
       policyDefinition,
@@ -63,12 +68,16 @@ export default class PolicyExecutor {
     info: GraphQLResolveInfo,
     result?: unknown
   ): boolean {
-    const policyDefinition = getPolicyDefinition(
-      requestContext.resourceGroup.policies,
-      policy.namespace,
-      policy.name,
-      policyLogger
-    );
+    const policyDefinition = getPolicyDefinition(requestContext.resourceGroup.policies, policy.namespace, policy.name);
+    if (!policyDefinition) {
+      policyLogger.error('The policy was not found');
+      throw new PolicyExecutionFailedError(
+        { namespace: policy.namespace, name: policy.name },
+        `The policy was not found`,
+        info.parentType.name,
+        info.fieldName
+      );
+    }
     return this.getPolicyResultSync({
       policy,
       policyDefinition,
@@ -105,7 +114,7 @@ export default class PolicyExecutor {
     const allow = await this.evaluatePolicy(policy, policyLogger, source, gqlArgs, requestContext, info, result);
     policyLogger.trace(`Policy validated. The resolver execution is ${allow ? 'allowed' : 'denied'}`);
     if (!allow) {
-      throw new UnauthorizedByPolicyError(policy);
+      throw new UnauthorizedByPolicyError(policy, info.parentType.name, info.fieldName);
     }
   }
 
@@ -132,7 +141,7 @@ export default class PolicyExecutor {
     const allow = this.evaluatePolicySync(policy, policyLogger, source, gqlArgs, requestContext, info);
     policyLogger.trace(`Policy validated. The resolver execution is ${allow ? 'allowed' : 'denied'}`);
     if (!allow) {
-      throw new UnauthorizedByPolicyError(policy);
+      throw new UnauthorizedByPolicyError(policy, info.parentType.name, info.fieldName);
     }
   }
 
@@ -164,7 +173,9 @@ export default class PolicyExecutor {
     if (!evaluate)
       throw new PolicyExecutionFailedError(
         ctx.policyDefinition.metadata,
-        `Unsupported policy type ${ctx.policyDefinition.type}`
+        `Unsupported policy type ${ctx.policyDefinition.type}`,
+        ctx.info.parentType.name,
+        ctx.info.fieldName
       );
 
     const logData = {
@@ -181,7 +192,12 @@ export default class PolicyExecutor {
     });
     if (!done) {
       ctx.logger.error('in-line query evaluation not yet supported');
-      throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, 'in-line query evaluation not yet supported');
+      throw new PolicyExecutionFailedError(
+        ctx.policyDefinition.metadata,
+        'in-line query evaluation not yet supported',
+        ctx.info.parentType.name,
+        ctx.info.fieldName
+      );
     }
 
     ctx.logger.trace(logData, 'OPA policy executed');
@@ -204,7 +220,12 @@ export default class PolicyExecutor {
         if (policyArgValue === undefined) {
           if (!optional) {
             ctx.logger.error({ policyArgName }, `Missing argument "${policyArgName}"`);
-            throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, `Missing argument "${policyArgName}"`);
+            throw new PolicyExecutionFailedError(
+              ctx.policyDefinition.metadata,
+              `Missing argument "${policyArgName}"`,
+              ctx.info.parentType.name,
+              ctx.info.fieldName
+            );
           }
 
           policyArgValue = null;
@@ -217,7 +238,10 @@ export default class PolicyExecutor {
 
         policyArgs[policyArgName] = policyArgValue;
         ctx.logger.trace(
-          { [policyArgName]: policyArgValue },
+          {
+            policyArgExp: ctx.policy.args?.[policyArgName] ?? defaultArg,
+            policyArgValue: policyArgValue,
+          },
           `Policy argument "${policyArgName}" evaluated to "${policyArgValue}"`
         );
 
@@ -225,7 +249,12 @@ export default class PolicyExecutor {
         if (typeAST.kind === 'NonNullType' && (typeof policyArgValue === 'undefined' || policyArgValue === null)) {
           const errorMessage = `Non-nullable argument "${policyArgName}" got value "${policyArgValue}"`;
           ctx.logger.error({ policyArgName }, errorMessage);
-          throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, errorMessage);
+          throw new PolicyExecutionFailedError(
+            ctx.policyDefinition.metadata,
+            errorMessage,
+            ctx.info.parentType.name,
+            ctx.info.fieldName
+          );
         }
 
         return policyArgs;
@@ -237,19 +266,8 @@ export default class PolicyExecutor {
   }
 }
 
-export function getPolicyDefinition(
-  policyDefinitions: PolicyDefinition[],
-  namespace: string,
-  name: string,
-  policyLogger: Logger = logger
-) {
-  const policyDefinition = policyDefinitions.find(({ metadata }) => {
+export function getPolicyDefinition(policyDefinitions: PolicyDefinition[], namespace: string, name: string) {
+  return policyDefinitions.find(({ metadata }) => {
     return metadata.namespace === namespace && metadata.name === name;
   });
-
-  if (!policyDefinition) {
-    policyLogger.error('The policy was not found');
-    throw new PolicyExecutionFailedError({ namespace, name }, `The policy was not found`);
-  }
-  return policyDefinition;
 }
