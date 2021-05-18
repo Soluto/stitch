@@ -80,6 +80,8 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
         for (const elem of value) {
           requestParams.url.searchParams.append(kv.key, elem);
         }
+      } else if (typeof value === 'object' && Object.prototype.toString.call(value) !== '[object Date]') {
+        requestParams.url.searchParams.append(kv.key, JSON.stringify(value));
       } else {
         requestParams.url.searchParams.append(kv.key, String(value));
       }

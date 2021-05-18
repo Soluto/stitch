@@ -57,6 +57,30 @@ const testCases: [string, TestCase][] = [
     },
   ],
   [
+    'GET with key value query params',
+    {
+      mock: () =>
+        nock(upstreamHost)
+          .get('/hello')
+          .query({ name: 'miriam' })
+          .reply(200, url => `${new URL(url, upstreamHost).searchParams.get('name')}!`),
+      schema: gql`
+        type Query {
+          hello(name: String!): String! @rest(url: "${upstreamHost}/hello" query: [
+            { key: "name", value: "{args.name}"},
+            { key: "nameObject", value: "{{name: args.name}}"},
+          ])
+        }
+      `,
+      query: gql`
+        query Hello($name: String!) {
+          hello(name: $name)
+        }
+      `,
+      variables: { name: 'miriam' },
+    },
+  ],
+  [
     'POST with predefined body',
     {
       mock: () =>
