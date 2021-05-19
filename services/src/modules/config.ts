@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as envVar from 'env-var';
-import { LoggerOptions } from 'pino';
+import { LoggerOptions, LevelWithSilent } from 'pino';
 import { PlaygroundConfig } from 'apollo-server-core';
 import { AuthenticationConfig } from './authentication/types';
 import { CorsConfiguration } from './cors';
@@ -10,9 +10,15 @@ const envVarExt = envVar.from(process.env, {
 });
 
 // General
-export const httpPort = envVarExt.get('PORT').default('8080').asIntPositive();
-export const logLevel = envVarExt.get('LOG_LEVEL').default('WARN').asString();
 export const nodeEnv = envVarExt.get('NODE_ENV').default('development').asString();
+
+export const httpPort = envVarExt.get('PORT').default('8080').asIntPositive();
+
+// Logging
+export type ChildLoggersLevels = Record<string, LevelWithSilent>;
+export const logLevel = envVarExt.get('LOG_LEVEL').default('WARN').asString();
+export const childLoggerLevels = envVarExt.get('CHILD_LOGGERS_LEVELS').default({}).asJsonObject() as ChildLoggersLevels;
+export const loggerConfiguration = envVar.get('LOGGER_CONFIGURATION').default({}).asJsonObject() as LoggerOptions;
 
 // Repositories
 export const useS3ResourceRepository = envVarExt.get('USE_S3_RESOURCE_REPOSITORY').default('false').asBoolStrict();
@@ -61,7 +67,5 @@ export const knownApolloDirectives = envVarExt
   .get('KNOWN_APOLLO_DIRECTIVES')
   .default(defaultKnownApolloDirectives)
   .asSet();
-
-export const loggerConfiguration = envVar.get('LOGGER_CONFIGURATION').default({}).asJsonObject() as LoggerOptions;
 
 export const corsConfiguration = envVar.get('CORS_CONFIGURATION').default({}).asJsonObject() as CorsConfiguration;
