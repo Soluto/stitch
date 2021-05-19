@@ -2,7 +2,7 @@ import { SchemaDirectiveVisitor } from 'graphql-tools';
 import { GraphQLField, GraphQLResolveInfo } from 'graphql';
 import { gql } from 'apollo-server-core';
 import { RequestContext } from '../../context';
-import logger from '../../logger';
+import logger, { createChildLogger } from '../../logger';
 import { PolicyResult, Policy } from './types';
 
 export class PolicyQueryDirective extends SchemaDirectiveVisitor {
@@ -20,7 +20,6 @@ export class PolicyQueryDirective extends SchemaDirectiveVisitor {
       };
 
       const logData = {
-        name: 'policy-query-directive',
         policy: {
           namespace: policy.namespace,
           name: policy.name,
@@ -28,7 +27,7 @@ export class PolicyQueryDirective extends SchemaDirectiveVisitor {
         type: info.parentType.name,
         field: info.fieldName,
       };
-      const policyLogger = logger.child(logData);
+      const policyLogger = createChildLogger(logger, 'policy-query-directive', logData);
       policyLogger.trace('Evaluating policy...');
       const allow = await context.policyExecutor.evaluatePolicy(policy, policyLogger, source, args, context, info);
       policyLogger.trace({ allow }, 'The policy has been evaluated');

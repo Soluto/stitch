@@ -5,7 +5,7 @@ import * as childProcess from 'child_process';
 import { ApolloError } from 'apollo-server-fastify';
 import { GraphQLError } from 'graphql';
 import { ResourceMetadata } from './resource-repository/types';
-import logger from './logger';
+import logger, { createChildLogger } from './logger';
 import * as config from './config';
 const exec = promisify(childProcess.exec);
 
@@ -28,7 +28,7 @@ export async function prepareCompiledRegoFile(resourceMetadata: ResourceMetadata
   await fs.writeFile(uncompiledPath, regoCode);
 
   const compileCommand = getOpaBuildWasmCommand(uncompiledPath, compiledPath);
-  const regoLogger = logger.child({ policy: resourceMetadata });
+  const regoLogger = createChildLogger(logger, 'opa-rego-compilation', { policy: resourceMetadata });
   try {
     await exec(compileCommand);
     regoLogger.debug('Rego compilation succeeded');

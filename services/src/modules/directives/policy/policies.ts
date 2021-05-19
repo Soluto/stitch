@@ -15,7 +15,7 @@ import { SchemaDirectiveVisitor } from 'graphql-tools';
 import { gql } from 'apollo-server-core';
 import { GraphQLJSONObject } from 'graphql-type-json';
 import { RequestContext } from '../../context';
-import logger from '../../logger';
+import logger, { createChildLogger } from '../../logger';
 import { GraphQLArguments, Policy } from './types';
 import { UnauthorizedByPolicyError } from '.';
 
@@ -30,8 +30,7 @@ const validatePolicies = async (
 ) => {
   if (context.ignorePolicies) return;
 
-  const policiesLogger = logger.child({
-    name: 'policies',
+  const policiesLogger = createChildLogger(logger, 'policies-directive', {
     type: info.parentType.name,
     field: info.fieldName,
     policies: policies.map(({ namespace, name }) => ({ namespace, name })),

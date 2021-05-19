@@ -1,6 +1,6 @@
 import { GraphQLResolveInfo, parseType } from 'graphql';
 import { Logger } from 'pino';
-import logger from '../../logger';
+import logger, { createChildLogger } from '../../logger';
 import { RequestContext } from '../../context';
 import { PolicyDefinition, PolicyArgsObject } from '../../resource-repository';
 import { inject } from '../../arguments-injection';
@@ -92,7 +92,6 @@ export default class PolicyExecutor {
     if (requestContext.ignorePolicies) return;
 
     const logData = {
-      name: 'policy-executor',
       policy: {
         namespace: policy.namespace,
         name: policy.name,
@@ -100,7 +99,7 @@ export default class PolicyExecutor {
       type: info.parentType.name,
       field: info.fieldName,
     };
-    const policyLogger = logger.child(logData);
+    const policyLogger = createChildLogger(logger, 'policy-executor', logData);
     policyLogger.trace('Validating policy...');
     const allow = await this.evaluatePolicy(policy, policyLogger, source, gqlArgs, requestContext, info, result);
     policyLogger.trace(`Policy validated. The resolver execution is ${allow ? 'allowed' : 'denied'}`);
@@ -119,7 +118,6 @@ export default class PolicyExecutor {
     if (requestContext.ignorePolicies) return;
 
     const logData = {
-      name: 'policy-executor',
       policy: {
         namespace: policy.namespace,
         name: policy.name,
@@ -127,7 +125,7 @@ export default class PolicyExecutor {
       type: info.parentType.name,
       field: info.fieldName,
     };
-    const policyLogger = logger.child(logData);
+    const policyLogger = createChildLogger(logger, 'policy-executor', logData);
     policyLogger.trace('Validating policy...');
     const allow = this.evaluatePolicySync(policy, policyLogger, source, gqlArgs, requestContext, info);
     policyLogger.trace(`Policy validated. The resolver execution is ${allow ? 'allowed' : 'denied'}`);

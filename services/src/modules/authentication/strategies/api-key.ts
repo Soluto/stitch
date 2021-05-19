@@ -1,5 +1,5 @@
 import * as fastify from 'fastify';
-import logger from '../../logger';
+import logger, { createChildLogger } from '../../logger';
 import { authenticationConfig } from '../../config';
 
 export interface ApiKeyAuthPartialRequest {
@@ -19,7 +19,9 @@ export default async function (request: ApiKeyAuthPartialRequest) {
     (config.queryParam && request.query[config.queryParam])) as string;
   if (!apiKey) throw new Error('Unauthorized');
 
-  const reqLogger = logger.child({ apiKey: apiKey.replace(/(.{2}).+(.{2})/, '$1***$2') });
+  const reqLogger = createChildLogger(logger, 'auth-strategy-api-key', {
+    apiKey: apiKey.replace(/(.{2}).+(.{2})/, '$1***$2'),
+  });
   reqLogger.trace('Api key found in request');
 
   const apiKeyConfig = apiKeys[apiKey];
