@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Child loggers levels No logs for valid key 1`] = `
+"**** START OUTPUT CAPTURE *****\\"
+\\"***** END OUTPUT CAPTURE *****"
+`;
+
+exports[`Child loggers levels No trace logs for invalid key 1`] = `
+"**** START OUTPUT CAPTURE *****\\"
+[hh:mm:ss.ms] DEBUG (auth-strategy-api-key): Unexpected api key
+    apiKey: \\"in***ey\\"
+\\"***** END OUTPUT CAPTURE *****"
+`;
