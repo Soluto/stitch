@@ -10,11 +10,11 @@ exports[`Authentication - Verify JWT Authority without discovery endpoint: gatew
 "**** START OUTPUT CAPTURE *****\\"
 [hh:mm:ss.ms] DEBUG: JWK found
     authority: \\"http://authority-without-discrovery-endpoint\\"
-[hh:mm:ss.ms] TRACE: JWT verified
+[hh:mm:ss.ms] TRACE (auth-strategy-jwt): JWT verified
     issuer: \\"http://localhost:8070\\"
-[hh:mm:ss.ms] DEBUG: Started to handle request
+[hh:mm:ss.ms] DEBUG (request): Started to handle request
     query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
-[hh:mm:ss.ms] TRACE: request query variables
+[hh:mm:ss.ms] TRACE (request): request query variables
     variables: {
       \\"foo\\": \\"FOO\\"
     }
@@ -23,10 +23,10 @@ exports[`Authentication - Verify JWT Authority without discovery endpoint: gatew
     operationName: null
 [hh:mm:ss.ms] TRACE: Executing request...
 [hh:mm:ss.ms] TRACE: Executed.
-[hh:mm:ss.ms] DEBUG: Finished to handle request
+[hh:mm:ss.ms] DEBUG (request): Finished to handle request
     durationMs: XXX
     query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
-[hh:mm:ss.ms] TRACE: response data
+[hh:mm:ss.ms] TRACE (request): response data
     data: {
       \\"jwt_foo\\": \\"FOO\\"
     }
@@ -67,7 +67,7 @@ exports[`Authentication - Verify JWT Invalid JWT: gateway logs 1`] = `
           SigningKeyNotFoundError: Unable to find a signing key that matches 'C1B59DF60057CFB292C4E36CCE329615'
       \\"name\\": \\"SigningKeyNotFoundError\\"
     }
-[hh:mm:ss.ms] DEBUG: Failed to verify request JWT
+[hh:mm:ss.ms] DEBUG (auth-strategy-jwt): Failed to verify request JWT
     issuer: \\"http://localhost:8070\\"
     err: {
       \\"type\\": \\"SigningKeyNotFoundError\\",
@@ -107,7 +107,7 @@ exports[`Authentication - Verify JWT JWK uri is not resolved: gateway logs 1`] =
       \\"stack\\":
           Error: Failed to retrieve jwksUri for http://discovery-endpoint-does-not-exist from undefined
     }
-[hh:mm:ss.ms] DEBUG: Failed to verify request JWT
+[hh:mm:ss.ms] DEBUG (auth-strategy-jwt): Failed to verify request JWT
     issuer: \\"http://localhost:8071\\"
     err: {
       \\"type\\": \\"Error\\",
@@ -128,11 +128,11 @@ exports[`Authentication - Verify JWT Multiple audiences: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
 [hh:mm:ss.ms] DEBUG: JWK found
     authority: \\"http://authority-without-discrovery-endpoint\\"
-[hh:mm:ss.ms] TRACE: JWT verified
+[hh:mm:ss.ms] TRACE (auth-strategy-jwt): JWT verified
     issuer: \\"http://localhost:8070\\"
-[hh:mm:ss.ms] DEBUG: Started to handle request
+[hh:mm:ss.ms] DEBUG (request): Started to handle request
     query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
-[hh:mm:ss.ms] TRACE: request query variables
+[hh:mm:ss.ms] TRACE (request): request query variables
     variables: {
       \\"foo\\": \\"FOO\\"
     }
@@ -141,10 +141,10 @@ exports[`Authentication - Verify JWT Multiple audiences: gateway logs 1`] = `
     operationName: null
 [hh:mm:ss.ms] TRACE: Executing request...
 [hh:mm:ss.ms] TRACE: Executed.
-[hh:mm:ss.ms] DEBUG: Finished to handle request
+[hh:mm:ss.ms] DEBUG (request): Finished to handle request
     durationMs: XXX
     query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
-[hh:mm:ss.ms] TRACE: response data
+[hh:mm:ss.ms] TRACE (request): response data
     data: {
       \\"jwt_foo\\": \\"FOO\\"
     }
@@ -162,11 +162,11 @@ exports[`Authentication - Verify JWT Second call with valid JWT - JWKs caching: 
 "**** START OUTPUT CAPTURE *****\\"
 [hh:mm:ss.ms] DEBUG: JWK found
     authority: \\"http://oidc-server-mock:8060\\"
-[hh:mm:ss.ms] TRACE: JWT verified
+[hh:mm:ss.ms] TRACE (auth-strategy-jwt): JWT verified
     issuer: \\"http://localhost:8060\\"
-[hh:mm:ss.ms] DEBUG: Started to handle request
+[hh:mm:ss.ms] DEBUG (request): Started to handle request
     query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
-[hh:mm:ss.ms] TRACE: request query variables
+[hh:mm:ss.ms] TRACE (request): request query variables
     variables: {
       \\"foo\\": \\"FOO\\"
     }
@@ -175,10 +175,10 @@ exports[`Authentication - Verify JWT Second call with valid JWT - JWKs caching: 
     operationName: null
 [hh:mm:ss.ms] TRACE: Executing request...
 [hh:mm:ss.ms] TRACE: Executed.
-[hh:mm:ss.ms] DEBUG: Finished to handle request
+[hh:mm:ss.ms] DEBUG (request): Finished to handle request
     durationMs: XXX
     query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
-[hh:mm:ss.ms] TRACE: response data
+[hh:mm:ss.ms] TRACE (request): response data
     data: {
       \\"jwt_foo\\": \\"FOO\\"
     }
@@ -197,7 +197,7 @@ Object {
 
 exports[`Authentication - Verify JWT Unexpected audience: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
-[hh:mm:ss.ms] DEBUG: Unexpected audience
+[hh:mm:ss.ms] DEBUG (auth-strategy-jwt): Unexpected audience
     audience: \\"Stitch Other\\"
     issuer: \\"http://localhost:8070\\"
 \\"***** END OUTPUT CAPTURE *****"
@@ -214,7 +214,7 @@ Object {
 
 exports[`Authentication - Verify JWT Unknown issuer: gateway logs 1`] = `
 "**** START OUTPUT CAPTURE *****\\"
-[hh:mm:ss.ms] DEBUG: Unknown issuer
+[hh:mm:ss.ms] DEBUG (auth-strategy-jwt): Unknown issuer
     issuer: \\"http://microsoft.com\\"
 \\"***** END OUTPUT CAPTURE *****"
 `;
@@ -232,11 +232,11 @@ exports[`Authentication - Verify JWT Valid JWT: gateway logs 1`] = `
     jwksUri: \\"http://oidc-server-mock:8060/.well-known/openid-configuration/jwks\\"
 [hh:mm:ss.ms] DEBUG: JWK found
     authority: \\"http://oidc-server-mock:8060\\"
-[hh:mm:ss.ms] TRACE: JWT verified
+[hh:mm:ss.ms] TRACE (auth-strategy-jwt): JWT verified
     issuer: \\"http://localhost:8060\\"
-[hh:mm:ss.ms] DEBUG: Started to handle request
+[hh:mm:ss.ms] DEBUG (request): Started to handle request
     query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
-[hh:mm:ss.ms] TRACE: request query variables
+[hh:mm:ss.ms] TRACE (request): request query variables
     variables: {
       \\"foo\\": \\"FOO\\"
     }
@@ -245,10 +245,10 @@ exports[`Authentication - Verify JWT Valid JWT: gateway logs 1`] = `
     operationName: null
 [hh:mm:ss.ms] TRACE: Executing request...
 [hh:mm:ss.ms] TRACE: Executed.
-[hh:mm:ss.ms] DEBUG: Finished to handle request
+[hh:mm:ss.ms] DEBUG (request): Finished to handle request
     durationMs: XXX
     query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
-[hh:mm:ss.ms] TRACE: response data
+[hh:mm:ss.ms] TRACE (request): response data
     data: {
       \\"jwt_foo\\": \\"FOO\\"
     }
