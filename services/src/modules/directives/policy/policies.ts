@@ -30,12 +30,6 @@ const validatePolicies = async (
 ) => {
   if (context.ignorePolicies) return;
 
-  const policiesLogger = createChildLogger(logger, 'policies-directive', {
-    type: info.parentType.name,
-    field: info.fieldName,
-    policies: policies.map(({ namespace, name }) => ({ namespace, name })),
-  });
-  policiesLogger.trace('Validating policies...');
   const results = await Promise.allSettled(
     policies.map((p: Policy) => context.policyExecutor.validatePolicy(p, source, args, context, info, result))
   );
@@ -43,19 +37,18 @@ const validatePolicies = async (
   const allApproved = results.every(r => r.status === 'fulfilled');
   const someApproved = results.some(r => r.status === 'fulfilled');
 
-  if ((relation === 'AND' && allApproved) || (relation === 'OR' && someApproved)) {
-    policiesLogger.trace('Authorized');
-    return;
-  }
+  if ((relation === 'AND' && allApproved) || (relation === 'OR' && someApproved)) return;
 
   const rejectedPolicies = results.filter(r => r.status === 'rejected').map(r => (r as PromiseRejectedResult).reason);
   const failedPolicies = rejectedPolicies.filter(pe => pe.name !== 'UnauthorizedByPolicyError');
   if (failedPolicies.length > 0) {
-    policiesLogger.trace({ failedPolicies }, 'Policies validation failed');
     throw new GraphQLError(failedPolicies.join(', '));
   }
-  policiesLogger.trace({ rejectedPolicies }, 'Unauthorized');
-  throw new UnauthorizedByPolicyError(rejectedPolicies as UnauthorizedByPolicyError[]);
+  throw new UnauthorizedByPolicyError(
+    rejectedPolicies as UnauthorizedByPolicyError[],
+    info.parentType.name,
+    info.fieldName
+  );
 };
 
 export class PoliciesDirective extends SchemaDirectiveVisitor {
@@ -70,13 +63,20 @@ export class PoliciesDirective extends SchemaDirectiveVisitor {
       context: RequestContext,
       info: GraphQLResolveInfo
     ) => {
+      const pLogger = createChildLogger(logger, 'policies-directive', {
+        policies,
+        type: info.parentType.name,
+        field: info.fieldName,
+      });
       if (!postResolve) {
+        pLogger.trace('Pre resolve validation');
         await validatePolicies(policies, relation, source, {}, context, info);
       }
 
       const result = originalResolveObject ? await originalResolveObject(source, fields, context, info) : source;
 
       if (postResolve) {
+        pLogger.trace({ result }, 'Post resolve validation');
         await validatePolicies(policies, relation, source, {}, context, info, result);
       }
 
@@ -94,13 +94,20 @@ export class PoliciesDirective extends SchemaDirectiveVisitor {
       context: RequestContext,
       info: GraphQLResolveInfo
     ) => {
+      const pLogger = createChildLogger(logger, 'policies-directive', {
+        policies,
+        type: info.parentType.name,
+        field: info.fieldName,
+      });
       if (!postResolve) {
+        pLogger.trace('Pre resolve validation');
         await validatePolicies(policies, relation, source, args, context, info);
       }
 
       const result = await originalResolve.call(field, source, args, context, info);
 
       if (postResolve) {
+        pLogger.trace({ result }, 'Post resolve validation');
         await validatePolicies(policies, relation, source, args, context, info, result);
       }
 

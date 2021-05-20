@@ -32,7 +32,7 @@ exports[`authorization rejects access to a field based on JWT info 1`] = `
 {
   "errors": [
     {
-      "message": "Unauthorized by policy \\"jwtName\\" in namespace \\"auth_jwt\\"",
+      "message": "Access to ArbitraryData.arbitraryField is unauthorized by policy \\"jwtName\\" in namespace \\"auth_jwt\\"",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "arbitraryData",
@@ -52,7 +52,7 @@ exports[`authorization rejects access to a field based on JWT info when no JWT i
 {
   "errors": [
     {
-      "message": "Unauthorized by policy \\"jwtName\\" in namespace \\"auth_jwt\\"",
+      "message": "Access to ArbitraryData.arbitraryField is unauthorized by policy \\"jwtName\\" in namespace \\"auth_jwt\\"",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "arbitraryData",
@@ -72,7 +72,7 @@ exports[`authorization rejects access to a field when policy test fails, but sti
 {
   "errors": [
     {
-      "message": "Unauthorized by policy \\"onlyAdmin\\" in namespace \\"auth_jwt\\"",
+      "message": "Access to User.lastName is unauthorized by policy \\"onlyAdmin\\" in namespace \\"auth_jwt\\"",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "user",

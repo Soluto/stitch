@@ -28,7 +28,7 @@ export async function prepareCompiledRegoFile(resourceMetadata: ResourceMetadata
   await fs.writeFile(uncompiledPath, regoCode);
 
   const compileCommand = getOpaBuildWasmCommand(uncompiledPath, compiledPath);
-  const regoLogger = createChildLogger(logger, 'opa-rego-compilation', { policy: resourceMetadata });
+  const regoLogger = createChildLogger(logger, 'opa-rego-compiler', { policy: resourceMetadata });
   try {
     await exec(compileCommand);
     regoLogger.debug('Rego compilation succeeded');

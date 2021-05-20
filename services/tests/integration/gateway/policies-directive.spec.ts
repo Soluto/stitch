@@ -24,9 +24,9 @@ when(mockValidatePolicy)
   .calledWith({ namespace: 'ns', name: 'allowWithArgs', args: { a: 'b' } })
   .mockResolvedValue(undefined)
   .calledWith(unauthorizedPolicy)
-  .mockRejectedValue(new UnauthorizedByPolicyError(unauthorizedPolicy))
+  .mockRejectedValue(new UnauthorizedByPolicyError(unauthorizedPolicy, 'Foo', 'bar'))
   .calledWith(failedPolicy)
-  .mockRejectedValue(new PolicyExecutionFailedError(failedPolicy, 'Not good'));
+  .mockRejectedValue(new PolicyExecutionFailedError(failedPolicy, 'Not good', 'Foo', 'bar'));
 jest.mock('../../../src/modules/directives/policy/policy-executor', () => ({
   default: jest.fn().mockImplementation(() => ({ validatePolicy: mockValidatePolicy })),
 }));
