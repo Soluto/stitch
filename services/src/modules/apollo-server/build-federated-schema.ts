@@ -24,7 +24,7 @@ import { composeAndValidate } from '@apollo/federation';
 import { ApolloError } from 'apollo-server-core';
 import createTypeResolvers from '../implicit-type-resolver';
 import { knownApolloDirectives } from '../config';
-import logger from '../logger';
+import logger, { createChildLogger } from '../logger';
 interface DirectiveVisitors {
   [directiveName: string]: typeof SchemaDirectiveVisitor;
 }
@@ -49,6 +49,7 @@ export function buildSchemaFromFederatedTypeDefs({
   schemaDirectives,
   schemaDirectivesContext,
 }: FederatedSchemaBase) {
+  const fLogger = createChildLogger(logger, 'federated-schema-builder');
   // Federation throws away non federation/builtin directives, so we need to do some shenanigans here
 
   // Remove non-federation directives from SDL, save them aside
@@ -76,7 +77,7 @@ export function buildSchemaFromFederatedTypeDefs({
   const compositionResult = composeAndValidate(serviceDefinitions);
   const compositionErrors = compositionResult.errors ?? [];
   if (compositionErrors.length > 0) {
-    logger.error({ compositionErrors }, 'Schema federation validation failed');
+    fLogger.error({ compositionErrors }, 'Schema federation validation failed');
     throw new ApolloError('Schema federation validation failed', 'FEDERATION_VALIDATION_FAILURE', {
       errors: compositionErrors.map(err => (err instanceof GraphQLError ? err : new GraphQLError(err!.message))),
     });

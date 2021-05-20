@@ -3,12 +3,14 @@ import { join } from 'path';
 import { PluginDefinition } from 'apollo-server-core';
 import { BaseSchema } from '../base-schema';
 import { pluginsDir, pluginsConfig } from '../config';
-import logger from '../logger';
+import logger, { createChildLogger } from '../logger';
 import { ResourceGroup } from '../resource-repository';
 import { StitchPlugin } from './types';
 
 export const plugins: StitchPlugin[] = [];
 export let argumentInjectionGlobals: Record<string, unknown> = {};
+
+const pLogger = createChildLogger(logger, 'plugins');
 
 export async function loadPlugins() {
   if (!pluginsDir) return;
@@ -29,9 +31,9 @@ export async function loadPlugins() {
         const version = await getPluginVersion(pluginPath);
 
         plugins.push({ name, version, ...plugin });
-        logger.info({ name }, `Plugin ${name}@${version} has been loaded successfully.`);
+        pLogger.info({ name }, `Plugin ${name}@${version} has been loaded successfully.`);
       } catch (err) {
-        logger.error({ err, name }, 'Failed to load plugin');
+        pLogger.error({ err, name }, 'Failed to load plugin');
         throw err;
       }
     })
@@ -40,25 +42,25 @@ export async function loadPlugins() {
   try {
     argumentInjectionGlobals = await buildArgumentInjectionGlobals();
   } catch (err) {
-    logger.error({ err }, 'Failed to build argument injection globals');
+    pLogger.error({ err }, 'Failed to build argument injection globals');
     throw err;
   }
 }
 
 export async function buildArgumentInjectionGlobals(): Promise<Record<string, unknown>> {
-  logger.info('Building argument injection globals');
+  pLogger.info('Building argument injection globals');
   const globals = await plugins
     .filter(p => p.addArgumentInjectionGlobals)
     .reduce(async (resultPromise, curPlugin) => {
       try {
-        logger.debug(
+        pLogger.debug(
           { plugin: curPlugin.name, method: 'addArgumentInjectionGlobals' },
           `Applying addArgumentInjectionGlobals of ${curPlugin.name} plugin...`
         );
         const resultGlobals = await resultPromise;
         const curPluginGlobals = await curPlugin.addArgumentInjectionGlobals!();
 
-        logger.debug(
+        pLogger.debug(
           { plugin: curPlugin.name, method: 'addArgumentInjectionGlobals' },
           `addArgumentInjectionGlobals of ${curPlugin.name} plugin was applied successfully.`
         );
@@ -66,32 +68,32 @@ export async function buildArgumentInjectionGlobals(): Promise<Record<string, un
         return { ...resultGlobals, ...curPluginGlobals };
       } catch (err) {
         const message = `Plugin "${curPlugin.name}" failed to execute "addArgumentInjectionGlobals" with error: ${err}`;
-        logger.warn({ err, plugin: curPlugin.name, method: 'addArgumentInjectionGlobals' }, message);
+        pLogger.warn({ err, plugin: curPlugin.name, method: 'addArgumentInjectionGlobals' }, message);
         throw new Error(message);
       }
     }, Promise.resolve({}));
-  logger.debug({ globals: Object.keys(globals) }, 'Argument injection globals were built');
+  pLogger.debug({ globals: Object.keys(globals) }, 'Argument injection globals were built');
   return globals;
 }
 
 export async function transformResourceGroup(resourceGroup: ResourceGroup): Promise<ResourceGroup> {
-  logger.info('Applying plugins on resource group.');
+  pLogger.info('Applying plugins on resource group.');
   let rg: ResourceGroup = { ...resourceGroup, pluginsData: {} };
   const pluginsToApply = plugins.filter(p => p.transformResourceGroup);
   for (const curPlugin of pluginsToApply) {
     try {
-      logger.debug(
+      pLogger.debug(
         { plugin: curPlugin.name, method: 'transformResourceGroup' },
         `Applying transformResourceGroup of ${curPlugin.name} plugin...`
       );
       rg = await curPlugin.transformResourceGroup!(rg);
-      logger.debug(
+      pLogger.debug(
         { plugin: curPlugin.name, method: 'transformResourceGroup' },
         `transformResourceGroup of ${curPlugin.name} plugin was applied successfully.`
       );
     } catch (err) {
       const message = `Plugin "${curPlugin.name}" failed to execute "transformResourceGroup" with error: ${err}`;
-      logger.warn({ err, plugin: curPlugin.name, method: 'transformResourceGroup' }, message);
+      pLogger.warn({ err, plugin: curPlugin.name, method: 'transformResourceGroup' }, message);
       throw new Error(message);
     }
   }
@@ -99,23 +101,23 @@ export async function transformResourceGroup(resourceGroup: ResourceGroup): Prom
 }
 
 export async function transformBaseSchema(baseSchema: BaseSchema): Promise<BaseSchema> {
-  logger.info('Applying plugins on base schema.');
+  pLogger.info('Applying plugins on base schema.');
   let bs: BaseSchema = baseSchema;
   const pluginsToApply = plugins.filter(p => p.transformBaseSchema);
   for (const curPlugin of pluginsToApply) {
     try {
-      logger.debug(
+      pLogger.debug(
         { plugin: curPlugin.name, method: 'transformBaseSchema' },
         `Applying transformBaseSchema of ${curPlugin.name} plugin...`
       );
       bs = await curPlugin.transformBaseSchema!(bs);
-      logger.debug(
+      pLogger.debug(
         { plugin: curPlugin.name, method: 'transformBaseSchema' },
         `transformBaseSchema of ${curPlugin.name} plugin was applied successfully.`
       );
     } catch (err) {
       const message = `Plugin "${curPlugin.name}" failed to execute "transformBaseSchema" with error: ${err}`;
-      logger.warn({ err, plugin: curPlugin.name, method: 'transformBaseSchema' }, message);
+      pLogger.warn({ err, plugin: curPlugin.name, method: 'transformBaseSchema' }, message);
       throw new Error(message);
     }
   }
@@ -123,23 +125,23 @@ export async function transformBaseSchema(baseSchema: BaseSchema): Promise<BaseS
 }
 
 export function transformApolloServerPlugins(baseApolloServerPlugins: PluginDefinition[]): PluginDefinition[] {
-  logger.info('Applying plugins on apollo server plugin.');
+  pLogger.info('Applying plugins on apollo server plugin.');
   let apolloServerPlugins: PluginDefinition[] = baseApolloServerPlugins;
   const pluginsToApply = plugins.filter(p => p.transformApolloServerPlugins);
   for (const curPlugin of pluginsToApply) {
     try {
-      logger.debug(
+      pLogger.debug(
         { plugin: curPlugin.name, method: 'transformApolloServerPlugins' },
         `Applying transformApolloServerPlugins of ${curPlugin.name} plugin...`
       );
       apolloServerPlugins = curPlugin.transformApolloServerPlugins!(apolloServerPlugins);
-      logger.debug(
+      pLogger.debug(
         { plugin: curPlugin.name, method: 'transformApolloServerPlugins' },
         `transformApolloServerPlugins of ${curPlugin.name} plugin was applied successfully.`
       );
     } catch (err) {
       const message = `Plugin "${curPlugin.name}" failed to execute "transformApolloServerPlugins" with error: ${err}`;
-      logger.warn({ err, plugin: curPlugin.name, method: 'transformApolloServerPlugins' }, message);
+      pLogger.warn({ err, plugin: curPlugin.name, method: 'transformApolloServerPlugins' }, message);
       throw new Error(message);
     }
   }

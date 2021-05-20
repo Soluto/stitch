@@ -4,15 +4,17 @@ import * as fastifyMetrics from 'fastify-metrics';
 import * as jwtPlugin from 'fastify-jwt';
 import * as authPlugin from 'fastify-auth';
 import * as config from './modules/config';
-import logger from './modules/logger';
+import logger, { createChildLogger } from './modules/logger';
 import { handleSignals, handleUncaughtErrors } from './modules/shutdown-handler';
 import createStitchGateway from './modules/apollo-server';
 import { getSecret, anonymousPlugin, jwtDecoderPlugin, authStrategies } from './modules/authentication';
 import { loadPlugins } from './modules/plugins';
 import { initializeMetrics } from './modules/apollo-server-plugins/metrics';
 
+const sLogger = createChildLogger(logger, 'http-server');
+
 export async function createServer() {
-  logger.info('Stitch gateway booting up...');
+  sLogger.info('Stitch gateway booting up...');
 
   await loadPlugins();
 
@@ -52,16 +54,16 @@ export async function createServer() {
     replay.status(200).send('OK');
   });
 
-  logger.info('Stitch gateway is ready to start');
+  sLogger.info('Stitch gateway is ready to start');
   return app;
 }
 
 async function runServer(app: fastify.FastifyInstance) {
   const address = await app.listen(config.httpPort, '0.0.0.0');
   initializeMetrics(app.metrics.client);
-  logger.info({ address }, 'Stitch gateway started');
+  sLogger.info({ address }, 'Stitch gateway started');
 
-  handleSignals(() => app.close(() => logger.info('Stitch gateway stopped successfully')));
+  handleSignals(() => app.close(() => sLogger.info('Stitch gateway stopped successfully')));
   handleUncaughtErrors();
 }
 

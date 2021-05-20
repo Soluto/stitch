@@ -19,10 +19,12 @@ exports[`Authentication - Verify JWT Authority without discovery endpoint: gatew
       \\"foo\\": \\"FOO\\"
     }
     query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
-[hh:mm:ss.ms] TRACE: Enriching request context...
+[hh:mm:ss.ms] TRACE (request-executor): Enriching request context...
     operationName: null
-[hh:mm:ss.ms] TRACE: Executing request...
-[hh:mm:ss.ms] TRACE: Executed.
+[hh:mm:ss.ms] TRACE (request-executor): Executing request...
+    operationName: null
+[hh:mm:ss.ms] TRACE (request-executor): Executed.
+    operationName: null
 [hh:mm:ss.ms] DEBUG (request): Finished to handle request
     durationMs: XXX
     query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
@@ -137,10 +139,12 @@ exports[`Authentication - Verify JWT Multiple audiences: gateway logs 1`] = `
       \\"foo\\": \\"FOO\\"
     }
     query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
-[hh:mm:ss.ms] TRACE: Enriching request context...
+[hh:mm:ss.ms] TRACE (request-executor): Enriching request context...
     operationName: null
-[hh:mm:ss.ms] TRACE: Executing request...
-[hh:mm:ss.ms] TRACE: Executed.
+[hh:mm:ss.ms] TRACE (request-executor): Executing request...
+    operationName: null
+[hh:mm:ss.ms] TRACE (request-executor): Executed.
+    operationName: null
 [hh:mm:ss.ms] DEBUG (request): Finished to handle request
     durationMs: XXX
     query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
@@ -171,10 +175,12 @@ exports[`Authentication - Verify JWT Second call with valid JWT - JWKs caching: 
       \\"foo\\": \\"FOO\\"
     }
     query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
-[hh:mm:ss.ms] TRACE: Enriching request context...
+[hh:mm:ss.ms] TRACE (request-executor): Enriching request context...
     operationName: null
-[hh:mm:ss.ms] TRACE: Executing request...
-[hh:mm:ss.ms] TRACE: Executed.
+[hh:mm:ss.ms] TRACE (request-executor): Executing request...
+    operationName: null
+[hh:mm:ss.ms] TRACE (request-executor): Executed.
+    operationName: null
 [hh:mm:ss.ms] DEBUG (request): Finished to handle request
     durationMs: XXX
     query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
@@ -241,10 +247,12 @@ exports[`Authentication - Verify JWT Valid JWT: gateway logs 1`] = `
       \\"foo\\": \\"FOO\\"
     }
     query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
-[hh:mm:ss.ms] TRACE: Enriching request context...
+[hh:mm:ss.ms] TRACE (request-executor): Enriching request context...
     operationName: null
-[hh:mm:ss.ms] TRACE: Executing request...
-[hh:mm:ss.ms] TRACE: Executed.
+[hh:mm:ss.ms] TRACE (request-executor): Executing request...
+    operationName: null
+[hh:mm:ss.ms] TRACE (request-executor): Executed.
+    operationName: null
 [hh:mm:ss.ms] DEBUG (request): Finished to handle request
     durationMs: XXX
     query: \\"query ($foo: String!) {\\\\n  jwt_foo(foo: $foo)\\\\n}\\\\n\\"
