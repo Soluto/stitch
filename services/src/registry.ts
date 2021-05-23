@@ -6,12 +6,14 @@ import * as jwtPlugin from 'fastify-jwt';
 import * as authPlugin from 'fastify-auth';
 import * as config from './modules/config';
 import { RegistryRequestContext, resolvers, typeDefs } from './modules/registry-schema';
-import logger from './modules/logger';
+import logger, { createChildLogger } from './modules/logger';
 import * as opaHelper from './modules/opa-helper';
 import { handleSignals, handleUncaughtErrors } from './modules/shutdown-handler';
 import { loadPlugins } from './modules/plugins';
 import { ActiveDirectoryAuth } from './modules/upstreams';
 import { anonymousPlugin, authStrategies, getSecret, jwtDecoderPlugin } from './modules/authentication';
+
+const sLogger = createChildLogger(logger, 'http-server');
 
 export const app = new ApolloServer({
   typeDefs,
@@ -31,7 +33,7 @@ export const app = new ApolloServer({
 export async function createServer() {
   await opaHelper.initializeForRegistry();
 
-  logger.info('Stitch registry booting up...');
+  sLogger.info('Stitch registry booting up...');
   await loadPlugins();
 
   await app.start();
@@ -56,15 +58,15 @@ export async function createServer() {
     server.addHook('onClose', () => app.stop());
   });
 
-  logger.info('Stitch registry is ready to start');
+  sLogger.info('Stitch registry is ready to start');
   return server;
 }
 
 async function runServer(server: fastify.FastifyInstance) {
   const address = await server.listen(config.httpPort, '0.0.0.0');
-  logger.info({ address }, 'Stitch registry started');
+  sLogger.info({ address }, 'Stitch registry started');
 
-  handleSignals(() => server.close(() => logger.info('Stitch registry stopped successfully')));
+  handleSignals(() => server.close(() => sLogger.info('Stitch registry stopped successfully')));
   handleUncaughtErrors();
 }
 

@@ -2,9 +2,9 @@ import { ApolloError } from 'apollo-server-core';
 import { ResourceMetadata } from '../../resource-repository';
 
 export default class PolicyExecutionFailedError extends ApolloError {
-  constructor(policy: ResourceMetadata, reason: string) {
+  constructor(policy: ResourceMetadata, reason: string, type: string, field: string) {
     super(
-      `Policy "${policy.name}" in namespace "${policy.namespace}" execution failed: ${reason}`,
+      `Policy "${policy.name}" in namespace "${policy.namespace}" on ${type}.${field} execution failed: ${reason}`,
       'POLICY_EXECUTION_FAILED',
       { policy, reason }
     );

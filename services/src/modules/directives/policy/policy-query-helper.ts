@@ -2,6 +2,7 @@ import { gql } from 'apollo-server-core';
 import { DocumentNode, graphql } from 'graphql';
 import { injectArgs } from '../../arguments-injection';
 import { RequestContext } from '../../context';
+import { createChildLogger } from '../../logger';
 import { PolicyQueryVariables, PolicyArgsObject, PolicyDefinition, ResourceMetadata } from '../../resource-repository';
 import PolicyExecutionFailedError from './policy-execution-failed-error';
 import { PolicyDirectiveExecutionContext, QueryResults } from './types';
@@ -12,21 +13,33 @@ export async function getQueryResult(
 ): Promise<QueryResults> {
   const query = ctx.policyDefinition.query;
   if (!query) return;
-  ctx.logger.trace('Preparing policy query variables...');
+
+  const pqLogger = createChildLogger(ctx.logger, 'policy-query-executor');
+  pqLogger.trace('Preparing policy query variables...');
   const variables = prepareVariables(args, query.variables);
   const requestContext: RequestContext = { ...ctx.requestContext, ignorePolicies: true };
   const gql = query.gql;
-  ctx.logger.trace({ variables }, 'Executing policy query...');
+  pqLogger.trace({ variables }, 'Executing policy query...');
 
   const { data, errors } = await graphql(ctx.info.schema, gql, undefined, requestContext, variables).catch(error => {
-    ctx.logger.error({ error }, 'Policy query execution failed');
-    throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, error);
+    pqLogger.error({ error }, 'Policy query execution failed');
+    throw new PolicyExecutionFailedError(
+      ctx.policyDefinition.metadata,
+      error,
+      ctx.info.parentType.name,
+      ctx.info.fieldName
+    );
   });
   if (errors) {
-    ctx.logger.error({ errors }, 'Policy query execution failed');
-    throw new PolicyExecutionFailedError(ctx.policyDefinition.metadata, 'Policy query execution failed');
+    pqLogger.error({ errors }, 'Policy query execution failed');
+    throw new PolicyExecutionFailedError(
+      ctx.policyDefinition.metadata,
+      'Policy query execution failed',
+      ctx.info.parentType.name,
+      ctx.info.fieldName
+    );
   }
-  ctx.logger.trace({ data }, 'Policy query executed');
+  pqLogger.trace({ data }, 'Policy query executed');
   return data;
 }
 

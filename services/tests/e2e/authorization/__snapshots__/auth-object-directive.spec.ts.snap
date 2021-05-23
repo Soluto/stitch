@@ -4,7 +4,7 @@ exports[`Authorization - Policy directive on Object Error for query field with d
 {
   "errors": [
     {
-      "message": "Unauthorized by policy \\"alwaysDeny\\" in namespace \\"auth_object_directive\\"",
+      "message": "Access to Foo.baz is unauthorized by policy \\"alwaysDeny\\" in namespace \\"auth_object_directive\\"",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "aod_foo",
@@ -20,7 +20,7 @@ exports[`Authorization - Policy directive on Object Error for query field withou
 {
   "errors": [
     {
-      "message": "Unauthorized by policy \\"alwaysDeny\\" in namespace \\"auth_object_directive\\"",
+      "message": "Access to Foo2.bar2 is unauthorized by policy \\"alwaysDeny\\" in namespace \\"auth_object_directive\\"",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "aod_foo2",

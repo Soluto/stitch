@@ -78,7 +78,7 @@ describe('Logger config', () => {
       payload,
     });
 
-    const captureResult = await endCaptureOutput();
+    const captureResult = endCaptureOutput();
     expect(captureResult).toContain('"extensions": "[Redacted]"');
 
     expect(response.statusCode).toEqual(200);

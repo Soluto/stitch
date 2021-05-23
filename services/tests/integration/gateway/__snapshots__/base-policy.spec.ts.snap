@@ -21,7 +21,7 @@ exports[`Base Policy Tests Allow on base policy, deny on field definition 1`] = 
   "errors": [
     {
       "name": "GraphQLError",
-      "message": "Unauthorized by policy \\"field_policy\\" in namespace \\"ns\\"",
+      "message": "Access to Query.foo is unauthorized by policy \\"field_policy\\" in namespace \\"ns\\"",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "foo"
@@ -40,7 +40,7 @@ exports[`Base Policy Tests Deny on base policy, allow on field definition 1`] = 
   "errors": [
     {
       "name": "GraphQLError",
-      "message": "Unauthorized by policy \\"base_policy\\" in namespace \\"internal\\"",
+      "message": "Access to Query.foo is unauthorized by policy \\"base_policy\\" in namespace \\"internal\\"",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "foo"
@@ -48,7 +48,7 @@ exports[`Base Policy Tests Deny on base policy, allow on field definition 1`] = 
     },
     {
       "name": "GraphQLError",
-      "message": "Unauthorized by policy \\"base_policy\\" in namespace \\"internal\\"",
+      "message": "Access to Query.bar is unauthorized by policy \\"base_policy\\" in namespace \\"internal\\"",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "bar"
@@ -67,7 +67,7 @@ exports[`Base Policy Tests Deny on base policy, allow on field definition with o
   "errors": [
     {
       "name": "GraphQLError",
-      "message": "Unauthorized by policy \\"base_policy\\" in namespace \\"internal\\"",
+      "message": "Access to Query.bar is unauthorized by policy \\"base_policy\\" in namespace \\"internal\\"",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "bar"

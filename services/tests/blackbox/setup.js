@@ -27,6 +27,8 @@ process.env.AUTHENTICATION_CONFIGURATION = JSON.stringify({
   },
 });
 
+process.env.CHILD_LOGGERS_LEVELS = JSON.stringify({ request: 'warn' });
+
 process.env.LOGGER_CONFIGURATION = JSON.stringify({ redact: ['errors[*].extensions'] });
 
 const resourceDir = './tests/blackbox/resources';

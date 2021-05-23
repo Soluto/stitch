@@ -1,5 +1,5 @@
 import * as pino from 'pino';
-import { logLevel, nodeEnv, loggerConfiguration } from './config';
+import { logLevel, nodeEnv, loggerConfiguration } from '../config';
 
 let logger: pino.Logger;
 

@@ -3,7 +3,7 @@ import {
   GraphQLRequestContext,
   GraphQLRequestContextWillSendResponse,
 } from 'apollo-server-plugin-base';
-import logger from '../logger';
+import logger, { createChildLogger } from '../logger';
 
 const isIntrospectionQuery = (operationName?: string) => operationName === 'IntrospectionQuery';
 
@@ -14,7 +14,7 @@ export function createLoggingPlugin(): ApolloServerPlugin {
         request: { query, operationName, variables },
       } = requestDidStartContext;
       const startHrTime = process.hrtime.bigint();
-      const reqLogger = logger.child({ query, operationName });
+      const reqLogger = createChildLogger(logger, 'request', { query, operationName });
       if (!isIntrospectionQuery(operationName)) {
         reqLogger.debug('Started to handle request');
         variables && reqLogger.trace({ variables }, 'request query variables');

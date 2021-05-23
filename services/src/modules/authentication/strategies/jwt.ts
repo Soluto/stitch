@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import logger from '../../logger';
+import logger, { createChildLogger } from '../../logger';
 import { authenticationConfig } from '../../config';
 import { DecodedJWT } from '../jwt-decoder-plugin';
 
@@ -20,7 +20,7 @@ export default async function (request: JWTAuthPartialRequest): Promise<void> {
 
   // Verify issuer
   const issuer = String(decodedJWT.payload.iss);
-  const reqLogger = logger.child({ issuer });
+  const reqLogger = createChildLogger(logger, 'auth-strategy-jwt', { issuer });
 
   const issuerConfig = config[issuer];
   if (!issuerConfig) {

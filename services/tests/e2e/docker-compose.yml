@@ -16,6 +16,10 @@ services:
     environment:
       NODE_ENV: test
       LOG_LEVEL: ${LOG_LEVEL:-trace}
+      CHILD_LOGGERS_LEVELS: |
+        {
+          "auth-strategy-api-key": "debug"
+        }
       PORT: 80
       AUTHENTICATION_CONFIGURATION: |
         {

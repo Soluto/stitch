@@ -39,7 +39,7 @@ exports[`Policies Directive Tests Allow and deny policies with AND (DENY) 1`] = 
   "errors": [
     {
       "name": "GraphQLError",
-      "message": "Unauthorized by policies: alwaysDeny (ns)",
+      "message": "Access to Foo.bar is unauthorized by policies: alwaysDeny (ns)",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "foo",
@@ -77,7 +77,7 @@ exports[`Policies Directive Tests Policy fails 1`] = `
   "errors": [
     {
       "name": "GraphQLError",
-      "message": "PolicyExecutionFailedError: Policy \\"alwaysFail\\" in namespace \\"ns\\" execution failed: Not good",
+      "message": "PolicyExecutionFailedError: Policy \\"alwaysFail\\" in namespace \\"ns\\" on Foo.bar execution failed: Not good",
       "errorCode": "INTERNAL_SERVER_ERROR",
       "path": [
         "foo",
@@ -132,7 +132,7 @@ exports[`Policies Directive Tests Single policy (DENY) 1`] = `
   "errors": [
     {
       "name": "GraphQLError",
-      "message": "Unauthorized by policies: alwaysDeny (ns)",
+      "message": "Access to Foo.bar is unauthorized by policies: alwaysDeny (ns)",
       "errorCode": "UNAUTHORIZED_BY_POLICY",
       "path": [
         "foo",
