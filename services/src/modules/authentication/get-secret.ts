@@ -64,10 +64,10 @@ export default async function getSecret(
         logger.error({ err, authority, jwksUri: jwksConfig?.jwksUri }, 'Failed to get JWK for request token.');
         // eslint-disable-next-line unicorn/no-useless-undefined
         cb(err, undefined);
-        return;
+      } else {
+        logger.debug({ authority }, 'JWK found');
+        cb(null, key.getPublicKey());
       }
-      logger.debug({ authority }, 'JWK found');
-      cb(null, key.getPublicKey());
     });
   } catch (err) {
     logger.error({ err, issuerConfig }, 'Failed to get JWK config.');
