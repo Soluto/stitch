@@ -10,6 +10,7 @@ import createStitchGateway from './modules/apollo-server';
 import { getSecret, anonymousPlugin, jwtDecoderPlugin, authStrategies } from './modules/authentication';
 import { loadPlugins } from './modules/plugins';
 import { initializeMetrics } from './modules/apollo-server-plugins/metrics';
+import { contentTypeFilterMiddleware } from './modules/fastify-middlewares';
 
 const sLogger = createChildLogger(logger, 'http-server');
 
@@ -23,8 +24,9 @@ export async function createServer() {
     playground: config.enableGraphQLPlayground,
     introspection: config.enableGraphQLIntrospection,
   });
-
-  const app = fastify()
+  const appWithMiddlewares = fastify();
+  appWithMiddlewares.use(contentTypeFilterMiddleware);
+  const app = appWithMiddlewares
     .register(corsPlugin as any, config.corsConfiguration)
     .register(authPlugin)
     .register(jwtPlugin, {
