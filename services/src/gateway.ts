@@ -11,6 +11,7 @@ import { getSecret, anonymousPlugin, jwtDecoderPlugin, authStrategies } from './
 import { loadPlugins } from './modules/plugins';
 import { initializeMetrics } from './modules/apollo-server-plugins/metrics';
 import { contentTypeFilterMiddleware } from './modules/fastify-middlewares';
+import applyCertificates from './modules/certs/apply-ceritficates';
 
 const sLogger = createChildLogger(logger, 'http-server');
 
@@ -18,6 +19,7 @@ export async function createServer() {
   sLogger.info('Stitch gateway booting up...');
 
   await loadPlugins();
+  applyCertificates();
 
   const { server, updateSchema } = await createStitchGateway({
     tracing: config.enableGraphQLTracing,

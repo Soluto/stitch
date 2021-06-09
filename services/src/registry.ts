@@ -12,6 +12,7 @@ import { handleSignals, handleUncaughtErrors } from './modules/shutdown-handler'
 import { loadPlugins } from './modules/plugins';
 import { ActiveDirectoryAuth } from './modules/upstreams';
 import { anonymousPlugin, authStrategies, getSecret, jwtDecoderPlugin } from './modules/authentication';
+import applyCertificates from './modules/certs/apply-ceritficates';
 
 const sLogger = createChildLogger(logger, 'http-server');
 
@@ -35,6 +36,8 @@ export async function createServer() {
 
   sLogger.info('Stitch registry booting up...');
   await loadPlugins();
+  applyCertificates();
+  
 
   await app.start();
 
