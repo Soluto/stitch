@@ -57,6 +57,9 @@ const defaultAuthenticationConfig: AuthenticationConfig = {
 export const authenticationConfig =
   (envVarExt.get('AUTHENTICATION_CONFIGURATION').asJsonObject() as AuthenticationConfig) ?? defaultAuthenticationConfig;
 
+// Cert
+export const certDir = envVar.get('CERT_DIR').asString();
+
 // Plugins
 export const pluginsDir = envVar.get('PLUGINS_DIR').asString();
 export const pluginsConfig = envVar.get('PLUGINS_CONFIGURATION').asJsonObject() as Record<string, unknown> | undefined;
