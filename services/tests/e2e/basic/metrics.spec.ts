@@ -107,6 +107,7 @@ describe('Metrics', () => {
     );
     const bucketRegex = /le="(.+)",parentType=/;
     const buckets = bucketMetrics.map(m => m.match(bucketRegex)?.[1]);
+    expect(buckets).toHaveLength(4);
     expect(buckets).toMatchSnapshot();
   });
 
@@ -117,6 +118,7 @@ describe('Metrics', () => {
     );
     const bucketRegex = /le="(.+)",operationName=/;
     const buckets = bucketMetrics.map(m => m.match(bucketRegex)?.[1]);
+    expect(buckets).toHaveLength(5);
     expect(buckets).toMatchSnapshot();
   });
 

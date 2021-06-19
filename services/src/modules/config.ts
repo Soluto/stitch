@@ -69,3 +69,13 @@ export const knownApolloDirectives = envVarExt
   .asSet();
 
 export const corsConfiguration = envVar.get('CORS_CONFIGURATION').default({}).asJsonObject() as CorsConfiguration;
+
+export const requestDurationPromHistogramBuckets: number[] = envVarExt
+  .get('REQUEST_DURATION_PROM_HISTOGRAM_BUCKETS')
+  .default('[0.02, 0.1, 0.5, 2, 10]')
+  .asJsonArray();
+
+export const resolverDurationPromHistogramBuckets: number[] = envVarExt
+  .get('RESOLVER_DURATION_PROM_HISTOGRAM_BUCKETS')
+  .default('[0.02, 0.1, 0.5, 2, 10]')
+  .asJsonArray();

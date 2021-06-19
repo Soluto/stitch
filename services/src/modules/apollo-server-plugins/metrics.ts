@@ -6,7 +6,11 @@ import {
   GraphQLRequestListenerValidationDidEnd,
 } from 'apollo-server-plugin-base';
 import * as promClient from 'prom-client';
-import { knownApolloDirectives } from '../config';
+import {
+  knownApolloDirectives,
+  requestDurationPromHistogramBuckets,
+  resolverDurationPromHistogramBuckets,
+} from '../config';
 
 let requestDurationHistogram: promClient.Histogram<string> | undefined;
 let resolverDurationHistogram: promClient.Histogram<string> | undefined;
@@ -18,14 +22,14 @@ export function initializeMetrics(pClient: typeof promClient) {
     name: 'graphql_request_duration_seconds',
     help: 'request duration in seconds',
     labelNames: ['status', 'operationName'],
-    buckets: [0.02, 0.1, 0.5, 2, 10],
+    buckets: requestDurationPromHistogramBuckets,
   });
 
   resolverDurationHistogram = new pClient.Histogram({
     name: 'graphql_resolver_duration_seconds',
     help: 'resolver duration in seconds',
     labelNames: ['parentType', 'fieldName', 'status'],
-    buckets: [0.02, 0.1, 0.5, 2, 10],
+    buckets: resolverDurationPromHistogramBuckets,
   });
 
   requestParsingErrorCounter = new pClient.Counter({
