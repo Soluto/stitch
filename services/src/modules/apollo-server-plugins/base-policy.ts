@@ -18,8 +18,7 @@ export function createBasicPolicyPlugin(): ApolloServerPlugin {
           if (!basePolicy) return;
 
           const fieldDirectives = info.parentType.getFields()[info.fieldName].astNode?.directives;
-          const fieldPolicyDirectives = fieldDirectives?.filter(d => d.name.value === 'policy');
-          if (!fieldPolicyDirectives) return;
+          const fieldPolicyDirectives = fieldDirectives?.filter(d => d.name.value === 'policy') ?? [];
 
           const shouldOverrideBasePolicy = fieldPolicyDirectives.some(d => {
             const args = d.arguments!.reduce(
