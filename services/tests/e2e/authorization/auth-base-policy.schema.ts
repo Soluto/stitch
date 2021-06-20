@@ -84,6 +84,11 @@ export const schema = {
         @policy(namespace: "auth_bp", name: "regular_policy", args: { isActive: "{jwt?.isActive}" })
       bp_baz: String @localResolver(value: "BAZ") @policy(namespace: "auth_bp", name: "override_base_policy")
       bp_taz: String @localResolver(value: "TAZ") @policy(namespace: "auth_bp", name: "public_policy")
+      bp_qyz: Qyz @localResolver(value: { wer: "WER" }) @policy(namespace: "auth_bp", name: "public_policy")
+    }
+
+    type Qyz {
+      wer: String!
     }
   `),
 };
@@ -94,5 +99,8 @@ export const query = print(gql`
     bp_bar
     bp_baz
     bp_taz
+    bp_qyz {
+      wer
+    }
   }
 `);

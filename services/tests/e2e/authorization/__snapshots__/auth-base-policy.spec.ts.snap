@@ -23,13 +23,22 @@ exports[`Authorization - Base policy Anonymous access 1`] = `
       "path": [
         "bp_baz"
       ]
+    },
+    {
+      "message": "Access to Qyz.wer is unauthorized by policy \\"base_policy\\" in namespace \\"internal\\"",
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_qyz",
+        "wer"
+      ]
     }
   ],
   "data": {
     "bp_foo": null,
     "bp_bar": null,
     "bp_baz": null,
-    "bp_taz": "TAZ"
+    "bp_taz": "TAZ",
+    "bp_qyz": null
   }
 }
 `;
@@ -39,6 +48,9 @@ Object {
   "bp_bar": "BAR",
   "bp_baz": "BAZ",
   "bp_foo": "FOO",
+  "bp_qyz": Object {
+    "wer": "WER",
+  },
   "bp_taz": "TAZ",
 }
 `;
@@ -58,7 +70,10 @@ exports[`Authorization - Base policy JWT pass base and regular policy 1`] = `
     "bp_foo": "FOO",
     "bp_bar": "BAR",
     "bp_baz": null,
-    "bp_taz": "TAZ"
+    "bp_taz": "TAZ",
+    "bp_qyz": {
+      "wer": "WER"
+    }
   }
 }
 `;
@@ -86,13 +101,22 @@ exports[`Authorization - Base policy JWT pass none of policies 1`] = `
       "path": [
         "bp_baz"
       ]
+    },
+    {
+      "message": "Access to Qyz.wer is unauthorized by policy \\"base_policy\\" in namespace \\"internal\\"",
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_qyz",
+        "wer"
+      ]
     }
   ],
   "data": {
     "bp_foo": null,
     "bp_bar": null,
     "bp_baz": null,
-    "bp_taz": "TAZ"
+    "bp_taz": "TAZ",
+    "bp_qyz": null
   }
 }
 `;
@@ -119,7 +143,10 @@ exports[`Authorization - Base policy JWT pass only base policy 1`] = `
     "bp_foo": "FOO",
     "bp_bar": null,
     "bp_baz": null,
-    "bp_taz": "TAZ"
+    "bp_taz": "TAZ",
+    "bp_qyz": {
+      "wer": "WER"
+    }
   }
 }
 `;
@@ -140,13 +167,22 @@ exports[`Authorization - Base policy JWT pass only override policy 1`] = `
       "path": [
         "bp_bar"
       ]
+    },
+    {
+      "message": "Access to Qyz.wer is unauthorized by policy \\"base_policy\\" in namespace \\"internal\\"",
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_qyz",
+        "wer"
+      ]
     }
   ],
   "data": {
     "bp_foo": null,
     "bp_bar": null,
     "bp_baz": "BAZ",
-    "bp_taz": "TAZ"
+    "bp_taz": "TAZ",
+    "bp_qyz": null
   }
 }
 `;
@@ -174,13 +210,22 @@ exports[`Authorization - Base policy JWT pass only regular policy 1`] = `
       "path": [
         "bp_baz"
       ]
+    },
+    {
+      "message": "Access to Qyz.wer is unauthorized by policy \\"base_policy\\" in namespace \\"internal\\"",
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_qyz",
+        "wer"
+      ]
     }
   ],
   "data": {
     "bp_foo": null,
     "bp_bar": null,
     "bp_baz": null,
-    "bp_taz": "TAZ"
+    "bp_taz": "TAZ",
+    "bp_qyz": null
   }
 }
 `;
@@ -201,13 +246,22 @@ exports[`Authorization - Base policy JWT pass regular and override policy 1`] = 
       "path": [
         "bp_bar"
       ]
+    },
+    {
+      "message": "Access to Qyz.wer is unauthorized by policy \\"base_policy\\" in namespace \\"internal\\"",
+      "errorCode": "UNAUTHORIZED_BY_POLICY",
+      "path": [
+        "bp_qyz",
+        "wer"
+      ]
     }
   ],
   "data": {
     "bp_foo": null,
     "bp_bar": null,
     "bp_baz": "BAZ",
-    "bp_taz": "TAZ"
+    "bp_taz": "TAZ",
+    "bp_qyz": null
   }
 }
 `;
