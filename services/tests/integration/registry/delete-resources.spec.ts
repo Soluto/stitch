@@ -59,9 +59,11 @@ const policy: PolicyDefinition = {
   args: {
     an: {
       type: 'String',
+      optional: true,
     },
     another: {
       type: 'String!',
+      optional: false,
     },
   },
   query: {

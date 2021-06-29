@@ -7,9 +7,11 @@ Object {
       "args": Object {
         "an": Object {
           "default": "{source.an}",
+          "optional": true,
           "type": "String",
         },
         "another": Object {
+          "optional": false,
           "type": "String!",
         },
       },
@@ -81,9 +83,11 @@ Object {
       "args": Object {
         "an": Object {
           "default": "{source.an}",
+          "optional": true,
           "type": "String",
         },
         "another": Object {
+          "optional": false,
           "type": "String!",
         },
       },
@@ -156,9 +160,11 @@ Object {
       "args": Object {
         "an": Object {
           "default": "{source.an}",
+          "optional": true,
           "type": "String",
         },
         "another": Object {
+          "optional": false,
           "type": "String!",
         },
       },
@@ -231,9 +237,11 @@ Object {
       "args": Object {
         "an": Object {
           "default": "{source.an}",
+          "optional": true,
           "type": "String",
         },
         "another": Object {
+          "optional": false,
           "type": "String!",
         },
       },
