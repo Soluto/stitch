@@ -6,7 +6,7 @@ import { createGatewaySchema } from '../../apollo-server';
 import { applyResourceGroupDeletions } from '../../resource-repository';
 import { validateResourceGroupOrThrow } from '../validation';
 import { transformResourceGroup as applyPluginForResourceGroup } from '../../plugins';
-import { PolicyAttachmentsHelper } from '../helpers';
+import { markOptionalPolicyArgs, PolicyAttachmentsHelper } from '../helpers';
 import getResourceRepository from '../repository';
 import { RegistryRequestContext, ResourceGroupMetadataInput } from '..';
 import { updateRemoteGqlSchemas } from '../../directives/gql';
@@ -41,6 +41,9 @@ export default async function (deletions: ResourceGroupMetadataInput, context: R
 
       logger.debug('Creating schema config...');
       await createGatewaySchema(gatewayRg);
+
+      logger.debug('Marking optional policy arguments...');
+      markOptionalPolicyArgs(gatewayRg.policies);
 
       logger.debug('Synchronizing policy attachments...');
       await policyAttachments.sync(existingPolicies, gatewayRg.policies);
