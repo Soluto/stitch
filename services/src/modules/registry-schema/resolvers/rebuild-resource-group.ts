@@ -5,7 +5,7 @@ import { updateRemoteGqlSchemas } from '../../directives/gql';
 import { createGatewaySchema } from '../../apollo-server';
 import logger from '../../logger';
 import { transformResourceGroup as applyPluginsForResourceGroup } from '../../plugins';
-import { PolicyAttachmentsHelper } from '../helpers';
+import { markOptionalPolicyArgs, PolicyAttachmentsHelper } from '../helpers';
 import getResourceRepository from '../repository';
 import { validateResourceGroupOrThrow } from '../validation';
 
@@ -36,6 +36,9 @@ export default async function (context: RegistryRequestContext, dryRun = false) 
 
       logger.debug('Creating schema...');
       await createGatewaySchema(gatewayRg);
+
+      logger.debug('Marking optional policy arguments...');
+      markOptionalPolicyArgs(gatewayRg.policies);
 
       logger.debug('Synchronizing policy attachments...');
       await policyAttachments.sync(existingPolicies, gatewayRg.policies);

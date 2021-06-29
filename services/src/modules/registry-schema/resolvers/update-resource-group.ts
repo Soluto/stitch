@@ -43,7 +43,7 @@ export default async function (updates: ResourceGroupInput, context: RegistryReq
       await createGatewaySchema(gatewayRg);
 
       logger.debug('Marking optional policy arguments...');
-      markOptionalPolicyArgs(updates.policies);
+      markOptionalPolicyArgs(gatewayRg.policies);
 
       logger.debug('Synchronizing policy attachments...');
       await policyAttachments.sync(existingPolicies, gatewayRg.policies);

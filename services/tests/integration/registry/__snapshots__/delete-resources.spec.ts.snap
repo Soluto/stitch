@@ -65,9 +65,11 @@ Object {
     Object {
       "args": Object {
         "an": Object {
+          "optional": true,
           "type": "String",
         },
         "another": Object {
+          "optional": false,
           "type": "String!",
         },
       },
@@ -132,9 +134,11 @@ Object {
     Object {
       "args": Object {
         "an": Object {
+          "optional": true,
           "type": "String",
         },
         "another": Object {
+          "optional": false,
           "type": "String!",
         },
       },
@@ -199,9 +203,11 @@ Object {
     Object {
       "args": Object {
         "an": Object {
+          "optional": true,
           "type": "String",
         },
         "another": Object {
+          "optional": false,
           "type": "String!",
         },
       },
@@ -262,9 +268,11 @@ Object {
     Object {
       "args": Object {
         "an": Object {
+          "optional": true,
           "type": "String",
         },
         "another": Object {
+          "optional": false,
           "type": "String!",
         },
       },
@@ -379,9 +387,11 @@ Object {
     Object {
       "args": Object {
         "an": Object {
+          "optional": true,
           "type": "String",
         },
         "another": Object {
+          "optional": false,
           "type": "String!",
         },
       },

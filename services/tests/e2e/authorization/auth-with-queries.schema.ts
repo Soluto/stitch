@@ -41,6 +41,22 @@ export const policies: PolicyDefinition[] = [
   },
   {
     metadata: {
+      name: 'is-active',
+      namespace: 'auth-with-query',
+    },
+    type: PolicyType.opa,
+    code: `
+      default allow = false
+      allow {
+        input.args.active
+      }
+    `,
+    args: {
+      active: { type: 'Boolean!', default: '{ true }' },
+    },
+  },
+  {
+    metadata: {
       name: 'notClassified',
       namespace: 'auth-with-query',
     },
@@ -50,11 +66,12 @@ export const policies: PolicyDefinition[] = [
       allow {
         input.query.classifiedDepartments[_].id != input.args.departmentId;
         input.query.policy.auth_with_query___is_senior.allow
+        input.query.policy.auth_with_query___is_active.allow
       }
     `,
     args: {
-      departmentId: { type: 'String', default: '{source.department.id}' },
-      hireDate: { type: 'Int', default: '{source.hireDate}' },
+      departmentId: { type: 'String!', default: '{source.department.id}' },
+      hireDate: { type: 'Int!', default: '{source.hireDate}' },
     },
     query: {
       gql: print(gql`
@@ -64,6 +81,9 @@ export const policies: PolicyDefinition[] = [
           }
           policy {
             auth_with_query___is_senior(hireDate: $hireDate) {
+              allow
+            }
+            auth_with_query___is_active {
               allow
             }
           }
