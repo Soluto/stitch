@@ -15,6 +15,7 @@ export interface ResourceGroup {
   // policyAttachments are compiled from the Rego code in opa policies, they are not directly modified by users
   policyAttachments?: PolicyAttachments;
   basePolicy?: Policy;
+  introspectionQueryPolicy?: Policy;
   defaultUpstream?: DefaultUpstream;
   remoteSchemas?: RemoteSchema[];
   pluginsData?: Record<string, any>;
@@ -35,6 +36,7 @@ export interface ResourceGroupMetadata {
   upstreamClientCredentials: ResourceMetadata[];
   policies: ResourceMetadata[];
   basePolicy: boolean;
+  introspectionQueryPolicy: boolean;
   defaultUpstream: boolean;
 }
 

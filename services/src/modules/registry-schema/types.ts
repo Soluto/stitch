@@ -18,6 +18,7 @@ export enum ResourceType {
   DefaultUpstream,
   Policy,
   BasePolicy,
+  IntrospectionQueryPolicy,
 }
 
 export interface ResourceGroupMetadataInput {

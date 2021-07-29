@@ -26,6 +26,7 @@ export type AuthorizationConfig = {
   policyAttachments?: Record<string, LoadedPolicy>;
   policyExecutor: PolicyExecutor;
   basePolicy?: Policy;
+  introspectionQueryPolicy?: Policy;
 };
 
 export const policyBaseSdl = gql`
