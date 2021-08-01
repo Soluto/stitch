@@ -77,6 +77,7 @@ args:
   - [Resources](#resources)
   - [Commands](#commands)
   - [`stitch apply:base-policy RESOURCEPATH`](#stitch-applybase-policy-resourcepath)
+  - [`stitch apply:introspection-query-policy RESOURCEPATH`](#stitch-applyintrospection-query-policy-resourcepath)
   - [`stitch apply:resources RESOURCESPATH`](#stitch-applyresources-resourcespath)
   - [`stitch help [COMMAND]`](#stitch-help-command)
   - [`stitch refresh:remote-schema REMOTESERVERURL`](#stitch-refreshremote-schema-remoteserverurl)
@@ -102,6 +103,28 @@ EXAMPLE
 ```
 
 _See code: [src/commands/apply/base-policy.ts](https://github.com/Soluto/stitch/blob/v0.0.15/src/commands/apply/base-policy.ts)_
+
+## `stitch apply:introspection-query-policy RESOURCEPATH`
+
+Apply introspection query policy
+
+```
+USAGE
+  $ stitch apply:introspection-query-policy RESOURCEPATH
+
+OPTIONS
+  --authorization-header=authorization-header  Custom authorization header
+  --dry-run                                    Should perform a dry run
+  --registry-url=registry-url                  (required) Url of the registry
+  --timeout=timeout                            [default: 10000] Request timeout
+
+EXAMPLE
+
+         $ stitch apply:introspection-query-policy introspection-query-policy.yaml
+         Uploaded successfully!
+```
+
+_See code: [src/commands/apply/introspection-query-policy.ts](https://github.com/Soluto/stitch/blob/v0.0.15/src/commands/apply/introspection-query-policy.ts)_
 
 ## `stitch apply:resources RESOURCESPATH`
 
