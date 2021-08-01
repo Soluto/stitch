@@ -8,19 +8,10 @@ import { beforeEachDispose } from '../before-each-dispose';
 import { Policy } from '../../../src/modules/directives/policy/types';
 import { mockLoadedPolicy } from '../../helpers/opa-utility';
 import getResourceRepository from '../../../src/modules/resource-repository/get-resource-repository';
-import { UnauthorizedByPolicyError } from '../../../src/modules/directives/policy';
 
 jest.mock('../../../src/modules/resource-repository/get-resource-repository');
 
 const policies: PolicyDefinition[] = [
-  {
-    metadata: {
-      namespace: 'internal',
-      name: 'base_policy',
-    },
-    type: PolicyType.opa,
-    code: `Rego code`,
-  },
   {
     metadata: {
       namespace: 'internal',
@@ -30,11 +21,6 @@ const policies: PolicyDefinition[] = [
     code: `Rego code`,
   },
 ];
-
-const basePolicy: Policy = {
-  namespace: 'internal',
-  name: 'base_policy',
-};
 
 const introspectionQueryPolicy: Policy = {
   namespace: 'internal',
@@ -46,12 +32,38 @@ const testCases: [string, ResourceGroup & { etag: string }, DocumentNode | strin
     'Deny on introspection query policy',
     {
       etag: 'etag1',
-      basePolicy,
       introspectionQueryPolicy,
       policies,
       policyAttachments: {
         ['internal-introspection_query_policy.wasm']: mockLoadedPolicy(false),
-        ['internal-base_policy.wasm']: mockLoadedPolicy(true),
+      },
+      upstreams: [],
+      upstreamClientCredentials: [],
+      schemas: [
+        {
+          metadata: {
+            namespace: 'ns',
+            name: 'main',
+          },
+          schema: print(gql`
+            type Query {
+              bar: String @localResolver(value: "BAR")
+            }
+          `),
+        },
+      ],
+    },
+    getIntrospectionQuery(),
+    false,
+  ],
+  [
+    'Allow on introspection query policy',
+    {
+      etag: 'etag2',
+      introspectionQueryPolicy,
+      policies,
+      policyAttachments: {
+        ['internal-introspection_query_policy.wasm']: mockLoadedPolicy(true),
       },
       upstreams: [],
       upstreamClientCredentials: [],
@@ -73,73 +85,13 @@ const testCases: [string, ResourceGroup & { etag: string }, DocumentNode | strin
     true,
   ],
   [
-    'Allow on introspection query policy',
-    {
-      etag: 'etag2',
-      basePolicy,
-      introspectionQueryPolicy,
-      policies,
-      policyAttachments: {
-        ['internal-introspection_query_policy.wasm']: mockLoadedPolicy(true),
-        ['internal-base_policy.wasm']: mockLoadedPolicy(true),
-      },
-      upstreams: [],
-      upstreamClientCredentials: [],
-      schemas: [
-        {
-          metadata: {
-            namespace: 'ns',
-            name: 'main',
-          },
-          schema: print(gql`
-            type Query {
-              bar: String @localResolver(value: "BAR")
-            }
-          `),
-        },
-      ],
-    },
-    getIntrospectionQuery(),
-    false,
-  ],
-  [
-    'Allow on base policy, introspection query not configured',
-    {
-      etag: 'etag3',
-      basePolicy,
-      policies,
-      policyAttachments: {
-        ['internal-base_policy.wasm']: mockLoadedPolicy(true),
-      },
-      upstreams: [],
-      upstreamClientCredentials: [],
-      schemas: [
-        {
-          metadata: {
-            namespace: 'ns',
-            name: 'main',
-          },
-          schema: print(gql`
-            type Query {
-              bar: String @localResolver(value: "BAR")
-            }
-          `),
-        },
-      ],
-    },
-    getIntrospectionQuery(),
-    false,
-  ],
-  [
     'Deny on introspection query when using alias',
     {
       etag: 'etag3',
-      basePolicy,
       introspectionQueryPolicy,
       policies,
       policyAttachments: {
         ['internal-introspection_query_policy.wasm']: mockLoadedPolicy(false),
-        ['internal-base_policy.wasm']: mockLoadedPolicy(true),
       },
       upstreams: [],
       upstreamClientCredentials: [],
@@ -166,11 +118,11 @@ const testCases: [string, ResourceGroup & { etag: string }, DocumentNode | strin
         }
       }
     `,
-    true,
+    false,
   ],
 ];
 
-describe.each(testCases)('Introspection Query Policy Tests', (testName, resourceGroup, query, shouldThrow) => {
+describe.each(testCases)('Introspection Query Policy Tests', (testName, resourceGroup, query, shouldAllow) => {
   let client: ApolloServerTestClient;
 
   const defaultIntrospectionQuery = getIntrospectionQuery();
@@ -192,13 +144,13 @@ describe.each(testCases)('Introspection Query Policy Tests', (testName, resource
   });
 
   test(testName, async () => {
-    const promise = client.query({ query: query || defaultIntrospectionQuery });
+    const { data, errors } = await client.query({ query: query || defaultIntrospectionQuery });
 
-    if (shouldThrow) {
-      await expect(promise).rejects.toThrow(UnauthorizedByPolicyError);
+    if (shouldAllow) {
+      expect(JSON.stringify(data)).toMatch('__schema');
     } else {
-      const response = await promise;
-      expect(response.data).toMatch('__schema');
+      expect(errors).toHaveLength(1);
+      expect(errors![0].message).toMatch('unauthorized by policy "introspection_query_policy"');
     }
   });
 });
