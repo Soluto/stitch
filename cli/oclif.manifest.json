@@ -1,5 +1,5 @@
 {
-  "version": "0.0.156",
+  "version": "0.0.17",
   "commands": {
     "apply:base-policy": {
       "id": "apply:base-policy",
@@ -8,6 +8,45 @@
       "pluginType": "core",
       "aliases": [],
       "examples": ["\n      $ stitch apply:base-policy base-policy.yaml\n      Uploaded successfully!\n    "],
+      "flags": {
+        "registry-url": {
+          "name": "registry-url",
+          "type": "option",
+          "description": "Url of the registry",
+          "required": true
+        },
+        "dry-run": {
+          "name": "dry-run",
+          "type": "boolean",
+          "description": "Should perform a dry run",
+          "required": false,
+          "allowNo": false
+        },
+        "authorization-header": {
+          "name": "authorization-header",
+          "type": "option",
+          "description": "Custom authorization header",
+          "required": false
+        },
+        "timeout": {
+          "name": "timeout",
+          "type": "option",
+          "description": "Request timeout",
+          "required": false,
+          "default": 10000
+        }
+      },
+      "args": [{ "name": "resourcePath", "required": true }]
+    },
+    "apply:introspection-query-policy": {
+      "id": "apply:introspection-query-policy",
+      "description": "Apply introspection query policy",
+      "pluginName": "stitch-cli",
+      "pluginType": "core",
+      "aliases": [],
+      "examples": [
+        "\n      $ stitch apply:introspection-query-policy introspection-query-policy.yaml\n      Uploaded successfully!\n    "
+      ],
       "flags": {
         "registry-url": {
           "name": "registry-url",
