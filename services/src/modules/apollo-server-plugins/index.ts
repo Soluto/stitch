@@ -6,9 +6,12 @@ import { createLoggingPlugin } from './logging';
 import { createMetricsPlugin } from './metrics';
 
 export default function getPlugins(): PluginDefinition[] {
-  createIntrospectionQueryPolicyPlugin();
-
-  const baseApolloServerPlugins = [createBasicPolicyPlugin, createLoggingPlugin, createMetricsPlugin];
+  const baseApolloServerPlugins = [
+    createBasicPolicyPlugin,
+    createLoggingPlugin,
+    createMetricsPlugin,
+    createIntrospectionQueryPolicyPlugin,
+  ];
   const plugins = applyPluginsForApolloServerPlugins(baseApolloServerPlugins);
   return plugins;
 }

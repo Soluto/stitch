@@ -27,11 +27,10 @@ const introspectionQueryPolicy: Policy = {
   name: 'introspection_query_policy',
 };
 
-const testCases: [string, ResourceGroup & { etag: string }, DocumentNode | string, boolean][] = [
+const testCases: [string, ResourceGroup, DocumentNode | string, boolean][] = [
   [
     'Deny on introspection query policy',
     {
-      etag: 'etag1',
       introspectionQueryPolicy,
       policies,
       policyAttachments: {
@@ -59,7 +58,6 @@ const testCases: [string, ResourceGroup & { etag: string }, DocumentNode | strin
   [
     'Allow on introspection query policy',
     {
-      etag: 'etag2',
       introspectionQueryPolicy,
       policies,
       policyAttachments: {
@@ -85,9 +83,31 @@ const testCases: [string, ResourceGroup & { etag: string }, DocumentNode | strin
     true,
   ],
   [
+    'Allow when no introspection query policy was configured',
+    {
+      policies,
+      upstreams: [],
+      upstreamClientCredentials: [],
+      schemas: [
+        {
+          metadata: {
+            namespace: 'ns',
+            name: 'main',
+          },
+          schema: print(gql`
+            type Query {
+              bar: String @localResolver(value: "BAR")
+            }
+          `),
+        },
+      ],
+    },
+    getIntrospectionQuery(),
+    true,
+  ],
+  [
     'Deny on introspection query when using alias',
     {
-      etag: 'etag3',
       introspectionQueryPolicy,
       policies,
       policyAttachments: {

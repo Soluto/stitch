@@ -1,22 +1,26 @@
-import { GraphQLResolveInfo, SchemaMetaFieldDef, TypeMetaFieldDef } from 'graphql';
+import { GraphQLField, SchemaMetaFieldDef, TypeMetaFieldDef } from 'graphql';
+import { ApolloServerPlugin } from 'apollo-server-plugin-base';
 import logger from '../logger';
 import { RequestContext } from '../context';
 import { ResourceGroup } from '../resource-repository';
 import { ActiveDirectoryAuth } from '../upstreams/authentication';
 import { PolicyExecutor } from '../directives/policy';
 
-const INTROSPECTION_QUERY_FIELD_NAMES = new Set([SchemaMetaFieldDef.name, TypeMetaFieldDef.name]);
-
-function isIntrospectionRequest(info: GraphQLResolveInfo) {
-  return INTROSPECTION_QUERY_FIELD_NAMES.has(info.fieldName);
+export function createIntrospectionQueryPolicyPlugin(): ApolloServerPlugin {
+  return {
+    serverWillStart() {
+      wrapWithPolicyValidation(SchemaMetaFieldDef);
+      wrapWithPolicyValidation(TypeMetaFieldDef);
+    },
+  };
 }
 
-export function createIntrospectionQueryPolicyPlugin(): void {
-  const originalSchemaMetaFieldResolver = SchemaMetaFieldDef.resolve;
+function wrapWithPolicyValidation(field: GraphQLField<unknown, RequestContext>) {
+  const originalResolver = field.resolve;
 
-  SchemaMetaFieldDef.resolve = function (source, args, context, info) {
+  field.resolve = function (source, args, context, info) {
     function callOriginal() {
-      return originalSchemaMetaFieldResolver!.call(SchemaMetaFieldDef, source, args, context, info);
+      return originalResolver!.call(field, source, args, context, info);
     }
 
     if (!context) {
@@ -24,25 +28,23 @@ export function createIntrospectionQueryPolicyPlugin(): void {
       return callOriginal();
     }
 
-    const { resourceGroup, policyExecutor } = (context as unknown) as RequestContext;
+    const { resourceGroup, policyExecutor } = context as unknown as RequestContext;
     const { introspectionQueryPolicy, basePolicy } = resourceGroup;
 
-    if (isIntrospectionRequest(info)) {
-      let policy = introspectionQueryPolicy;
+    let policy = introspectionQueryPolicy;
 
-      if (!policy) {
-        logger.info('Introspection query policy not found, using base policy');
-        policy = basePolicy;
-      }
+    if (!policy) {
+      logger.debug('Introspection query policy not found, using base policy');
+      policy = basePolicy;
+    }
 
-      if (!policy) {
-        logger.info('Base policy not found, allowing access by default');
-        return callOriginal();
-      }
-
-      policyExecutor.validatePolicySync(policy, source, args, context, info);
+    if (!policy) {
+      logger.debug('Base policy not found, allowing access by default');
       return callOriginal();
     }
+
+    policyExecutor.validatePolicySync(policy, source, args, context, info);
+    return callOriginal();
   };
 }
 
