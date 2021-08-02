@@ -25,6 +25,14 @@ export const updateBasePolicyMutation = print(gql`
   }
 `);
 
+export const updateIntrospectionQueryPolicyMutation = print(gql`
+  mutation UpdateIntrospectionQueryPolicy($introspectionQueryPolicy: IntrospectionQueryPolicyInput!) {
+    result: updateIntrospectionQueryPolicy(input: $introspectionQueryPolicy) {
+      success
+    }
+  }
+`);
+
 export const updateResourceGroupMutation = print(gql`
   mutation UpdateResourceGroupMutation($resourceGroup: ResourceGroupInput!) {
     result: updateResourceGroup(input: $resourceGroup) {

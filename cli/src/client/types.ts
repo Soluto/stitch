@@ -67,6 +67,7 @@ export type Mutation = {
   updateUpstreamClientCredentials?: Maybe<Result>;
   updatePolicies?: Maybe<Result>;
   updateBasePolicy?: Maybe<Result>;
+  updateIntrospectionQueryPolicy?: Maybe<Result>;
 };
 
 export type MutationUpdateResourceGroupArgs = {
@@ -91,6 +92,10 @@ export type MutationUpdatePoliciesArgs = {
 
 export type MutationUpdateBasePolicyArgs = {
   input: BasePolicyInput;
+};
+
+export type MutationUpdateIntrospectionQueryPolicyArgs = {
+  input: IntrospectionQueryPolicyInput;
 };
 
 export type SchemaInput = {
@@ -157,6 +162,12 @@ export type PolicyInput = {
 };
 
 export type BasePolicyInput = {
+  namespace: Scalars['String'];
+  name: Scalars['String'];
+  args?: Maybe<Scalars['JSONObject']>;
+};
+
+export type IntrospectionQueryPolicyInput = {
   namespace: Scalars['String'];
   name: Scalars['String'];
   args?: Maybe<Scalars['JSONObject']>;
