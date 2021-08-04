@@ -34,7 +34,7 @@ function wrapWithPolicyValidation(field: GraphQLField<unknown, RequestContext>) 
     let policy = introspectionQueryPolicy;
 
     if (!policy) {
-      logger.debug('Introspection query policy not found, using base policy');
+      logger.trace('Introspection query policy not found, using base policy');
       policy = basePolicy;
     }
 
