@@ -122,7 +122,7 @@ export async function uploadBasePolicy(
 }
 
 export async function uploadIntrospectionQueryPolicy(
-  introspectionQuery: IntrospectionQueryPolicyInput,
+  introspectionQueryPolicy: IntrospectionQueryPolicyInput,
   options: {
     registryUrl: string;
     dryRun?: boolean;
@@ -134,7 +134,7 @@ export async function uploadIntrospectionQueryPolicy(
 
   const query = options.dryRun ? ValidateIntrospectionQueryPolicyQuery : UploadIntrospectionQueryPolicyMutation;
 
-  return registryClient.request<{ result: { success: boolean } }>(query, { introspectionQuery });
+  return registryClient.request<{ result: { success: boolean } }>(query, { introspectionQueryPolicy });
 }
 
 export async function refreshRemoteSchema(
