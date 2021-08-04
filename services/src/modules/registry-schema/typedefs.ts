@@ -245,10 +245,4 @@ export default gql`
     name: String!
     args: JSONObject
   }
-
-  input BasePolicyInput {
-    namespace: String!
-    name: String!
-    args: JSONObject
-  }
 `;
