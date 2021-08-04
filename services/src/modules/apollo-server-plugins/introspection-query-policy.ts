@@ -28,8 +28,10 @@ function wrapWithPolicyValidation(field: GraphQLField<unknown, RequestContext>) 
       return callOriginal();
     }
 
-    const { resourceGroup, policyExecutor } = context as unknown as RequestContext;
-    const { introspectionQueryPolicy, basePolicy } = resourceGroup;
+    const {
+      resourceGroup: { introspectionQueryPolicy, basePolicy },
+      policyExecutor,
+    } = (context as unknown) as RequestContext;
 
     let policy = introspectionQueryPolicy;
 
