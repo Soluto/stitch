@@ -53,6 +53,10 @@ export default function applyResourceGroupUpdates(rg: ResourceGroup, update: Par
     newRg.basePolicy = update.basePolicy;
   }
 
+  if (typeof update.introspectionQueryPolicy !== 'undefined') {
+    newRg.introspectionQueryPolicy = update.introspectionQueryPolicy;
+  }
+
   if (typeof update.defaultUpstream !== 'undefined') {
     newRg.defaultUpstream = update.defaultUpstream;
   }

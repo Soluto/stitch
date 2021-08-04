@@ -76,6 +76,12 @@ export default gql`
     args: JSONObject
   }
 
+  type IntrospectionQueryPolicy {
+    namespace: String!
+    name: String!
+    args: JSONObject
+  }
+
   type RemoteSchema {
     url: String!
     schema: String!
@@ -116,6 +122,7 @@ export default gql`
     policy(metadata: ResourceMetadataInput!, fromGatewayResources: Boolean): Policy
     policies(fromGatewayResources: Boolean): [Policy!]!
     basePolicy(fromGatewayResources: Boolean): BasePolicy
+    introspectionQueryPolicy(fromGatewayResources: Boolean): IntrospectionQueryPolicy
 
     remoteSchemas: [RemoteSchema!]!
     remoteSchema(url: String!): RemoteSchema
@@ -126,6 +133,7 @@ export default gql`
     validateUpstreamClientCredentials(input: [UpstreamClientCredentialsInput!]!): Result
     validatePolicies(input: [PolicyInput!]!): Result
     validateBasePolicy(input: BasePolicyInput!): Result
+    validateIntrospectionQueryPolicy(input: IntrospectionQueryPolicyInput!): Result
     validateDefaultUpstream(input: DefaultUpstreamInput!): Result
   }
 
@@ -138,6 +146,7 @@ export default gql`
     updateUpstreamClientCredentials(input: [UpstreamClientCredentialsInput!]!): Result
     updatePolicies(input: [PolicyInput!]!): Result
     updateBasePolicy(input: BasePolicyInput!): Result
+    updateIntrospectionQueryPolicy(input: IntrospectionQueryPolicyInput!): Result
     setDefaultUpstream(input: DefaultUpstreamInput!): Result
 
     deleteResources(input: ResourceGroupMetadataInput!): Result
@@ -146,6 +155,7 @@ export default gql`
     deleteUpstreamClientCredentials(input: [ResourceMetadataInput!]!): Result
     deletePolicies(input: [ResourceMetadataInput!]!): Result
     deleteBasePolicy(input: Boolean!): Result
+    deleteIntrospectionQueryPolicy(input: Boolean!): Result
     resetDefaultUpstream(input: Boolean!): Result
 
     refreshRemoteSchema(url: String!): Result
@@ -237,6 +247,12 @@ export default gql`
   }
 
   input BasePolicyInput {
+    namespace: String!
+    name: String!
+    args: JSONObject
+  }
+
+  input IntrospectionQueryPolicyInput {
     namespace: String!
     name: String!
     args: JSONObject

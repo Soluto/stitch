@@ -18,6 +18,7 @@ export enum ResourceType {
   DefaultUpstream,
   Policy,
   BasePolicy,
+  IntrospectionQueryPolicy,
 }
 
 export interface ResourceGroupMetadataInput {
@@ -26,6 +27,7 @@ export interface ResourceGroupMetadataInput {
   upstreamClientCredentials?: ResourceMetadataInput[];
   policies?: ResourceMetadataInput[];
   basePolicy?: boolean;
+  introspectionQueryPolicy?: boolean;
   defaultUpstream?: boolean;
 }
 
@@ -37,6 +39,7 @@ export interface ResourceGroupInput {
   upstreamClientCredentials?: UpstreamClientCredentialsInput[];
   policies?: PolicyInput[];
   basePolicy?: BasePolicyInput;
+  introspectionQueryPolicy?: IntrospectionQueryPolicyInput;
   defaultUpstream?: DefaultUpstreamInput;
 }
 
@@ -94,6 +97,12 @@ export interface PolicyInput {
 }
 
 export interface BasePolicyInput {
+  namespace: string;
+  name: string;
+  args?: PolicyArgsObject;
+}
+
+export interface IntrospectionQueryPolicyInput {
   namespace: string;
   name: string;
   args?: PolicyArgsObject;

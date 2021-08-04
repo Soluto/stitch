@@ -44,6 +44,10 @@ export default function applyResourceGroupDeletions(
     newRg.basePolicy = undefined;
   }
 
+  if (deletions.introspectionQueryPolicy) {
+    newRg.introspectionQueryPolicy = undefined;
+  }
+
   if (deletions.defaultUpstream) {
     newRg.defaultUpstream = undefined;
   }

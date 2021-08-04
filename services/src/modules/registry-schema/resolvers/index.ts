@@ -2,6 +2,7 @@ import { IResolvers } from 'graphql-tools';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
 import {
   BasePolicyInput,
+  IntrospectionQueryPolicyInput,
   DefaultUpstreamInput,
   PolicyInput,
   ResourceGroupInput,
@@ -49,6 +50,9 @@ const resolvers: IResolvers = {
     basePolicy: (_, args: { fromGatewayResources?: boolean }) =>
       getResourcesByType(ResourceType.BasePolicy, args.fromGatewayResources),
 
+    introspectionQueryPolicy: (_, args: { fromGatewayResources?: boolean }) =>
+      getResourcesByType(ResourceType.IntrospectionQueryPolicy, args.fromGatewayResources),
+
     remoteSchemas: getRemoteSchemas,
     remoteSchema: (_, args: { url: string }) => getRemoteSchema(args.url),
 
@@ -69,6 +73,9 @@ const resolvers: IResolvers = {
 
     validateBasePolicy: (_, args: { input: BasePolicyInput }, context) =>
       handleUpdateResourceGroupRequest({ basePolicy: args.input }, context, true),
+
+    validateIntrospectionQueryPolicy: (_, args: { input: IntrospectionQueryPolicyInput }, context) =>
+      handleUpdateResourceGroupRequest({ introspectionQueryPolicy: args.input }, context, true),
 
     validateDefaultUpstream: (_, args: { input: DefaultUpstreamInput }, context) =>
       handleUpdateResourceGroupRequest({ defaultUpstream: args.input }, context, true),
@@ -95,6 +102,9 @@ const resolvers: IResolvers = {
     updateBasePolicy: (_, args: { input: BasePolicyInput }, context) =>
       handleUpdateResourceGroupRequest({ basePolicy: args.input }, context),
 
+    updateIntrospectionQueryPolicy: (_, args: { input: IntrospectionQueryPolicyInput }, context) =>
+      handleUpdateResourceGroupRequest({ introspectionQueryPolicy: args.input }, context),
+
     setDefaultUpstream: (_, args: { input: DefaultUpstreamInput }, context) =>
       handleUpdateResourceGroupRequest({ defaultUpstream: args.input }, context),
 
@@ -116,6 +126,9 @@ const resolvers: IResolvers = {
 
     deleteBasePolicy: (_, args: { input: boolean }, context) =>
       handleDeleteResourcesRequest({ basePolicy: args.input }, context),
+
+    deleteIntrospectionQueryPolicy: (_, args: { input: boolean }, context) =>
+      handleDeleteResourcesRequest({ introspectionQueryPolicy: args.input }, context),
 
     resetDefaultUpstream: (_, args: { input: boolean }, context) =>
       handleDeleteResourcesRequest({ defaultUpstream: args.input }, context),

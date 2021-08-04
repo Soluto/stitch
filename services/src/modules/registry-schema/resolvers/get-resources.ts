@@ -9,6 +9,7 @@ const resourcesByType: Record<ResourceType, (rg: ResourceGroup) => unknown> = {
   [ResourceType.DefaultUpstream]: rg => rg.defaultUpstream,
   [ResourceType.Policy]: rg => rg.policies,
   [ResourceType.BasePolicy]: rg => rg.basePolicy,
+  [ResourceType.IntrospectionQueryPolicy]: rg => rg.introspectionQueryPolicy,
 };
 
 export async function getResourcesByType(resourceType: ResourceType, fromGatewayResources = false) {

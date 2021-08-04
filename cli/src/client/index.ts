@@ -1,5 +1,5 @@
 import { GraphQLClient, gql } from 'graphql-request';
-import { BasePolicyInput, ResourceGroupInput } from './types';
+import { BasePolicyInput, IntrospectionQueryPolicyInput, ResourceGroupInput } from './types';
 
 export interface RequestInit {
   body?: BodyInit | null;
@@ -46,6 +46,22 @@ const UploadBasePolicyMutation = gql`
 const ValidateBasePolicyQuery = gql`
   query ValidateBasePolicyQuery($basePolicy: BasePolicyInput!) {
     result: validateBasePolicy(input: $basePolicy) {
+      success
+    }
+  }
+`;
+
+const UploadIntrospectionQueryPolicyMutation = gql`
+  mutation UploadIntrospectionQueryPolicyMutation($introspectionQueryPolicy: IntrospectionQueryPolicyInput!) {
+    result: updateIntrospectionQueryPolicy(input: $introspectionQueryPolicy) {
+      success
+    }
+  }
+`;
+
+const ValidateIntrospectionQueryPolicyQuery = gql`
+  query ValidateIntrospectionQueryPolicyQuery($introspectionQueryPolicy: IntrospectionQueryPolicyInput!) {
+    result: validateIntrospectionQueryPolicy(input: $introspectionQueryPolicy) {
       success
     }
   }
@@ -103,6 +119,22 @@ export async function uploadBasePolicy(
   const query = options.dryRun ? ValidateBasePolicyQuery : UploadBasePolicyMutation;
 
   return registryClient.request<{ result: { success: boolean } }>(query, { basePolicy });
+}
+
+export async function uploadIntrospectionQueryPolicy(
+  introspectionQuery: IntrospectionQueryPolicyInput,
+  options: {
+    registryUrl: string;
+    dryRun?: boolean;
+    authorizationHeader?: string;
+  },
+  clientOptions: Partial<RequestInit>
+) {
+  const registryClient = initClient(options, clientOptions);
+
+  const query = options.dryRun ? ValidateIntrospectionQueryPolicyQuery : UploadIntrospectionQueryPolicyMutation;
+
+  return registryClient.request<{ result: { success: boolean } }>(query, { introspectionQuery });
 }
 
 export async function refreshRemoteSchema(
