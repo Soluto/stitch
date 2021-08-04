@@ -1,5 +1,5 @@
 import { GraphQLClient, gql } from 'graphql-request';
-import { BasePolicyInput, IntrospectionQueryPolicyInput, ResourceGroupInput } from './types';
+import { BasePolicyInput, ResourceGroupInput } from './types';
 
 export interface RequestInit {
   body?: BodyInit | null;
@@ -52,7 +52,7 @@ const ValidateBasePolicyQuery = gql`
 `;
 
 const UploadIntrospectionQueryPolicyMutation = gql`
-  mutation UploadIntrospectionQueryPolicyMutation($introspectionQueryPolicy: IntrospectionQueryPolicyInput!) {
+  mutation UploadIntrospectionQueryPolicyMutation($introspectionQueryPolicy: BasePolicyInput!) {
     result: updateIntrospectionQueryPolicy(input: $introspectionQueryPolicy) {
       success
     }
@@ -60,7 +60,7 @@ const UploadIntrospectionQueryPolicyMutation = gql`
 `;
 
 const ValidateIntrospectionQueryPolicyQuery = gql`
-  query ValidateIntrospectionQueryPolicyQuery($introspectionQueryPolicy: IntrospectionQueryPolicyInput!) {
+  query ValidateIntrospectionQueryPolicyQuery($introspectionQueryPolicy: BasePolicyInput!) {
     result: validateIntrospectionQueryPolicy(input: $introspectionQueryPolicy) {
       success
     }
@@ -122,7 +122,7 @@ export async function uploadBasePolicy(
 }
 
 export async function uploadIntrospectionQueryPolicy(
-  introspectionQueryPolicy: IntrospectionQueryPolicyInput,
+  introspectionQueryPolicy: BasePolicyInput,
   options: {
     registryUrl: string;
     dryRun?: boolean;
