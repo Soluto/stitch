@@ -72,12 +72,11 @@ args:
 ## Commands
 
 <!-- commands -->
-
-- [`stitch apply:base-policy RESOURCEPATH`](#stitch-applybase-policy-resourcepath)
-- [`stitch apply:introspection-query-policy RESOURCEPATH`](#stitch-applyintrospection-query-policy-resourcepath)
-- [`stitch apply:resources RESOURCESPATH`](#stitch-applyresources-resourcespath)
-- [`stitch help [COMMAND]`](#stitch-help-command)
-- [`stitch refresh:remote-schema REMOTESERVERURL`](#stitch-refreshremote-schema-remoteserverurl)
+* [`stitch apply:base-policy RESOURCEPATH`](#stitch-applybase-policy-resourcepath)
+* [`stitch apply:introspection-query-policy RESOURCEPATH`](#stitch-applyintrospection-query-policy-resourcepath)
+* [`stitch apply:resources RESOURCESPATH`](#stitch-applyresources-resourcespath)
+* [`stitch help [COMMAND]`](#stitch-help-command)
+* [`stitch refresh:remote-schema REMOTESERVERURL`](#stitch-refreshremote-schema-remoteserverurl)
 
 ## `stitch apply:base-policy RESOURCEPATH`
 
@@ -99,7 +98,7 @@ EXAMPLE
          Uploaded successfully!
 ```
 
-_See code: [src/commands/apply/base-policy.ts](https://github.com/Soluto/stitch/blob/v0.0.17/src/commands/apply/base-policy.ts)_
+_See code: [src/commands/apply/base-policy.ts](https://github.com/Soluto/stitch/blob/v0.0.18/src/commands/apply/base-policy.ts)_
 
 ## `stitch apply:introspection-query-policy RESOURCEPATH`
 
@@ -121,7 +120,7 @@ EXAMPLE
          Uploaded successfully!
 ```
 
-_See code: [src/commands/apply/introspection-query-policy.ts](https://github.com/Soluto/stitch/blob/v0.0.17/src/commands/apply/introspection-query-policy.ts)_
+_See code: [src/commands/apply/introspection-query-policy.ts](https://github.com/Soluto/stitch/blob/v0.0.18/src/commands/apply/introspection-query-policy.ts)_
 
 ## `stitch apply:resources RESOURCESPATH`
 
@@ -144,7 +143,7 @@ EXAMPLE
   Uploaded successfully!
 ```
 
-_See code: [src/commands/apply/resources.ts](https://github.com/Soluto/stitch/blob/v0.0.17/src/commands/apply/resources.ts)_
+_See code: [src/commands/apply/resources.ts](https://github.com/Soluto/stitch/blob/v0.0.18/src/commands/apply/resources.ts)_
 
 ## `stitch help [COMMAND]`
 
@@ -182,6 +181,5 @@ EXAMPLE
   Remote schema refreshed successfully!
 ```
 
-_See code: [src/commands/refresh/remote-schema.ts](https://github.com/Soluto/stitch/blob/v0.0.17/src/commands/refresh/remote-schema.ts)_
-
+_See code: [src/commands/refresh/remote-schema.ts](https://github.com/Soluto/stitch/blob/v0.0.18/src/commands/refresh/remote-schema.ts)_
 <!-- commandsstop -->
