@@ -39,7 +39,7 @@ function wrapWithPolicyValidation(field: GraphQLField<unknown, RequestContext>) 
     }
 
     if (!policy) {
-      logger.debug('Base policy not found, allowing access by default');
+      logger.trace('Base policy not found, allowing access by default');
       return callOriginal();
     }
 
