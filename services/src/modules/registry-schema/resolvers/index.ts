@@ -2,7 +2,6 @@ import { IResolvers } from 'graphql-tools';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
 import {
   BasePolicyInput,
-  IntrospectionQueryPolicyInput,
   DefaultUpstreamInput,
   PolicyInput,
   ResourceGroupInput,
@@ -74,7 +73,7 @@ const resolvers: IResolvers = {
     validateBasePolicy: (_, args: { input: BasePolicyInput }, context) =>
       handleUpdateResourceGroupRequest({ basePolicy: args.input }, context, true),
 
-    validateIntrospectionQueryPolicy: (_, args: { input: IntrospectionQueryPolicyInput }, context) =>
+    validateIntrospectionQueryPolicy: (_, args: { input: PolicyInput }, context) =>
       handleUpdateResourceGroupRequest({ introspectionQueryPolicy: args.input }, context, true),
 
     validateDefaultUpstream: (_, args: { input: DefaultUpstreamInput }, context) =>
@@ -102,7 +101,7 @@ const resolvers: IResolvers = {
     updateBasePolicy: (_, args: { input: BasePolicyInput }, context) =>
       handleUpdateResourceGroupRequest({ basePolicy: args.input }, context),
 
-    updateIntrospectionQueryPolicy: (_, args: { input: IntrospectionQueryPolicyInput }, context) =>
+    updateIntrospectionQueryPolicy: (_, args: { input: PolicyInput }, context) =>
       handleUpdateResourceGroupRequest({ introspectionQueryPolicy: args.input }, context),
 
     setDefaultUpstream: (_, args: { input: DefaultUpstreamInput }, context) =>

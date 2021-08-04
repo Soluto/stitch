@@ -39,7 +39,7 @@ export interface ResourceGroupInput {
   upstreamClientCredentials?: UpstreamClientCredentialsInput[];
   policies?: PolicyInput[];
   basePolicy?: BasePolicyInput;
-  introspectionQueryPolicy?: IntrospectionQueryPolicyInput;
+  introspectionQueryPolicy?: PolicyInput;
   defaultUpstream?: DefaultUpstreamInput;
 }
 
@@ -97,12 +97,6 @@ export interface PolicyInput {
 }
 
 export interface BasePolicyInput {
-  namespace: string;
-  name: string;
-  args?: PolicyArgsObject;
-}
-
-export interface IntrospectionQueryPolicyInput {
   namespace: string;
   name: string;
   args?: PolicyArgsObject;

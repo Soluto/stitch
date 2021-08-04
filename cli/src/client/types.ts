@@ -95,7 +95,7 @@ export type MutationUpdateBasePolicyArgs = {
 };
 
 export type MutationUpdateIntrospectionQueryPolicyArgs = {
-  input: IntrospectionQueryPolicyInput;
+  input: PolicyInput;
 };
 
 export type SchemaInput = {
@@ -162,12 +162,6 @@ export type PolicyInput = {
 };
 
 export type BasePolicyInput = {
-  namespace: Scalars['String'];
-  name: Scalars['String'];
-  args?: Maybe<Scalars['JSONObject']>;
-};
-
-export type IntrospectionQueryPolicyInput = {
   namespace: Scalars['String'];
   name: Scalars['String'];
   args?: Maybe<Scalars['JSONObject']>;

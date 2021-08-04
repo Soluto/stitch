@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import { safeLoad } from 'js-yaml';
 import Command, { flags } from '@oclif/command';
-import { IntrospectionQueryPolicyInput, uploadIntrospectionQueryPolicy } from '../../client';
+import { PolicyInput, uploadIntrospectionQueryPolicy } from '../../client';
 import getEnvInfo from '../../utils/get-env-info';
 
 export default class ApplyIntrospectionQueryPolicy extends Command {
@@ -34,7 +34,7 @@ export default class ApplyIntrospectionQueryPolicy extends Command {
     try {
       this.log(`${dryRun ? 'Verifying' : 'Uploading'} introspection query policy from ${args.resourcePath}...`);
       const introspectionQueryPolicyContent = await fs.readFile(args.resourcePath, { encoding: 'utf8' });
-      const introspectionQueryPolicy = safeLoad(introspectionQueryPolicyContent) as IntrospectionQueryPolicyInput;
+      const introspectionQueryPolicy = safeLoad(introspectionQueryPolicyContent) as PolicyInput;
 
       const {
         result: { success },

@@ -76,12 +76,6 @@ export default gql`
     args: JSONObject
   }
 
-  type IntrospectionQueryPolicy {
-    namespace: String!
-    name: String!
-    args: JSONObject
-  }
-
   type RemoteSchema {
     url: String!
     schema: String!
@@ -122,7 +116,7 @@ export default gql`
     policy(metadata: ResourceMetadataInput!, fromGatewayResources: Boolean): Policy
     policies(fromGatewayResources: Boolean): [Policy!]!
     basePolicy(fromGatewayResources: Boolean): BasePolicy
-    introspectionQueryPolicy(fromGatewayResources: Boolean): IntrospectionQueryPolicy
+    introspectionQueryPolicy(fromGatewayResources: Boolean): Policy
 
     remoteSchemas: [RemoteSchema!]!
     remoteSchema(url: String!): RemoteSchema
@@ -133,7 +127,7 @@ export default gql`
     validateUpstreamClientCredentials(input: [UpstreamClientCredentialsInput!]!): Result
     validatePolicies(input: [PolicyInput!]!): Result
     validateBasePolicy(input: BasePolicyInput!): Result
-    validateIntrospectionQueryPolicy(input: IntrospectionQueryPolicyInput!): Result
+    validateIntrospectionQueryPolicy(input: PolicyInput!): Result
     validateDefaultUpstream(input: DefaultUpstreamInput!): Result
   }
 
@@ -146,7 +140,7 @@ export default gql`
     updateUpstreamClientCredentials(input: [UpstreamClientCredentialsInput!]!): Result
     updatePolicies(input: [PolicyInput!]!): Result
     updateBasePolicy(input: BasePolicyInput!): Result
-    updateIntrospectionQueryPolicy(input: IntrospectionQueryPolicyInput!): Result
+    updateIntrospectionQueryPolicy(input: PolicyInput!): Result
     setDefaultUpstream(input: DefaultUpstreamInput!): Result
 
     deleteResources(input: ResourceGroupMetadataInput!): Result
@@ -252,7 +246,7 @@ export default gql`
     args: JSONObject
   }
 
-  input IntrospectionQueryPolicyInput {
+  input PolicyInput {
     namespace: String!
     name: String!
     args: JSONObject
