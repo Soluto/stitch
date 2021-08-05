@@ -26,7 +26,7 @@ export const updateBasePolicyMutation = print(gql`
 `);
 
 export const updateIntrospectionQueryPolicyMutation = print(gql`
-  mutation UpdateIntrospectionQueryPolicy($introspectionQueryPolicy: IntrospectionQueryPolicyInput!) {
+  mutation UpdateIntrospectionQueryPolicy($introspectionQueryPolicy: BasePolicyInput!) {
     result: updateIntrospectionQueryPolicy(input: $introspectionQueryPolicy) {
       success
     }
