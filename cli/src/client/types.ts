@@ -166,9 +166,3 @@ export type BasePolicyInput = {
   name: Scalars['String'];
   args?: Maybe<Scalars['JSONObject']>;
 };
-
-export type BasePolicyInput = {
-  namespace: Scalars['String'];
-  name: Scalars['String'];
-  args?: Maybe<Scalars['JSONObject']>;
-};
