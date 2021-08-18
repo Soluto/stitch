@@ -78,6 +78,8 @@ const resolvers: IResolvers = {
 
     validateDefaultUpstream: (_, args: { input: DefaultUpstreamInput }, context) =>
       handleUpdateResourceGroupRequest({ defaultUpstream: args.input }, context, true),
+
+    testConnection: () => 'success',
   },
   Mutation: {
     rebuildResourceGroup: (_, args: { dryRun: boolean }, context) => rebuildResourceGroup(context, args.dryRun),

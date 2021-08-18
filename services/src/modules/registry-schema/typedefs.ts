@@ -117,6 +117,7 @@ export default gql`
     policies(fromGatewayResources: Boolean): [Policy!]!
     basePolicy(fromGatewayResources: Boolean): BasePolicy
     introspectionQueryPolicy(fromGatewayResources: Boolean): BasePolicy
+    testConnection: String
 
     remoteSchemas: [RemoteSchema!]!
     remoteSchema(url: String!): RemoteSchema

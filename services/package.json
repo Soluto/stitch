@@ -1,6 +1,6 @@
 {
   "name": "stitch",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "test": "jest --ci --runInBand --config jest.config.js",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand --config jest.config.js",
