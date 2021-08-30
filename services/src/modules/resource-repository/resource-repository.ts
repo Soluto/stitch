@@ -4,7 +4,14 @@ import * as _ from 'lodash';
 import { Storage, listFilesItem } from '../storage';
 import { getWasmPolicy } from '../directives/policy/opa';
 import buildResourcesMetadata from './resource-metadata';
-import { FetchLatestResult, ResourceGroup, IResourceRepository, PolicyAttachments, UpdateOptions } from '.';
+import {
+  FetchLatestResult,
+  ResourceGroup,
+  IResourceRepository,
+  PolicyAttachments,
+  UpdateOptions,
+  ResourcesMetadata,
+} from '.';
 
 export class ResourceRepository implements IResourceRepository {
   protected resourceGroup?: { lastModified?: Date; resources: ResourceGroup };
@@ -39,13 +46,23 @@ export class ResourceRepository implements IResourceRepository {
     return { isNew: true, resourceGroup: resources };
   }
 
+  async fetchMetadata(): Promise<ResourcesMetadata> {
+    const resourceFilePath = this.isRegistry ? this.registryResourceFilePath! : this.resourceFilePath;
+    const resourceMetadataFilePath = this.getMetadataFilePath(resourceFilePath);
+
+    const { content } = await this.storage.readFile(resourceMetadataFilePath, { asString: true });
+    const metadata = JSON.parse(content) as ResourcesMetadata;
+
+    return metadata;
+  }
+
   async update(resources: ResourceGroup, options?: UpdateOptions): Promise<void> {
     const defaultOptions = { registry: false };
     const { registry } = { ...defaultOptions, ...options };
     const resourceFilePath = registry ? this.registryResourceFilePath! : this.resourceFilePath;
     const resourceFileContent = JSON.stringify(resources);
 
-    const resourceMetadataFilePath = `${resourceFilePath.split('.').slice(0, -1).join('.')}-metadata.json`;
+    const resourceMetadataFilePath = this.getMetadataFilePath(resourceFilePath);
     const resourceMetadata = await buildResourcesMetadata(resources, resourceFileContent, options);
 
     await this.storage.writeFile(resourceFilePath, resourceFileContent);
@@ -87,7 +104,7 @@ export class ResourceRepository implements IResourceRepository {
     this.policyAttachments.refreshedAt = newRefreshedAt;
   }
 
-  protected async listPolicyAttachments() {
+  async listPolicyAttachments() {
     return this.storage.listFiles(this.policyAttachmentsFolderPath);
   }
 
@@ -113,5 +130,9 @@ export class ResourceRepository implements IResourceRepository {
         });
       })
     );
+  }
+
+  protected getMetadataFilePath(resourceFilePath: string) {
+    return `${resourceFilePath.split('.').slice(0, -1).join('.')}-metadata.json`;
   }
 }

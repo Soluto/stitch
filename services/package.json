@@ -5,6 +5,7 @@
     "test": "jest --ci --runInBand --config jest.config.js",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand --config jest.config.js",
     "test:blackbox": "jest --ci --runInBand --config jest.config.blackbox.js",
+    "test:blackbox:debug": "node --inspect node_modules/.bin/jest --runInBand --config jest.config.blackbox.js",
     "test:e2e": "jest --ci --runInBand --config jest.config.e2e.js",
     "test:full": "NODE_OPTIONS=--max_old_space_size=4096 jest --ci --runInBand --config jest.config.full.js",
     "build": "tsc",
