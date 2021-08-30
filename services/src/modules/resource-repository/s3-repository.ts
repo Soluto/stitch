@@ -44,13 +44,13 @@ export class S3ResourceRepository extends ResourceRepository {
     return { isNew: true, resourceGroup: resources };
   }
 
-  static fromEnvironment(options: { isRegistry: boolean } = { isRegistry: false }) {
+  static fromEnvironment({ isRegistry = false } = {}) {
     const s3endpoint = envVar.get('S3_ENDPOINT').required().asString();
     const bucketName = envVar.get('S3_RESOURCE_BUCKET_NAME').required().asString();
     const resourceFilePath = envVar.get('S3_RESOURCE_OBJECT_KEY').default('resources-gateway.json').asString();
 
     let registryResourceEnvVar = envVar.get('S3_REGISTRY_RESOURCE_OBJECT_KEY');
-    if (options.isRegistry) registryResourceEnvVar = registryResourceEnvVar.default('resources-registry.json');
+    if (isRegistry) registryResourceEnvVar = registryResourceEnvVar.default('resources-registry.json');
     const registryResourceFilePath = registryResourceEnvVar.asString();
 
     const policyAttachmentsFolderPath = envVar
@@ -65,7 +65,7 @@ export class S3ResourceRepository extends ResourceRepository {
       s3Storage,
       resourceFilePath,
       policyAttachmentsFolderPath,
-      options.isRegistry,
+      isRegistry,
       registryResourceFilePath
     );
   }

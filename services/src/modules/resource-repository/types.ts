@@ -1,6 +1,7 @@
 import { RemoteSchema } from '../directives/gql';
 import { Policy, LoadedPolicy } from '../directives/policy/types';
 import { PluginMetadata } from '../plugins/types';
+import { listFilesItem } from '../storage';
 
 export type PolicyAttachments = Record<string, LoadedPolicy>;
 export type PolicyQueryVariables = Record<string, unknown>;
@@ -100,9 +101,11 @@ export type UpdateOptions = { registry: boolean };
 
 export interface IResourceRepository {
   fetchLatest(): Promise<FetchLatestResult>;
+  fetchMetadata(): Promise<ResourcesMetadata>;
   update(rg: ResourceGroup, options?: UpdateOptions): Promise<void>;
   writePolicyAttachment(filename: string, content: Buffer): Promise<void>;
   deletePolicyAttachment(filename: string): Promise<void>;
+  listPolicyAttachments(): Promise<listFilesItem[]>;
 }
 
 enum AuthType {

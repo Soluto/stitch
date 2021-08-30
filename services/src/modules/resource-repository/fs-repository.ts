@@ -37,7 +37,7 @@ export class FileSystemResourceRepository extends ResourceRepository {
     this.policyAttachmentsFolderInitialized = true;
   }
 
-  static fromEnvironment(options: { isRegistry: boolean } = { isRegistry: false }) {
+  static fromEnvironment({ isRegistry = false } = {}) {
     const resourceFilePath = envVar.get('FS_RESOURCE_REPOSITORY_PATH').required().asString();
     const registryResourceFilePath = envVar.get('FS_REGISTRY_RESOURCE_REPOSITORY_PATH').asString();
     const policyAttachmentsFolderPath = envVar
@@ -50,7 +50,7 @@ export class FileSystemResourceRepository extends ResourceRepository {
       fsStorage,
       resourceFilePath,
       policyAttachmentsFolderPath,
-      options.isRegistry,
+      isRegistry,
       registryResourceFilePath
     );
   }

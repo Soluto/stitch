@@ -1,4 +1,11 @@
-import { FetchLatestResult, IResourceRepository, applyResourceGroupUpdates, ResourceRepository } from '.';
+import { listFilesItem } from '../storage';
+import {
+  FetchLatestResult,
+  IResourceRepository,
+  applyResourceGroupUpdates,
+  ResourceRepository,
+  ResourcesMetadata,
+} from '.';
 
 export class CompositeResourceRepository implements IResourceRepository {
   constructor(protected repositories: ResourceRepository[]) {}
@@ -10,6 +17,14 @@ export class CompositeResourceRepository implements IResourceRepository {
       isNew: res1.isNew || res2.isNew,
       resourceGroup: applyResourceGroupUpdates(res1.resourceGroup, res2.resourceGroup),
     }));
+  }
+
+  async fetchMetadata(): Promise<ResourcesMetadata> {
+    throw new Error('Multiplexed resource repository cannot return metadata');
+  }
+
+  async listPolicyAttachments(): Promise<listFilesItem[]> {
+    throw new Error('Multiplexed resource repository cannot list Policy Attachments');
   }
 
   async update(): Promise<void> {

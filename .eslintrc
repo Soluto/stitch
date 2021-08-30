@@ -37,6 +37,9 @@
     "unicorn/prefer-spread": "off",
     "unicorn/prefer-string-slice": "off",
     "unicorn/prevent-abbreviations": "off",
+    "unicorn/no-array-reduce": "off",
+    "unicorn/import-style": "off",
+    "unicorn/no-useless-undefined": "off",
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-explicit-any": "off",
@@ -49,6 +52,8 @@
         "@typescript-eslint/ban-types": "off",
         "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-var-requires": "off",
+        "node/no-unpublished-require": "off"
       }
     }
   ],

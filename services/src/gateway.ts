@@ -47,13 +47,13 @@ export async function createServer() {
     app.addHook('onClose', () => server.stop());
   });
 
-  app.get('/health', {}, (_, reply) => {
+  app.get('/health', (_, reply) => {
     reply.status(200).send('OK');
   });
 
-  app.post('/updateSchema', {}, async (_, replay) => {
+  app.post('/updateSchema', async (_, reply) => {
     await updateSchema();
-    replay.status(200).send('OK');
+    reply.status(200).send('OK');
   });
 
   sLogger.info('Stitch gateway is ready to start');

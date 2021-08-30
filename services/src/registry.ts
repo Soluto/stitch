@@ -12,6 +12,7 @@ import { handleSignals, handleUncaughtErrors } from './modules/shutdown-handler'
 import { loadPlugins } from './modules/plugins';
 import { ActiveDirectoryAuth } from './modules/upstreams';
 import { anonymousPlugin, authStrategies, getSecret, jwtDecoderPlugin } from './modules/authentication';
+import statusHandler from './modules/status-handler';
 
 const sLogger = createChildLogger(logger, 'http-server');
 
@@ -57,6 +58,8 @@ export async function createServer() {
     server.addHook('onRequest', server.auth(authStrategies));
     server.addHook('onClose', () => app.stop());
   });
+
+  server.get('/status', statusHandler);
 
   sLogger.info('Stitch registry is ready to start');
   return server;

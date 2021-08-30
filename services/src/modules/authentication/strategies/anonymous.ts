@@ -1,3 +1,4 @@
+import { URL } from 'url';
 import * as fastify from 'fastify';
 import { authenticationConfig } from '../../config';
 
@@ -18,8 +19,10 @@ export default async function (request: AnonymousAuthPartialRequest) {
 
   const anonymousPaths = config.publicPaths;
   if (!anonymousPaths) throw new Error('Unauthorized');
-  if (!anonymousPaths.some(ap => request.raw.url?.endsWith(ap))) {
-    throw new Error('Unauthorized');
-  }
+
+  const url = new URL(request.raw.url ?? '', 'https://localhost:80');
+  const isAnonymous = anonymousPaths.includes(url.pathname);
+  if (!isAnonymous) throw new Error('Unauthorized');
+
   request._isAnonymousAccess = true;
 }

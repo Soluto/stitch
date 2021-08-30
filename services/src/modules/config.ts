@@ -51,7 +51,7 @@ export const ignorePolicies =
 // Authentication
 const defaultAuthenticationConfig: AuthenticationConfig = {
   anonymous: {
-    publicPaths: ['/metrics', '/.well-known/apollo/server-health', '/graphql'],
+    publicPaths: ['/metrics', '/.well-known/apollo/server-health', '/graphql', '/status'],
   },
 };
 export const authenticationConfig =
