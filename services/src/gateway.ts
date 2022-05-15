@@ -56,6 +56,8 @@ export async function createServer() {
     reply.status(200).send('OK');
   });
 
+  app.server.keepAliveTimeout = config.keepAliveTimeout || app.server.keepAliveTimeout;
+
   sLogger.info('Stitch gateway is ready to start');
   return app;
 }

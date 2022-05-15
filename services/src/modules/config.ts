@@ -13,6 +13,7 @@ const envVarExt = envVar.from(process.env, {
 export const nodeEnv = envVarExt.get('NODE_ENV').default('development').asString();
 
 export const httpPort = envVarExt.get('PORT').default('8080').asIntPositive();
+export const keepAliveTimeout = envVarExt.get('KEEP_ALIVE_TIMEOUT').asIntPositive();
 
 // Logging
 export type ChildLoggersLevels = Record<string, LevelWithSilent>;
