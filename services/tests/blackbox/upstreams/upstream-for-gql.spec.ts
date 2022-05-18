@@ -3,7 +3,7 @@ import * as nock from 'nock';
 import { graphqlSync, print, printSchema } from 'graphql';
 import { gql, GraphQLRequest } from 'apollo-server-core';
 import { FastifyInstance } from 'fastify';
-import { makeExecutableSchema } from 'graphql-tools';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { createServer as createGateway } from '../../../src/gateway';
 import { ResourceGroup, Schema, Upstream } from '../../../src/modules/resource-repository';

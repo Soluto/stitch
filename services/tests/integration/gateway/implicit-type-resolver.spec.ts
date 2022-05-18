@@ -1,6 +1,5 @@
-import { ApolloServerTestClient, createTestClient } from 'apollo-server-testing';
 import { print } from 'graphql';
-import { gql } from 'apollo-server-core';
+import { ApolloServerBase, gql } from 'apollo-server-core';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { beforeEachDispose } from '../before-each-dispose';
 import createStitchGateway from '../../../src/modules/apollo-server';
@@ -116,8 +115,6 @@ const testCases: [string, ResourceGroup][] = [
 ];
 
 describe.each(testCases)('Implicit Type Resolver Tests', (testName, resourceGroup) => {
-  let client: ApolloServerTestClient;
-
   const query = gql`
     query {
       foo {
@@ -137,10 +134,10 @@ describe.each(testCases)('Implicit Type Resolver Tests', (testName, resourceGrou
     })
   );
 
-  beforeEachDispose(async () => {
-    const { server } = await createStitchGateway();
-    client = createTestClient(server);
+  let server: ApolloServerBase;
 
+  beforeEachDispose(async () => {
+    ({ server } = await createStitchGateway());
     return () => {
       return server.stop();
     };
@@ -151,7 +148,7 @@ describe.each(testCases)('Implicit Type Resolver Tests', (testName, resourceGrou
   });
 
   test(testName, async () => {
-    const response = await client.query({ query });
+    const response = await server.executeOperation({ query });
     expect(response).toMatchSnapshot();
   });
 });

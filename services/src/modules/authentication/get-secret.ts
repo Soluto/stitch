@@ -39,11 +39,7 @@ async function getJwkClient(authority: string, jwksConfig?: Partial<JwksClientOp
   return jwkClients[authority]!;
 }
 
-export default async function getSecret(
-  request: fastify.FastifyRequest,
-  _reply: fastify.FastifyReply<unknown>,
-  cb: (e: Error | null, secret: string | undefined) => void
-): Promise<void> {
+export default async function getSecret(request: fastify.FastifyRequest): Promise<string> {
   const decodedJWT = request.decodeJWT();
   const kid = decodedJWT?.header.kid as string;
   const issuer = decodedJWT?.payload.iss as string;
@@ -51,28 +47,18 @@ export default async function getSecret(
   const issuerConfig = authenticationConfig?.jwt?.[issuer];
   if (!issuerConfig) {
     // eslint-disable-next-line unicorn/no-useless-undefined
-    cb(new Error('No appropriate authentication configuration found'), undefined);
-    return;
+    throw new Error('No appropriate authentication configuration found');
   }
 
   try {
     const { authority, jwksConfig } = issuerConfig;
     const jwkClient = await getJwkClient(authority, jwksConfig);
 
-    jwkClient.getSigningKey(kid, (err, key) => {
-      if (err) {
-        logger.error({ err, authority, jwksUri: jwksConfig?.jwksUri }, 'Failed to get JWK for request token.');
-        // eslint-disable-next-line unicorn/no-useless-undefined
-        cb(err, undefined);
-        return;
-      }
-      logger.debug({ authority }, 'JWK found');
-      cb(null, key.getPublicKey());
-    });
+    const key = await jwkClient.getSigningKey(kid);
+    return key.getPublicKey();
   } catch (err) {
-    logger.error({ err, issuerConfig }, 'Failed to get JWK config.');
+    logger.error({ err, issuerConfig }, 'Failed to get JWK.');
     // eslint-disable-next-line unicorn/no-useless-undefined
-    cb(err, undefined);
-    return;
+    throw err;
   }
 }

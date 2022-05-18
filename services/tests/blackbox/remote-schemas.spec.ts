@@ -3,7 +3,7 @@ import * as nock from 'nock';
 import * as _ from 'lodash';
 import { FastifyInstance } from 'fastify';
 import { graphqlSync, print } from 'graphql';
-import { makeExecutableSchema } from 'graphql-tools';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import { gql, GraphQLRequest } from 'apollo-server-core';
 import { createServer as createRegistry } from '../../src/registry';
 import GraphQLErrorSerializer from '../utils/graphql-error-serializer';

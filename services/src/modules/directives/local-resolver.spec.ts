@@ -1,9 +1,10 @@
-import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { IResolvers } from '@graphql-tools/utils';
 import { ApolloServerBase, gql } from 'apollo-server-core';
-import { ApolloServer, IResolvers, SchemaDirectiveVisitor } from 'apollo-server-fastify';
+import { ApolloServer } from 'apollo-server-fastify';
 import { concatAST, DocumentNode } from 'graphql';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
-import { sdl as localResolverSdl, LocalResolverDirective } from './local-resolver';
+import { sdl as localResolverSdl, directiveSchemaTransformer } from './local-resolver';
 
 interface TestCase {
   typeDefs: DocumentNode;
@@ -358,10 +359,6 @@ const baseTypeDefs = gql`
   directive @keepStringVariable(var: String!) on FIELD
 `;
 
-const schemaDirectives: Record<string, typeof SchemaDirectiveVisitor> = {
-  localResolver: LocalResolverDirective,
-};
-
 const baseResolvers: IResolvers = {
   JSON: GraphQLJSON,
   JSONObject: GraphQLJSONObject,
@@ -381,17 +378,19 @@ describe.each(testCases)(
       only = false,
     }
   ) => {
-    let client: ApolloServerTestClient;
     let server: ApolloServerBase;
 
     beforeAll(() => {
+      const schema = directiveSchemaTransformer(
+        makeExecutableSchema({
+          typeDefs: concatAST([typeDefs, baseTypeDefs, localResolverSdl]),
+          resolvers: { ...baseResolvers, ...resolvers },
+        })
+      );
       server = new ApolloServer({
-        typeDefs: concatAST([typeDefs, baseTypeDefs, localResolverSdl]),
-        schemaDirectives,
-        resolvers: { ...baseResolvers, ...resolvers },
+        schema,
         rootValue,
       });
-      client = createTestClient(server);
     });
 
     afterAll(async () => {
@@ -401,7 +400,7 @@ describe.each(testCases)(
     const testCommand = only ? test.only : test;
 
     testCommand(testCase, async () => {
-      const { data, errors } = await client.query({ query, variables });
+      const { data, errors } = await server.executeOperation({ query, variables });
       expect(errors).toBeUndefined();
       expect(data).toEqual(expected);
     });

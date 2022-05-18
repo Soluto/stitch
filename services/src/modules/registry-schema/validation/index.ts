@@ -50,6 +50,7 @@ function validateUpstreams(upstreams: Upstream[]) {
     };
 
     if (upstream.host) validateHost(upstream.host);
+    // eslint-disable-next-line unicorn/no-array-callback-reference, unicorn/no-array-for-each
     if (upstream.sourceHosts) upstream.sourceHosts.forEach(validateHost);
   }
 
@@ -177,8 +178,7 @@ export function validateResourceGroupOrThrow(rg: ResourceGroup) {
     errors.push(...validateUpstreams(rg.upstreams));
   }
 
-  errors.push(...validateMetadataCharacters(rg));
-  errors.push(...validateMetadataNameConflicts(rg));
+  errors.push(...validateMetadataCharacters(rg), ...validateMetadataNameConflicts(rg));
 
   if (errors.length > 0) {
     logger.warn({ errors }, 'Resource validation failed');

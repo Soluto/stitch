@@ -4,31 +4,39 @@ import {
   DocumentNode,
   FloatValueNode,
   GraphQLError,
-  GraphQLField,
   GraphQLScalarType,
+  GraphQLSchema,
   Kind,
   ObjectValueNode,
   parse,
   ValueNode,
 } from 'graphql';
-import { IResolvers, SchemaDirectiveVisitor } from 'graphql-tools';
+import { getDirective, IResolvers, MapperKind, mapSchema } from '@graphql-tools/utils';
 
 type BaseSchema = {
   typeDefs: DocumentNode;
   resolvers: IResolvers;
-  directives: Record<string, typeof SchemaDirectiveVisitor>;
+  directives: Record<string, (schema: GraphQLSchema) => GraphQLSchema>;
 };
 
-class ReverseDirective extends SchemaDirectiveVisitor {
-  visitFieldDefinition(field: GraphQLField<unknown, unknown>) {
-    const originalResolve = field.resolve || defaultFieldResolver;
-    field.resolve = async (parent, args, context, info) => {
-      const result = await originalResolve.call(field, parent, args, context, info);
+const directiveName = 'reverse';
 
-      return String(result).split('').reverse().join('');
-    };
-  }
-}
+export const directiveSchemaTransformer = (schema: GraphQLSchema) =>
+  mapSchema(schema, {
+    [MapperKind.OBJECT_FIELD]: fieldConfig => {
+      const directive = getDirective(schema, fieldConfig, directiveName)?.[0];
+      if (directive) {
+        const originalResolve = fieldConfig.resolve || defaultFieldResolver;
+        fieldConfig.resolve = async (parent, args, context, info) => {
+          const result = await originalResolve.call(fieldConfig, parent, args, context, info);
+
+          return String(result).split('').reverse().join('');
+        };
+        return fieldConfig;
+      }
+      return;
+    },
+  });
 
 const sdl = parse(`
   directive @reverse on FIELD_DEFINITION
@@ -40,7 +48,7 @@ const Point = new GraphQLScalarType({
   name: 'Point',
   description: 'Point scalar',
   serialize: JSON.stringify,
-  parseValue: JSON.parse,
+  parseValue: value => JSON.parse(value.toString()),
   parseLiteral(ast: ValueNode) {
     if (ast.kind !== Kind.OBJECT) {
       throw new GraphQLError('Wrong format for PolicyDetails');
@@ -63,7 +71,7 @@ export function transformBaseSchema(baseSchema: BaseSchema): BaseSchema {
   const result = {
     typeDefs: concatAST([baseSchema.typeDefs, sdl]),
     resolvers: { ...baseSchema.resolvers, ...resolvers },
-    directives: { ...baseSchema.directives, reverse: ReverseDirective },
+    directives: { ...baseSchema.directives, reverse: directiveSchemaTransformer },
   };
   return result;
 }

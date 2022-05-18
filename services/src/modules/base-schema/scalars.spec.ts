@@ -1,7 +1,6 @@
 import { concatAST } from 'graphql';
 import { gql, ApolloServerBase } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-fastify';
-import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { policiesSdl } from '../directives/policy';
 import { sdl, resolvers } from './scalars';
 
@@ -16,25 +15,25 @@ const testCases: [string, unknown][] = [
   ['PolicyDetails', { namespace: 'ns', name: 'my-policy', args: { foo: '{source.foo}' } }],
 ];
 
-describe('Scalars', () => {
-  const createTestSchema = (scalar: string) => gql`
+const createTestSchema = (scalar: string) => gql`
     type Query {
       foo: ${scalar}!
     }
   `;
-  const createTestResolver = <T>(data: T) => ({
-    Query: {
-      foo: () => data,
-    },
-  });
 
-  const query = gql`
-    query {
-      foo
-    }
-  `;
+const createTestResolver = <T>(data: T) => ({
+  Query: {
+    foo: () => data,
+  },
+});
 
-  let client: ApolloServerTestClient;
+const query = gql`
+  query {
+    foo
+  }
+`;
+
+describe('Scalars', () => {
   let server: ApolloServerBase;
 
   test.each(testCases)('%s is declared', async (scalarName, scalarValue) => {
@@ -42,9 +41,7 @@ describe('Scalars', () => {
       typeDefs: concatAST([createTestSchema(scalarName), sdl, policiesSdl]),
       resolvers: [createTestResolver(scalarValue), resolvers],
     });
-    client = createTestClient(server);
-
-    const { data, errors } = await client.query({ query });
+    const { data, errors } = await server.executeOperation({ query });
     expect({ data, errors }).toMatchSnapshot();
   });
 });

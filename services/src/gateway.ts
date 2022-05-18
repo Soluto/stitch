@@ -1,8 +1,8 @@
-import * as fastify from 'fastify';
-import * as corsPlugin from 'fastify-cors';
+import fastify, { FastifyInstance } from 'fastify';
+import corsPlugin from '@fastify/cors';
 import * as fastifyMetrics from 'fastify-metrics';
-import * as jwtPlugin from 'fastify-jwt';
-import * as authPlugin from 'fastify-auth';
+import jwtPlugin from '@fastify/jwt';
+import authPlugin from '@fastify/auth';
 import * as config from './modules/config';
 import logger, { createChildLogger } from './modules/logger';
 import { handleSignals, handleUncaughtErrors } from './modules/shutdown-handler';
@@ -10,7 +10,7 @@ import createStitchGateway from './modules/apollo-server';
 import { getSecret, anonymousPlugin, jwtDecoderPlugin, authStrategies } from './modules/authentication';
 import { loadPlugins } from './modules/plugins';
 import { initializeMetrics } from './modules/apollo-server-plugins/metrics';
-import { contentTypeFilterMiddleware } from './modules/fastify-middlewares';
+// import { contentTypeFilterMiddleware } from './modules/fastify-middlewares';
 
 const sLogger = createChildLogger(logger, 'http-server');
 
@@ -20,14 +20,15 @@ export async function createServer() {
   await loadPlugins();
 
   const { server, updateSchema } = await createStitchGateway({
-    tracing: config.enableGraphQLTracing,
-    playground: config.enableGraphQLPlayground,
+    // tracing: config.enableGraphQLTracing,
+    // playground: config.enableGraphQLPlayground,
     introspection: config.enableGraphQLIntrospection,
   });
-  const appWithMiddlewares = fastify();
-  appWithMiddlewares.use(contentTypeFilterMiddleware);
-  const app = appWithMiddlewares
-    .register(corsPlugin as any, config.corsConfiguration)
+  const app = fastify();
+  // appWithMiddlewares.use(contentTypeFilterMiddleware); FIXME: WHAT TO DO WITH THIS?
+
+  await app
+    .register(corsPlugin, config.corsConfiguration)
     .register(authPlugin)
     .register(jwtPlugin, {
       secret: getSecret,
@@ -40,20 +41,20 @@ export async function createServer() {
     .register(fastifyMetrics, {
       endpoint: '/metrics',
     })
-    .register(server.createHandler({ path: '/graphql' }));
+    .register(server.createHandler({ path: '/graphql', cors: false }));
 
   app.after(() => {
     app.addHook('onRequest', app.auth(authStrategies));
     app.addHook('onClose', () => server.stop());
   });
 
-  app.get('/health', (_, reply) => {
-    reply.status(200).send('OK');
+  app.get('/health', async (_, reply) => {
+    await reply.status(200).send('OK');
   });
 
   app.post('/updateSchema', async (_, reply) => {
     await updateSchema();
-    reply.status(200).send('OK');
+    await reply.status(200).send('OK');
   });
 
   app.server.keepAliveTimeout = config.keepAliveTimeout || app.server.keepAliveTimeout;
@@ -62,7 +63,7 @@ export async function createServer() {
   return app;
 }
 
-async function runServer(app: fastify.FastifyInstance) {
+async function runServer(app: FastifyInstance) {
   const address = await app.listen(config.httpPort, '0.0.0.0');
   initializeMetrics(app.metrics.client);
   sLogger.info({ address }, 'Stitch gateway started');
@@ -74,5 +75,5 @@ async function runServer(app: fastify.FastifyInstance) {
 // Only run when file is being executed, not when being imported
 if (require.main === module) {
   // eslint-disable-next-line promise/catch-or-return
-  createServer().then(runServer);
+  void createServer().then(runServer);
 }

@@ -1,4 +1,4 @@
-import { sdl, GqlDirective } from './directive';
+import { sdl, directiveSchemaTransformer } from './directive';
 import { updateRemoteGqlSchemas, RemoteSchema } from './introspection';
 
-export { sdl, GqlDirective, updateRemoteGqlSchemas, RemoteSchema };
+export { sdl, directiveSchemaTransformer, updateRemoteGqlSchemas, RemoteSchema };

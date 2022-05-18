@@ -1,8 +1,8 @@
 import * as fs from 'fs/promises';
 import * as nock from 'nock';
-import { HTTPInjectOptions } from 'fastify';
+import { InjectOptions } from 'fastify';
 import { graphqlSync, print } from 'graphql';
-import { makeExecutableSchema } from 'graphql-tools';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import { gql, GraphQLRequest } from 'apollo-server-core';
 import { createServer as createRegistry } from '../../src/registry';
 import { createServer as createGateway } from '../../src/gateway';
@@ -41,7 +41,7 @@ describe('@requires directive', () => {
   `),
   };
 
-  const registryInject = (schema: Schema): HTTPInjectOptions => ({
+  const registryInject = (schema: Schema): InjectOptions => ({
     method: 'POST',
     url: '/graphql',
     payload: {

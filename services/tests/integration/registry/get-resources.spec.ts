@@ -1,6 +1,5 @@
 import { print } from 'graphql';
 import { gql } from 'apollo-server-core';
-import { ApolloServerTestClient, createTestClient } from 'apollo-server-testing';
 import * as nock from 'nock';
 import { AuthType } from '../../../src/modules/registry-schema';
 import {
@@ -110,10 +109,7 @@ const baseResourceGroup: ResourceGroup = {
 };
 
 describe('Get resources', () => {
-  let client: ApolloServerTestClient;
-
   beforeEach(() => {
-    client = createTestClient(app);
     const initialPolicyFiles = { 'namespace-name.wasm': 'old compiled code' };
     mockResourceBucket({ registry: baseResourceGroup, policyFiles: initialPolicyFiles });
   });
@@ -134,7 +130,7 @@ describe('Get resources', () => {
         }
       }
     `;
-    const { data, errors } = await client.query({ query });
+    const { data, errors } = await app.executeOperation({ query });
     expect({ data, errors }).toMatchSnapshot();
   });
 
@@ -151,7 +147,7 @@ describe('Get resources', () => {
       }
     `;
     const variables = { metadata: { namespace: 'get-resource', name: 'schema1' } };
-    const { data, errors } = await client.query({ query, variables });
+    const { data, errors } = await app.executeOperation({ query, variables });
     expect({ data, errors }).toMatchSnapshot();
   });
 
@@ -171,7 +167,7 @@ describe('Get resources', () => {
         }
       }
     `;
-    const { data, errors } = await client.query({ query });
+    const { data, errors } = await app.executeOperation({ query });
     expect({ data, errors }).toMatchSnapshot();
   });
 
@@ -190,7 +186,7 @@ describe('Get resources', () => {
       }
     `;
     const variables = { metadata: { namespace: 'get-resource', name: 'upstream1' } };
-    const { data, errors } = await client.query({ query, variables });
+    const { data, errors } = await app.executeOperation({ query, variables });
     expect({ data, errors }).toMatchSnapshot();
   });
 
@@ -207,7 +203,7 @@ describe('Get resources', () => {
         }
       }
     `;
-    const { data, errors } = await client.query({ query });
+    const { data, errors } = await app.executeOperation({ query });
     expect({ data, errors }).toMatchSnapshot();
   });
 
@@ -223,7 +219,7 @@ describe('Get resources', () => {
         }
       }
     `;
-    const { data, errors } = await client.query({ query });
+    const { data, errors } = await app.executeOperation({ query });
     expect({ data, errors }).toMatchSnapshot();
   });
 
@@ -240,7 +236,7 @@ describe('Get resources', () => {
       }
     `;
     const variables = { metadata: { namespace: 'get-resource', name: 'policy1' } };
-    const { data, errors } = await client.query({ query, variables });
+    const { data, errors } = await app.executeOperation({ query, variables });
     expect({ data, errors }).toMatchSnapshot();
   });
 
@@ -254,7 +250,7 @@ describe('Get resources', () => {
         }
       }
     `;
-    const { data, errors } = await client.query({ query });
+    const { data, errors } = await app.executeOperation({ query });
     expect({ data, errors }).toMatchSnapshot();
   });
 });

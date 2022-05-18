@@ -1,6 +1,5 @@
-import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import * as nock from 'nock';
-import { gql } from 'apollo-server-core';
+import { gql, ApolloServerBase } from 'apollo-server-core';
 import { print } from 'graphql';
 import createStitchGateway from '../../../src/modules/apollo-server';
 import { beforeEachDispose } from '../before-each-dispose';
@@ -41,12 +40,9 @@ const resourceGroup = {
 );
 
 describe('Custom scalars', () => {
-  let client: ApolloServerTestClient;
-
+  let server: ApolloServerBase;
   beforeEachDispose(async () => {
-    const { server } = await createStitchGateway();
-    client = createTestClient(server);
-
+    ({ server } = await createStitchGateway());
     return () => {
       nock.cleanAll();
       return server.stop();
@@ -54,7 +50,7 @@ describe('Custom scalars', () => {
   });
 
   it('DateTime/Date/Time scalars', async () => {
-    const response = await client.query({
+    const response = await server.executeOperation({
       query: gql`
         query {
           date
@@ -75,7 +71,7 @@ describe('Custom scalars', () => {
   });
 
   it('JSON/JSONObject scalars', async () => {
-    const response = await client.query({
+    const response = await server.executeOperation({
       query: gql`
         query {
           rawJson

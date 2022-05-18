@@ -30,6 +30,7 @@
     "node/no-unsupported-features/es-syntax": "off",
     "promise/param-names": "off",
     "unicorn/catch-error-name": "off",
+    "unicorn/no-array-for-each": "off",
     "unicorn/no-fn-reference-in-iterator": "off",
     "unicorn/no-null": "off",
     "unicorn/no-reduce": "off",
@@ -43,7 +44,7 @@
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
-    "eslint-comments/require-description": ["error", { "ignore": [] }],
+    "eslint-comments/require-description": ["error", { "ignore": ["eslint-disable", "eslint-disable-next-line"] }],
     "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/no-floating-promises": ["warn", { "ignoreVoid": true }]
   },

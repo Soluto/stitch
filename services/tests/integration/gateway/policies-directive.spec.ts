@@ -1,12 +1,14 @@
-/* eslint-disable unicorn/no-useless-undefined */
-import { ApolloServerTestClient, createTestClient } from 'apollo-server-testing';
 import { ApolloServerBase, gql } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-fastify';
 import { when } from 'jest-when';
 import { concatAST, DocumentNode } from 'graphql';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import { PolicyExecutor, UnauthorizedByPolicyError } from '../../../src/modules/directives/policy';
-import { sdl as lowerCaseSdl, LowerCaseDirective } from '../utils/lower-case-directive';
-import { sdl as mockSdl, MockDirective } from '../utils/mock-directive';
+import {
+  sdl as lowerCaseSdl,
+  directiveSchemaTransformer as lowerCaseDirectiveSchemaTransformer,
+} from '../utils/lower-case-directive';
+import { sdl as mockSdl, directiveSchemaTransformer as mockDirectiveSchemaTransformer } from '../utils/mock-directive';
 import getBaseSchema from '../../../src/modules/base-schema';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import PolicyExecutionFailedError from '../../../src/modules/directives/policy/policy-execution-failed-error';
@@ -159,7 +161,6 @@ const testCases: [string, TestCase][] = [
 ];
 
 describe.each(testCases)('Policies Directive Tests', (testName, { typeDefs }) => {
-  let client: ApolloServerTestClient;
   let server: ApolloServerBase;
 
   const query = gql`
@@ -178,25 +179,30 @@ describe.each(testCases)('Policies Directive Tests', (testName, { typeDefs }) =>
 
   beforeAll(async () => {
     const baseSchema = await getBaseSchema();
-    server = new ApolloServer({
+    let schema = makeExecutableSchema({
       typeDefs: concatAST([baseSchema.typeDefs, typeDefs, lowerCaseSdl, mockSdl]),
       resolvers: [resolvers ?? {}, baseSchema.resolvers],
-      schemaDirectives: {
-        ...baseSchema.directives,
-        lowerCase: LowerCaseDirective,
-        mock: MockDirective,
-      },
+    });
+    for (const directiveSchemaTransformer of Object.values([
+      ...Object.values(baseSchema.directives),
+      mockDirectiveSchemaTransformer,
+      lowerCaseDirectiveSchemaTransformer,
+    ])) {
+      schema = directiveSchemaTransformer(schema);
+    }
+
+    server = new ApolloServer({
+      schema,
       context: {
         policyExecutor: new PolicyExecutor(),
       },
     });
-    client = createTestClient(server);
-
+    await server.start();
     expect.addSnapshotSerializer(GraphQLErrorSerializer);
   });
 
   test(testName, async () => {
-    const response = await client.query({ query });
+    const response = await server.executeOperation({ query });
     expect(response).toMatchSnapshot();
   });
 });

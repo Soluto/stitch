@@ -1,7 +1,7 @@
 import { gql } from 'apollo-server-core';
-import { EnumValueNode, GraphQLEnumType, GraphQLEnumValue, ValueNode } from 'graphql';
-import { SchemaDirectiveVisitor } from 'graphql-tools';
+import { EnumValueNode, GraphQLSchema, ValueNode } from 'graphql';
 import { GraphQLJSONObject } from 'graphql-scalars';
+import { mapSchema, MapperKind, getDirective } from '@graphql-tools/utils';
 
 function parseValueNode(valueNode: ValueNode) {
   switch (valueNode.kind) {
@@ -20,38 +20,39 @@ function parseValueNode(valueNode: ValueNode) {
   }
 }
 
-export class EnumValueDirective extends SchemaDirectiveVisitor {
-  visitEnumValue(value: GraphQLEnumValue) {
-    return value;
-  }
-}
-
-export class EnumResolverDirective extends SchemaDirectiveVisitor {
-  visitEnum(type: GraphQLEnumType): GraphQLEnumType | void | null {
-    const values = type.getValues().map(enumVal => {
-      const key = enumVal.name;
-      const enumValueDirective = enumVal.astNode?.directives?.find(d => d.name.value === 'enumValue');
-      if (!enumValueDirective) {
-        throw new Error('Each ENUM_VALUE must have @enumValue directive');
-      }
-      const valNode = enumValueDirective.arguments?.find(a => a.name.value === 'value')?.value;
-      if (!valNode) {
-        throw new Error('@enumValue directive must have "value" argument');
-      }
-      const value = parseValueNode(valNode);
-      return { key, value };
-    });
-
-    type.parseValue = k => values.find(({ key }) => key === k)?.value;
-    type.serialize = v => values.find(({ value }) => value === v)?.key;
-    type.parseLiteral = keyNode => {
-      const k = (keyNode as EnumValueNode).value;
-      return values.find(({ key }) => key === k)?.value;
-    };
-  }
-}
+const directiveName = 'enumResolver';
 
 export const sdl = gql`
-  directive @enumValue(value: JSON!) on ENUM_VALUE
   directive @enumResolver on ENUM
 `;
+
+export const directiveSchemaTransformer = (schema: GraphQLSchema) =>
+  mapSchema(schema, {
+    [MapperKind.ENUM_TYPE]: type => {
+      const directive = getDirective(schema, type, directiveName)?.[0];
+      if (directive) {
+        const values = type.getValues().map(enumVal => {
+          const key = enumVal.name;
+          const enumValueDirective = enumVal.astNode?.directives?.find(d => d.name.value === 'enumValue');
+          if (!enumValueDirective) {
+            throw new Error('Each ENUM_VALUE must have @enumValue directive');
+          }
+          const valNode = enumValueDirective.arguments?.find(a => a.name.value === 'value')?.value;
+          if (!valNode) {
+            throw new Error('@enumValue directive must have "value" argument');
+          }
+          const value = parseValueNode(valNode);
+          return { key, value };
+        });
+
+        type.parseValue = k => values.find(({ key }) => key === k)?.value;
+        type.serialize = v => values.find(({ value }) => value === v)?.key;
+        type.parseLiteral = keyNode => {
+          const k = (keyNode as EnumValueNode).value;
+          return values.find(({ key }) => key === k)?.value;
+        };
+        return type;
+      }
+      return;
+    },
+  });

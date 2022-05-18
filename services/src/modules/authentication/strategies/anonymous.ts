@@ -1,9 +1,9 @@
+import { IncomingHttpHeaders } from 'http';
 import { URL } from 'url';
-import * as fastify from 'fastify';
 import { authenticationConfig } from '../../config';
 
 export interface AnonymousAuthPartialRequest {
-  headers?: fastify.DefaultHeaders;
+  headers?: IncomingHttpHeaders;
   raw: {
     url?: string;
   };

@@ -1,15 +1,8 @@
-import { SchemaDirectiveVisitor } from 'graphql-tools';
-import { GraphQLField } from 'graphql';
+import { GraphQLSchema } from 'graphql';
 import { gql } from 'apollo-server-core';
-import { RequestContext } from '../../context';
-import { RestParams } from './types';
+import { getDirective, MapperKind, mapSchema } from '@graphql-tools/utils';
 
-export class RestDirective extends SchemaDirectiveVisitor {
-  visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
-    field.resolve = (source, args, context, info) =>
-      context.dataSources.rest.doRequest(this.args as RestParams, { source, args, context, info });
-  }
-}
+const directiveName = 'rest';
 
 export const sdl = gql`
   input KeyValue {
@@ -29,3 +22,17 @@ export const sdl = gql`
     notFoundAsNull: Boolean
   ) on FIELD_DEFINITION
 `;
+
+export const directiveSchemaTransformer = (schema: GraphQLSchema) =>
+  mapSchema(schema, {
+    [MapperKind.OBJECT_FIELD]: fieldConfig => {
+      // Check whether this field has the specified directive
+      const directive = getDirective(schema, fieldConfig, directiveName)?.[0];
+      if (directive) {
+        fieldConfig.resolve = (source, args, context, info) =>
+          context.dataSources.rest.doRequest(directive, { source, args, context, info });
+        return fieldConfig;
+      }
+      return;
+    },
+  });

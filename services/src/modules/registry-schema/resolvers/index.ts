@@ -1,4 +1,4 @@
-import { IResolvers } from 'graphql-tools';
+import { IResolvers } from '@graphql-tools/utils';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
 import {
   BasePolicyInput,

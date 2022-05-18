@@ -1,6 +1,5 @@
 import { basename } from 'path';
-import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
-import { gql } from 'apollo-server-core';
+import { ApolloServerBase, gql } from 'apollo-server-core';
 import { print } from 'graphql';
 import * as nock from 'nock';
 import createStitchGateway from '../../../src/modules/apollo-server';
@@ -88,14 +87,12 @@ const resourceGroup: ResourceGroup = {
 );
 
 describe('Schema Extensions', () => {
-  let client: ApolloServerTestClient;
+  let server: ApolloServerBase;
 
   beforeEachDispose(async () => {
     mockRestBackend('http://test.api');
 
-    const { server } = await createStitchGateway();
-    client = createTestClient(server);
-
+    ({ server } = await createStitchGateway());
     return () => {
       nock.cleanAll();
       return server.stop();
@@ -103,7 +100,7 @@ describe('Schema Extensions', () => {
   });
 
   it('Queries work through schema extensions', async () => {
-    const response = await client.query({
+    const response = await server.executeOperation({
       query: gql`
         query {
           organizations {

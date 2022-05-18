@@ -1,12 +1,11 @@
 import { promises as fs } from 'fs';
 import { exec } from 'child_process';
 import * as path from 'path';
-import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { gql } from 'apollo-server-core';
 import { graphqlSync, print } from 'graphql';
 import { mocked } from 'ts-jest/utils';
 import * as nock from 'nock';
-import { makeExecutableSchema } from 'graphql-tools';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import { beforeEachDispose } from '../before-each-dispose';
 import { app } from '../../../src/registry';
 import { MockResourceBucket, mockResourceBucket } from '../resource-bucket';
@@ -96,11 +95,9 @@ const baseResourceGroup: ResourceGroup = {
   policies: [policy],
 };
 describe('Update resource', () => {
-  let client: ApolloServerTestClient;
   let bucketContents: MockResourceBucket;
 
   beforeEachDispose(() => {
-    client = createTestClient(app);
     const initialPolicyFiles = { 'namespace-name.wasm': 'old compiled code' };
     bucketContents = mockResourceBucket({ registry: baseResourceGroup, policyFiles: initialPolicyFiles });
 
@@ -109,8 +106,8 @@ describe('Update resource', () => {
 
   it('updates a Schema', async () => {
     const newSchema = { ...schema, ...schemaUpdate };
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation CreateSchema($schema: SchemaInput!) {
           updateSchemas(input: [$schema]) {
             success
@@ -136,8 +133,8 @@ describe('Update resource', () => {
       `),
     };
     const newSchema = { ...schema, ...wrongSchemaUpdate };
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation CreateSchema($schema: SchemaInput!) {
           updateSchemas(input: [$schema]) {
             success
@@ -155,8 +152,8 @@ describe('Update resource', () => {
 
   it('updates a Schema using updateResourceGroup', async () => {
     const newSchema = { ...schema, ...schemaUpdate };
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation UploadResources($resourceGroup: ResourceGroupInput!) {
           updateResourceGroup(input: $resourceGroup) {
             success
@@ -201,8 +198,8 @@ describe('Update resource', () => {
       );
 
     const newSchema = { ...schema, ...schemaWithGql };
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation UploadResources($resourceGroup: ResourceGroupInput!) {
           updateResourceGroup(input: $resourceGroup) {
             success
@@ -229,8 +226,8 @@ describe('Update resource', () => {
       metadata: { namespace: 'namespace', name: 'upstreamWithSourceHosts' },
       sourceHosts: ['some-host-2'],
     };
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation CreateUpstream($upstreams: [UpstreamInput!]!) {
           updateUpstreams(input: $upstreams) {
             success
@@ -256,8 +253,8 @@ describe('Update resource', () => {
       },
     };
 
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation CreateUpstream($upstreamClientCredentials: UpstreamClientCredentialsInput!) {
           updateUpstreamClientCredentials(input: [$upstreamClientCredentials]) {
             success
@@ -278,8 +275,8 @@ describe('Update resource', () => {
     mockFsForOpa.mock();
 
     const newPolicy = { ...policy, ...policyUpdate };
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation CreatePolicy($policy: PolicyInput!) {
           updatePolicies(input: [$policy]) {
             success
@@ -315,8 +312,8 @@ describe('Update resource', () => {
     mockFsForOpa.mock();
 
     const newPolicy = { ...policy, ...policyUpdate };
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation UploadResources($resourceGroup: ResourceGroupInput!) {
           updateResourceGroup(input: $resourceGroup) {
             success

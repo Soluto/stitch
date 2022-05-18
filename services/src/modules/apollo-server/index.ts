@@ -1,7 +1,7 @@
 import { ApolloServer, Config } from 'apollo-server-fastify';
 import { ignorePolicies } from '../config';
 import { RESTDirectiveDataSource } from '../directives/rest';
-import { ExportTrackingExtension } from '../exports';
+// import { ExportTrackingExtension } from '../exports';
 import getPlugins from '../apollo-server-plugins';
 import createGraphQLService from './create-graphql-service';
 
@@ -15,9 +15,8 @@ export default async function createStitchGateway(apolloConfig?: Config): Promis
   const server = new ApolloServer({
     ...apolloConfig,
     gateway,
-    extensions: [() => new ExportTrackingExtension()],
+    // extensions: [() => new ExportTrackingExtension()], // TODO: Replace extensions with a plugin
     plugins: getPlugins(),
-    subscriptions: false,
     context({ request }) {
       const ctx = {
         request,

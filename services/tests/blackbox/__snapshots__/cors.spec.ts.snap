@@ -8,7 +8,7 @@ Object {
 }
 `;
 
-exports[`CORS reflight request from invalid origin 1`] = `
+exports[`CORS Preflight request from invalid origin 1`] = `
 Object {
   "access-control-allow-headers": "x-api-client, authorization",
   "access-control-allow-methods": "GET, POST",

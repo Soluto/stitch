@@ -1,7 +1,7 @@
+import { mapSchema, MapperKind, getDirective } from '@graphql-tools/utils';
 import { gql } from 'apollo-server-core';
 import { GraphQLFieldResolverParams } from 'apollo-server-types';
-import { defaultFieldResolver, FieldNode, GraphQLField, GraphQLObjectType, GraphQLResolveInfo } from 'graphql';
-import { SchemaDirectiveVisitor } from 'graphql-tools';
+import { defaultFieldResolver, FieldNode, GraphQLResolveInfo, GraphQLSchema } from 'graphql';
 import { inject } from '../arguments-injection';
 import { RequestContext } from '../context';
 
@@ -15,42 +15,7 @@ const defaultObjectResolver = (
   _info: GraphQLResolveInfo
 ) => source;
 
-export class ErrorHandlerDirective extends SchemaDirectiveVisitor {
-  visitObject(object: GraphQLObjectType<unknown, RequestContext>) {
-    const originalResolve = object.resolveObject || defaultObjectResolver;
-    const { catchError, throwError } = this.args as ErrorHandlerDirectiveArgs;
-
-    object.resolveObject = async (source, fields, context, info) => {
-      const injectionArgs = { source, args: {}, context, info };
-      let result;
-      try {
-        result = await originalResolve.call(object, source, fields, context, info);
-      } catch (error) {
-        result = handleCatchErrorArgument(catchError, error, injectionArgs);
-      }
-      throwError && handleThrowErrorArgument(throwError, result, injectionArgs);
-      return result;
-    };
-  }
-
-  visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
-    const originalResolve = field.resolve || defaultFieldResolver;
-    const { catchError, throwError } = this.args as ErrorHandlerDirectiveArgs;
-
-    field.resolve = async (source, args, context, info) => {
-      const injectionArgs = { source, args, context, info };
-      let result;
-      try {
-        result = await originalResolve.call(field, source, args, context, info);
-      } catch (error) {
-        result = handleCatchErrorArgument(catchError, error, injectionArgs);
-      }
-
-      throwError && handleThrowErrorArgument(throwError, result, injectionArgs);
-      return result;
-    };
-  }
-}
+const directiveName = 'errorHandler';
 
 export const sdl = gql`
   input CatchErrorInput {
@@ -65,6 +30,53 @@ export const sdl = gql`
 
   directive @errorHandler(catchError: CatchErrorInput, throwError: ThrowErrorInput) on OBJECT | FIELD_DEFINITION
 `;
+
+export const directiveSchemaTransformer = (schema: GraphQLSchema) =>
+  mapSchema(schema, {
+    [MapperKind.OBJECT_TYPE]: object => {
+      const directive = getDirective(schema, object, directiveName)?.[0];
+      if (directive) {
+        const originalResolve = object.resolveObject || defaultObjectResolver;
+        const { catchError, throwError } = directive as ErrorHandlerDirectiveArgs;
+
+        object.resolveObject = async (source, fields, context, info) => {
+          const injectionArgs = { source, args: {}, context, info };
+          let result;
+          try {
+            result = await originalResolve.call(object, source, fields, context, info);
+          } catch (error) {
+            result = handleCatchErrorArgument(catchError, error as Error, injectionArgs);
+          }
+          throwError && handleThrowErrorArgument(throwError, result, injectionArgs);
+          return result;
+        };
+        return object;
+      }
+      return;
+    },
+    [MapperKind.OBJECT_FIELD]: fieldConfig => {
+      const directive = getDirective(schema, fieldConfig, directiveName)?.[0];
+      if (directive) {
+        const originalResolve = fieldConfig.resolve || defaultFieldResolver;
+        const { catchError, throwError } = directive as ErrorHandlerDirectiveArgs;
+
+        fieldConfig.resolve = async (source, args, context, info) => {
+          const injectionArgs = { source, args, context, info };
+          let result;
+          try {
+            result = await originalResolve.call(fieldConfig, source, args, context, info);
+          } catch (error) {
+            result = handleCatchErrorArgument(catchError, error as Error, injectionArgs);
+          }
+
+          throwError && handleThrowErrorArgument(throwError, result, injectionArgs);
+          return result;
+        };
+        return fieldConfig;
+      }
+      return;
+    },
+  });
 
 type ErrorHandlerDirectiveArgs = {
   catchError?: {

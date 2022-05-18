@@ -52,7 +52,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
     if (bodyObj && bodyArg) {
       throw new Error('Set either "body" or "bodyArg" argument but not both');
     }
-    const body = bodyObj ? inject(bodyObj, fieldResolverParams) : fieldResolverParams.args[params.bodyArg || 'input'];
+    const body = bodyObj ? inject(bodyObj, fieldResolverParams) : fieldResolverParams.args[bodyArg || 'input'];
     if (body) {
       requestParams.body = JSON.stringify(body);
       requestParams.headers!['Content-Type'] = 'application/json';
@@ -65,7 +65,7 @@ export class RESTDirectiveDataSource extends RESTDataSource<RequestContext> {
 
   private setQueryParams(requestParams: RequestParams, params: RestParams, fieldResolverParams: FieldResolverParams) {
     const { query: kvs } = params;
-    if (!kvs || kvs.length == 0) return;
+    if (!kvs || kvs.length === 0) return;
 
     for (const kv of kvs) {
       const value = inject(kv.value, fieldResolverParams);

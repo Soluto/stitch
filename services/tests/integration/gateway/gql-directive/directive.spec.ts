@@ -1,8 +1,8 @@
-import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import * as nock from 'nock';
-import { makeExecutableSchema } from 'graphql-tools';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import { gql } from 'apollo-server-core';
 import { graphqlSync, GraphQLSchema, print, printSchema } from 'graphql';
+import { ApolloServer } from 'apollo-server-fastify';
 import createStitchGateway from '../../../../src/modules/apollo-server';
 import { beforeEachDispose } from '../../before-each-dispose';
 import { RemoteSchema } from '../../../../src/modules/directives/gql';
@@ -107,13 +107,11 @@ const testCases: [string, TestCase][] = [
 ];
 
 describe.each(testCases)('GQL Directive', (testCaseName, { statusCode, delay }) => {
-  let client: ApolloServerTestClient;
-
+  let server: ApolloServer;
   beforeEachDispose(async () => {
     mockGqlBackend(remoteHost, remoteSchema, statusCode, delay);
 
-    const { server } = await createStitchGateway();
-    client = createTestClient(server);
+    ({ server } = await createStitchGateway());
 
     return () => {
       nock.cleanAll();
@@ -122,8 +120,8 @@ describe.each(testCases)('GQL Directive', (testCaseName, { statusCode, delay }) 
   });
 
   it(`Remote GraphQL server call - ${testCaseName}`, async () => {
-    const response = await client
-      .query({
+    const response = await server
+      .executeOperation({
         query: gql`
           query EmpById($id: ID!) {
             employee(employeeId: $id) {

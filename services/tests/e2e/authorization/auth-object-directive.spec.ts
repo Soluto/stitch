@@ -1,5 +1,5 @@
 import { print } from 'graphql';
-import { GraphQLClient } from 'graphql-request';
+import { ClientError, GraphQLClient } from 'graphql-request';
 import { gql } from 'apollo-server-core';
 import {
   RegistryMutationResponse,
@@ -69,7 +69,7 @@ describe('Authorization - Policy directive on Object', () => {
         `)
       );
     } catch (e) {
-      response = e.response;
+      if (e instanceof ClientError) response = e.response;
     }
     expect(response).toMatchSnapshot();
   });
@@ -87,7 +87,7 @@ describe('Authorization - Policy directive on Object', () => {
         `)
       );
     } catch (e) {
-      response = e.response;
+      if (e instanceof ClientError) response = e.response;
     }
     expect(response).toMatchSnapshot();
   });
