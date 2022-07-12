@@ -1,5 +1,9 @@
 {
   "root": true,
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2019,
@@ -22,7 +26,8 @@
     "plugin:unicorn/recommended",
     "plugin:prettier/recommended",
     "plugin:promise/recommended",
-    "plugin:jest/style"
+    "plugin:jest/style",
+    "plugin:eslint-comments/recommended"
   ],
   "rules": {
     "no-process-exit": "off",
@@ -43,7 +48,8 @@
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-non-null-assertion": "off"
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "eslint-comments/require-description": ["error", {"ignore": []}]
   },
   "overrides": [
     {
