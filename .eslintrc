@@ -9,13 +9,7 @@
     "ecmaVersion": 2019,
     "project": ["./tsconfig.json"]
   },
-  "plugins": [
-    "@typescript-eslint",
-    "unicorn",
-    "promise",
-    "prettier",
-    "jest"
-  ],
+  "plugins": ["@typescript-eslint", "unicorn", "promise", "prettier", "jest", "simple-import-sort"],
   "extends": [
     "eslint:recommended",
     "plugin:node/recommended",
@@ -24,10 +18,10 @@
     "plugin:import/warnings",
     "plugin:import/typescript",
     "plugin:unicorn/recommended",
-    "plugin:prettier/recommended",
     "plugin:promise/recommended",
     "plugin:jest/style",
-    "plugin:eslint-comments/recommended"
+    "plugin:eslint-comments/recommended",
+    "plugin:prettier/recommended"
   ],
   "rules": {
     "no-process-exit": "off",
@@ -49,7 +43,27 @@
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
-    "eslint-comments/require-description": ["error", {"ignore": []}]
+    "eslint-comments/require-description": ["error", { "ignore": [] }],
+    "simple-import-sort/imports": [
+      "warn",
+      {
+        "groups": [
+          ["^react", "^@?\\w"],
+          ["^(@|@mx-tech-care|@soluto-private)(.*|$)"],
+          ["^\\.\\.(?!/?$)", "^\\.\\./?$", "^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
+          ["^.+\\.s?css$"]
+        ]
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "ignoreRestSiblings": true,
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "@typescript-eslint/consistent-type-imports": "warn",
+    "@typescript-eslint/no-floating-promises": ["warn", { "ignoreVoid": true }]
   },
   "overrides": [
     {

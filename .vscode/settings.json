@@ -1,4 +1,9 @@
 {
   "debug.node.autoAttach": "on",
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.onIgnoredFiles": "warn",
+  "eslint.options": {
+    "ignorePath": ".gitignore",
+    "extensions": [".js", ".ts"]
+  }
 }

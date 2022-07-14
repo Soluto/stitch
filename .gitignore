@@ -5,10 +5,23 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+# dependencies
 node_modules/
+
 *.tsbuildinfo
 .yarn-integrity
 .docker
-
+/coverage
 
 services/tests/blackbox/resources
+
+# compiled output
+/dist
+
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
