@@ -9,7 +9,7 @@
     "ecmaVersion": 2019,
     "project": ["./tsconfig.json"]
   },
-  "plugins": ["@typescript-eslint", "unicorn", "promise", "prettier", "jest", "simple-import-sort"],
+  "plugins": ["@typescript-eslint", "unicorn", "promise", "prettier", "jest"],
   "extends": [
     "eslint:recommended",
     "plugin:node/recommended",
@@ -44,9 +44,8 @@
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
     "eslint-comments/require-description": ["error", { "ignore": [] }],
-    "@typescript-eslint/no-unused-vars": ["warn", {"vars": "all", "args": "all"}],
-    "@typescript-eslint/no-floating-promises": ["warn", { "ignoreVoid": true }],
-    "object-curly-spacing": ["error", "always"]
+    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-floating-promises": ["warn", { "ignoreVoid": true }]
   },
   "overrides": [
     {
