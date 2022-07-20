@@ -5,10 +5,15 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+# dependencies
 node_modules/
+
 *.tsbuildinfo
 .yarn-integrity
 .docker
-
+/coverage
 
 services/tests/blackbox/resources
+
+# compiled output
+/dist
