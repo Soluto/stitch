@@ -1,6 +1,5 @@
-import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import * as nock from 'nock';
-import { gql } from 'apollo-server-core';
+import { ApolloServerBase, gql } from 'apollo-server-core';
 import { print } from 'graphql';
 import createStitchGateway from '../../../src/modules/apollo-server';
 import { beforeEachDispose } from '../before-each-dispose';
@@ -36,12 +35,9 @@ const resourceGroup: ResourceGroup & { etag: string } = {
 );
 
 describe('Hello world', () => {
-  let client: ApolloServerTestClient;
-
+  let server: ApolloServerBase;
   beforeEachDispose(async () => {
-    const { server } = await createStitchGateway();
-    client = createTestClient(server);
-
+    ({ server } = await createStitchGateway());
     return () => {
       nock.cleanAll();
       return server.stop();
@@ -49,7 +45,7 @@ describe('Hello world', () => {
   });
 
   it('Returns basic hello world', async () => {
-    const response = await client.query({
+    const response = await server.executeOperation({
       query: gql`
         query {
           hello

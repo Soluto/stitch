@@ -18,12 +18,8 @@ function capturingStdWrite(
   encoding?: BufferEncoding | ((err?: Error) => void),
   cb?: (err?: Error) => void
 ) {
-  let chunk: string;
-  if (typeof str === 'string') {
-    chunk = str;
-  } else {
-    chunk = Buffer.from(str).toString(typeof encoding === 'string' ? encoding : 'utf8');
-  }
+  const chunk =
+    typeof str === 'string' ? str : Buffer.from(str).toString(typeof encoding === 'string' ? encoding : 'utf8');
   output += chunk;
 
   if (typeof encoding === 'string') {

@@ -8,8 +8,8 @@ import PolicyExecutionFailedError from '../directives/policy/policy-execution-fa
 
 export function createBasicPolicyPlugin(): ApolloServerPlugin {
   return {
-    requestDidStart: () => ({
-      executionDidStart: () => ({
+    requestDidStart: async () => ({
+      executionDidStart: async () => ({
         willResolveField(
           fieldResolverParams: GraphQLFieldResolverParams<unknown, RequestContext, Record<string, unknown>>
         ): ((error: Error | null, result?: unknown) => void) | void {

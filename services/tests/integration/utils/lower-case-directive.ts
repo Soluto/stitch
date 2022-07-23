@@ -1,30 +1,55 @@
-import { SchemaDirectiveVisitor } from 'graphql-tools';
-import { GraphQLField, defaultFieldResolver, GraphQLObjectType } from 'graphql';
+import { defaultFieldResolver, GraphQLFieldResolver, GraphQLSchema } from 'graphql';
 import { gql } from 'apollo-server-core';
+import { getDirective, MapperKind, mapSchema } from '@graphql-tools/utils';
 
-export class LowerCaseDirective extends SchemaDirectiveVisitor {
-  visitObject(object: GraphQLObjectType<unknown, unknown>) {
-    const fields = object.getFields();
-    const fieldDefinitions = object.astNode?.fields;
+const directiveName = 'lowerCase';
 
-    if (fieldDefinitions) {
-      for (const fd of fieldDefinitions) {
-        const field = fields[fd.name.value];
-        this.visitFieldDefinition(field);
-      }
+const mapObjectField = (fieldConfig: {
+  resolve?: GraphQLFieldResolver<
+    any,
+    any,
+    {
+      [argName: string]: any;
     }
-  }
+  >;
+}) => {
+  const originalResolve = fieldConfig.resolve || defaultFieldResolver;
+  fieldConfig.resolve = async (source, args, context, info) => {
+    const result = await originalResolve.call(fieldConfig, source, args, context, info);
 
-  visitFieldDefinition(field: GraphQLField<unknown, unknown>) {
-    const originalResolve = field.resolve || defaultFieldResolver;
-    field.resolve = async (parent, args, context, info) => {
-      const result = await originalResolve.call(field, parent, args, context, info);
-
-      return String(result).toLowerCase();
-    };
-  }
-}
+    return String(result).toLowerCase();
+  };
+  return fieldConfig;
+};
 
 export const sdl = gql`
   directive @lowerCase on OBJECT | FIELD_DEFINITION
 `;
+
+export const directiveSchemaTransformer = (schema: GraphQLSchema) =>
+  mapSchema(schema, {
+    [MapperKind.OBJECT_TYPE]: object => {
+      const directive = getDirective(schema, object, directiveName)?.[0];
+      if (directive) {
+        const fields = object.getFields();
+        const fieldDefinitions = object.astNode?.fields;
+
+        if (fieldDefinitions) {
+          for (const fd of fieldDefinitions) {
+            const field = fields[fd.name.value];
+            mapObjectField(field);
+          }
+        }
+        return object;
+      }
+      return;
+    },
+    [MapperKind.OBJECT_FIELD]: fieldConfig => {
+      const directive = getDirective(schema, fieldConfig, directiveName)?.[0];
+      if (directive) {
+        mapObjectField(fieldConfig);
+        return fieldConfig;
+      }
+      return;
+    },
+  });

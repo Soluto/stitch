@@ -1,8 +1,6 @@
 import {
   GraphQLResolveInfo,
-  GraphQLField,
   defaultFieldResolver,
-  GraphQLObjectType,
   FieldNode,
   GraphQLError,
   GraphQLScalarType,
@@ -10,10 +8,11 @@ import {
   ValueNode,
   StringValueNode,
   ObjectValueNode,
+  GraphQLSchema,
 } from 'graphql';
-import { SchemaDirectiveVisitor } from 'graphql-tools';
 import { gql } from 'apollo-server-core';
 import { GraphQLJSONObject } from 'graphql-type-json';
+import { mapSchema, MapperKind, getDirective } from '@graphql-tools/utils';
 import { RequestContext } from '../../context';
 import logger, { createChildLogger } from '../../logger';
 import { GraphQLArguments, Policy } from './types';
@@ -51,70 +50,82 @@ const validatePolicies = async (
   );
 };
 
-export class PoliciesDirective extends SchemaDirectiveVisitor {
-  visitObject(object: GraphQLObjectType<unknown, RequestContext>) {
-    const { policies, relation, postResolve } = this.args;
+const directiveName = 'policies';
 
-    const originalResolveObject = object.resolveObject;
+export const directiveSchemaTransformer = (schema: GraphQLSchema) =>
+  mapSchema(schema, {
+    [MapperKind.OBJECT_TYPE]: object => {
+      const directive = getDirective(schema, object, directiveName)?.[0];
+      if (directive) {
+        const { policies, relation, postResolve } = directive;
 
-    object.resolveObject = async (
-      source: unknown,
-      fields: Record<string, ReadonlyArray<FieldNode>>,
-      context: RequestContext,
-      info: GraphQLResolveInfo
-    ) => {
-      const pLogger = createChildLogger(logger, 'policies-directive', {
-        policies,
-        type: info.parentType.name,
-        field: info.fieldName,
-      });
-      if (!postResolve) {
-        pLogger.trace('Pre resolve validation');
-        await validatePolicies(policies, relation, source, {}, context, info);
+        const originalResolveObject = object.resolveObject;
+
+        object.resolveObject = async (
+          source: unknown,
+          fields: Record<string, ReadonlyArray<FieldNode>>,
+          context: RequestContext,
+          info: GraphQLResolveInfo
+        ) => {
+          const pLogger = createChildLogger(logger, 'policies-directive', {
+            policies,
+            type: info.parentType.name,
+            field: info.fieldName,
+          });
+          if (!postResolve) {
+            pLogger.trace('Pre resolve validation');
+            await validatePolicies(policies, relation, source, {}, context, info);
+          }
+
+          const result = originalResolveObject ? await originalResolveObject(source, fields, context, info) : source;
+
+          if (postResolve) {
+            pLogger.trace({ result }, 'Post resolve validation');
+            await validatePolicies(policies, relation, source, {}, context, info, result);
+          }
+
+          return result;
+        };
+        return object;
       }
+      return;
+    },
+    [MapperKind.OBJECT_FIELD]: fieldConfig => {
+      const directive = getDirective(schema, fieldConfig, directiveName)?.[0];
+      if (directive) {
+        const { policies, relation, postResolve } = directive;
+        const originalResolve = fieldConfig.resolve || defaultFieldResolver;
 
-      const result = originalResolveObject ? await originalResolveObject(source, fields, context, info) : source;
+        fieldConfig.resolve = async (
+          source: unknown,
+          args: GraphQLArguments,
+          context: RequestContext,
+          info: GraphQLResolveInfo
+        ) => {
+          const pLogger = createChildLogger(logger, 'policies-directive', {
+            policies,
+            type: info.parentType.name,
+            field: info.fieldName,
+          });
+          if (!postResolve) {
+            pLogger.trace('Pre resolve validation');
+            await validatePolicies(policies, relation, source, args, context, info);
+          }
 
-      if (postResolve) {
-        pLogger.trace({ result }, 'Post resolve validation');
-        await validatePolicies(policies, relation, source, {}, context, info, result);
+          const result = await originalResolve.call(fieldConfig, source, args, context, info);
+
+          if (postResolve) {
+            pLogger.trace({ result }, 'Post resolve validation');
+            await validatePolicies(policies, relation, source, args, context, info, result);
+          }
+
+          return result;
+        };
+        return fieldConfig;
       }
-
-      return result;
-    };
-  }
-
-  visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
-    const { policies, relation, postResolve } = this.args;
-    const originalResolve = field.resolve || defaultFieldResolver;
-
-    field.resolve = async (
-      source: unknown,
-      args: GraphQLArguments,
-      context: RequestContext,
-      info: GraphQLResolveInfo
-    ) => {
-      const pLogger = createChildLogger(logger, 'policies-directive', {
-        policies,
-        type: info.parentType.name,
-        field: info.fieldName,
-      });
-      if (!postResolve) {
-        pLogger.trace('Pre resolve validation');
-        await validatePolicies(policies, relation, source, args, context, info);
-      }
-
-      const result = await originalResolve.call(field, source, args, context, info);
-
-      if (postResolve) {
-        pLogger.trace({ result }, 'Post resolve validation');
-        await validatePolicies(policies, relation, source, args, context, info, result);
-      }
-
-      return result;
-    };
-  }
-}
+      return;
+    },
+  });
 
 const PolicyDetails = new GraphQLScalarType({
   name: 'PolicyDetails',

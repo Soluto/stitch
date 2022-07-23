@@ -1,6 +1,5 @@
-import { gql } from 'apollo-server-core';
+import { ApolloServerBase, gql } from 'apollo-server-core';
 import { print } from 'graphql';
-import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { Schema, ResourceGroup } from '../../../src/modules/resource-repository';
 import { PolicyDefinition, PolicyType } from '../../../src/modules/resource-repository/types';
 import createStitchGateway from '../../../src/modules/apollo-server';
@@ -84,15 +83,13 @@ const resourceGroup: ResourceGroup = {
 );
 
 describe('Policy Caching', () => {
-  let client: ApolloServerTestClient;
   let _evaluatePolicySpy: jest.SpyInstance;
+  let server: ApolloServerBase;
 
   beforeEachDispose(async () => {
     _evaluatePolicySpy = jest.spyOn(PolicyExecutor.prototype as any, '_evaluatePolicy');
 
-    const { server } = await createStitchGateway();
-    client = createTestClient(server);
-
+    ({ server } = await createStitchGateway());
     return () => {
       jest.restoreAllMocks();
       return server.stop();
@@ -100,7 +97,7 @@ describe('Policy Caching', () => {
   });
 
   it('Evaluates a Policy with identical args only once per request', async () => {
-    const response = await client.query({
+    const response = await server.executeOperation({
       query: gql`
         query {
           user {

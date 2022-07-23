@@ -1,5 +1,5 @@
 import { visit, DocumentNode, GraphQLError } from 'graphql';
-import { IResolvers } from 'graphql-tools';
+import { IResolvers } from '@graphql-tools/utils';
 
 type SourceWithTypename = {
   __typename: string;

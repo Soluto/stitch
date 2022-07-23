@@ -1,5 +1,5 @@
 import { print } from 'graphql';
-import { GraphQLClient } from 'graphql-request';
+import { ClientError, GraphQLClient } from 'graphql-request';
 import { gql } from 'apollo-server-core';
 import {
   RegistryMutationResponse,
@@ -57,7 +57,7 @@ describe('Authorization - Replace policy error by "not found" one', () => {
         `)
       );
     } catch (e) {
-      response = e.response;
+      if (e instanceof ClientError) response = e.response;
     }
     expect(response).toMatchSnapshot();
   });

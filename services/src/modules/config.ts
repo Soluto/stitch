@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as envVar from 'env-var';
 import { LoggerOptions, LevelWithSilent } from 'pino';
-import { PlaygroundConfig } from 'apollo-server-core';
+// import { PlaygroundConfig } from 'apollo-server-core';
 import { AuthenticationConfig } from './authentication/types';
 import { CorsConfiguration } from './cors';
 
@@ -33,10 +33,10 @@ export const resourceUpdateInterval = envVarExt.get('RESOURCE_UPDATE_INTERVAL').
 
 // GraphQL configuration
 export const enableGraphQLTracing = envVarExt.get('GRAPHQL_TRACING').default('true').asBool();
-export const enableGraphQLPlayground = envVarExt
-  .get('GRAPHQL_PLAYGROUND')
-  .default('true')
-  .asJsonObject() as PlaygroundConfig;
+// export const enableGraphQLPlayground = envVarExt
+//   .get('GRAPHQL_PLAYGROUND')
+//   .default('true')
+//   .asJsonObject() as PlaygroundConfig;
 export const enableGraphQLIntrospection = envVarExt.get('GRAPHQL_INTROSPECTION').default('true').asBoolStrict();
 
 // Policies

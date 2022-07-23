@@ -1,10 +1,10 @@
-import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { IResolvers } from '@graphql-tools/utils';
 import { ApolloServerBase, gql } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-fastify';
 import { concatAST, DocumentNode } from 'graphql';
-import { IResolvers, SchemaDirectiveVisitor } from 'graphql-tools';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
-import { sdl as stubSdl, StubDirective } from './stub';
+import { sdl as stubSdl, directiveSchemaTransformer } from './stub';
 
 interface TestCase {
   typeDefs: DocumentNode;
@@ -92,27 +92,25 @@ const baseTypeDefs = gql`
   directive @keepStringVariable(var: String!) on FIELD
 `;
 
-const schemaDirectives: Record<string, typeof SchemaDirectiveVisitor> = {
-  stub: StubDirective,
-};
-
 const resolvers: IResolvers = {
   JSON: GraphQLJSON,
   JSONObject: GraphQLJSONObject,
 };
 
 describe.each(testCases)('Stub Directive', (testCase, { typeDefs, query, variables, rootValue, expected }) => {
-  let client: ApolloServerTestClient;
   let server: ApolloServerBase;
 
   beforeAll(() => {
+    const schema = directiveSchemaTransformer(
+      makeExecutableSchema({
+        typeDefs: concatAST([typeDefs, baseTypeDefs, stubSdl]),
+        resolvers,
+      })
+    );
     server = new ApolloServer({
-      typeDefs: concatAST([typeDefs, baseTypeDefs, stubSdl]),
-      schemaDirectives,
-      resolvers,
+      schema,
       rootValue,
     });
-    client = createTestClient(server);
   });
 
   afterAll(async () => {
@@ -120,7 +118,7 @@ describe.each(testCases)('Stub Directive', (testCase, { typeDefs, query, variabl
   });
 
   test(testCase, async () => {
-    const response = await client.query({ query, variables });
+    const response = await server.executeOperation({ query, variables });
     expect(response.data).toEqual(expected);
   });
 });

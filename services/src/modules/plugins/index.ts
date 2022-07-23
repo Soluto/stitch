@@ -1,5 +1,5 @@
 import { gql } from 'apollo-server-core';
-import { IResolvers } from 'graphql-tools';
+import { IResolvers } from '@graphql-tools/utils';
 import * as _ from 'lodash';
 import {
   plugins,

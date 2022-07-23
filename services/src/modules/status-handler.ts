@@ -1,5 +1,4 @@
 import * as path from 'path';
-import { ServerResponse } from 'http';
 import { FastifyRequest, FastifyReply } from 'fastify';
 import logger, { createChildLogger } from './logger';
 import getResourceRepository from './registry-schema/repository';
@@ -8,9 +7,9 @@ import { getCompiledFilename } from './opa-helper';
 
 const sLogger = createChildLogger(logger, 'status-endpoint');
 
-export default async function (request: FastifyRequest, reply: FastifyReply<ServerResponse>) {
+export default async function (request: FastifyRequest, reply: FastifyReply) {
   try {
-    const isRegistry = request?.query?.registry === 'true';
+    const isRegistry = (request?.query as Record<string, unknown>)?.registry === 'true';
     const repository = getResourceRepository(isRegistry);
 
     const [metadata, missingOpaPolicyAttachments] = await Promise.all([
@@ -19,10 +18,10 @@ export default async function (request: FastifyRequest, reply: FastifyReply<Serv
     ]);
 
     const result = { metadata, missingOpaPolicyAttachments };
-    reply.status(200).send(result);
+    await reply.status(200).send(result);
   } catch (err) {
-    sLogger.error(err, 'Error getting data for status endpoint');
-    reply.status(500).send(err?.message);
+    sLogger.error(err as Error, 'Error getting data for status endpoint');
+    await reply.status(500).send((err as Error).message);
   }
 }
 

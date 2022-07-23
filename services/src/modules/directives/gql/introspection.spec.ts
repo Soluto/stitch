@@ -1,6 +1,6 @@
 import { gql } from 'apollo-server-core';
 import { DocumentNode, graphqlSync, print } from 'graphql';
-import { makeExecutableSchema } from 'graphql-tools';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import * as nock from 'nock';
 import { RegistryRequestContext } from '../../registry-schema';
 import { ResourceGroup } from '../../resource-repository';

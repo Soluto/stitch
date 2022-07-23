@@ -34,11 +34,11 @@ export async function prepareCompiledRegoFile(resourceMetadata: ResourceMetadata
     regoLogger.debug('Rego compilation succeeded');
   } catch (err) {
     regoLogger.warn(
-      { err, cmd: err.cmd, stdout: err.stdout },
+      { err, cmd: (err as any).cmd, stdout: (err as any).stdout },
       'Rego compilation failed (normally means invalid user input)'
     );
 
-    const errors = [new GraphQLError(err.stdout)];
+    const errors = [new GraphQLError((err as any).stdout)];
     throw new ApolloError('Rego compilation failed', 'REGO_COMPILATION_FAILURE', { errors });
   } finally {
     try {

@@ -8,7 +8,7 @@ import { PolicyExecutor } from '../directives/policy';
 
 export function createIntrospectionQueryPolicyPlugin(): ApolloServerPlugin {
   return {
-    serverWillStart() {
+    async serverWillStart() {
       wrapWithPolicyValidation(SchemaMetaFieldDef);
       wrapWithPolicyValidation(TypeMetaFieldDef);
     },
@@ -31,7 +31,7 @@ function wrapWithPolicyValidation(field: GraphQLField<unknown, RequestContext>) 
     const {
       resourceGroup: { introspectionQueryPolicy, basePolicy },
       policyExecutor,
-    } = context as unknown as RequestContext;
+    } = (context as unknown) as RequestContext;
 
     let policy = introspectionQueryPolicy;
 

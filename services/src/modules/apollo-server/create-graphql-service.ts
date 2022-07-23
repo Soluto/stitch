@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { GraphQLExecutor, GraphQLService, SchemaChangeCallback } from 'apollo-server-core';
+import { GraphQLService, SchemaChangeCallback } from 'apollo-server-core';
 import { execute, GraphQLSchema } from 'graphql';
 import type { GraphQLRequestContextExecutionDidStart } from 'apollo-server-types';
 import { getResourceRepository, ResourceGroup } from '../resource-repository';
@@ -32,19 +32,24 @@ let _resourceGroup: ResourceGroup | undefined;
 let schema: GraphQLSchema | undefined;
 
 const executor = async <TContext>(requestContext: GraphQLRequestContextExecutionDidStart<TContext>) => {
-  const { operationName } = requestContext;
+  const {
+    operationName,
+    context,
+    document,
+    request: { operationName: requestOperationName, variables },
+  } = requestContext;
   const eLogger = createChildLogger(logger, 'request-executor', { operationName });
   eLogger.trace('Enriching request context...');
-  ((requestContext.context as unknown) as RequestContext).resourceGroup = _resourceGroup!;
-  ((requestContext.context as unknown) as RequestContext).activeDirectoryAuth = activeDirectoryAuth;
-  ((requestContext.context as unknown) as RequestContext).policyExecutor = policyExecutor;
+  ((context as unknown) as RequestContext).resourceGroup = _resourceGroup!;
+  ((context as unknown) as RequestContext).activeDirectoryAuth = activeDirectoryAuth;
+  ((context as unknown) as RequestContext).policyExecutor = policyExecutor;
   eLogger.trace('Executing request...');
   const result = await execute({
-    document: requestContext.document,
+    document: document,
     schema: schema!,
-    contextValue: requestContext.context,
-    operationName: requestContext.operationName ?? requestContext.request.operationName,
-    variableValues: requestContext.request.variables,
+    contextValue: context,
+    operationName: operationName ?? requestOperationName,
+    variableValues: variables,
   });
   eLogger.trace('Executed.');
   return result;
@@ -69,7 +74,7 @@ export default function createGraphQLService(): LocalFederationGateway {
     // executor property of return value of load method is not in use anymore in apollo-server-core v2.22.2
     // instead the executor property is in use.
     // eslint-disable-next-line prettier/prettier
-    return { schema, executor: (undefined as unknown) as GraphQLExecutor };
+    return { schema, executor };
   };
 
   const updateSchema = async () => {
@@ -87,7 +92,6 @@ export default function createGraphQLService(): LocalFederationGateway {
   return {
     load,
     onSchemaChange,
-    executor,
     stop,
     updateSchema,
   };

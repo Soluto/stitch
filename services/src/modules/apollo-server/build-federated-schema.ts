@@ -18,23 +18,26 @@ import {
   parse,
   GraphQLError,
   concatAST,
+  GraphQLSchema,
 } from 'graphql';
-import { IResolvers, makeExecutableSchema, SchemaDirectiveVisitor } from 'graphql-tools';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import { composeAndValidate } from '@apollo/federation';
 import { ApolloError } from 'apollo-server-core';
+import { IResolvers } from '@graphql-tools/utils';
 import createTypeResolvers from '../implicit-type-resolver';
 import { knownApolloDirectives } from '../config';
 import logger, { createChildLogger } from '../logger';
-interface DirectiveVisitors {
-  [directiveName: string]: typeof SchemaDirectiveVisitor;
-}
+import { ResourceGroup } from '../resource-repository';
 
 interface FederatedSchemaBase {
   typeDefs: { [name: string]: DocumentNode };
   baseTypeDefs: DocumentNode;
   resolvers: IResolvers;
-  schemaDirectives: DirectiveVisitors;
-  schemaDirectivesContext: Record<string, unknown>;
+  schemaDirectives: Record<
+    string,
+    (schema: GraphQLSchema, context?: { resourceGroup: ResourceGroup }) => GraphQLSchema
+  >;
+  schemaDirectivesContext: { resourceGroup: ResourceGroup };
 }
 
 type DirectivesUsagesByObjectName = Record<string, DirectiveNode[]>;
@@ -79,7 +82,9 @@ export function buildSchemaFromFederatedTypeDefs({
   if (compositionErrors.length > 0) {
     fLogger.error({ compositionErrors }, 'Schema federation validation failed');
     throw new ApolloError('Schema federation validation failed', 'FEDERATION_VALIDATION_FAILURE', {
-      errors: compositionErrors.map(err => (err instanceof GraphQLError ? err : new GraphQLError(err!.message))),
+      errors: compositionErrors.map((err: Error) =>
+        err instanceof GraphQLError ? err : new GraphQLError(err!.message)
+      ),
     });
   }
 
@@ -112,13 +117,14 @@ export function buildSchemaFromFederatedTypeDefs({
   const directiveTypeDefs = baseTypeDefs.definitions.filter(td => td.kind === 'DirectiveDefinition');
 
   // Create final schema, re-adding directive definitions and directive implementations
-  const schema = makeExecutableSchema({
+  let schema = makeExecutableSchema({
     typeDefs: [...directiveTypeDefs, fullTypeDefWithDirectives],
     resolvers: [resolvers, typeResolvers],
   });
 
-  SchemaDirectiveVisitor.visitSchemaDirectives(schema, schemaDirectives, schemaDirectivesContext);
-
+  for (const schemaDirective of Object.values(schemaDirectives)) {
+    schema = schemaDirective(schema, schemaDirectivesContext);
+  }
   return schema;
 }
 

@@ -1,4 +1,3 @@
-import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import * as nock from 'nock';
 import { gql } from 'apollo-server-core';
 import { print } from 'graphql';
@@ -42,7 +41,6 @@ const resourceGroup: ResourceGroup = {
 
 describe('Hello world', () => {
   let stitch: StitchGatewayService;
-  let client: ApolloServerTestClient;
 
   const fetchLatestMock = jest.fn();
   (getResourceRepository as jest.Mock).mockImplementationOnce(
@@ -57,7 +55,6 @@ describe('Hello world', () => {
     );
 
     stitch = await createStitchGateway();
-    client = createTestClient(stitch.server);
 
     return () => {
       jest.useRealTimers();
@@ -67,7 +64,7 @@ describe('Hello world', () => {
   });
 
   it('Returns different values after schema updates', async () => {
-    const response1 = await client.query({
+    const response1 = await stitch.server.executeOperation({
       query: gql`
         query {
           version
@@ -83,7 +80,7 @@ describe('Hello world', () => {
     );
     await stitch.updateSchema();
 
-    const response2 = await client.query({
+    const response2 = await stitch.server.executeOperation({
       query: gql`
         query {
           version

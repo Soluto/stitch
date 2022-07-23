@@ -1,9 +1,9 @@
 import { ApolloServer } from 'apollo-server-fastify';
-import * as fastify from 'fastify';
-import * as corsPlugin from 'fastify-cors';
+import { fastify, FastifyInstance } from 'fastify';
+import corsPlugin from '@fastify/cors';
 import * as fastifyMetrics from 'fastify-metrics';
-import * as jwtPlugin from 'fastify-jwt';
-import * as authPlugin from 'fastify-auth';
+import jwtPlugin from '@fastify/jwt';
+import authPlugin from '@fastify/auth';
 import * as config from './modules/config';
 import { RegistryRequestContext, resolvers, typeDefs } from './modules/registry-schema';
 import logger, { createChildLogger } from './modules/logger';
@@ -26,8 +26,8 @@ export const app = new ApolloServer({
     };
     return ctx;
   },
-  tracing: config.enableGraphQLTracing,
-  playground: config.enableGraphQLPlayground,
+  // tracing: config.enableGraphQLTracing,
+  // playground: config.enableGraphQLPlayground,
   introspection: config.enableGraphQLIntrospection,
 });
 
@@ -40,8 +40,8 @@ export async function createServer() {
   await app.start();
 
   const server = fastify();
-  server
-    .register(corsPlugin as any, config.corsConfiguration)
+  await server
+    .register(corsPlugin, config.corsConfiguration)
     .register(authPlugin)
     .register(jwtPlugin, {
       secret: getSecret,
@@ -51,7 +51,7 @@ export async function createServer() {
     })
     .register(jwtDecoderPlugin)
     .register(anonymousPlugin)
-    .register(app.createHandler({ path: '/graphql' }))
+    .register(app.createHandler({ path: '/graphql', cors: false }))
     .register(fastifyMetrics, { endpoint: '/metrics' });
 
   server.after(() => {
@@ -65,7 +65,7 @@ export async function createServer() {
   return server;
 }
 
-async function runServer(server: fastify.FastifyInstance) {
+async function runServer(server: FastifyInstance) {
   const address = await server.listen(config.httpPort, '0.0.0.0');
   sLogger.info({ address }, 'Stitch registry started');
 
@@ -76,5 +76,5 @@ async function runServer(server: fastify.FastifyInstance) {
 // Only run when file is being executed, not when being imported
 if (require.main === module) {
   // eslint-disable-next-line promise/catch-or-return
-  createServer().then(runServer);
+  void createServer().then(runServer);
 }

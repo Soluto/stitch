@@ -1,12 +1,9 @@
 import fetch from 'node-fetch';
-import { createHttpLink } from 'apollo-link-http';
-import { ObjectTypeDefinitionNode, ObjectTypeExtensionNode, parse, printSchema, StringValueNode } from 'graphql';
-import { introspectSchema } from 'graphql-tools';
+import { print, ObjectTypeDefinitionNode, ObjectTypeExtensionNode, parse, printSchema, StringValueNode } from 'graphql';
+import { introspectSchema } from '@graphql-tools/wrap';
 import { ApolloError } from 'apollo-server-core';
-import { ApolloLink } from 'apollo-link';
-import { setContext } from 'apollo-link-context';
-import { RetryLink } from 'apollo-link-retry';
 import * as _ from 'lodash';
+import { AsyncExecutor } from '@graphql-tools/utils';
 import { applyUpstream } from '../../upstreams';
 import logger from '../../logger';
 import { ResourceGroup } from '../../resource-repository';
@@ -70,32 +67,28 @@ export async function updateRemoteGqlSchemas(resourceGroup: ResourceGroup, conte
 
 export async function fetchRemoteGqlSchema(url: string, resourceGroup: ResourceGroup, context: RegistryRequestContext) {
   try {
-    const link = ApolloLink.from([
-      new RetryLink({
-        delay: { max: 1000 },
-        attempts: {
-          max: 3,
-          retryIf(error) {
-            logger.warn({ error, url }, 'Failed fetching introspection query');
-            return !!error;
-          },
+    const executor: AsyncExecutor = async ({ document, variables }) => {
+      const query = print(document);
+      const fetchResult = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      }),
-      setContext(async () => {
-        const requestParams = await applyUpstream(
-          {
-            url: new URL(url),
-          },
-          resourceGroup,
-          context.activeDirectoryAuth,
-          context.request
-        );
-        return { ...requestParams, uri: requestParams.url };
-      }),
-      createHttpLink({ fetch: fetch as any }),
-    ]);
+        body: JSON.stringify({ query, variables }),
+      });
+      return fetchResult.json();
+    };
 
-    const remoteSchema = await introspectSchema(link);
+    const requestParams = await applyUpstream(
+      {
+        url: new URL(url),
+      },
+      resourceGroup,
+      context.activeDirectoryAuth,
+      context.request
+    );
+    const executorContext = { ...requestParams, uri: requestParams.url };
+    const remoteSchema = await introspectSchema(executor, executorContext);
     return printSchema(remoteSchema);
   } catch (err) {
     logger.error({ err, url }, `Introspection query to ${url} failed`);

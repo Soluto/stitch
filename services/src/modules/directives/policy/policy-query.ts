@@ -1,41 +1,44 @@
-import { SchemaDirectiveVisitor } from 'graphql-tools';
-import { GraphQLField, GraphQLResolveInfo } from 'graphql';
+import { GraphQLSchema } from 'graphql';
 import { gql } from 'apollo-server-core';
-import { RequestContext } from '../../context';
+import { mapSchema, MapperKind, getDirective } from '@graphql-tools/utils';
 import logger, { createChildLogger } from '../../logger';
-import { PolicyResult, Policy } from './types';
+import { Policy } from './types';
 
-export class PolicyQueryDirective extends SchemaDirectiveVisitor {
-  visitFieldDefinition(field: GraphQLField<unknown, RequestContext>) {
-    field.resolve = async (
-      source: unknown,
-      args: Record<string, unknown>,
-      context: RequestContext,
-      info: GraphQLResolveInfo
-    ): Promise<PolicyResult> => {
-      const policy: Policy = {
-        namespace: this.args.namespace,
-        name: this.args.name,
-        args: args,
-      };
-
-      const logData = {
-        policy: {
-          namespace: policy.namespace,
-          name: policy.name,
-        },
-        type: info.parentType.name,
-        field: info.fieldName,
-      };
-      const policyLogger = createChildLogger(logger, 'policy-query-directive', logData);
-      policyLogger.trace('Evaluating policy...');
-      const allow = await context.policyExecutor.evaluatePolicy(policy, policyLogger, source, args, context, info);
-      policyLogger.trace({ allow }, 'The policy has been evaluated');
-      return { allow };
-    };
-  }
-}
+const directiveName = 'policyQuery';
 
 export const sdl = gql`
   directive @policyQuery(namespace: String!, name: String!) on FIELD_DEFINITION
 `;
+
+export const directiveSchemaTransformer = (schema: GraphQLSchema) =>
+  mapSchema(schema, {
+    [MapperKind.OBJECT_FIELD]: fieldConfig => {
+      // Check whether this field has the specified directive
+      const directive = getDirective(schema, fieldConfig, directiveName)?.[0];
+      if (directive) {
+        fieldConfig.resolve = async (source, args, context, info) => {
+          const policy: Policy = {
+            namespace: directive.namespace,
+            name: directive.name,
+            args,
+          };
+
+          const logData = {
+            policy: {
+              namespace: policy.namespace,
+              name: policy.name,
+            },
+            type: info.parentType.name,
+            field: info.fieldName,
+          };
+          const policyLogger = createChildLogger(logger, 'policy-query-directive', logData);
+          policyLogger.trace('Evaluating policy...');
+          const allow = await context.policyExecutor.evaluatePolicy(policy, policyLogger, source, args, context, info);
+          policyLogger.trace({ allow }, 'The policy has been evaluated');
+          return { allow };
+        };
+        return fieldConfig;
+      }
+      return;
+    },
+  });

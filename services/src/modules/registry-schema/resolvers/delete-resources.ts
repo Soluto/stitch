@@ -29,7 +29,7 @@ export default async function (deletions: ResourceGroupMetadataInput, context: R
 
       // TODO: In case of upstream deletion we should force refresh of remote schemas
       logger.debug('Updating remote gql schemas...');
-      updateRemoteGqlSchemas(newRg, context);
+      await updateRemoteGqlSchemas(newRg, context);
 
       const registryRg = _.cloneDeep(newRg);
 

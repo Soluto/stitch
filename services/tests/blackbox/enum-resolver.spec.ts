@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import * as nock from 'nock';
-import { HTTPInjectOptions } from 'fastify';
+import { InjectOptions } from 'fastify';
 import { print } from 'graphql';
 import { gql, GraphQLRequest } from 'apollo-server-core';
 import { createServer as createRegistry } from '../../src/registry';
@@ -27,7 +27,7 @@ describe('@enumResolver directive', () => {
     `),
   };
 
-  const registryInject = (schema: Schema): HTTPInjectOptions => ({
+  const registryInject = (schema: Schema): InjectOptions => ({
     method: 'POST',
     url: '/graphql',
     payload: {

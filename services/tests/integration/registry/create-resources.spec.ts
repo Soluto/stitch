@@ -1,7 +1,6 @@
 import { exec } from 'child_process';
 import * as path from 'path';
 import { promises as fs } from 'fs';
-import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { gql } from 'apollo-server-core';
 import { mocked } from 'ts-jest/utils';
 import * as nock from 'nock';
@@ -88,19 +87,17 @@ const baseResourceGroup: ResourceGroup = {
 };
 
 describe('Create resource', () => {
-  let client: ApolloServerTestClient;
   let bucketContents: MockResourceBucket;
 
   beforeEachDispose(() => {
-    client = createTestClient(app);
     bucketContents = mockResourceBucket({ registry: baseResourceGroup });
 
     return () => nock.cleanAll();
   });
 
   it('creates a Schema', async () => {
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation CreateSchema($schema: SchemaInput!) {
           updateSchemas(input: [$schema]) {
             success
@@ -118,8 +115,8 @@ describe('Create resource', () => {
   });
 
   it('creates a Schema using updateResourceGroup', async () => {
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation UploadResources($resourceGroup: ResourceGroupInput!) {
           updateResourceGroup(input: $resourceGroup) {
             success
@@ -137,8 +134,8 @@ describe('Create resource', () => {
   });
 
   it('Upstream', async () => {
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation CreateUpstream($upstream: UpstreamInput!) {
           updateUpstreams(input: [$upstream]) {
             success
@@ -156,8 +153,8 @@ describe('Create resource', () => {
   });
 
   it('Default upstream', async () => {
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation SetDefaultUpstream($defaultUpstream: DefaultUpstreamInput!) {
           setDefaultUpstream(input: $defaultUpstream) {
             success
@@ -175,8 +172,8 @@ describe('Create resource', () => {
   });
 
   it('UpstreamClientCredentials', async () => {
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation CreateUpstreamClientCredentials($upstreamClientCredentials: UpstreamClientCredentialsInput!) {
           updateUpstreamClientCredentials(input: [$upstreamClientCredentials]) {
             success
@@ -196,8 +193,8 @@ describe('Create resource', () => {
   it('creates an opa type policy', async () => {
     mockFsForOpa.mock();
 
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation CreatePolicy($policy: PolicyInput!) {
           updatePolicies(input: [$policy]) {
             success
@@ -232,8 +229,8 @@ describe('Create resource', () => {
   it('creates an opa type policy using updateResourceGroup', async () => {
     mockFsForOpa.mock();
 
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation CreatePolicy($resourceGroup: ResourceGroupInput!) {
           updateResourceGroup(input: $resourceGroup) {
             success

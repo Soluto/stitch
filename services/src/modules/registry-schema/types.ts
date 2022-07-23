@@ -101,9 +101,3 @@ export interface BasePolicyInput {
   name: string;
   args?: PolicyArgsObject;
 }
-
-export interface BasePolicyInput {
-  namespace: string;
-  name: string;
-  args?: PolicyArgsObject;
-}

@@ -1,4 +1,3 @@
-import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { gql } from 'apollo-server-core';
 import * as nock from 'nock';
 import { print } from 'graphql';
@@ -43,18 +42,15 @@ const baseResourceGroup: ResourceGroup = {
   policies: [],
 };
 describe('Creation of invalid schemas', () => {
-  let client: ApolloServerTestClient;
-
   beforeEachDispose(() => {
-    client = createTestClient(app);
     mockResourceBucket({ registry: baseResourceGroup });
 
     return () => nock.cleanAll();
   });
 
   it('Invalid SDL in schema gets rejected', async () => {
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation CreateSchema($schema: SchemaInput!) {
           updateSchemas(input: [$schema]) {
             success
@@ -70,8 +66,8 @@ describe('Creation of invalid schemas', () => {
   });
 
   it('Invalid directive arguments in schema gets rejected', async () => {
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation CreateSchema($schema: SchemaInput!) {
           updateSchemas(input: [$schema]) {
             success
@@ -87,8 +83,8 @@ describe('Creation of invalid schemas', () => {
   });
 
   it('Bad federation composition in schema gets rejected', async () => {
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation CreateSchema($schemas: [SchemaInput!]!) {
           updateSchemas(input: $schemas) {
             success

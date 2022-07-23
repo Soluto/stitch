@@ -1,6 +1,5 @@
-import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { print } from 'graphql';
-import { gql } from 'apollo-server-core';
+import { ApolloServerBase, gql } from 'apollo-server-core';
 import * as nock from 'nock';
 import createStitchGateway from '../../../../src/modules/apollo-server';
 import { DefaultUpstream, ResourceGroup, Schema, Upstream } from '../../../../src/modules/resource-repository';
@@ -99,9 +98,8 @@ const testCases: [string, TestCase][] = [
 ];
 
 describe.each(testCases)('Rest - Upstreams', (testCaseName, { upstreams, defaultUpstream, virtualHost, headers }) => {
-  let client: ApolloServerTestClient;
   const remoteServer = virtualHost ?? defaultRemoteServer;
-
+  let server: ApolloServerBase;
   beforeEachDispose(async () => {
     let postMock = nock(defaultRemoteServer).post('/api/mock', b => !!b.name);
 
@@ -146,8 +144,7 @@ describe.each(testCases)('Rest - Upstreams', (testCaseName, { upstreams, default
       })
     );
 
-    const { server } = await createStitchGateway();
-    client = createTestClient(server);
+    ({ server } = await createStitchGateway());
 
     return () => {
       nock.cleanAll();
@@ -156,8 +153,8 @@ describe.each(testCases)('Rest - Upstreams', (testCaseName, { upstreams, default
   });
 
   it(testCaseName, async () => {
-    const response = await client
-      .query({
+    const response = await server
+      .executeOperation({
         query: gql`
           mutation {
             createFoo(name: "BAR") {

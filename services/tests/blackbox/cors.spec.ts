@@ -42,7 +42,7 @@ describe('CORS', () => {
     expect(headers).toMatchSnapshot();
   });
 
-  test('reflight request from invalid origin', async () => {
+  test('Preflight request from invalid origin', async () => {
     const response = await app.inject({
       method: 'OPTIONS',
       url: '/graphql',

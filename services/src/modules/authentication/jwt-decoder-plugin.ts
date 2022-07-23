@@ -1,7 +1,6 @@
-import * as http from 'http';
 import { decode } from 'jsonwebtoken';
 import { FastifyRequest, FastifyInstance } from 'fastify';
-import * as fp from 'fastify-plugin';
+import fp from 'fastify-plugin';
 import logger from '../logger';
 
 export type DecodedJWT = {
@@ -11,13 +10,7 @@ export type DecodedJWT = {
 };
 
 declare module 'fastify' {
-  interface FastifyRequest<
-    HttpRequest = http.IncomingMessage,
-    Query = DefaultQuery,
-    Params = DefaultParams,
-    Headers = DefaultHeaders,
-    Body = DefaultBody
-  > {
+  interface FastifyRequest {
     decodeJWT(): DecodedJWT | undefined;
     _decodedJWT?: DecodedJWT | null;
   }
@@ -37,7 +30,7 @@ function decodeRequestJwt(this: FastifyRequest) {
     }
     return;
   } catch (e) {
-    logger.debug(e, 'Fail to extract and decode JWT from request');
+    logger.debug(e as Error, 'Fail to extract and decode JWT from request');
     return;
   }
 }

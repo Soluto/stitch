@@ -1,10 +1,12 @@
-import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { ApolloServerBase, gql } from 'apollo-server-core';
-import { ApolloServer, IResolvers, SchemaDirectiveVisitor } from 'apollo-server-fastify';
+import { ApolloServer } from 'apollo-server-fastify';
 import { concatAST, DocumentNode } from 'graphql';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
-import { sdl as localResolverSdl, LocalResolverDirective } from './local-resolver';
-import { sdl as enumResolverSdl, EnumResolverDirective, EnumValueDirective } from './enum-resolver';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { IResolvers } from '@graphql-tools/utils';
+import { sdl as localResolverSdl, directiveSchemaTransformer as localResolverTransformer } from './local-resolver';
+import { sdl as enumResolverSdl, directiveSchemaTransformer as enumResolverTransformer } from './enum-resolver';
+import { sdl as enumValueSdl, directiveSchemaTransformer as enumValueTransformer } from './enum-value';
 
 interface TestCase {
   typeDefs: DocumentNode;
@@ -112,28 +114,28 @@ const baseTypeDefs = gql`
   }
 `;
 
-const schemaDirectives: Record<string, typeof SchemaDirectiveVisitor> = {
-  localResolver: LocalResolverDirective,
-  enumResolver: EnumResolverDirective,
-  enumValue: EnumValueDirective,
-};
-
 const baseResolvers: IResolvers = {
   JSON: GraphQLJSON,
   JSONObject: GraphQLJSONObject,
 };
 
 describe.each(testCases)('EnumResolver Directive', (testCase, { typeDefs, query, variables, expected, resolvers }) => {
-  let client: ApolloServerTestClient;
   let server: ApolloServerBase;
 
   beforeAll(() => {
+    const schema = localResolverTransformer(
+      enumResolverTransformer(
+        enumValueTransformer(
+          makeExecutableSchema({
+            typeDefs: concatAST([typeDefs, baseTypeDefs, localResolverSdl, enumResolverSdl, enumValueSdl]),
+            resolvers: { ...baseResolvers, ...resolvers },
+          })
+        )
+      )
+    );
     server = new ApolloServer({
-      typeDefs: concatAST([typeDefs, baseTypeDefs, localResolverSdl, enumResolverSdl]),
-      schemaDirectives,
-      resolvers: { ...baseResolvers, ...resolvers },
+      schema,
     });
-    client = createTestClient(server);
   });
 
   afterAll(async () => {
@@ -141,7 +143,7 @@ describe.each(testCases)('EnumResolver Directive', (testCase, { typeDefs, query,
   });
 
   test(testCase, async () => {
-    const response = await client.query({ query, variables });
+    const response = await server.executeOperation({ query, variables });
     expect(response.data).toEqual(expected);
   });
 });

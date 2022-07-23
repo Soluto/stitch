@@ -1,6 +1,6 @@
 import { print } from 'graphql';
 import { gql } from 'apollo-server-core';
-import { GraphQLClient } from 'graphql-request';
+import { ClientError, GraphQLClient } from 'graphql-request';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import { sleep, updateGatewaySchema } from '../../helpers/utility';
 import { RegistryMutationResponse, updateSchemasMutation } from '../../helpers/registry-request-builder';
@@ -66,12 +66,14 @@ describe('Basic flow', () => {
   });
 
   test('Send wrong schema', async () => {
+    let response;
     try {
       await registryClient.request(updateSchemasMutation, {
         schema: invalidSchema,
       });
     } catch (e) {
-      expect(e.response).toMatchSnapshot();
+      if (e instanceof ClientError) response = e.response;
     }
+    expect(response).toMatchSnapshot();
   });
 });

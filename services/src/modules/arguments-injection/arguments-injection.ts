@@ -1,7 +1,7 @@
 import { FastifyRequest } from 'fastify';
 import { GraphQLFieldResolverParams } from 'apollo-server-types';
 import { RequestContext } from '../context';
-import { getExportsProxy } from '../exports';
+// import { getExportsProxy } from '../exports';
 import { isObject } from '../utils';
 import { ResourceGroup } from '../resource-repository';
 import evaluate from './arguments-evaluation';
@@ -15,7 +15,7 @@ declare module '../context' {
 
 type InjectionParams = GraphQLFieldResolverParams<
   unknown,
-  Pick<RequestContext, 'exports' | 'request' | 'resourceGroup'> | undefined
+  Pick<RequestContext, /*'exports' | */ 'request' | 'resourceGroup'> | undefined
 > & { [key: string]: unknown };
 
 function injectTemplate<T = unknown>(template: string, params: InjectionParams): T {
@@ -26,7 +26,7 @@ function injectTemplate<T = unknown>(template: string, params: InjectionParams):
     jwt: context?.request?.decodeJWT?.()?.payload,
     headers: context?.request?.headers,
     isAnonymousAccess: context?.request?.isAnonymousAccess?.(),
-    exports: info && context && getExportsProxy(context.exports, info?.parentType, source as Record<string, unknown>),
+    // exports: info && context && getExportsProxy(context.exports, info?.parentType, source as Record<string, unknown>),
     vars: info?.variableValues,
     info,
     plugins: context?.resourceGroup?.pluginsData,

@@ -1,6 +1,5 @@
-import { ApolloServerTestClient, createTestClient } from 'apollo-server-testing';
 import { print } from 'graphql';
-import { gql } from 'apollo-server-core';
+import { ApolloServerBase, gql } from 'apollo-server-core';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
 import createStitchGateway from '../../../src/modules/apollo-server';
 import { ResourceGroup, PolicyDefinition, PolicyType } from '../../../src/modules/resource-repository';
@@ -160,8 +159,6 @@ const testCases: [string, ResourceGroup & { etag: string }][] = [
 ];
 
 describe.each(testCases)('Base Policy Tests', (testName, resourceGroup) => {
-  let client: ApolloServerTestClient;
-
   const query = gql`
     query {
       foo
@@ -175,10 +172,10 @@ describe.each(testCases)('Base Policy Tests', (testName, resourceGroup) => {
     })
   );
 
-  beforeEachDispose(async () => {
-    const { server } = await createStitchGateway();
-    client = createTestClient(server);
+  let server: ApolloServerBase;
 
+  beforeEachDispose(async () => {
+    ({ server } = await createStitchGateway());
     return () => {
       return server.stop();
     };
@@ -189,7 +186,7 @@ describe.each(testCases)('Base Policy Tests', (testName, resourceGroup) => {
   });
 
   test(testName, async () => {
-    const response = await client.query({ query });
+    const response = await server.executeOperation({ query });
     expect(response).toMatchSnapshot();
   });
 });

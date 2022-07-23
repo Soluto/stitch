@@ -1,6 +1,5 @@
-import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { graphqlSync, print } from 'graphql';
-import { makeExecutableSchema } from 'graphql-tools';
+import { makeExecutableSchema } from '@graphql-tools/schema';
 import { gql } from 'apollo-server-core';
 import * as nock from 'nock';
 import GraphQLErrorSerializer from '../../utils/graphql-error-serializer';
@@ -46,7 +45,6 @@ const testCases: [string, TestCase][] = [
 ];
 
 describe.each(testCases)('Upstreams - Gql - Introspection', (testCaseName, { upstreams, virtualHost }) => {
-  let client: ApolloServerTestClient;
   const remoteServer = virtualHost ?? defaultRemoteServer;
 
   beforeAll(() => {
@@ -78,7 +76,6 @@ describe.each(testCases)('Upstreams - Gql - Introspection', (testCaseName, { ups
           operationName: body.operationName,
         })
       );
-    client = createTestClient(app);
   });
 
   afterEach(() => {
@@ -105,7 +102,7 @@ describe.each(testCases)('Upstreams - Gql - Introspection', (testCaseName, { ups
       policies: [],
     };
 
-    const response = await client.query({
+    const response = await app.executeOperation({
       query: gql`
         query ValidateResourceGroup($input: ResourceGroupInput!) {
           validateResourceGroup(input: $input) {

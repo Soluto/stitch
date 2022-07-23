@@ -1,4 +1,3 @@
-import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { gql, ApolloServerBase } from 'apollo-server-core';
 import { print, DocumentNode } from 'graphql';
 import * as nock from 'nock';
@@ -288,7 +287,6 @@ const testCases: [string, TestCase][] = [
 
 describe.each(testCases)('Rest directive', (testName, { mock, schema, query, variables, skipMockIsDoneAssert }) => {
   let server: ApolloServerBase;
-  let client: ApolloServerTestClient;
   let nockScope: nock.Scope;
   beforeAll(async () => {
     const schemaResource: Schema = {
@@ -314,7 +312,6 @@ describe.each(testCases)('Rest directive', (testName, { mock, schema, query, var
     );
 
     ({ server } = await createStitchGateway());
-    client = createTestClient(server);
 
     nockScope = mock();
     expect(nockScope).toBeDefined();
@@ -326,7 +323,7 @@ describe.each(testCases)('Rest directive', (testName, { mock, schema, query, var
   });
 
   test(testName, async () => {
-    const response = await client.query({ query, variables }).catch(e => e.response);
+    const response = await server.executeOperation({ query, variables }).catch(e => e.response);
     expect(response).toMatchSnapshot();
 
     if (!skipMockIsDoneAssert) {

@@ -19,8 +19,8 @@ export function createLoggingPlugin(): ApolloServerPlugin {
         reqLogger.debug('Started to handle request');
         variables && reqLogger.trace({ variables }, 'request query variables');
       }
-      return {
-        willSendResponse(willSendResponseContext: GraphQLRequestContextWillSendResponse<unknown>) {
+      return Promise.resolve({
+        async willSendResponse(willSendResponseContext: GraphQLRequestContextWillSendResponse<unknown>) {
           const {
             response: { errors, data },
           } = willSendResponseContext;
@@ -37,7 +37,7 @@ export function createLoggingPlugin(): ApolloServerPlugin {
             data && reqLogger.trace({ data }, 'response data');
           }
         },
-      };
+      });
     },
   };
 }

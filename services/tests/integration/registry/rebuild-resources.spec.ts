@@ -1,4 +1,3 @@
-import { createTestClient, ApolloServerTestClient } from 'apollo-server-testing';
 import { gql } from 'apollo-server-core';
 import { print } from 'graphql';
 import { app } from '../../../src/registry';
@@ -80,11 +79,9 @@ const baseResourceGroup: ResourceGroup = {
 };
 
 describe('Rebuild resource group', () => {
-  let client: ApolloServerTestClient;
   let bucketContents: MockResourceBucket;
 
   beforeAll(() => {
-    client = createTestClient(app);
     const initialPolicyFiles = { 'namespace-name.wasm': 'old compiled code' };
     bucketContents = mockResourceBucket({
       registry: baseResourceGroup,
@@ -103,8 +100,8 @@ describe('Rebuild resource group', () => {
   it('rebuild resources - dry run', async () => {
     expect(bucketContents.gateway).toMatchSnapshot('before');
 
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation RebuildResourceGroup {
           result: rebuildResourceGroup(dryRun: true) {
             success
@@ -121,8 +118,8 @@ describe('Rebuild resource group', () => {
   it('rebuild resources', async () => {
     expect(bucketContents.gateway).toMatchSnapshot('before');
 
-    const response = await client.mutate({
-      mutation: gql`
+    const response = await app.executeOperation({
+      query: gql`
         mutation RebuildResourceGroup {
           result: rebuildResourceGroup {
             success

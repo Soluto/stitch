@@ -1,6 +1,5 @@
-import { ApolloServerTestClient, createTestClient } from 'apollo-server-testing';
 import { DocumentNode, print } from 'graphql';
-import { gql } from 'apollo-server-core';
+import { ApolloServerBase, gql } from 'apollo-server-core';
 import { getIntrospectionQuery } from 'graphql/utilities';
 import createStitchGateway from '../../../src/modules/apollo-server';
 import { ResourceGroup, PolicyDefinition, PolicyType } from '../../../src/modules/resource-repository';
@@ -143,9 +142,8 @@ const testCases: [string, ResourceGroup, DocumentNode | string, boolean][] = [
 ];
 
 describe.each(testCases)('Introspection Query Policy Tests', (testName, resourceGroup, query, shouldAllow) => {
-  let client: ApolloServerTestClient;
-
   const defaultIntrospectionQuery = getIntrospectionQuery();
+  let server: ApolloServerBase;
 
   beforeEachDispose(async () => {
     (getResourceRepository as jest.Mock).mockImplementation(
@@ -154,9 +152,7 @@ describe.each(testCases)('Introspection Query Policy Tests', (testName, resource
       })
     );
 
-    const { server } = await createStitchGateway();
-    client = createTestClient(server);
-
+    ({ server } = await createStitchGateway());
     return () => {
       (getResourceRepository as jest.Mock).mockReset();
       return server.stop();
@@ -164,7 +160,7 @@ describe.each(testCases)('Introspection Query Policy Tests', (testName, resource
   });
 
   test(testName, async () => {
-    const { data, errors } = await client.query({ query: query || defaultIntrospectionQuery });
+    const { data, errors } = await server.executeOperation({ query: query || defaultIntrospectionQuery });
 
     if (shouldAllow) {
       expect(JSON.stringify(data)).toMatch('__schema');

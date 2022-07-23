@@ -1,11 +1,11 @@
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { IResolvers } from '@graphql-tools/utils';
 import { ApolloError, ApolloServerBase, gql } from 'apollo-server-core';
 import { ApolloServer } from 'apollo-server-fastify';
-import { ApolloServerTestClient, createTestClient } from 'apollo-server-testing';
 import { concatAST, DocumentNode } from 'graphql';
-import { IResolvers, SchemaDirectiveVisitor } from 'graphql-tools';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
 import GraphQLErrorSerializer from '../../../tests/utils/graphql-error-serializer';
-import { sdl as errorHandlerSdl, ErrorHandlerDirective } from './error-handler';
+import { sdl as errorHandlerSdl, directiveSchemaTransformer } from './error-handler';
 
 interface TestCase {
   directiveArgsFieldDefinition: string;
@@ -232,10 +232,6 @@ const baseTypeDefs = gql`
   scalar JSONObject
 `;
 
-const schemaDirectives: Record<string, typeof SchemaDirectiveVisitor> = {
-  errorHandler: ErrorHandlerDirective,
-};
-
 const baseResolvers: IResolvers = {
   JSON: GraphQLJSON,
   JSONObject: GraphQLJSONObject,
@@ -254,18 +250,20 @@ describe.each(testCases)(
       only = false,
     }
   ) => {
-    let client: ApolloServerTestClient;
     let server: ApolloServerBase;
 
     beforeAll(() => {
       expect.addSnapshotSerializer(GraphQLErrorSerializer);
       const typeDefs = createTypeDefs(directiveArgsFieldDefinition, directiveArgsObjectDefinition);
+      const schema = directiveSchemaTransformer(
+        makeExecutableSchema({
+          typeDefs: concatAST([typeDefs, baseTypeDefs, errorHandlerSdl]),
+          resolvers: { ...baseResolvers, ...resolvers },
+        })
+      );
       server = new ApolloServer({
-        typeDefs: concatAST([typeDefs, baseTypeDefs, errorHandlerSdl]),
-        schemaDirectives,
-        resolvers: { ...baseResolvers, ...resolvers },
+        schema,
       });
-      client = createTestClient(server);
     });
 
     afterAll(async () => {
@@ -275,7 +273,7 @@ describe.each(testCases)(
     const testCommand = only ? test.only : test;
 
     testCommand(testCase, async () => {
-      const { data, errors } = await client.query({ query, variables });
+      const { data, errors } = await server.executeOperation({ query, variables });
       expect({ data, errors }).toMatchSnapshot();
     });
   }

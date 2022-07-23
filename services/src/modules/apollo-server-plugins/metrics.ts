@@ -2,8 +2,6 @@ import {
   ApolloServerPlugin,
   GraphQLRequestContextWillSendResponse,
   GraphQLFieldResolverParams,
-  GraphQLRequestListenerParsingDidEnd,
-  GraphQLRequestListenerValidationDidEnd,
 } from 'apollo-server-plugin-base';
 import * as promClient from 'prom-client';
 import {
@@ -45,31 +43,31 @@ export function initializeMetrics(pClient: typeof promClient) {
 
 export function createMetricsPlugin(): ApolloServerPlugin {
   return {
-    requestDidStart() {
+    async requestDidStart() {
       const endResponseTimer = requestDurationHistogram?.startTimer();
       return {
-        parsingDidStart(): GraphQLRequestListenerParsingDidEnd {
-          return (err?: Error) => {
+        async parsingDidStart() {
+          return async (err?: Error) => {
             if (err) {
               requestParsingErrorCounter?.inc(1);
             }
           };
         },
-        validationDidStart(): GraphQLRequestListenerValidationDidEnd {
-          return (err?: ReadonlyArray<Error>) => {
+        async validationDidStart() {
+          return async (err?: ReadonlyArray<Error>) => {
             if (err && err?.length > 0) {
               requestValidationErrorCounter?.inc(1);
             }
           };
         },
-        willSendResponse(willSendResponseContext: GraphQLRequestContextWillSendResponse<unknown>) {
+        async willSendResponse(willSendResponseContext: GraphQLRequestContextWillSendResponse<unknown>) {
           const {
             operationName,
             response: { errors },
           } = willSendResponseContext;
           endResponseTimer?.({ operationName: operationName ?? 'N/A', status: errors ? 'error' : 'success' });
         },
-        executionDidStart: () => ({
+        executionDidStart: async () => ({
           willResolveField(
             fieldResolverParams: GraphQLFieldResolverParams<unknown, unknown, Record<string, unknown>>
           ): ((error: Error | null, result?: unknown) => void) | void {

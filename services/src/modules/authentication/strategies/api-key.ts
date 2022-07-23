@@ -1,10 +1,10 @@
-import * as fastify from 'fastify';
+import { IncomingHttpHeaders } from 'http';
 import logger, { createChildLogger } from '../../logger';
 import { authenticationConfig } from '../../config';
 
 export interface ApiKeyAuthPartialRequest {
-  headers: fastify.DefaultHeaders;
-  query: fastify.DefaultQuery;
+  headers: IncomingHttpHeaders;
+  query: unknown;
   raw: {
     url?: string;
   };
@@ -16,7 +16,7 @@ export default async function (request: ApiKeyAuthPartialRequest) {
   const apiKeys = config.keys;
 
   const apiKey = ((config.header && request.headers[config.header]) ||
-    (config.queryParam && request.query[config.queryParam])) as string;
+    (config.queryParam && (request.query as { [key: string]: unknown })[config.queryParam])) as string;
   if (!apiKey) throw new Error('Unauthorized');
 
   const reqLogger = createChildLogger(logger, 'auth-strategy-api-key', {

@@ -1,8 +1,15 @@
 import { gql } from 'apollo-server-core';
 import { PolicyDefinition } from '../../resource-repository';
-import { sdl as policySdl, PolicyDirective } from './policy';
-import { sdl as policiesSdl, PoliciesDirective, resolvers as policyScalarResolvers } from './policies';
-import { sdl as policyQuerySdl, PolicyQueryDirective } from './policy-query';
+import { sdl as policySdl, directiveSchemaTransformer as policyDirectiveSchemaTransformer } from './policy';
+import {
+  sdl as policiesSdl,
+  directiveSchemaTransformer as policiesDirectiveSchemaTransformer,
+  resolvers as policyScalarResolvers,
+} from './policies';
+import {
+  sdl as policyQuerySdl,
+  directiveSchemaTransformer as policyQueryDirectiveSchemaTransformer,
+} from './policy-query';
 import PolicyExecutor from './policy-executor';
 import { buildPolicyQueryTypeDef } from './policy-query-helper';
 import { Policy, LoadedPolicy } from './types';
@@ -15,9 +22,9 @@ export {
   policySdl,
   policiesSdl,
   policyQuerySdl,
-  PolicyDirective,
-  PoliciesDirective,
-  PolicyQueryDirective,
+  policyDirectiveSchemaTransformer,
+  policiesDirectiveSchemaTransformer,
+  policyQueryDirectiveSchemaTransformer,
   policyScalarResolvers,
 };
 
