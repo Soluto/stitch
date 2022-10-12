@@ -127,6 +127,6 @@ describe('Metrics', () => {
     const sampleMetric = metrics.find(m => m.startsWith('nodejs_version_info'));
     expect(sampleMetric).toBeDefined();
     const majorVersion = /major="(\d+)"/g.exec(sampleMetric!);
-    expect(majorVersion?.[1]).toEqual('14');
+    expect(majorVersion?.[1]).toEqual('16');
   });
 });
